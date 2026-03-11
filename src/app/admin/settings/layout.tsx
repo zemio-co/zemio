@@ -37,6 +37,7 @@ export default async function ServerLayout({
 					</SidebarTrigger>
 					<Button
 						className={"inline-flex md:hidden"}
+						nativeButton={false}
 						render={
 							<Link href={ROUTES.ADMIN_DASHBOARD}>
 								<ArrowLeftIcon /> Zurück
