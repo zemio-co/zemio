@@ -34,6 +34,7 @@ jobs:
       - name: Install dependencies
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/db
+          DIRECT_URL: postgresql://user:password@localhost:5432/db
           SKIP_ENV_VALIDATION: true
         run: pnpm install --frozen-lockfile
 
@@ -41,4 +42,5 @@ jobs:
         run: pnpm check
         env:
           DATABASE_URL: postgresql://user:password@localhost:5432/db
+          DIRECT_URL: postgresql://user:password@localhost:5432/db
           SKIP_ENV_VALIDATION: true
