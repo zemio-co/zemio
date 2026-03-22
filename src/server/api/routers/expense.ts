@@ -324,8 +324,13 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const updateData: Record<string, any> = { ...baseData };
+			const updateData: {
+				description?: string;
+				amount?: number;
+				startDate?: Date;
+				endDate?: Date;
+				meta?: Record<string, unknown>;
+			} = { ...baseData };
 
 			if (expense.type === ExpenseType.TRAVEL) {
 				const currentMeta = travelExpenseMetaSchema.safeParse(expense.meta);
