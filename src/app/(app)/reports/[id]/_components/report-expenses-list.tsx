@@ -79,7 +79,7 @@ export function ReportExpensesList({
 		>
 			{expenses.map((expense) => (
 				<li key={expense.id}>
-					<ReportExpenseCard expense={expense} />
+					<ReportExpenseCard expense={expense} reportStatus={reportStatus} />
 				</li>
 			))}
 		</ul>

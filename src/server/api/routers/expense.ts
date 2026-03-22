@@ -278,35 +278,32 @@ export const expenseRouter = createTRPCRouter({
 			z.object({
 				id: z.string(),
 				description: z.string().optional(),
-				amount: z.number().positive().optional(),
+				amount: z.number().min(0).optional(),
 				startDate: z.date().optional(),
 				endDate: z.date().optional(),
-				receiptFileUrl: z
-					.string()
-					.refine(
-						(val) => {
-							if (!val) return true; // optional
-							// Akzeptiere vollständige URLs oder relative Pfade die mit / beginnen
-							return (
-								val.startsWith("http://") ||
-								val.startsWith("https://") ||
-								val.startsWith("/")
-							);
-						},
-						{
-							message: "Must be a valid URL or relative path starting with /",
-						},
-					)
-					.optional(),
-				reason: z.string().optional(),
-				kilometers: z.number().positive().optional(),
-				departure: z.string().optional(),
-				destination: z.string().optional(),
-				travelReason: z.string().optional(),
+				// TRAVEL-specific meta fields
+				from: z.string().optional(),
+				to: z.string().optional(),
+				distance: z.number().min(0).optional(),
+				// FOOD-specific meta fields
+				days: z.number().min(1).optional(),
+				breakfastDeduction: z.number().min(0).optional(),
+				lunchDeduction: z.number().min(0).optional(),
+				dinnerDeduction: z.number().min(0).optional(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { id, ...data } = input;
+			const {
+				id,
+				from,
+				to,
+				distance,
+				days,
+				breakfastDeduction,
+				lunchDeduction,
+				dinnerDeduction,
+				...baseData
+			} = input;
 
 			const expense = await ctx.db.expense.findUnique({
 				where: { id },
@@ -327,18 +324,62 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
-			// If kilometers changed for travel expense, recalculate amount
-			if (data.kilometers && expense.type === ExpenseType.TRAVEL) {
-				const settings = await ctx.db.settings.findUnique({
-					where: { id: "singleton" },
-				});
-				const kilometerRate = settings?.kilometerRate ?? 0.3;
-				data.amount = Number(data.kilometers) * Number(kilometerRate);
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const updateData: Record<string, any> = { ...baseData };
+
+			if (expense.type === ExpenseType.TRAVEL) {
+				const currentMeta = travelExpenseMetaSchema.safeParse(expense.meta);
+				const currentMetaData = currentMeta.success
+					? currentMeta.data
+					: { from: "", to: "", distance: 0 };
+
+				if (from !== undefined || to !== undefined || distance !== undefined) {
+					updateData.meta = {
+						from: from ?? currentMetaData.from,
+						to: to ?? currentMetaData.to,
+						distance: distance ?? currentMetaData.distance,
+					};
+				}
+
+				if (distance !== undefined) {
+					const settings = await ctx.db.settings.findUnique({
+						where: { id: "singleton" },
+					});
+					const kilometerRate = settings?.kilometerRate ?? 0.3;
+					updateData.amount = Number(distance) * Number(kilometerRate);
+				}
+			}
+
+			if (expense.type === ExpenseType.FOOD) {
+				const currentMeta = foodExpenseMetaSchema.safeParse(expense.meta);
+				const currentMetaData = currentMeta.success
+					? currentMeta.data
+					: {
+							days: 0,
+							breakfastDeduction: 0,
+							lunchDeduction: 0,
+							dinnerDeduction: 0,
+						};
+
+				if (
+					days !== undefined ||
+					breakfastDeduction !== undefined ||
+					lunchDeduction !== undefined ||
+					dinnerDeduction !== undefined
+				) {
+					updateData.meta = {
+						days: days ?? currentMetaData.days,
+						breakfastDeduction:
+							breakfastDeduction ?? currentMetaData.breakfastDeduction,
+						lunchDeduction: lunchDeduction ?? currentMetaData.lunchDeduction,
+						dinnerDeduction: dinnerDeduction ?? currentMetaData.dinnerDeduction,
+					};
+				}
 			}
 
 			return ctx.db.expense.update({
 				where: { id },
-				data,
+				data: updateData,
 			});
 		}),
 
