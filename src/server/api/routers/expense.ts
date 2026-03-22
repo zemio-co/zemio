@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
 import { ExpenseType, ReportStatus } from "@/generated/prisma/enums";
 import {
 	createFoodExpenseSchema,
@@ -324,13 +325,7 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
-			const updateData: {
-				description?: string;
-				amount?: number;
-				startDate?: Date;
-				endDate?: Date;
-				meta?: Record<string, unknown>;
-			} = { ...baseData };
+			const updateData: Prisma.ExpenseUpdateInput = { ...baseData };
 
 			if (expense.type === ExpenseType.TRAVEL) {
 				const currentMeta = travelExpenseMetaSchema.safeParse(expense.meta);
