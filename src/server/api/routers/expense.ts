@@ -283,9 +283,9 @@ export const expenseRouter = createTRPCRouter({
 				startDate: z.date().optional(),
 				endDate: z.date().optional(),
 				// TRAVEL-specific meta fields
-				from: z.string().optional(),
-				to: z.string().optional(),
-				distance: z.number().min(0).optional(),
+				from: z.string().min(1).optional(),
+				to: z.string().min(1).optional(),
+				distance: z.number().min(1).optional(),
 				// FOOD-specific meta fields
 				days: z.number().min(1).optional(),
 				breakfastDeduction: z.number().min(0).optional(),
@@ -355,7 +355,7 @@ export const expenseRouter = createTRPCRouter({
 				const currentMetaData = currentMeta.success
 					? currentMeta.data
 					: {
-							days: 0,
+							days: 1,
 							breakfastDeduction: 0,
 							lunchDeduction: 0,
 							dinnerDeduction: 0,

@@ -258,6 +258,8 @@ function TravelEditForm({
 			amount: expense.amount,
 		},
 		onSubmit: ({ value }) => {
+			if (!value.from.trim() || !value.to.trim() || value.distance < 1) return;
+
 			const startDate = parse(value.startDate, "dd.MM.yyyy", new Date());
 			const endDate = parse(value.endDate, "dd.MM.yyyy", new Date());
 
@@ -553,11 +555,13 @@ function FoodEditForm({
 	}, [startDate, endDate, form]);
 
 	React.useEffect(() => {
-		const amount =
+		const amount = Math.max(
+			0,
 			settings.dailyFoodAllowance * days -
-			(breakfastDeduction * settings.breakfastDeduction +
-				lunchDeduction * settings.lunchDeduction +
-				dinnerDeduction * settings.dinnerDeduction);
+				(breakfastDeduction * settings.breakfastDeduction +
+					lunchDeduction * settings.lunchDeduction +
+					dinnerDeduction * settings.dinnerDeduction),
+		);
 		form.setFieldValue("amount", amount);
 	}, [
 		days,
