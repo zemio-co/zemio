@@ -1,14 +1,27 @@
 "use client";
 
 import { format } from "date-fns";
-import { CheckIcon, ShieldUserIcon } from "lucide-react";
+import { CheckIcon, ShieldUserIcon, Trash2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import { PageDescription, PageTitle } from "@/components/page-title";
 import { ReportStatusBadge } from "@/components/report-status-badge";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import type { Report, User } from "@/generated/prisma/client";
+import { ROUTES } from "@/lib/consts";
 import { ADMINS_UPDATE_OWN_REPORT } from "@/lib/flags";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
@@ -23,8 +36,20 @@ export function ReportHeader({
 	report: Report & { owner: Pick<User, "id" | "name" | "email"> };
 }) {
 	const utils = api.useUtils();
-	// const [report] = api.report.getById.useSuspenseQuery({ id: reportId });
+	const router = useRouter();
 	const { data, isPending } = authClient.useSession();
+
+	const handleDelete = api.report.delete.useMutation({
+		onSuccess: () => {
+			toast.success("Antrag erfolgreich gelöscht");
+			router.push(ROUTES.USER_DASHBOARD);
+		},
+		onError: ({ message }) => {
+			toast.error("Fehler beim Löschen des Antrags", {
+				description: message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			});
+		},
+	});
 
 	const handleSubmit = api.report.submit.useMutation({
 		onSuccess: () => {
@@ -95,6 +120,42 @@ export function ReportHeader({
 							<Kbd>⌘</Kbd>+ <Kbd>B</Kbd>
 						</KbdGroup>
 					</ReportAdministration>
+				)}
+
+				{(report.status === "DRAFT" || report.status === "NEEDS_REVISION") && (
+					<AlertDialog>
+						<AlertDialogTrigger
+							render={
+								<Button
+									className={"w-full sm:w-fit"}
+									disabled={handleDelete.isPending}
+									variant={"destructive"}
+								/>
+							}
+						>
+							<Trash2Icon />
+							{handleDelete.isPending ? "Wird gelöscht..." : "Löschen"}
+						</AlertDialogTrigger>
+						<AlertDialogContent>
+							<AlertDialogHeader>
+								<AlertDialogTitle>Antrag löschen?</AlertDialogTitle>
+								<AlertDialogDescription>
+									Möchtest du den Antrag &ldquo;{report.title}&rdquo; wirklich löschen?
+									Diese Aktion kann nicht rückgängig gemacht werden.
+								</AlertDialogDescription>
+							</AlertDialogHeader>
+							<AlertDialogFooter>
+								<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+								<AlertDialogAction
+									disabled={handleDelete.isPending}
+									onClick={() => handleDelete.mutate({ id: report.id })}
+									variant={"destructive"}
+								>
+									<Trash2Icon /> Endgültig löschen
+								</AlertDialogAction>
+							</AlertDialogFooter>
+						</AlertDialogContent>
+					</AlertDialog>
 				)}
 
 				<Button
