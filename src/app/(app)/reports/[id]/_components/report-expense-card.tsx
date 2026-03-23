@@ -1,6 +1,7 @@
 "use client";
 
 import type { JsonValue } from "@prisma/client/runtime/client";
+import { formatDate } from "date-fns";
 import {
 	CarIcon,
 	EllipsisVerticalIcon,
@@ -143,7 +144,7 @@ export function ReportExpenseCard({
 					<ReportCardField label="Betrag" value={`${expense.amount.toFixed(2)} €`} />
 					<ReportCardField
 						label="Datum"
-						value={expense.startDate.toLocaleDateString()}
+						value={formatDate(expense.startDate, "dd.MM.yyyy")}
 					/>
 				</CardContent>
 			</Card>
