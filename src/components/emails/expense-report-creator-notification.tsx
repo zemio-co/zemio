@@ -52,16 +52,6 @@ export default function ExpenseReportCreatorNotification({
 			<Preview>{previewText}</Preview>
 			<Body style={main}>
 				<Container style={container}>
-					<Section style={logoSection}>
-						<Img
-							alt="move e.V. logo"
-							height={38}
-							src="cid:move-logo"
-							style={logo}
-							width={90}
-						/>
-					</Section>
-
 					<Section style={badgeSection}>
 						<Text style={badge}>
 							Spesenantrag <strong>{isCreated ? "erstellt" : "geändert"}</strong>
