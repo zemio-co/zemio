@@ -5,12 +5,14 @@ import { formatDate } from "date-fns";
 import {
 	CarIcon,
 	EllipsisVerticalIcon,
+	ExternalLinkIcon,
 	InfoIcon,
 	PencilIcon,
 	ReceiptIcon,
 	Trash2Icon,
 	UtensilsIcon,
 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
 import { ExpenseDetails } from "@/app/(app)/admin/_components/expense-details";
@@ -59,7 +61,7 @@ export function ReportExpenseCard({
 	reportStatus,
 	...props
 }: React.ComponentProps<typeof Card> & {
-	expense: ClientExpense & { attachments: Partial<Attachment>[] };
+	expense: ClientExpense & { attachments: Attachment[] };
 	reportStatus?: ReportStatus;
 }) {
 	const [detailsOpen, setDetailsOpen] = React.useState(false);
@@ -146,6 +148,25 @@ export function ReportExpenseCard({
 						label="Datum"
 						value={formatDate(expense.startDate, "dd.MM.yyyy")}
 					/>
+					{expense.type === "RECEIPT" && expense.attachments.length > 0 ? (
+						<div className="space-y-2 pt-4">
+							<p className="font-medium text-muted-foreground text-xs">Belege</p>
+							<div className="flex flex-col gap-2">
+								{expense.attachments.map((attachment, index) => (
+									<Link
+										className="flex items-center justify-start gap-2 font-medium text-primary text-sm"
+										href={`/api/attachments/${attachment.id}`}
+										key={attachment.id ?? attachment.key ?? index}
+										rel="noopener noreferrer"
+										target="_blank"
+									>
+										Beleg {index + 1}
+										<ExternalLinkIcon className="size-3.5" />
+									</Link>
+								))}
+							</div>
+						</div>
+					) : null}
 				</CardContent>
 			</Card>
 
