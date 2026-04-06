@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ROUTES } from "@/lib/consts";
 import { HydrateClient } from "@/trpc/server";
 import { AppSidebarAdmin } from "./app-sidebar-admin";
+import { OrgSwitcher } from "./org-switcher";
 import {
 	Sidebar,
 	SidebarContent,
@@ -34,7 +35,9 @@ export function AppSidebar() {
 	return (
 		<HydrateClient>
 			<Sidebar>
-				<SidebarHeader></SidebarHeader>
+				<SidebarHeader>
+					<OrgSwitcher />
+				</SidebarHeader>
 				<SidebarContent>
 					<SidebarGroup>
 						<SidebarGroupLabel>Navigation</SidebarGroupLabel>

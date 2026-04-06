@@ -11,6 +11,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 
@@ -30,9 +31,31 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 	const session = await auth.api.getSession({
 		headers: opts.headers,
 	});
+
+	let activeMember: {
+		id: string;
+		role: string;
+		organizationId: string;
+	} | null = null;
+
+	if (session?.user && session.session.activeOrganizationId) {
+		activeMember = await db.member.findFirst({
+			where: {
+				userId: session.user.id,
+				organizationId: session.session.activeOrganizationId,
+			},
+			select: {
+				id: true,
+				role: true,
+				organizationId: true,
+			},
+		});
+	}
+
 	return {
 		db,
 		session,
+		activeMember,
 		...opts,
 	};
 };
@@ -98,9 +121,8 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 	}
 
 	const result = await next();
-
-	const end = Date.now();
-	console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+	void path;
+	void start;
 
 	return result;
 });
@@ -136,16 +158,41 @@ export const protectedProcedure = t.procedure
 		});
 	});
 
-/**
- * Admin procedure
- *
- * Procedures with this middleware are only accessible to users with the "admin" role.
- *
- * @see https://trpc.io/docs/procedures
- */
-export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-	if (ctx.session.user.role !== "admin") {
+export const orgProcedure = protectedProcedure.use(({ ctx, next }) => {
+	if (!ctx.activeMember) {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "No active organization selected.",
+		});
+	}
+
+	return next({
+		ctx: {
+			...ctx,
+			organizationId: ctx.activeMember.organizationId,
+			orgRole: ctx.activeMember.role,
+		},
+	});
+});
+
+export const orgAdminProcedure = orgProcedure.use(({ ctx, next }) => {
+	if (!isOrganizationAdminRole(ctx.orgRole)) {
 		throw new TRPCError({ code: "UNAUTHORIZED" });
 	}
+
 	return next({ ctx });
 });
+
+/**
+ * Platform admin procedure — restricted to users with user.role === "admin"
+ * (the better-auth admin plugin role). These users manage the platform itself,
+ * including creating organizations and assigning tenant IDs.
+ */
+export const platformAdminProcedure = protectedProcedure.use(
+	({ ctx, next }) => {
+		if (ctx.session.user.role !== "admin") {
+			throw new TRPCError({ code: "FORBIDDEN" });
+		}
+		return next({ ctx });
+	},
+);

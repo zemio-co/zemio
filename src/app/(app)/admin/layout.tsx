@@ -1,7 +1,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/consts";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
+import { db } from "@/server/db";
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
 	const session = await auth.api.getSession({
@@ -13,10 +15,17 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
 		redirect(ROUTES.AUTH);
 	}
 
-	const { user } = session;
+	const member = await db.member.findFirst({
+		where: {
+			userId: session.user.id,
+			organizationId: session.session.activeOrganizationId ?? "",
+		},
+		select: {
+			role: true,
+		},
+	});
 
-	// If user is not admin, redirect to dashboard
-	if (user.role !== "admin") {
+	if (!member || !isOrganizationAdminRole(member.role)) {
 		redirect(ROUTES.USER_DASHBOARD);
 	}
 

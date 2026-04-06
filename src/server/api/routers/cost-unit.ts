@@ -8,7 +8,7 @@ import {
 	updateCostUnitGroupSchema,
 	updateCostUnitSchema,
 } from "@/lib/validators";
-import { adminProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, orgAdminProcedure, orgProcedure } from "../trpc";
 
 /**
  * Checks if an error is a Prisma unique constraint violation
@@ -25,10 +25,13 @@ function isPrismaUniqueConstraintError(
 }
 
 export const costUnitRouter = createTRPCRouter({
-	listGroupsWithUnits: protectedProcedure.query(async ({ ctx }) => {
+	listGroupsWithUnits: orgProcedure.query(async ({ ctx }) => {
 		const [groups, ungroupedCostUnits] = await ctx.db.$transaction([
 			// Fetch groups with their cost units
 			ctx.db.costUnitGroup.findMany({
+				where: {
+					organizationId: ctx.organizationId,
+				},
 				include: {
 					costUnits: true,
 				},
@@ -36,7 +39,10 @@ export const costUnitRouter = createTRPCRouter({
 			}),
 			// Fetch ungrouped cost units (those with costUnitGroupId = null)
 			ctx.db.costUnit.findMany({
-				where: { costUnitGroupId: null },
+				where: {
+					organizationId: ctx.organizationId,
+					costUnitGroupId: null,
+				},
 				orderBy: { tag: "asc" },
 			}),
 		]);
@@ -57,8 +63,11 @@ export const costUnitRouter = createTRPCRouter({
 
 		return groups;
 	}),
-	listGrouped: protectedProcedure.query(async ({ ctx }) => {
+	listGrouped: orgProcedure.query(async ({ ctx }) => {
 		const costUnits = await ctx.db.costUnit.findMany({
+			where: {
+				organizationId: ctx.organizationId,
+			},
 			include: {
 				costUnitGroup: true,
 			},
@@ -97,29 +106,49 @@ export const costUnitRouter = createTRPCRouter({
 		};
 	}),
 
-	listGroups: protectedProcedure.query(async ({ ctx }) => {
+	listGroups: orgProcedure.query(async ({ ctx }) => {
 		return await ctx.db.costUnitGroup.findMany({
+			where: {
+				organizationId: ctx.organizationId,
+			},
 			orderBy: { title: "asc" },
 		});
 	}),
 
-	create: adminProcedure
+	create: orgAdminProcedure
 		.input(createCostUnitSchema)
 		.mutation(async ({ ctx, input }) => {
+			const shouldConnectGroup =
+				input.costUnitGroupId.length > 0 &&
+				input.costUnitGroupId !== NO_COST_UNIT_GROUP;
+
+			if (shouldConnectGroup) {
+				const costUnitGroup = await ctx.db.costUnitGroup.findFirst({
+					where: {
+						id: input.costUnitGroupId,
+						organizationId: ctx.organizationId,
+					},
+					select: {
+						id: true,
+					},
+				});
+
+				if (!costUnitGroup) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Kostenstellengruppe nicht gefunden.",
+					});
+				}
+			}
+
 			try {
 				return await ctx.db.costUnit.create({
 					data: {
 						tag: input.tag,
 						title: input.title,
 						examples: input.examples,
-						...(input.costUnitGroupId.length > 0 &&
-							input.costUnitGroupId !== NO_COST_UNIT_GROUP && {
-								costUnitGroup: {
-									connect: {
-										id: input.costUnitGroupId,
-									},
-								},
-							}),
+						organizationId: ctx.organizationId,
+						costUnitGroupId: shouldConnectGroup ? input.costUnitGroupId : null,
 					},
 				});
 			} catch (error) {
@@ -133,12 +162,48 @@ export const costUnitRouter = createTRPCRouter({
 			}
 		}),
 
-	update: adminProcedure
+	update: orgAdminProcedure
 		.input(updateCostUnitSchema)
 		.mutation(async ({ ctx, input }) => {
 			const shouldConnectGroup =
 				input.costUnitGroupId.length > 0 &&
 				input.costUnitGroupId !== NO_COST_UNIT_GROUP;
+
+			const existingCostUnit = await ctx.db.costUnit.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!existingCostUnit) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Kostenstelle nicht gefunden.",
+				});
+			}
+
+			if (shouldConnectGroup) {
+				const costUnitGroup = await ctx.db.costUnitGroup.findFirst({
+					where: {
+						id: input.costUnitGroupId,
+						organizationId: ctx.organizationId,
+					},
+					select: {
+						id: true,
+					},
+				});
+
+				if (!costUnitGroup) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Kostenstellengruppe nicht gefunden.",
+					});
+				}
+			}
 
 			try {
 				return await ctx.db.costUnit.update({
@@ -161,21 +226,39 @@ export const costUnitRouter = createTRPCRouter({
 			}
 		}),
 
-	delete: adminProcedure
+	delete: orgAdminProcedure
 		.input(deleteCostUnitSchema)
 		.mutation(async ({ ctx, input }) => {
+			const existingCostUnit = await ctx.db.costUnit.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!existingCostUnit) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Kostenstelle nicht gefunden.",
+				});
+			}
+
 			return await ctx.db.costUnit.delete({
 				where: { id: input.id },
 			});
 		}),
 
-	createGroup: adminProcedure
+	createGroup: orgAdminProcedure
 		.input(createCostUnitGroupSchema)
 		.mutation(async ({ ctx, input }) => {
 			try {
 				return await ctx.db.costUnitGroup.create({
 					data: {
 						title: input.title,
+						organizationId: ctx.organizationId,
 					},
 				});
 			} catch (error) {
@@ -189,9 +272,26 @@ export const costUnitRouter = createTRPCRouter({
 			}
 		}),
 
-	updateGroup: adminProcedure
+	updateGroup: orgAdminProcedure
 		.input(updateCostUnitGroupSchema)
 		.mutation(async ({ ctx, input }) => {
+			const existingGroup = await ctx.db.costUnitGroup.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!existingGroup) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Kostenstellengruppe nicht gefunden.",
+				});
+			}
+
 			try {
 				return await ctx.db.costUnitGroup.update({
 					where: { id: input.id },
@@ -210,9 +310,26 @@ export const costUnitRouter = createTRPCRouter({
 			}
 		}),
 
-	deleteGroup: adminProcedure
+	deleteGroup: orgAdminProcedure
 		.input(deleteCostUnitGroupSchema)
 		.mutation(async ({ ctx, input }) => {
+			const existingGroup = await ctx.db.costUnitGroup.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!existingGroup) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Kostenstellengruppe nicht gefunden.",
+				});
+			}
+
 			return await ctx.db.costUnitGroup.delete({
 				where: { id: input.id },
 			});

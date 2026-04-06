@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { ExpenseType, ReportStatus } from "@/generated/prisma/enums";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import {
 	createFoodExpenseSchema,
 	createReceiptExpenseSchema,
@@ -10,14 +11,17 @@ import {
 	receiptExpenseMetaSchema,
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, orgProcedure } from "@/server/api/trpc";
 
 export const expenseRouter = createTRPCRouter({
-	listForReport: protectedProcedure
+	listForReport: orgProcedure
 		.input(z.object({ reportId: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.reportId },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.reportId,
+					organizationId: ctx.organizationId,
+				},
 				select: { ownerId: true },
 			});
 
@@ -28,7 +32,7 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
-			const isAdmin = ctx.session.user.role === "admin";
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
 			if (!isAdmin && report.ownerId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -49,12 +53,15 @@ export const expenseRouter = createTRPCRouter({
 			}));
 		}),
 	// Get all expenses for a report
-	getByReportId: protectedProcedure
+	getByReportId: orgProcedure
 		.input(z.object({ reportId: z.string() }))
 		.query(async ({ ctx, input }) => {
 			// First check if user owns the report
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.reportId },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.reportId,
+					organizationId: ctx.organizationId,
+				},
 			});
 
 			if (!report) {
@@ -64,7 +71,7 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
-			const isAdmin = ctx.session.user.role === "admin";
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
 			if (!isAdmin && report.ownerId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -82,12 +89,15 @@ export const expenseRouter = createTRPCRouter({
 			});
 		}),
 
-	createReceipt: protectedProcedure
+	createReceipt: orgProcedure
 		.input(createReceiptExpenseSchema)
 		.mutation(async ({ ctx, input }) => {
 			// Check if user owns the report
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.reportId },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.reportId,
+					organizationId: ctx.organizationId,
+				},
 				select: {
 					ownerId: true,
 					status: true,
@@ -146,12 +156,15 @@ export const expenseRouter = createTRPCRouter({
 			return expense;
 		}),
 
-	createTravel: protectedProcedure
+	createTravel: orgProcedure
 		.input(createTravelExpenseSchema)
 		.mutation(async ({ ctx, input }) => {
 			// Check if user owns the report
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.reportId },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.reportId,
+					organizationId: ctx.organizationId,
+				},
 				select: {
 					ownerId: true,
 					status: true,
@@ -183,7 +196,7 @@ export const expenseRouter = createTRPCRouter({
 			}
 
 			const settings = await ctx.db.settings.findUnique({
-				where: { id: "singleton" },
+				where: { organizationId: ctx.organizationId },
 				select: {
 					kilometerRate: true,
 				},
@@ -216,12 +229,15 @@ export const expenseRouter = createTRPCRouter({
 			});
 		}),
 
-	createFood: protectedProcedure
+	createFood: orgProcedure
 		.input(createFoodExpenseSchema)
 		.mutation(async ({ ctx, input }) => {
 			// Check if user owns the report
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.reportId },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.reportId,
+					organizationId: ctx.organizationId,
+				},
 				select: {
 					ownerId: true,
 					status: true,
@@ -274,7 +290,7 @@ export const expenseRouter = createTRPCRouter({
 		}),
 
 	// Update an expense
-	update: protectedProcedure
+	update: orgProcedure
 		.input(
 			z.object({
 				id: z.string(),
@@ -308,10 +324,24 @@ export const expenseRouter = createTRPCRouter({
 
 			const expense = await ctx.db.expense.findUnique({
 				where: { id },
-				include: { report: true },
+				include: {
+					report: {
+						select: {
+							ownerId: true,
+							organizationId: true,
+						},
+					},
+				},
 			});
 
 			if (!expense) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Expense not found",
+				});
+			}
+
+			if (expense.report.organizationId !== ctx.organizationId) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Expense not found",
@@ -343,7 +373,7 @@ export const expenseRouter = createTRPCRouter({
 
 				if (distance !== undefined) {
 					const settings = await ctx.db.settings.findUnique({
-						where: { id: "singleton" },
+						where: { organizationId: ctx.organizationId },
 					});
 					const kilometerRate = settings?.kilometerRate ?? 0.3;
 					updateData.amount = Number(distance) * Number(kilometerRate);
@@ -384,15 +414,29 @@ export const expenseRouter = createTRPCRouter({
 		}),
 
 	// Delete an expense
-	delete: protectedProcedure
+	delete: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
 			const expense = await ctx.db.expense.findUnique({
 				where: { id: input.id },
-				include: { report: true },
+				include: {
+					report: {
+						select: {
+							ownerId: true,
+							organizationId: true,
+						},
+					},
+				},
 			});
 
 			if (!expense) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Expense not found",
+				});
+			}
+
+			if (expense.report.organizationId !== ctx.organizationId) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Expense not found",
@@ -411,7 +455,7 @@ export const expenseRouter = createTRPCRouter({
 			});
 		}),
 
-	get: protectedProcedure
+	get: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
 			const expense = await ctx.db.expense.findUnique({
@@ -420,6 +464,7 @@ export const expenseRouter = createTRPCRouter({
 					report: {
 						select: {
 							ownerId: true,
+							organizationId: true,
 						},
 					},
 				},
@@ -432,8 +477,15 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
+			if (expense.report.organizationId !== ctx.organizationId) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Expense not found",
+				});
+			}
+
 			// Only allow admins and owners to access the expense
-			const isAdmin = ctx.session.user.role === "admin";
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
 			if (!isAdmin && expense.report.ownerId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
