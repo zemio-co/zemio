@@ -44,6 +44,7 @@ export type SettingsSumAggregateOutputType = {
 
 export type SettingsMinAggregateOutputType = {
   id: string | null
+  organizationId: string | null
   kilometerRate: runtime.Decimal | null
   reviewerEmail: string | null
   costUnitInfoUrl: string | null
@@ -57,6 +58,7 @@ export type SettingsMinAggregateOutputType = {
 
 export type SettingsMaxAggregateOutputType = {
   id: string | null
+  organizationId: string | null
   kilometerRate: runtime.Decimal | null
   reviewerEmail: string | null
   costUnitInfoUrl: string | null
@@ -70,6 +72,7 @@ export type SettingsMaxAggregateOutputType = {
 
 export type SettingsCountAggregateOutputType = {
   id: number
+  organizationId: number
   kilometerRate: number
   reviewerEmail: number
   costUnitInfoUrl: number
@@ -101,6 +104,7 @@ export type SettingsSumAggregateInputType = {
 
 export type SettingsMinAggregateInputType = {
   id?: true
+  organizationId?: true
   kilometerRate?: true
   reviewerEmail?: true
   costUnitInfoUrl?: true
@@ -114,6 +118,7 @@ export type SettingsMinAggregateInputType = {
 
 export type SettingsMaxAggregateInputType = {
   id?: true
+  organizationId?: true
   kilometerRate?: true
   reviewerEmail?: true
   costUnitInfoUrl?: true
@@ -127,6 +132,7 @@ export type SettingsMaxAggregateInputType = {
 
 export type SettingsCountAggregateInputType = {
   id?: true
+  organizationId?: true
   kilometerRate?: true
   reviewerEmail?: true
   costUnitInfoUrl?: true
@@ -227,6 +233,7 @@ export type SettingsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type SettingsGroupByOutputType = {
   id: string
+  organizationId: string
   kilometerRate: runtime.Decimal
   reviewerEmail: string | null
   costUnitInfoUrl: string | null
@@ -263,6 +270,7 @@ export type SettingsWhereInput = {
   OR?: Prisma.SettingsWhereInput[]
   NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
   id?: Prisma.StringFilter<"Settings"> | string
+  organizationId?: Prisma.StringFilter<"Settings"> | string
   kilometerRate?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: Prisma.StringNullableFilter<"Settings"> | string | null
   costUnitInfoUrl?: Prisma.StringNullableFilter<"Settings"> | string | null
@@ -272,10 +280,12 @@ export type SettingsWhereInput = {
   breakfastDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
 }
 
 export type SettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   kilometerRate?: Prisma.SortOrder
   reviewerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   costUnitInfoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -285,10 +295,12 @@ export type SettingsOrderByWithRelationInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  organization?: Prisma.OrganizationOrderByWithRelationInput
 }
 
 export type SettingsWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  organizationId?: string
   AND?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
   OR?: Prisma.SettingsWhereInput[]
   NOT?: Prisma.SettingsWhereInput | Prisma.SettingsWhereInput[]
@@ -301,10 +313,12 @@ export type SettingsWhereUniqueInput = Prisma.AtLeast<{
   breakfastDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-}, "id">
+  organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+}, "id" | "organizationId">
 
 export type SettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   kilometerRate?: Prisma.SortOrder
   reviewerEmail?: Prisma.SortOrderInput | Prisma.SortOrder
   costUnitInfoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -326,6 +340,7 @@ export type SettingsScalarWhereWithAggregatesInput = {
   OR?: Prisma.SettingsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SettingsScalarWhereWithAggregatesInput | Prisma.SettingsScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Settings"> | string
+  organizationId?: Prisma.StringWithAggregatesFilter<"Settings"> | string
   kilometerRate?: Prisma.DecimalWithAggregatesFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
   costUnitInfoUrl?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
@@ -348,10 +363,12 @@ export type SettingsCreateInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  organization: Prisma.OrganizationCreateNestedOneWithoutSettingsInput
 }
 
 export type SettingsUncheckedCreateInput = {
   id?: string
+  organizationId: string
   kilometerRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: string | null
   costUnitInfoUrl?: string | null
@@ -374,10 +391,12 @@ export type SettingsUpdateInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  organization?: Prisma.OrganizationUpdateOneRequiredWithoutSettingsNestedInput
 }
 
 export type SettingsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   kilometerRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costUnitInfoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -391,6 +410,7 @@ export type SettingsUncheckedUpdateInput = {
 
 export type SettingsCreateManyInput = {
   id?: string
+  organizationId: string
   kilometerRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: string | null
   costUnitInfoUrl?: string | null
@@ -417,6 +437,7 @@ export type SettingsUpdateManyMutationInput = {
 
 export type SettingsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  organizationId?: Prisma.StringFieldUpdateOperationsInput | string
   kilometerRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   reviewerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   costUnitInfoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -428,8 +449,14 @@ export type SettingsUncheckedUpdateManyInput = {
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type SettingsNullableScalarRelationFilter = {
+  is?: Prisma.SettingsWhereInput | null
+  isNot?: Prisma.SettingsWhereInput | null
+}
+
 export type SettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   kilometerRate?: Prisma.SortOrder
   reviewerEmail?: Prisma.SortOrder
   costUnitInfoUrl?: Prisma.SortOrder
@@ -451,6 +478,7 @@ export type SettingsAvgOrderByAggregateInput = {
 
 export type SettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   kilometerRate?: Prisma.SortOrder
   reviewerEmail?: Prisma.SortOrder
   costUnitInfoUrl?: Prisma.SortOrder
@@ -464,6 +492,7 @@ export type SettingsMaxOrderByAggregateInput = {
 
 export type SettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  organizationId?: Prisma.SortOrder
   kilometerRate?: Prisma.SortOrder
   reviewerEmail?: Prisma.SortOrder
   costUnitInfoUrl?: Prisma.SortOrder
@@ -483,10 +512,111 @@ export type SettingsSumOrderByAggregateInput = {
   dinnerDeduction?: Prisma.SortOrder
 }
 
+export type SettingsCreateNestedOneWithoutOrganizationInput = {
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutOrganizationInput
+  connect?: Prisma.SettingsWhereUniqueInput
+}
+
+export type SettingsUncheckedCreateNestedOneWithoutOrganizationInput = {
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutOrganizationInput
+  connect?: Prisma.SettingsWhereUniqueInput
+}
+
+export type SettingsUpdateOneWithoutOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutOrganizationInput
+  upsert?: Prisma.SettingsUpsertWithoutOrganizationInput
+  disconnect?: Prisma.SettingsWhereInput | boolean
+  delete?: Prisma.SettingsWhereInput | boolean
+  connect?: Prisma.SettingsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutOrganizationInput, Prisma.SettingsUpdateWithoutOrganizationInput>, Prisma.SettingsUncheckedUpdateWithoutOrganizationInput>
+}
+
+export type SettingsUncheckedUpdateOneWithoutOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+  connectOrCreate?: Prisma.SettingsCreateOrConnectWithoutOrganizationInput
+  upsert?: Prisma.SettingsUpsertWithoutOrganizationInput
+  disconnect?: Prisma.SettingsWhereInput | boolean
+  delete?: Prisma.SettingsWhereInput | boolean
+  connect?: Prisma.SettingsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutOrganizationInput, Prisma.SettingsUpdateWithoutOrganizationInput>, Prisma.SettingsUncheckedUpdateWithoutOrganizationInput>
+}
+
+export type SettingsCreateWithoutOrganizationInput = {
+  id?: string
+  kilometerRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reviewerEmail?: string | null
+  costUnitInfoUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  dailyFoodAllowance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type SettingsUncheckedCreateWithoutOrganizationInput = {
+  id?: string
+  kilometerRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  reviewerEmail?: string | null
+  costUnitInfoUrl?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  dailyFoodAllowance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type SettingsCreateOrConnectWithoutOrganizationInput = {
+  where: Prisma.SettingsWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+}
+
+export type SettingsUpsertWithoutOrganizationInput = {
+  update: Prisma.XOR<Prisma.SettingsUpdateWithoutOrganizationInput, Prisma.SettingsUncheckedUpdateWithoutOrganizationInput>
+  create: Prisma.XOR<Prisma.SettingsCreateWithoutOrganizationInput, Prisma.SettingsUncheckedCreateWithoutOrganizationInput>
+  where?: Prisma.SettingsWhereInput
+}
+
+export type SettingsUpdateToOneWithWhereWithoutOrganizationInput = {
+  where?: Prisma.SettingsWhereInput
+  data: Prisma.XOR<Prisma.SettingsUpdateWithoutOrganizationInput, Prisma.SettingsUncheckedUpdateWithoutOrganizationInput>
+}
+
+export type SettingsUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kilometerRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reviewerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costUnitInfoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dailyFoodAllowance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type SettingsUncheckedUpdateWithoutOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kilometerRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  reviewerEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  costUnitInfoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  dailyFoodAllowance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
 
 
 export type SettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  organizationId?: boolean
   kilometerRate?: boolean
   reviewerEmail?: boolean
   costUnitInfoUrl?: boolean
@@ -496,10 +626,12 @@ export type SettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  organizationId?: boolean
   kilometerRate?: boolean
   reviewerEmail?: boolean
   costUnitInfoUrl?: boolean
@@ -509,10 +641,12 @@ export type SettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  organizationId?: boolean
   kilometerRate?: boolean
   reviewerEmail?: boolean
   costUnitInfoUrl?: boolean
@@ -522,10 +656,12 @@ export type SettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
 export type SettingsSelectScalar = {
   id?: boolean
+  organizationId?: boolean
   kilometerRate?: boolean
   reviewerEmail?: boolean
   costUnitInfoUrl?: boolean
@@ -537,13 +673,25 @@ export type SettingsSelectScalar = {
   dinnerDeduction?: boolean
 }
 
-export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "kilometerRate" | "reviewerEmail" | "costUnitInfoUrl" | "createdAt" | "updatedAt" | "dailyFoodAllowance" | "breakfastDeduction" | "lunchDeduction" | "dinnerDeduction", ExtArgs["result"]["settings"]>
+export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "kilometerRate" | "reviewerEmail" | "costUnitInfoUrl" | "createdAt" | "updatedAt" | "dailyFoodAllowance" | "breakfastDeduction" | "lunchDeduction" | "dinnerDeduction", ExtArgs["result"]["settings"]>
+export type SettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+}
+export type SettingsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+}
+export type SettingsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+}
 
 export type $SettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Settings"
-  objects: {}
+  objects: {
+    organization: Prisma.$OrganizationPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    organizationId: string
     kilometerRate: runtime.Decimal
     reviewerEmail: string | null
     costUnitInfoUrl: string | null
@@ -947,6 +1095,7 @@ readonly fields: SettingsFieldRefs;
  */
 export interface Prisma__SettingsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -977,6 +1126,7 @@ export interface Prisma__SettingsClient<T, Null = never, ExtArgs extends runtime
  */
 export interface SettingsFieldRefs {
   readonly id: Prisma.FieldRef<"Settings", 'String'>
+  readonly organizationId: Prisma.FieldRef<"Settings", 'String'>
   readonly kilometerRate: Prisma.FieldRef<"Settings", 'Decimal'>
   readonly reviewerEmail: Prisma.FieldRef<"Settings", 'String'>
   readonly costUnitInfoUrl: Prisma.FieldRef<"Settings", 'String'>
@@ -1003,6 +1153,10 @@ export type SettingsFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
+  /**
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
@@ -1021,6 +1175,10 @@ export type SettingsFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
+  /**
    * Filter, which Settings to fetch.
    */
   where: Prisma.SettingsWhereUniqueInput
@@ -1038,6 +1196,10 @@ export type SettingsFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the Settings
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
   /**
    * Filter, which Settings to fetch.
    */
@@ -1087,6 +1249,10 @@ export type SettingsFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
+  /**
    * Filter, which Settings to fetch.
    */
   where?: Prisma.SettingsWhereInput
@@ -1135,6 +1301,10 @@ export type SettingsFindManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
+  /**
    * Filter, which Settings to fetch.
    */
   where?: Prisma.SettingsWhereInput
@@ -1178,6 +1348,10 @@ export type SettingsCreateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
+  /**
    * The data needed to create a Settings.
    */
   data: Prisma.XOR<Prisma.SettingsCreateInput, Prisma.SettingsUncheckedCreateInput>
@@ -1211,6 +1385,10 @@ export type SettingsCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    */
   data: Prisma.SettingsCreateManyInput | Prisma.SettingsCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1225,6 +1403,10 @@ export type SettingsUpdateArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Settings
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
   /**
    * The data needed to update a Settings.
    */
@@ -1277,6 +1459,10 @@ export type SettingsUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many Settings to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1291,6 +1477,10 @@ export type SettingsUpsertArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Settings
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
   /**
    * The filter to search for the Settings to update in case it exists.
    */
@@ -1317,6 +1507,10 @@ export type SettingsDeleteArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the Settings
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
   /**
    * Filter which Settings to delete.
    */
@@ -1349,4 +1543,8 @@ export type SettingsDefaultArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the Settings
    */
   omit?: Prisma.SettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettingsInclude<ExtArgs> | null
 }

@@ -58,6 +58,9 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
+  Organization: 'Organization',
+  Member: 'Member',
+  Invitation: 'Invitation',
   Preferences: 'Preferences',
   Settings: 'Settings',
   CostUnitGroup: 'CostUnitGroup',
@@ -87,6 +90,7 @@ export const ReportScalarFieldEnum = {
   title: 'title',
   description: 'description',
   status: 'status',
+  organizationId: 'organizationId',
   costUnitId: 'costUnitId',
   ownerId: 'ownerId',
   bankingDetailsId: 'bankingDetailsId',
@@ -131,6 +135,7 @@ export const UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   role: 'role',
+  microsoftTenantId: 'microsoftTenantId',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires'
@@ -148,7 +153,8 @@ export const SessionScalarFieldEnum = {
   ipAddress: 'ipAddress',
   userAgent: 'userAgent',
   userId: 'userId',
-  impersonatedBy: 'impersonatedBy'
+  impersonatedBy: 'impersonatedBy',
+  activeOrganizationId: 'activeOrganizationId'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -185,6 +191,44 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
+export const OrganizationScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  logo: 'logo',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  microsoftTenantId: 'microsoftTenantId'
+} as const
+
+export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const MemberScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  organizationId: 'organizationId',
+  role: 'role',
+  createdAt: 'createdAt'
+} as const
+
+export type MemberScalarFieldEnum = (typeof MemberScalarFieldEnum)[keyof typeof MemberScalarFieldEnum]
+
+
+export const InvitationScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  inviterId: 'inviterId',
+  organizationId: 'organizationId',
+  role: 'role',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof typeof InvitationScalarFieldEnum]
+
+
 export const PreferencesScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -196,6 +240,7 @@ export type PreferencesScalarFieldEnum = (typeof PreferencesScalarFieldEnum)[key
 
 export const SettingsScalarFieldEnum = {
   id: 'id',
+  organizationId: 'organizationId',
   kilometerRate: 'kilometerRate',
   reviewerEmail: 'reviewerEmail',
   costUnitInfoUrl: 'costUnitInfoUrl',
@@ -213,6 +258,7 @@ export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typ
 export const CostUnitGroupScalarFieldEnum = {
   id: 'id',
   title: 'title',
+  organizationId: 'organizationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -225,6 +271,7 @@ export const CostUnitScalarFieldEnum = {
   tag: 'tag',
   title: 'title',
   examples: 'examples',
+  organizationId: 'organizationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   costUnitGroupId: 'costUnitGroupId'

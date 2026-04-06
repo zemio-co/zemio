@@ -6,7 +6,9 @@ import { AdminSettingsSidebar } from "@/components/admin-settings-sidebar";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/consts";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
+import { db } from "@/server/db";
 
 export default async function ServerLayout({
 	children,
@@ -20,10 +22,17 @@ export default async function ServerLayout({
 		redirect(ROUTES.AUTH);
 	}
 
-	const { user } = session;
+	const member = await db.member.findFirst({
+		where: {
+			userId: session.user.id,
+			organizationId: session.session.activeOrganizationId ?? "",
+		},
+		select: {
+			role: true,
+		},
+	});
 
-	if (user.role !== "admin") {
-		// If user is not admin, redirect to dashboard
+	if (!member || !isOrganizationAdminRole(member.role)) {
 		redirect(ROUTES.USER_DASHBOARD);
 	}
 

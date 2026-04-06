@@ -8,19 +8,21 @@ import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
 import { mailer } from "@/lib/email";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { createReportSchema } from "@/lib/validators";
 import {
-	adminProcedure,
 	createTRPCRouter,
-	protectedProcedure,
+	orgAdminProcedure,
+	orgProcedure,
 } from "@/server/api/trpc";
 import { generatePdfSummary } from "@/server/pdf/summary";
 
 export const reportRouter = createTRPCRouter({
 	// Get all reports for the current user
-	getAll: protectedProcedure.query(async ({ ctx }) => {
+	getAll: orgProcedure.query(async ({ ctx }) => {
 		const reports = await ctx.db.report.findMany({
 			where: {
+				organizationId: ctx.organizationId,
 				ownerId: ctx.session.user.id,
 			},
 			include: {
@@ -47,12 +49,13 @@ export const reportRouter = createTRPCRouter({
 		}));
 	}),
 
-	getById: protectedProcedure
+	getById: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
+			const report = await ctx.db.report.findFirst({
 				where: {
 					id: input.id,
+					organizationId: ctx.organizationId,
 				},
 				include: {
 					owner: {
@@ -72,7 +75,7 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
-			const isAdmin = ctx.session.user.role === "admin";
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
 			if (!isAdmin && report?.ownerId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -83,12 +86,13 @@ export const reportRouter = createTRPCRouter({
 			return report;
 		}),
 
-	getDetails: protectedProcedure
+	getDetails: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const existsReport = await ctx.db.report.findUnique({
+			const existsReport = await ctx.db.report.findFirst({
 				where: {
 					id: input.id,
+					organizationId: ctx.organizationId,
 				},
 			});
 
@@ -99,7 +103,7 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
-			const isAdmin = ctx.session.user.role === "admin";
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
 			if (!isAdmin && existsReport?.ownerId !== ctx.session.user.id) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -120,6 +124,9 @@ export const reportRouter = createTRPCRouter({
 				ctx.db.expense.aggregate({
 					where: {
 						reportId: input.id,
+						report: {
+							organizationId: ctx.organizationId,
+						},
 					},
 					_sum: {
 						amount: true,
@@ -144,7 +151,7 @@ export const reportRouter = createTRPCRouter({
 		}),
 
 	// Create a new report
-	create: protectedProcedure
+	create: orgProcedure
 		.input(createReportSchema)
 		.mutation(async ({ ctx, input }) => {
 			const bankingDetails = await ctx.db.bankingDetails.findUnique({
@@ -164,11 +171,29 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
+			const costUnit = await ctx.db.costUnit.findFirst({
+				where: {
+					id: input.costUnitId,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!costUnit) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Cost unit not found",
+				});
+			}
+
 			// Create the report
 			const report = await ctx.db.report.create({
 				data: {
 					...input,
 					ownerId: ctx.session.user.id,
+					organizationId: ctx.organizationId,
 					status: ReportStatus.DRAFT,
 				},
 				include: {
@@ -211,7 +236,7 @@ export const reportRouter = createTRPCRouter({
 
 			// Get settings to find reviewer email
 			const settings = await ctx.db.settings.findUnique({
-				where: { id: "singleton" },
+				where: { organizationId: ctx.organizationId },
 				select: {
 					reviewerEmail: true,
 				},
@@ -264,7 +289,7 @@ export const reportRouter = createTRPCRouter({
 		}),
 
 	// Update a report
-	update: protectedProcedure
+	update: orgProcedure
 		.input(
 			z.object({
 				id: z.string(),
@@ -279,8 +304,11 @@ export const reportRouter = createTRPCRouter({
 			const { id, ...data } = input;
 
 			// Check if user owns the report
-			const existingReport = await ctx.db.report.findUnique({
-				where: { id },
+			const existingReport = await ctx.db.report.findFirst({
+				where: {
+					id,
+					organizationId: ctx.organizationId,
+				},
 			});
 
 			if (!existingReport) {
@@ -341,7 +369,7 @@ export const reportRouter = createTRPCRouter({
 
 			// Get settings to find reviewer email
 			const settings = await ctx.db.settings.findUnique({
-				where: { id: "singleton" },
+				where: { organizationId: ctx.organizationId },
 				select: {
 					reviewerEmail: true,
 				},
@@ -395,11 +423,14 @@ export const reportRouter = createTRPCRouter({
 		}),
 
 	// Delete a report
-	delete: protectedProcedure
+	delete: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.id },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
 			});
 
 			if (!report) {
@@ -424,7 +455,7 @@ export const reportRouter = createTRPCRouter({
 	 * This procedure is only intended for admin use. To set the status of a report from
 	 * draft to pending approval, use the submit procedure.
 	 */
-	updateStatus: adminProcedure
+	updateStatus: orgAdminProcedure
 		.input(
 			z.object({
 				id: z.string(),
@@ -433,6 +464,23 @@ export const reportRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const existingReport = await ctx.db.report.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+				},
+			});
+
+			if (!existingReport) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Report not found",
+				});
+			}
+
 			const result = await ctx.db.report.update({
 				where: { id: input.id },
 				data: { status: input.status },
@@ -516,12 +564,13 @@ export const reportRouter = createTRPCRouter({
 	 *
 	 * For force setting the status to pending approval, use the updateStatus procedure.
 	 */
-	submit: protectedProcedure
+	submit: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
+			const report = await ctx.db.report.findFirst({
 				where: {
 					id: input.id,
+					organizationId: ctx.organizationId,
 				},
 				select: {
 					owner: {
@@ -590,7 +639,7 @@ export const reportRouter = createTRPCRouter({
 
 			const settings = await ctx.db.settings.findUnique({
 				where: {
-					id: "singleton",
+					organizationId: ctx.organizationId,
 				},
 			});
 
@@ -631,11 +680,14 @@ export const reportRouter = createTRPCRouter({
 			}
 		}),
 
-	exportToPdf: protectedProcedure
+	exportToPdf: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existsReport = await ctx.db.report.findUnique({
-				where: { id: input.id },
+			const existsReport = await ctx.db.report.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
 				select: {
 					ownerId: true,
 				},
@@ -649,7 +701,7 @@ export const reportRouter = createTRPCRouter({
 			}
 
 			if (
-				ctx.session.user.role !== "admin" &&
+				!isOrganizationAdminRole(ctx.orgRole) &&
 				existsReport.ownerId !== ctx.session.user.id
 			) {
 				throw new TRPCError({

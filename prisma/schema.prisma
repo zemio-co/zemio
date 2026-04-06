@@ -21,6 +21,9 @@ model Report {
   description String?
   status      ReportStatus @default(DRAFT)
 
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   costUnitId String
   costUnit   CostUnit @relation(fields: [costUnitId], references: [id], onDelete: Cascade)
 
@@ -36,6 +39,7 @@ model Report {
   expenses Expense[]
 
   @@index([ownerId])
+  @@index([organizationId])
   @@index([status])
   @@index([costUnitId])
   @@index([bankingDetailsId])
@@ -96,11 +100,16 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  invitationsSent Invitation[]
+  members         Member[]
 
   ownReports Report[]
 
   // Role required by better-auth admin plugin
   role String @default("user")
+
+  // Microsoft Entra ID tenant ID captured from the OAuth id_token on first login
+  microsoftTenantId String?
 
   // Banning fields required by better-auth admin plugin
   banned     Boolean?  @default(false)
@@ -127,6 +136,7 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   impersonatedBy String?
+  activeOrganizationId String?
 
   @@unique([token])
   @@index([userId])
@@ -165,6 +175,59 @@ model Verification {
   @@map("verification")
 }
 
+model Organization {
+  id                String   @id
+  name              String
+  slug              String   @unique
+  logo              String?
+  metadata          String?
+  createdAt         DateTime
+  microsoftTenantId String?
+
+  members     Member[]
+  invitations Invitation[]
+
+  reports        Report[]
+  costUnits      CostUnit[]
+  costUnitGroups CostUnitGroup[]
+  settings       Settings?
+
+  @@map("organization")
+}
+
+model Member {
+  id             String   @id
+  userId         String
+  organizationId String
+  role           String
+  createdAt      DateTime
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@map("member")
+}
+
+model Invitation {
+  id             String   @id
+  email          String
+  inviterId      String
+  organizationId String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  createdAt      DateTime
+
+  inviter      User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([organizationId])
+  @@map("invitation")
+}
+
 model Preferences {
   id            String                 @id @default(cuid())
   userId        String                 @unique
@@ -181,7 +244,9 @@ enum NotificationPreference {
 }
 
 model Settings {
-  id              String   @id @default("singleton")
+  id              String   @id @default(cuid())
+  organizationId  String   @unique
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   kilometerRate   Decimal  @default(0.30) // Rate per kilometer in EUR
   reviewerEmail   String? // Email of the global reviewer
   costUnitInfoUrl String?  @map("accountingUnitPdfUrl") // PDF URL for cost unit information
@@ -199,12 +264,15 @@ model Settings {
 model CostUnitGroup {
   id        String     @id @default(cuid())
   title     String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   costUnits CostUnit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  @@unique([title])
+  @@unique([organizationId, title])
+  @@index([organizationId])
   @@map("cost_unit_group")
 }
 
@@ -213,6 +281,8 @@ model CostUnit {
   tag      String
   title    String
   examples String[]
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -222,6 +292,8 @@ model CostUnit {
 
   reports Report[]
 
+  @@unique([organizationId, tag])
+  @@index([organizationId])
   @@index([tag])
   @@map("cost_unit")
 }

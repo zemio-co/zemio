@@ -1,6 +1,7 @@
 import { adminRouter } from "@/server/api/routers/admin";
 import { costUnitRouter } from "@/server/api/routers/cost-unit";
 import { expenseRouter } from "@/server/api/routers/expense";
+import { platformAdminRouter } from "@/server/api/routers/platform-admin";
 import { reportRouter } from "@/server/api/routers/report";
 import { settingsRouter } from "@/server/api/routers/settings";
 import { userRouter } from "@/server/api/routers/user";
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
 	admin: adminRouter,
 	costUnit: costUnitRouter,
 	bankingDetails: bankingDetailsRouter,
+	platformAdmin: platformAdminRouter,
 });
 
 // export type definition of API

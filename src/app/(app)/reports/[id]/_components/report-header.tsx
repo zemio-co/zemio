@@ -23,6 +23,7 @@ import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import type { Report, User } from "@/generated/prisma/client";
 import { ROUTES } from "@/lib/consts";
 import { ADMINS_UPDATE_OWN_REPORT } from "@/lib/flags";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 import { api } from "@/trpc/react";
@@ -38,6 +39,8 @@ export function ReportHeader({
 	const utils = api.useUtils();
 	const router = useRouter();
 	const { data, isPending } = authClient.useSession();
+	const { data: activeMemberRole, isPending: isRolePending } =
+		authClient.useActiveMemberRole();
 
 	const handleDelete = api.report.delete.useMutation({
 		onSuccess: () => {
@@ -64,13 +67,13 @@ export function ReportHeader({
 	});
 
 	const canAdministrate = React.useMemo(() => {
-		if (isPending) return false;
+		if (isPending || isRolePending) return false;
 
 		// Drafts cannot be administrated
 		if (report.status === "DRAFT") return false;
 
 		const isOwner = data?.user?.id === report.ownerId;
-		const isAdmin = data?.user?.role === "admin";
+		const isAdmin = isOrganizationAdminRole(activeMemberRole?.role);
 
 		// Check if admins can update their own reports
 		if (ADMINS_UPDATE_OWN_REPORT && isAdmin && isOwner) return true;
@@ -82,7 +85,7 @@ export function ReportHeader({
 		if (!isAdmin && !isOwner) return false;
 
 		return false;
-	}, [data, report, isPending]);
+	}, [activeMemberRole?.role, data, isPending, isRolePending, report]);
 
 	return (
 		<header
