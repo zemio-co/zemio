@@ -44,7 +44,7 @@ export function NoOrgPageContent({
 						)}
 					</div>
 					<div className="flex grow flex-col items-center justify-center">
-						<div className="w-full max-w-md rounded-lg bg-white p-8 shadow-sm ring-1 ring-zinc-700/10 ring-offset-0">
+						<div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg ring-1 ring-zinc-700/10 ring-offset-0">
 							<div className="mb-8 w-fit rounded-md bg-zinc-50 p-2 shadow-sm ring-1 ring-zinc-700/10">
 								<BuildingIcon className="size-5 text-zinc-600" />
 							</div>

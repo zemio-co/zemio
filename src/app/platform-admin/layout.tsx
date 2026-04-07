@@ -1,14 +1,12 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import type { ReactNode } from "react";
 import { ROUTES } from "@/lib/consts";
+import { AdminLayout } from "@/modules/admin";
 import { auth } from "@/server/better-auth";
 
-export default async function PlatformAdminLayout({
-	children,
-}: {
-	children: ReactNode;
-}) {
+export default async function ServerLayout(
+	props: LayoutProps<"/platform-admin">,
+) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
@@ -21,5 +19,5 @@ export default async function PlatformAdminLayout({
 		redirect(ROUTES.USER_DASHBOARD);
 	}
 
-	return <>{children}</>;
+	return <AdminLayout {...props} />;
 }
