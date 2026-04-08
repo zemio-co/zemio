@@ -29,15 +29,24 @@ function AuthContent() {
 					<div className="flex flex-wrap justify-between gap-6">
 						<p className="text-xs text-zinc-500">
 							Schwierigkeiten bei der Anmeldung?{" "}
-							<Link className="font-medium text-foreground" href={"#"}>
+							<Link
+								className="font-medium text-foreground text-xs transition-colors hover:text-primary"
+								href={"#"}
+							>
 								Support kontaktieren
 							</Link>
 						</p>
 						<div className="flex gap-4">
-							<Link className="font-medium text-foreground text-xs" href={"#"}>
+							<Link
+								className="font-medium text-foreground text-xs transition-colors hover:text-primary"
+								href={"#"}
+							>
 								Privacy Policy
 							</Link>
-							<Link className="font-medium text-foreground text-xs" href={"#"}>
+							<Link
+								className="font-medium text-foreground text-xs transition-colors hover:text-primary"
+								href={"#"}
+							>
 								Help center
 							</Link>
 						</div>
