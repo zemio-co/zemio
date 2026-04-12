@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/consts";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
@@ -31,10 +31,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset>
-				<SiteHeader />
+			<div className="flex-1">
+				<SiteHeader className="hidden" />
 				{children}
-			</SidebarInset>
+			</div>
 		</SidebarProvider>
 	);
 }

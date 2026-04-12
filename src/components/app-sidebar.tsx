@@ -34,7 +34,7 @@ const sidebarItems = [
 export function AppSidebar() {
 	return (
 		<HydrateClient>
-			<Sidebar variant="inset">
+			<Sidebar>
 				<SidebarHeader>
 					<OrgSwitcher />
 				</SidebarHeader>
