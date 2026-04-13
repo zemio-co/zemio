@@ -38,8 +38,15 @@ export const router: Router = {
 					throw new RejectUpload("Unauthorized");
 				}
 
+				const orgId = session.session.activeOrganizationId;
+				if (!orgId) {
+					throw new RejectUpload("No active organization");
+				}
+
 				return {
-					generateObjectInfo: ({ file }) => ({ key: `attachment/${file.name}` }),
+					generateObjectInfo: () => ({
+						key: `attachment/${orgId}/${crypto.randomUUID()}`,
+					}),
 				};
 			},
 		}),
