@@ -1,7 +1,7 @@
 "use client";
 
 import { NumberField } from "@base-ui/react";
-import { useUploadFiles } from "@better-upload/client";
+import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { useForm } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { XIcon } from "lucide-react";
@@ -131,9 +131,7 @@ export function CreateReceiptExpenseForm({
 		},
 	});
 
-	const uploader = useUploadFiles({
-		route: "attachments",
-	});
+	const uploader = usePresignedUpload();
 
 	return (
 		<form
