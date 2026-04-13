@@ -1,7 +1,6 @@
 "use client";
 
 import { NumberField } from "@base-ui/react";
-import { useUploadFiles } from "@better-upload/client";
 import { useForm } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { XIcon } from "lucide-react";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
+import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { formatBytes, renameFileWithHash } from "@/lib/utils";
 import { baseCreateExpenseSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
@@ -131,9 +131,7 @@ export function CreateReceiptExpenseForm({
 		},
 	});
 
-	const uploader = useUploadFiles({
-		route: "attachments",
-	});
+	const uploader = usePresignedUpload();
 
 	return (
 		<form

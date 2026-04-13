@@ -1,6 +1,7 @@
 import {
 	DeleteObjectsCommand,
 	GetObjectCommand,
+	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -125,7 +126,7 @@ export async function getPresignedDownloadUrl(
 	expiresInSeconds = 300,
 ): Promise<string> {
 	const client = getS3Client();
-	const filename = downloadFilename ?? (key.split("/").at(-1) ?? "attachment");
+	const filename = downloadFilename ?? key.split("/").at(-1) ?? "attachment";
 	const command = new GetObjectCommand({
 		Bucket: env.STORAGE_BUCKET,
 		Key: key,
@@ -133,6 +134,40 @@ export async function getPresignedDownloadUrl(
 	});
 	// @ts-expect-error Issue with types from S3
 	return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+}
+
+/**
+ * Generate a presigned upload URL for a stored object.
+ * The caller uploads the file directly to S3 via HTTP PUT using this URL.
+ *
+ * Content-Length is included in the signed headers so S3 enforces the exact
+ * byte count server-side. Any PUT whose Content-Length does not match the
+ * signed value will be rejected with 403.
+ *
+ * @param key - The object key (e.g., "attachment/orgId/filename.pdf")
+ * @param contentType - The MIME type of the file being uploaded
+ * @param size - The exact byte size of the file; baked into the URL signature
+ * @param expiresInSeconds - URL validity duration in seconds (default: 300)
+ * @returns A presigned URL string
+ */
+export async function getPresignedUploadUrl(
+	key: string,
+	contentType: string,
+	size: number,
+	expiresInSeconds = 300,
+): Promise<string> {
+	const client = getS3Client();
+	const command = new PutObjectCommand({
+		Bucket: env.STORAGE_BUCKET,
+		Key: key,
+		ContentType: contentType,
+		ContentLength: size,
+	});
+	// @ts-expect-error Issue with types from S3
+	return getSignedUrl(client, command, {
+		expiresIn: expiresInSeconds,
+		signableHeaders: new Set(["content-length"]),
+	});
 }
 
 /**
