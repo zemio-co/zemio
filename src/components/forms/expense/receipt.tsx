@@ -38,6 +38,7 @@ export function CreateReceiptExpenseForm({
 }) {
 	const router = useRouter();
 	const utils = api.useUtils();
+	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const createReceipt = api.expense.createReceipt.useMutation({
 		onSuccess: () => {
 			utils.expense.invalidate();
@@ -75,9 +76,24 @@ export function CreateReceiptExpenseForm({
 				originalFiles.map((file) => renameFileWithHash(file, reportId, timestamp)),
 			);
 
-			const { files } = await uploader.upload(renamedFiles);
+			const { failedFiles, files } = await uploader.upload(renamedFiles);
 
-			if (files.length !== originalFiles.length) {
+			if (failedFiles.length > 0) {
+				const uploadedKeys = files.map((file) => file.objectInfo.key);
+				if (uploadedKeys.length > 0) {
+					try {
+						await deletePendingUploads.mutateAsync({
+							keys: uploadedKeys,
+						});
+					} catch {
+						toast.error("Upload fehlgeschlagen", {
+							description:
+								"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+						});
+						return;
+					}
+				}
+
 				toast.error("Upload fehlgeschlagen", {
 					description: "Nicht alle Dateien konnten hochgeladen werden",
 				});
