@@ -128,6 +128,18 @@ export const expenseRouter = createTRPCRouter({
 				});
 			}
 
+			// Verify every attachment key belongs to this organization
+			const expectedKeyPrefix = `attachment/${ctx.organizationId}/`;
+			const hasInvalidKey = input.attachments.some(
+				(a) => !a.key.startsWith(expectedKeyPrefix),
+			);
+			if (hasInvalidKey) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "One or more attachment keys do not belong to this organization",
+				});
+			}
+
 			// Create the meta data
 			const meta = JSON.stringify({});
 
