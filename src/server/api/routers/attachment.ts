@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, orgProcedure, protectedProcedure } from "@/server/api/trpc";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
-import { getPresignedDownloadUrl } from "@/server/storage";
+import { deleteFilesFromStorage, getPresignedDownloadUrl } from "@/server/storage";
 
 export const attachmentRouter = createTRPCRouter({
 	listForReport: protectedProcedure
@@ -65,6 +65,7 @@ export const attachmentRouter = createTRPCRouter({
 				where: { id: input.id },
 				select: {
 					key: true,
+					originalName: true,
 					expense: {
 						select: {
 							report: {
@@ -98,8 +99,48 @@ export const attachmentRouter = createTRPCRouter({
 				throw new TRPCError({ code: "UNAUTHORIZED" });
 			}
 
-			const url = await getPresignedDownloadUrl(attachment.key);
+			const url = await getPresignedDownloadUrl(
+				attachment.key,
+				attachment.originalName,
+			);
 
 			return { url };
+		}),
+
+	deletePendingUploads: orgProcedure
+		.input(
+			z.object({
+				keys: z
+					.array(
+						z
+							.string()
+							.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+					)
+					.max(5),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const organizationKeyPrefix = `attachment/${ctx.organizationId}/`;
+			const hasInvalidKey = input.keys.some(
+				(key) => !key.startsWith(organizationKeyPrefix),
+			);
+
+			if (hasInvalidKey) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "One or more attachment keys do not belong to this organization",
+				});
+			}
+
+			try {
+				await deleteFilesFromStorage(input.keys);
+			} catch {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to clean up uploaded attachments",
+				});
+			}
+
+			return { deletedKeys: input.keys };
 		}),
 });

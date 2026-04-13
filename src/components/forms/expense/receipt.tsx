@@ -25,7 +25,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { formatBytes, renameFileWithHash } from "@/lib/utils";
-import { createReceiptExpenseSchema } from "@/lib/validators";
+import { baseCreateExpenseSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 
 export function CreateReceiptExpenseForm({
@@ -38,6 +38,7 @@ export function CreateReceiptExpenseForm({
 }) {
 	const router = useRouter();
 	const utils = api.useUtils();
+	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const createReceipt = api.expense.createReceipt.useMutation({
 		onSuccess: () => {
 			utils.expense.invalidate();
@@ -59,22 +60,60 @@ export function CreateReceiptExpenseForm({
 			endDate: formatDate(new Date(), "dd.MM.yyyy"),
 			type: "RECEIPT",
 			reportId,
-			objectKeys: [] as string[],
 			files: [] as File[],
 		},
 		validators: {
-			onSubmit: createReceiptExpenseSchema.and(
-				z.object({ files: z.file().array() }),
-			),
+			// Only validates fields that are tracked in the form.
+			// The attachments payload is built imperatively in onSubmit after upload
+			// and is validated server-side by the TRPC router.
+			onSubmit: baseCreateExpenseSchema.and(z.object({ files: z.file().array() })),
 		},
 		onSubmit: async ({ value }) => {
 			// Rename files with unique hash before upload
 			const timestamp = Date.now();
+			const originalFiles = value.files;
 			const renamedFiles = await Promise.all(
-				value.files.map((file) => renameFileWithHash(file, reportId, timestamp)),
+				originalFiles.map((file) => renameFileWithHash(file, reportId, timestamp)),
 			);
 
-			const { files } = await uploader.upload(renamedFiles);
+			const { failedFiles, files } = await uploader.upload(renamedFiles);
+
+			if (failedFiles.length > 0) {
+				const uploadedKeys = files.map((file) => file.objectInfo.key);
+				if (uploadedKeys.length > 0) {
+					try {
+						await deletePendingUploads.mutateAsync({
+							keys: uploadedKeys,
+						});
+					} catch {
+						toast.error("Upload fehlgeschlagen", {
+							description:
+								"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+						});
+						return;
+					}
+				}
+
+				toast.error("Upload fehlgeschlagen", {
+					description: "Nicht alle Dateien konnten hochgeladen werden",
+				});
+				return;
+			}
+
+			const attachments = files.map((uploadedFile, index) => {
+				const original = originalFiles[index];
+				// originalFiles[index] is always defined here: the length guard above
+				// ensures files.length === originalFiles.length, but TypeScript cannot
+				// narrow that from a length comparison alone.
+				if (!original) {
+					throw new Error("Upload result count does not match selected file count");
+				}
+				return {
+					key: uploadedFile.objectInfo.key,
+					size: original.size,
+					originalName: original.name,
+				};
+			});
 
 			createReceipt.mutate({
 				amount: value.amount,
@@ -83,7 +122,7 @@ export function CreateReceiptExpenseForm({
 				endDate: value.endDate,
 				type: "RECEIPT",
 				reportId,
-				objectKeys: files.map((file) => file.objectInfo.key),
+				attachments,
 			});
 
 			// TODO: Invalidate expense list for report

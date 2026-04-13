@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Attachment } from "@/generated/prisma/client";
-import { cn } from "@/lib/utils";
+import { cn, formatBytes } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 function ReviewAttachments({
@@ -73,17 +73,25 @@ function AttachmentItem({ attachment }: { attachment: Attachment }) {
 		);
 	}
 
+	const dotIndex = attachment.originalName.lastIndexOf(".");
+	const fileExtension =
+		dotIndex !== -1
+			? attachment.originalName.slice(dotIndex + 1).toUpperCase()
+			: "—";
+
 	return (
 		<BoxItem key={attachment.id} variant="clickable">
 			<BoxItemIcon>
 				<FileIcon />
 			</BoxItemIcon>
 			<BoxItemContent>
-				<BoxItemTitle className="truncate">{attachment.key}</BoxItemTitle>
+				<BoxItemTitle className="truncate">{attachment.originalName}</BoxItemTitle>
 				<div className="flex items-center justify-start gap-1.5">
-					<BoxItemDescription>00 Kb</BoxItemDescription>
+					<BoxItemDescription>
+						{formatBytes(Number(attachment.size))}
+					</BoxItemDescription>
 					<BoxItemDescription className="text-zinc-600">•</BoxItemDescription>
-					<BoxItemDescription>PDF</BoxItemDescription>
+					<BoxItemDescription>{fileExtension}</BoxItemDescription>
 				</div>
 			</BoxItemContent>
 			<div className="ml-auto flex items-center justify-center gap-2 transition-opacity group-hover/item:opacity-100 md:opacity-0">

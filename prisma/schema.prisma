@@ -78,12 +78,14 @@ enum ExpenseType {
 }
 
 model Attachment {
-  id        String   @id @default(cuid())
-  key       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  expenseId String
-  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  key          String
+  size         BigInt
+  originalName String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  expenseId    String
+  expense      Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 
   @@index([key])
   @@index([expenseId])

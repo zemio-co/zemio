@@ -118,6 +118,8 @@ export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeo
 export const AttachmentScalarFieldEnum = {
   id: 'id',
   key: 'key',
+  size: 'size',
+  originalName: 'originalName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   expenseId: 'expenseId'

@@ -1,4 +1,8 @@
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+	DeleteObjectsCommand,
+	GetObjectCommand,
+	S3Client,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env";
 
@@ -71,6 +75,43 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
 }
 
 /**
+ * Delete objects from S3 storage by key.
+ * @param keys - The object keys to delete
+ */
+export async function deleteFilesFromStorage(keys: string[]): Promise<void> {
+	if (keys.length === 0) {
+		return;
+	}
+
+	const client = getS3Client();
+	const bucket = env.STORAGE_BUCKET;
+
+	try {
+		const command = new DeleteObjectsCommand({
+			Bucket: bucket,
+			Delete: {
+				Objects: keys.map((key) => ({ Key: key })),
+				Quiet: false,
+			},
+		});
+
+		const response = await client.send(command);
+		if ((response.Errors?.length ?? 0) > 0) {
+			const failedKeys = (response.Errors ?? [])
+				.map((error) => error.Key)
+				.filter((key): key is string => typeof key === "string");
+
+			throw new Error(
+				`Failed to delete storage objects: ${failedKeys.join(", ")}`,
+			);
+		}
+	} catch (error) {
+		console.error("[S3] Failed to delete files from storage", { keys, error });
+		throw error;
+	}
+}
+
+/**
  * Generate a presigned download URL for a stored object.
  * The URL carries a Content-Disposition: attachment header so the browser
  * downloads the file directly instead of opening it inline.
@@ -80,10 +121,11 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
  */
 export async function getPresignedDownloadUrl(
 	key: string,
+	downloadFilename?: string,
 	expiresInSeconds = 300,
 ): Promise<string> {
 	const client = getS3Client();
-	const filename = key.split("/").at(-1) ?? "attachment";
+	const filename = downloadFilename ?? (key.split("/").at(-1) ?? "attachment");
 	const command = new GetObjectCommand({
 		Bucket: env.STORAGE_BUCKET,
 		Key: key,
