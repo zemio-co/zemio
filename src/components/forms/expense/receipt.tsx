@@ -84,6 +84,21 @@ export function CreateReceiptExpenseForm({
 				return;
 			}
 
+			const attachments = files.map((uploadedFile, index) => {
+				const original = originalFiles[index];
+				// originalFiles[index] is always defined here: the length guard above
+				// ensures files.length === originalFiles.length, but TypeScript cannot
+				// narrow that from a length comparison alone.
+				if (!original) {
+					throw new Error("Upload result count does not match selected file count");
+				}
+				return {
+					key: uploadedFile.objectInfo.key,
+					size: original.size,
+					originalName: original.name,
+				};
+			});
+
 			createReceipt.mutate({
 				amount: value.amount,
 				description: value.description,
@@ -91,11 +106,7 @@ export function CreateReceiptExpenseForm({
 				endDate: value.endDate,
 				type: "RECEIPT",
 				reportId,
-				attachments: files.map((uploadedFile, index) => ({
-					key: uploadedFile.objectInfo.key,
-					size: originalFiles[index]!.size,
-					originalName: originalFiles[index]!.name,
-				})),
+				attachments,
 			});
 
 			// TODO: Invalidate expense list for report
