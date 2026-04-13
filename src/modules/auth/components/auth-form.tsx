@@ -3,9 +3,9 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/consts";
 import { authClient } from "@/server/better-auth/client";
-import { Button } from "../ui/button";
 
 const formSchema = z.object({});
 
@@ -48,10 +48,11 @@ export function AuthForm({ ...props }: React.ComponentProps<"form">) {
 			<Button
 				className={"w-full"}
 				form="auth-form"
+				size={"lg"}
 				type="submit"
 				variant={"outline"}
 			>
-				Login with Microsoft
+				Mit Microsoft fortfahren
 			</Button>
 		</form>
 	);

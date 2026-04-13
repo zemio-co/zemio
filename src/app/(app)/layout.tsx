@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/consts";
 import { auth } from "@/server/better-auth";
+import { db } from "@/server/db";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
 	const session = await auth.api.getSession({
@@ -17,11 +18,21 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 		redirect(ROUTES.AUTH);
 	}
 
+	const memberCount = await db.member.count({
+		where: {
+			userId: session.user.id,
+		},
+	});
+
+	if (memberCount === 0) {
+		redirect(ROUTES.NO_ORG);
+	}
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
 			<div className="flex-1">
-				<SiteHeader />
+				<SiteHeader className="hidden" />
 				{children}
 			</div>
 		</SidebarProvider>

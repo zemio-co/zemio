@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import { getFileExtension, getFileFromStorage } from "@/server/storage";
@@ -28,6 +29,25 @@ export async function GET(
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
+	const organizationId = session.session.activeOrganizationId;
+	if (!organizationId) {
+		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+	}
+
+	const member = await db.member.findFirst({
+		where: {
+			userId: session.user.id,
+			organizationId,
+		},
+		select: {
+			role: true,
+		},
+	});
+
+	if (!member) {
+		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+	}
+
 	const { id } = await params;
 	const attachment = await db.attachment.findUnique({
 		where: { id },
@@ -38,6 +58,7 @@ export async function GET(
 					report: {
 						select: {
 							ownerId: true,
+							organizationId: true,
 						},
 					},
 				},
@@ -49,7 +70,11 @@ export async function GET(
 		return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
 	}
 
-	const isAdmin = session.user.role === "admin";
+	if (attachment.expense.report.organizationId !== organizationId) {
+		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+	}
+
+	const isAdmin = isOrganizationAdminRole(member.role);
 	const isOwner = attachment.expense.report.ownerId === session.user.id;
 
 	if (!isAdmin && !isOwner) {

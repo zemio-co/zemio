@@ -1,0 +1,14 @@
+export const ROUTES = {
+	// ======= USER SETTINGS ==========================================
+	SETTINGS_USER_GENERAL: () => "/settings/user/general",
+	SETTINGS_USER_NOTIFICATIONS: () => "/settings/user/notifications",
+	SETTINGS_USER_BANK_DETAILS: () => "/settings/user/bank-details",
+	// ======= ORGANIZATION SETTINGS ==================================
+	SETTINGS_ORG_GENERAL: () => "/settings/org/general",
+	SETTINGS_ORG_MEMBERS: () => "/settings/org/members",
+	SETTINGS_ORG_ALLOWANCES: () => "/settings/org/allowances",
+	SETTINGS_ORG_COST_UNITS: () => "/settings/org/cost-units",
+	// ======= ADMIN SETTINGS =========================================
+	SETTINGS_ADMIN_ORGS: () => "/settings/admin/orgs",
+	SETTINGS_ADMIN_ORG_DETAILS: (id: string) => `/settings/admin/orgs/${id}`,
+} as const;

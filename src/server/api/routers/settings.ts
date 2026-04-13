@@ -4,27 +4,38 @@ import {
 	updateTravelAllowancesSchema,
 } from "@/lib/validators";
 import {
-	adminProcedure,
 	createTRPCRouter,
-	protectedProcedure,
+	orgAdminProcedure,
+	orgProcedure,
 	publicProcedure,
 } from "@/server/api/trpc";
 
 export const settingsRouter = createTRPCRouter({
-	get: protectedProcedure.query(async ({ ctx }) => {
-		let settings = await ctx.db.settings.findUnique({
-			where: { id: "singleton" },
+	getOrg: orgProcedure.query(async ({ ctx }) => {
+		return await ctx.db.organization.findUniqueOrThrow({
+			where: { id: ctx.organizationId },
 		});
+	}),
 
-		// Create default settings if they don't exist
-		if (!settings) {
-			settings = await ctx.db.settings.create({
-				data: {
-					id: "singleton",
-					kilometerRate: 0.3,
-				},
+	updateOrgName: orgAdminProcedure
+		.input(z.object({ name: z.string().min(1).max(100) }))
+		.mutation(async ({ ctx, input }) => {
+			return await ctx.db.organization.update({
+				where: { id: ctx.organizationId },
+				data: { name: input.name },
+				select: { id: true, name: true },
 			});
-		}
+		}),
+
+	get: orgProcedure.query(async ({ ctx }) => {
+		const settings = await ctx.db.settings.upsert({
+			where: { organizationId: ctx.organizationId },
+			create: {
+				organizationId: ctx.organizationId,
+				kilometerRate: 0.3,
+			},
+			update: {},
+		});
 
 		return {
 			...settings,
@@ -38,8 +49,16 @@ export const settingsRouter = createTRPCRouter({
 
 	// Public settings for non-admin usage
 	getPublic: publicProcedure.query(async ({ ctx }) => {
+		const session = ctx.session;
+		const organizationId = session?.session.activeOrganizationId;
+		if (!organizationId) {
+			return {
+				costUnitInfoUrl: null,
+			};
+		}
+
 		const settings = await ctx.db.settings.findUnique({
-			where: { id: "singleton" },
+			where: { organizationId },
 			select: {
 				costUnitInfoUrl: true,
 			},
@@ -51,7 +70,7 @@ export const settingsRouter = createTRPCRouter({
 	}),
 
 	// Update settings (only admins)
-	update: adminProcedure
+	update: orgAdminProcedure
 		.input(
 			z.object({
 				kilometerRate: z.number().positive().optional(),
@@ -60,45 +79,130 @@ export const settingsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// Ensure settings exist
-			let settings = await ctx.db.settings.findUnique({
-				where: { id: "singleton" },
+			const settings = await ctx.db.settings.upsert({
+				where: { organizationId: ctx.organizationId },
+				create: {
+					organizationId: ctx.organizationId,
+					kilometerRate: input.kilometerRate ?? 0.3,
+					reviewerEmail: input.reviewerEmail ?? null,
+					costUnitInfoUrl: input.costUnitInfoUrl ?? null,
+				},
+				update: input,
 			});
-
-			if (!settings) {
-				settings = await ctx.db.settings.create({
-					data: {
-						id: "singleton",
-						kilometerRate: input.kilometerRate ?? 0.3,
-						reviewerEmail: input.reviewerEmail ?? null,
-					},
-				});
-			} else {
-				settings = await ctx.db.settings.update({
-					where: { id: "singleton" },
-					data: input,
-				});
-			}
 
 			return settings;
 		}),
-	listUsers: adminProcedure.query(async ({ ctx }) => {
-		return await ctx.db.user.findMany({});
+	listUsers: orgAdminProcedure.query(async ({ ctx }) => {
+		return await ctx.db.member.findMany({
+			where: {
+				organizationId: ctx.organizationId,
+			},
+			include: {
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+						image: true,
+					},
+				},
+			},
+			orderBy: {
+				createdAt: "asc",
+			},
+		});
 	}),
-	updateMealAllowances: adminProcedure
-		.input(updateMealAllowancesSchema)
-		.mutation(async ({ ctx, input }) => {
-			return await ctx.db.settings.update({
-				where: { id: "singleton" },
-				data: input,
+	listMembers: orgAdminProcedure
+		.input(
+			z.object({
+				pageSize: z.number().min(1).max(50).default(20),
+				page: z.number().min(1).default(1),
+				search: z.string().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { page, pageSize, search } = input;
+
+			const where = search
+				? {
+						organizationId: ctx.organizationId,
+						user: {
+							name: {
+								contains: search,
+								mode: "insensitive" as const,
+							},
+						},
+					}
+				: { organizationId: ctx.organizationId };
+
+			const select = {
+				id: true,
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+						image: true,
+					},
+				},
+			};
+
+			const [rows, total] = await Promise.all([
+				ctx.db.member.findMany({
+					where,
+					select,
+					skip: (page - 1) * pageSize,
+					take: pageSize,
+				}),
+				ctx.db.member.count({ where }),
+			]);
+
+			return {
+				rows,
+				total,
+				pageCount: Math.ceil(total / pageSize),
+			};
+		}),
+	getMembershipDetails: orgAdminProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { id: membershipId } = input;
+
+			return await ctx.db.member.findUnique({
+				where: {
+					id: membershipId,
+				},
+				include: {
+					user: true,
+				},
 			});
 		}),
-	updateTravelAllowances: adminProcedure
+	updateMealAllowances: orgAdminProcedure
+		.input(updateMealAllowancesSchema)
+		.mutation(async ({ ctx, input }) => {
+			return await ctx.db.settings.upsert({
+				where: { organizationId: ctx.organizationId },
+				create: {
+					organizationId: ctx.organizationId,
+					...input,
+				},
+				update: input,
+			});
+		}),
+	updateTravelAllowances: orgAdminProcedure
 		.input(updateTravelAllowancesSchema)
 		.mutation(async ({ ctx, input }) => {
-			return await ctx.db.settings.update({
-				where: { id: "singleton" },
-				data: input,
+			return await ctx.db.settings.upsert({
+				where: { organizationId: ctx.organizationId },
+				create: {
+					organizationId: ctx.organizationId,
+					...input,
+				},
+				update: input,
 			});
 		}),
 });

@@ -1,8 +1,9 @@
 "use client";
 
-import { Settings2, ShieldUserIcon } from "lucide-react";
+import { BuildingIcon, Settings2, ShieldUserIcon } from "lucide-react";
 import Link from "next/link";
 import { ROUTES } from "@/lib/consts";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { authClient } from "@/server/better-auth/client";
 import {
 	SidebarGroup,
@@ -13,36 +14,60 @@ import {
 } from "./ui/sidebar";
 
 export function AppSidebarAdmin() {
-	const { isPending, data } = authClient.useSession();
+	const { isPending: rolePending, data: roleData } =
+		authClient.useActiveMemberRole();
+	const { isPending: sessionPending, data: sessionData } =
+		authClient.useSession();
 
-	if (isPending || !data?.user) return null;
+	if (rolePending || sessionPending) return null;
 
-	if (data.user.role !== "admin") return null;
+	const isOrgAdmin = roleData?.role
+		? isOrganizationAdminRole(roleData.role)
+		: false;
+	const isPlatformAdmin = sessionData?.user.role === "admin";
+
+	if (!isOrgAdmin && !isPlatformAdmin) return null;
 
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Admins</SidebarGroupLabel>
 			<SidebarMenu>
-				<SidebarMenuItem>
-					<SidebarMenuButton
-						render={
-							<Link href={ROUTES.ADMIN_DASHBOARD}>
-								<ShieldUserIcon />
-								Admin Dashboard
-							</Link>
-						}
-					/>
-				</SidebarMenuItem>
-				<SidebarMenuItem>
-					<SidebarMenuButton
-						render={
-							<Link href={ROUTES.ADMIN_SETTINGS}>
-								<Settings2 />
-								App Einstellungen
-							</Link>
-						}
-					/>
-				</SidebarMenuItem>
+				{isOrgAdmin && (
+					<>
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								render={
+									<Link href={ROUTES.ADMIN_DASHBOARD}>
+										<ShieldUserIcon />
+										Admin Dashboard
+									</Link>
+								}
+							/>
+						</SidebarMenuItem>
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								render={
+									<Link href={ROUTES.ADMIN_SETTINGS}>
+										<Settings2 />
+										App Einstellungen
+									</Link>
+								}
+							/>
+						</SidebarMenuItem>
+					</>
+				)}
+				{isPlatformAdmin && (
+					<SidebarMenuItem>
+						<SidebarMenuButton
+							render={
+								<Link href={ROUTES.PLATFORM_ADMIN_ORGANIZATIONS}>
+									<BuildingIcon />
+									Organisationen
+								</Link>
+							}
+						/>
+					</SidebarMenuItem>
+				)}
 			</SidebarMenu>
 		</SidebarGroup>
 	);

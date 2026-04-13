@@ -1,9 +1,11 @@
 import { HomeIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ROUTES } from "@/lib/consts";
+import { ROUTES as DEPR_ROUTES } from "@/lib/consts";
+import { ROUTES } from "@/lib/routes";
 import { HydrateClient } from "@/trpc/server";
 import { AppSidebarAdmin } from "./app-sidebar-admin";
+import { OrgSwitcher } from "./org-switcher";
 import {
 	Sidebar,
 	SidebarContent,
@@ -20,12 +22,12 @@ import { UserMenu } from "./user-menu";
 const sidebarItems = [
 	{
 		label: "Dashboard",
-		href: ROUTES.USER_DASHBOARD,
+		href: DEPR_ROUTES.USER_DASHBOARD,
 		icon: HomeIcon,
 	},
 	{
 		label: "Einstellungen",
-		href: ROUTES.USER_SETTINGS,
+		href: ROUTES.SETTINGS_USER_GENERAL(),
 		icon: SettingsIcon,
 	},
 ];
@@ -34,7 +36,9 @@ export function AppSidebar() {
 	return (
 		<HydrateClient>
 			<Sidebar>
-				<SidebarHeader></SidebarHeader>
+				<SidebarHeader>
+					<OrgSwitcher />
+				</SidebarHeader>
 				<SidebarContent>
 					<SidebarGroup>
 						<SidebarGroupLabel>Navigation</SidebarGroupLabel>

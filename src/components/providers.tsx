@@ -1,6 +1,8 @@
 "use client";
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+
 import type * as React from "react";
 
 export function Providers({
@@ -8,14 +10,16 @@ export function Providers({
 	...props
 }: React.ComponentProps<typeof NextThemesProvider>) {
 	return (
-		<NextThemesProvider
-			attribute="class"
-			defaultTheme="system"
-			disableTransitionOnChange
-			enableSystem
-			{...props}
-		>
-			{children}
-		</NextThemesProvider>
+		<NuqsAdapter>
+			<NextThemesProvider
+				attribute="class"
+				defaultTheme="system"
+				disableTransitionOnChange
+				enableSystem
+				{...props}
+			>
+				{children}
+			</NextThemesProvider>
+		</NuqsAdapter>
 	);
 }

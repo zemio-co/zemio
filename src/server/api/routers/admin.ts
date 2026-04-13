@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { ReportStatus } from "@/generated/prisma/enums";
-import { adminProcedure, createTRPCRouter } from "@/server/api/trpc";
+import { createTRPCRouter, orgAdminProcedure } from "@/server/api/trpc";
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const DEFAULT_PAGE_SIZE = 50;
@@ -16,14 +16,23 @@ export const adminRouter = createTRPCRouter({
 	 * Returns filter options for the admin reports list.
 	 * Fetches cost units and owners directly from their respective tables.
 	 */
-	getFilterOptions: adminProcedure.query(async ({ ctx }) => {
+	getFilterOptions: orgAdminProcedure.query(async ({ ctx }) => {
 		const [costUnits, owners] = await ctx.db.$transaction([
 			ctx.db.costUnit.findMany({
+				where: {
+					organizationId: ctx.organizationId,
+				},
 				select: { tag: true },
 				orderBy: { tag: "asc" },
 			}),
 			ctx.db.user.findMany({
-				where: { ownReports: { some: {} } },
+				where: {
+					ownReports: {
+						some: {
+							organizationId: ctx.organizationId,
+						},
+					},
+				},
 				select: { email: true, name: true, image: true },
 				orderBy: { name: "asc" },
 			}),
@@ -46,7 +55,7 @@ export const adminRouter = createTRPCRouter({
 	 * Paginated list of all reports with cursor-based pagination.
 	 * Returns items, nextCursor, and totalCount for infinite scroll.
 	 */
-	listAllPaginated: adminProcedure
+	listAllPaginated: orgAdminProcedure
 		.input(paginationInput)
 		.query(async ({ ctx, input }) => {
 			const { limit, cursor } = input;
@@ -55,6 +64,9 @@ export const adminRouter = createTRPCRouter({
 				ctx.db.report.findMany({
 					take: limit + 1, // Fetch one extra to determine if there's a next page
 					cursor: cursor ? { id: cursor } : undefined,
+					where: {
+						organizationId: ctx.organizationId,
+					},
 					include: {
 						owner: {
 							select: {
@@ -73,7 +85,11 @@ export const adminRouter = createTRPCRouter({
 						lastUpdatedAt: "desc",
 					},
 				}),
-				ctx.db.report.count(),
+				ctx.db.report.count({
+					where: {
+						organizationId: ctx.organizationId,
+					},
+				}),
 			]);
 
 			let nextCursor: string | undefined;
@@ -92,8 +108,11 @@ export const adminRouter = createTRPCRouter({
 	/**
 	 * @deprecated Use listAllPaginated instead for better performance
 	 */
-	listAll: adminProcedure.query(async ({ ctx }) => {
+	listAll: orgAdminProcedure.query(async ({ ctx }) => {
 		return ctx.db.report.findMany({
+			where: {
+				organizationId: ctx.organizationId,
+			},
 			include: {
 				owner: {
 					select: {
@@ -114,19 +133,29 @@ export const adminRouter = createTRPCRouter({
 		});
 	}),
 
-	stats: adminProcedure.query(async ({ ctx }) => {
+	stats: orgAdminProcedure.query(async ({ ctx }) => {
 		const { db } = ctx;
 
 		const [totalReports, openReports, totalAmount] = await db.$transaction([
-			db.report.count(),
 			db.report.count({
 				where: {
+					organizationId: ctx.organizationId,
+				},
+			}),
+			db.report.count({
+				where: {
+					organizationId: ctx.organizationId,
 					status: {
 						in: [ReportStatus.PENDING_APPROVAL],
 					},
 				},
 			}),
 			db.expense.aggregate({
+				where: {
+					report: {
+						organizationId: ctx.organizationId,
+					},
+				},
 				_sum: {
 					amount: true,
 				},
@@ -139,9 +168,10 @@ export const adminRouter = createTRPCRouter({
 			totalAmount: totalAmount._sum.amount ? Number(totalAmount._sum.amount) : 0,
 		};
 	}),
-	listOpen: adminProcedure.query(async ({ ctx }) => {
+	listOpen: orgAdminProcedure.query(async ({ ctx }) => {
 		const reports = await ctx.db.report.findMany({
 			where: {
+				organizationId: ctx.organizationId,
 				status: {
 					in: [ReportStatus.PENDING_APPROVAL],
 				},
@@ -174,11 +204,12 @@ export const adminRouter = createTRPCRouter({
 	/**
 	 * Lists all reports, which are NOT open and not a draft which have been updated in the last 30 days
 	 */
-	listRelevant: adminProcedure.query(async ({ ctx }) => {
+	listRelevant: orgAdminProcedure.query(async ({ ctx }) => {
 		const pastDate = new Date(Date.now() - THIRTY_DAYS_IN_MS);
 
 		const reports = await ctx.db.report.findMany({
 			where: {
+				organizationId: ctx.organizationId,
 				status: {
 					notIn: [ReportStatus.PENDING_APPROVAL, ReportStatus.DRAFT],
 				},
@@ -211,8 +242,11 @@ export const adminRouter = createTRPCRouter({
 			})),
 		}));
 	}),
-	getAllReports: adminProcedure.query(async ({ ctx }) => {
+	getAllReports: orgAdminProcedure.query(async ({ ctx }) => {
 		return ctx.db.report.findMany({
+			where: {
+				organizationId: ctx.organizationId,
+			},
 			include: {
 				expenses: true,
 				owner: {
@@ -230,12 +264,13 @@ export const adminRouter = createTRPCRouter({
 	}),
 
 	// Get a single report by ID (admin can access any report)
-	getReportById: adminProcedure
+	getReportById: orgAdminProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
+			const report = await ctx.db.report.findFirst({
 				where: {
 					id: input.id,
+					organizationId: ctx.organizationId,
 				},
 				include: {
 					expenses: true,
@@ -260,7 +295,7 @@ export const adminRouter = createTRPCRouter({
 		}),
 
 	// Update report status (admin only)
-	updateReportStatus: adminProcedure
+	updateReportStatus: orgAdminProcedure
 		.input(
 			z.object({
 				id: z.string(),
@@ -268,8 +303,11 @@ export const adminRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.id },
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
 			});
 
 			if (!report) {

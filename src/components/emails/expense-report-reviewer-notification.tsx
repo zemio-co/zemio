@@ -5,7 +5,6 @@ import {
 	Heading,
 	Hr,
 	Html,
-	Img,
 	Link,
 	Preview,
 	Row,
@@ -166,12 +165,12 @@ const container = {
 	border: "1px solid #eee",
 };
 
-const logoSection = {
+const _logoSection = {
 	textAlign: "center" as const,
 	padding: "32px 0 8px 0",
 };
 
-const logo = {
+const _logo = {
 	display: "inline-block",
 	marginBottom: "4px",
 };

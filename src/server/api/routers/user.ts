@@ -1,76 +1,44 @@
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { env } from "@/env";
+import { updateUserNameSchema } from "@/lib/validators";
 import {
-	ADMINS_DEMOTE_OTHER_ADMIN,
-	ADMINS_PROMOTE_OTHER_ADMIN,
-} from "@/lib/flags";
-import { adminProcedure, createTRPCRouter } from "@/server/api/trpc";
+	createTRPCRouter,
+	orgAdminProcedure,
+	protectedProcedure,
+} from "@/server/api/trpc";
 import { auth } from "@/server/better-auth";
 
 export const userRouter = createTRPCRouter({
-	promoteToAdmin: adminProcedure
-		.input(z.object({ targetUserId: z.string() }))
+	getOwn: protectedProcedure.query(async ({ ctx }) => {
+		return await ctx.db.user.findUniqueOrThrow({
+			where: { id: ctx.session.user.id },
+			select: { id: true, name: true, email: true, image: true },
+		});
+	}),
+
+	updateOwnName: protectedProcedure
+		.input(updateUserNameSchema)
 		.mutation(async ({ ctx, input }) => {
-			if (ctx.session.user.id === input.targetUserId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "You cannot promote yourself to admin",
-				});
-			}
-
-			const target = await ctx.db.user.findUnique({
-				where: { id: input.targetUserId },
-				select: {
-					id: true,
-					role: true,
-				},
-			});
-
-			if (!target) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "User not found",
-				});
-			}
-
-			const superuserId = env.SUPERUSER_ID;
-
-			if (!ADMINS_PROMOTE_OTHER_ADMIN && ctx.session.user.id !== superuserId) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "Only the superuser can promote other admins",
-				});
-			}
-
-			if (target.role === "admin") {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "User is already an admin",
-				});
-			}
-
-			return await auth.api.setRole({
-				headers: ctx.headers,
-				body: {
-					userId: input.targetUserId,
-					role: "admin",
-				},
+			return await ctx.db.user.update({
+				where: { id: ctx.session.user.id },
+				data: { name: input.name },
+				select: { id: true, name: true, email: true, image: true },
 			});
 		}),
 
-	demoteFromAdmin: adminProcedure
-		.input(z.object({ targetUserId: z.string() }))
+	setMemberRole: orgAdminProcedure
+		.input(
+			z.object({
+				memberId: z.string(),
+				role: z.enum(["admin", "member"]),
+			}),
+		)
 		.mutation(async ({ ctx, input }) => {
-			if (ctx.session.user.id === input.targetUserId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "You cannot demote yourself from admin",
-				});
-			}
-
-			const target = await ctx.db.user.findUnique({
-				where: { id: input.targetUserId },
+			const target = await ctx.db.member.findFirst({
+				where: {
+					id: input.memberId,
+					organizationId: ctx.organizationId,
+				},
 				select: {
 					id: true,
 					role: true,
@@ -84,34 +52,19 @@ export const userRouter = createTRPCRouter({
 				});
 			}
 
-			const superuserId = env.SUPERUSER_ID;
-
-			if (target.role !== "admin") {
+			if (target.role === input.role) {
 				throw new TRPCError({
 					code: "BAD_REQUEST",
-					message: "User is not an admin",
+					message: "Member already has this role",
 				});
 			}
 
-			if (target.id === superuserId) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "The superuser cannot be demoted",
-				});
-			}
-
-			if (!ADMINS_DEMOTE_OTHER_ADMIN && ctx.session.user.id !== superuserId) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "Only the superuser can demote other admins",
-				});
-			}
-
-			return await auth.api.setRole({
+			return await auth.api.updateMemberRole({
 				headers: ctx.headers,
 				body: {
-					userId: input.targetUserId,
-					role: "user",
+					memberId: input.memberId,
+					role: input.role,
+					organizationId: ctx.organizationId,
 				},
 			});
 		}),

@@ -2,7 +2,9 @@ import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { type NextRequest, NextResponse } from "next/server";
+import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
+import { db } from "@/server/db";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -14,7 +16,22 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		if (session.user.role !== "admin") {
+		const organizationId = session.session.activeOrganizationId;
+		if (!organizationId) {
+			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+		}
+
+		const member = await db.member.findFirst({
+			where: {
+				userId: session.user.id,
+				organizationId,
+			},
+			select: {
+				role: true,
+			},
+		});
+
+		if (!member || !isOrganizationAdminRole(member.role)) {
 			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
@@ -57,8 +74,7 @@ export async function POST(request: NextRequest) {
 		const publicUrl = `/uploads/settings/${filename}`;
 
 		return NextResponse.json({ url: publicUrl, filename });
-	} catch (error) {
-		console.error("Settings PDF upload error:", error);
+	} catch (_error) {
 		return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
 	}
 }
