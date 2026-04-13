@@ -73,7 +73,9 @@ function AttachmentItem({ attachment }: { attachment: Attachment }) {
 		);
 	}
 
-	const fileExtension = attachment.originalName.split(".").pop()?.toUpperCase() ?? "—";
+	const dotIndex = attachment.originalName.lastIndexOf(".");
+	const fileExtension =
+		dotIndex !== -1 ? attachment.originalName.slice(dotIndex + 1).toUpperCase() : "—";
 
 	return (
 		<BoxItem key={attachment.id} variant="clickable">
@@ -83,7 +85,7 @@ function AttachmentItem({ attachment }: { attachment: Attachment }) {
 			<BoxItemContent>
 				<BoxItemTitle className="truncate">{attachment.originalName}</BoxItemTitle>
 				<div className="flex items-center justify-start gap-1.5">
-					<BoxItemDescription>{formatBytes(attachment.size)}</BoxItemDescription>
+					<BoxItemDescription>{formatBytes(Number(attachment.size))}</BoxItemDescription>
 					<BoxItemDescription className="text-zinc-600">•</BoxItemDescription>
 					<BoxItemDescription>{fileExtension}</BoxItemDescription>
 				</div>
