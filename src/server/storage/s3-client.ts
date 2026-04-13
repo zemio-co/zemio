@@ -1,6 +1,7 @@
 import {
 	DeleteObjectsCommand,
 	GetObjectCommand,
+	PutObjectCommand,
 	S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -130,6 +131,29 @@ export async function getPresignedDownloadUrl(
 		Bucket: env.STORAGE_BUCKET,
 		Key: key,
 		ResponseContentDisposition: `attachment; filename="${filename}"`,
+	});
+	// @ts-expect-error Issue with types from S3
+	return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
+}
+
+/**
+ * Generate a presigned upload URL for a stored object.
+ * The caller uploads the file directly to S3 via HTTP PUT using this URL.
+ * @param key - The object key (e.g., "attachment/orgId/filename.pdf")
+ * @param contentType - The MIME type of the file being uploaded
+ * @param expiresInSeconds - URL validity duration in seconds (default: 300)
+ * @returns A presigned URL string
+ */
+export async function getPresignedUploadUrl(
+	key: string,
+	contentType: string,
+	expiresInSeconds = 300,
+): Promise<string> {
+	const client = getS3Client();
+	const command = new PutObjectCommand({
+		Bucket: env.STORAGE_BUCKET,
+		Key: key,
+		ContentType: contentType,
 	});
 	// @ts-expect-error Issue with types from S3
 	return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
