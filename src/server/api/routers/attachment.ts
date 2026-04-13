@@ -9,7 +9,9 @@ import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import {
 	deleteFilesFromStorage,
+	getFileExtension,
 	getPresignedDownloadUrl,
+	getPresignedUploadUrl,
 } from "@/server/storage";
 
 export const attachmentRouter = createTRPCRouter({
@@ -112,6 +114,41 @@ export const attachmentRouter = createTRPCRouter({
 			);
 
 			return { url };
+		}),
+
+	getUploadUrls: orgProcedure
+		.input(
+			z.object({
+				files: z
+					.array(
+						z.object({
+							name: z.string().min(1),
+							contentType: z.string().min(1),
+							size: z
+								.number()
+								.int()
+								.nonnegative()
+								.max(5 * 1024 * 1024, "File exceeds the 5 MB size limit"),
+						}),
+					)
+					.min(1)
+					.max(5),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const presignedUrls = await Promise.all(
+				input.files.map(async (file) => {
+					const extension = getFileExtension(file.name);
+					const uniqueFilename = extension
+						? `${crypto.randomUUID()}.${extension}`
+						: crypto.randomUUID();
+					const key = `attachment/${ctx.organizationId}/${uniqueFilename}`;
+					const url = await getPresignedUploadUrl(key, file.contentType);
+					return { url, key };
+				}),
+			);
+
+			return { presignedUrls };
 		}),
 
 	deletePendingUploads: orgProcedure

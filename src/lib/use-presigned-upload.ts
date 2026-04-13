@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { api } from "@/trpc/react";
 
 export type UploadedFile = {
 	objectInfo: { key: string };
@@ -12,8 +13,12 @@ export type UploadResult = {
 	failedFiles: File[];
 };
 
-type PresignResponse = {
-	presignedUrls: { url: string; key: string }[];
+export type UploadControl = {
+	upload: (
+		files: File[],
+		options?: { metadata?: Record<string, unknown> },
+	) => void;
+	isPending: boolean;
 };
 
 type UploadState =
@@ -21,37 +26,6 @@ type UploadState =
 	| { status: "pending" }
 	| { status: "success" }
 	| { status: "error"; error: Error };
-
-async function fetchPresignedUrls(
-	files: File[],
-): Promise<{ url: string; key: string }[]> {
-	const response = await fetch("/api/upload/presign", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			files: files.map((f) => ({
-				name: f.name,
-				contentType: f.type || "application/octet-stream",
-				size: f.size,
-			})),
-		}),
-	});
-
-	if (!response.ok) {
-		const body: unknown = await response.json();
-		const message =
-			typeof body === "object" &&
-			body !== null &&
-			"error" in body &&
-			typeof (body as { error: unknown }).error === "string"
-				? (body as { error: string }).error
-				: "Failed to get upload URLs";
-		throw new Error(message);
-	}
-
-	const { presignedUrls } = (await response.json()) as PresignResponse;
-	return presignedUrls;
-}
 
 async function uploadFileToS3(
 	file: File,
@@ -70,16 +44,9 @@ async function uploadFileToS3(
 	return entry.key;
 }
 
-export type UploadControl = {
-	upload: (
-		files: File[],
-		options?: { metadata?: Record<string, unknown> },
-	) => void;
-	isPending: boolean;
-};
-
 export function usePresignedUpload() {
 	const [state, setState] = useState<UploadState>({ status: "idle" });
+	const getUploadUrls = api.attachment.getUploadUrls.useMutation();
 
 	async function upload(
 		files: File[],
@@ -88,7 +55,13 @@ export function usePresignedUpload() {
 		setState({ status: "pending" });
 
 		try {
-			const presignedUrls = await fetchPresignedUrls(files);
+			const { presignedUrls } = await getUploadUrls.mutateAsync({
+				files: files.map((f) => ({
+					name: f.name,
+					contentType: f.type || "application/octet-stream",
+					size: f.size,
+				})),
+			});
 
 			const results = await Promise.allSettled(
 				files.map((file, index) => {
