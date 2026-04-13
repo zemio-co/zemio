@@ -80,7 +80,7 @@ enum ExpenseType {
 model Attachment {
   id           String   @id @default(cuid())
   key          String
-  size         Int
+  size         BigInt
   originalName String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
