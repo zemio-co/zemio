@@ -126,7 +126,7 @@ export async function getPresignedDownloadUrl(
 	expiresInSeconds = 300,
 ): Promise<string> {
 	const client = getS3Client();
-	const filename = downloadFilename ?? (key.split("/").at(-1) ?? "attachment");
+	const filename = downloadFilename ?? key.split("/").at(-1) ?? "attachment";
 	const command = new GetObjectCommand({
 		Bucket: env.STORAGE_BUCKET,
 		Key: key,

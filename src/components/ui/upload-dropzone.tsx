@@ -16,7 +16,10 @@ type UploadDropzoneProps = {
 				maxFiles?: number;
 		  }
 		| string;
-	uploadOverride?: (files: File[], options?: { metadata?: Record<string, unknown> }) => void;
+	uploadOverride?: (
+		files: File[],
+		options?: { metadata?: Record<string, unknown> },
+	) => void;
 };
 
 export function UploadDropzone({

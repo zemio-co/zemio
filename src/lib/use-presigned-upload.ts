@@ -71,7 +71,10 @@ async function uploadFileToS3(
 }
 
 export type UploadControl = {
-	upload: (files: File[], options?: { metadata?: Record<string, unknown> }) => void;
+	upload: (
+		files: File[],
+		options?: { metadata?: Record<string, unknown> },
+	) => void;
 	isPending: boolean;
 };
 
@@ -110,7 +113,11 @@ export function usePresignedUpload() {
 				}
 			}
 
-			setState(failedFiles.length > 0 ? { status: "error", error: new Error("Some files failed to upload") } : { status: "success" });
+			setState(
+				failedFiles.length > 0
+					? { status: "error", error: new Error("Some files failed to upload") }
+					: { status: "success" },
+			);
 
 			return { files: uploadedFiles, failedFiles };
 		} catch (error) {

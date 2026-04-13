@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import z from "zod";
 import { auth } from "@/server/better-auth";
-import { getFileExtension, getPresignedUploadUrl } from "@/server/storage/s3-client";
+import {
+	getFileExtension,
+	getPresignedUploadUrl,
+} from "@/server/storage/s3-client";
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -28,7 +31,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 	const orgId = session.session.activeOrganizationId;
 	if (!orgId) {
-		return NextResponse.json({ error: "No active organization" }, { status: 403 });
+		return NextResponse.json(
+			{ error: "No active organization" },
+			{ status: 403 },
+		);
 	}
 
 	const body: unknown = await req.json();
