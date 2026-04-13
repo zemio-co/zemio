@@ -2,6 +2,19 @@ import { z } from "zod";
 import { createOrganizationSlug } from "@/lib/organization";
 import { createTRPCRouter, platformAdminProcedure } from "@/server/api/trpc";
 
+const organizationIdSchema = z.object({
+	organizationId: z.string().min(1),
+});
+
+const organizationSlugSchema = z
+	.string()
+	.min(1, "Slug is required")
+	.max(100, "Slug must be at most 100 characters")
+	.regex(
+		/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+		'Slug must contain only lowercase letters, numbers, and "-"',
+	);
+
 export const platformAdminRouter = createTRPCRouter({
 	listOrganizations: platformAdminProcedure.query(async ({ ctx }) => {
 		return ctx.db.organization.findMany({
@@ -18,6 +31,81 @@ export const platformAdminRouter = createTRPCRouter({
 			},
 		});
 	}),
+
+	getOrganizationDetails: platformAdminProcedure
+		.input(organizationIdSchema)
+		.query(async ({ ctx, input }) => {
+			return ctx.db.organization.findUnique({
+				where: { id: input.organizationId },
+				select: {
+					id: true,
+					name: true,
+					slug: true,
+					logo: true,
+					metadata: true,
+					microsoftTenantId: true,
+					createdAt: true,
+					settings: {
+						select: {
+							id: true,
+							reviewerEmail: true,
+							kilometerRate: true,
+							costUnitInfoUrl: true,
+							dailyFoodAllowance: true,
+							breakfastDeduction: true,
+							lunchDeduction: true,
+							dinnerDeduction: true,
+							updatedAt: true,
+						},
+					},
+					members: {
+						orderBy: [{ role: "asc" }, { createdAt: "asc" }],
+						select: {
+							id: true,
+							role: true,
+							createdAt: true,
+							user: {
+								select: {
+									id: true,
+									name: true,
+									email: true,
+									image: true,
+									role: true,
+									microsoftTenantId: true,
+								},
+							},
+						},
+					},
+					invitations: {
+						orderBy: { createdAt: "desc" },
+						select: {
+							id: true,
+							email: true,
+							role: true,
+							status: true,
+							expiresAt: true,
+							createdAt: true,
+							inviter: {
+								select: {
+									id: true,
+									name: true,
+									email: true,
+								},
+							},
+						},
+					},
+					_count: {
+						select: {
+							members: true,
+							invitations: true,
+							reports: true,
+							costUnits: true,
+							costUnitGroups: true,
+						},
+					},
+				},
+			});
+		}),
 
 	createOrganization: platformAdminProcedure
 		.input(
@@ -55,10 +143,14 @@ export const platformAdminRouter = createTRPCRouter({
 			});
 		}),
 
-	updateOrganizationTenantId: platformAdminProcedure
+	updateOrganization: platformAdminProcedure
 		.input(
 			z.object({
 				organizationId: z.string().min(1),
+				name: z.string().trim().min(1).max(100),
+				slug: organizationSlugSchema,
+				logo: z.url("Logo must be a valid URL").nullable(),
+				metadata: z.string().trim().max(5000).nullable(),
 				microsoftTenantId: z
 					.string()
 					.uuid(
@@ -68,9 +160,29 @@ export const platformAdminRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.db.organization.findFirst({
+				where: {
+					slug: input.slug,
+					NOT: { id: input.organizationId },
+				},
+				select: { id: true },
+			});
+
+			if (existing) {
+				throw new Error(
+					`An organization with the slug "${input.slug}" already exists.`,
+				);
+			}
+
 			return ctx.db.organization.update({
 				where: { id: input.organizationId },
-				data: { microsoftTenantId: input.microsoftTenantId },
+				data: {
+					name: input.name,
+					slug: input.slug,
+					logo: input.logo,
+					metadata: input.metadata,
+					microsoftTenantId: input.microsoftTenantId,
+				},
 			});
 		}),
 });

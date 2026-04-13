@@ -60,7 +60,7 @@ export function OrgSwitcher() {
 			>
 				<SelectTrigger className="w-full justify-start">
 					<Building2Icon className="size-4 text-muted-foreground" />
-					<SelectValue placeholder="Organisation auswählen" />
+					<SelectValue className={"truncate"} placeholder="Organisation auswählen" />
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>

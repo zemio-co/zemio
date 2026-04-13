@@ -32,7 +32,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 		<SidebarProvider>
 			<AppSidebar />
 			<div className="flex-1">
-				<SiteHeader />
+				<SiteHeader className="hidden" />
 				{children}
 			</div>
 		</SidebarProvider>

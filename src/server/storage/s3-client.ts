@@ -1,4 +1,5 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env";
 
 /**
@@ -67,6 +68,29 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
 		console.error(`[S3] Failed to fetch file with key: ${key}`, error);
 		return null;
 	}
+}
+
+/**
+ * Generate a presigned download URL for a stored object.
+ * The URL carries a Content-Disposition: attachment header so the browser
+ * downloads the file directly instead of opening it inline.
+ * @param key - The object key (e.g., "attachment/filename.pdf")
+ * @param expiresInSeconds - URL validity duration in seconds (default: 300)
+ * @returns A presigned URL string
+ */
+export async function getPresignedDownloadUrl(
+	key: string,
+	expiresInSeconds = 300,
+): Promise<string> {
+	const client = getS3Client();
+	const filename = key.split("/").at(-1) ?? "attachment";
+	const command = new GetObjectCommand({
+		Bucket: env.STORAGE_BUCKET,
+		Key: key,
+		ResponseContentDisposition: `attachment; filename="${filename}"`,
+	});
+	// @ts-expect-error Issue with types from S3
+	return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
 }
 
 /**

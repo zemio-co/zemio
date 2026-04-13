@@ -11,6 +11,22 @@ import {
 } from "@/server/api/trpc";
 
 export const settingsRouter = createTRPCRouter({
+	getOrg: orgProcedure.query(async ({ ctx }) => {
+		return await ctx.db.organization.findUniqueOrThrow({
+			where: { id: ctx.organizationId },
+		});
+	}),
+
+	updateOrgName: orgAdminProcedure
+		.input(z.object({ name: z.string().min(1).max(100) }))
+		.mutation(async ({ ctx, input }) => {
+			return await ctx.db.organization.update({
+				where: { id: ctx.organizationId },
+				data: { name: input.name },
+				select: { id: true, name: true },
+			});
+		}),
+
 	get: orgProcedure.query(async ({ ctx }) => {
 		const settings = await ctx.db.settings.upsert({
 			where: { organizationId: ctx.organizationId },
@@ -96,6 +112,75 @@ export const settingsRouter = createTRPCRouter({
 			},
 		});
 	}),
+	listMembers: orgAdminProcedure
+		.input(
+			z.object({
+				pageSize: z.number().min(1).max(50).default(20),
+				page: z.number().min(1).default(1),
+				search: z.string().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { page, pageSize, search } = input;
+
+			const where = search
+				? {
+						organizationId: ctx.organizationId,
+						user: {
+							name: {
+								contains: search,
+								mode: "insensitive" as const,
+							},
+						},
+					}
+				: { organizationId: ctx.organizationId };
+
+			const select = {
+				id: true,
+				user: {
+					select: {
+						id: true,
+						name: true,
+						email: true,
+						image: true,
+					},
+				},
+			};
+
+			const [rows, total] = await Promise.all([
+				ctx.db.member.findMany({
+					where,
+					select,
+					skip: (page - 1) * pageSize,
+					take: pageSize,
+				}),
+				ctx.db.member.count({ where }),
+			]);
+
+			return {
+				rows,
+				total,
+				pageCount: Math.ceil(total / pageSize),
+			};
+		}),
+	getMembershipDetails: orgAdminProcedure
+		.input(
+			z.object({
+				id: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { id: membershipId } = input;
+
+			return await ctx.db.member.findUnique({
+				where: {
+					id: membershipId,
+				},
+				include: {
+					user: true,
+				},
+			});
+		}),
 	updateMealAllowances: orgAdminProcedure
 		.input(updateMealAllowancesSchema)
 		.mutation(async ({ ctx, input }) => {
