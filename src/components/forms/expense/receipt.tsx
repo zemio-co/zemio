@@ -25,7 +25,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { formatBytes, renameFileWithHash } from "@/lib/utils";
-import { createReceiptExpenseSchema } from "@/lib/validators";
+import { baseCreateExpenseSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 
 export function CreateReceiptExpenseForm({
@@ -59,11 +59,13 @@ export function CreateReceiptExpenseForm({
 			endDate: formatDate(new Date(), "dd.MM.yyyy"),
 			type: "RECEIPT",
 			reportId,
-			attachments: [] as { key: string; size: number; originalName: string }[],
 			files: [] as File[],
 		},
 		validators: {
-			onSubmit: createReceiptExpenseSchema.and(
+			// Only validates fields that are tracked in the form.
+			// The attachments payload is built imperatively in onSubmit after upload
+			// and is validated server-side by the TRPC router.
+			onSubmit: baseCreateExpenseSchema.and(
 				z.object({ files: z.file().array() }),
 			),
 		},
@@ -76,6 +78,13 @@ export function CreateReceiptExpenseForm({
 			);
 
 			const { files } = await uploader.upload(renamedFiles);
+
+			if (files.length !== originalFiles.length) {
+				toast.error("Upload fehlgeschlagen", {
+					description: "Nicht alle Dateien konnten hochgeladen werden",
+				});
+				return;
+			}
 
 			createReceipt.mutate({
 				amount: value.amount,
