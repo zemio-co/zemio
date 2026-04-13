@@ -3,7 +3,7 @@
 	"packages": {
 		".": {
 			"release-type": "node",
-			"package-name": "spesen-tool",
+			"package-name": "zemio",
 			"version-file": "package.json",
 			"changelog-path": "CHANGELOG.md",
 			"extra-files": [],

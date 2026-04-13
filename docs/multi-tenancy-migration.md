@@ -1,6 +1,6 @@
 # Multi-Tenancy Migration Guide
 
-This guide covers the complete migration of the spesen-tool from a single-tenant to a multi-tenant architecture using Better Auth's organization plugin. Since there is no existing data to migrate, all steps are purely additive.
+This guide covers the complete migration of zemio from a single-tenant to a multi-tenant architecture using Better Auth's organization plugin. Since there is no existing data to migrate, all steps are purely additive.
 
 ---
 
