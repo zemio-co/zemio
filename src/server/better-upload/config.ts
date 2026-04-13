@@ -12,6 +12,17 @@ const storageForcePathStyle = env.STORAGE_FORCE_PATH_STYLE;
 const maxFileSize = 5 * 1024 * 1024;
 const maxFiles = 5;
 
+function getFileExtension(filename: string): string {
+	const lastDotIndex = filename.lastIndexOf(".");
+	const hasExtension = lastDotIndex > 0 && lastDotIndex < filename.length - 1;
+
+	if (!hasExtension) {
+		return "";
+	}
+
+	return filename.slice(lastDotIndex + 1).toLowerCase();
+}
+
 const s3 = custom({
 	host: storageHost,
 	accessKeyId: env.STORAGE_ACCESS_KEY_ID,
@@ -44,9 +55,16 @@ export const router: Router = {
 				}
 
 				return {
-					generateObjectInfo: () => ({
-						key: `attachment/${orgId}/${crypto.randomUUID()}`,
-					}),
+					generateObjectInfo: ({ file }) => {
+						const extension = getFileExtension(file.name);
+						const uniqueFilename = extension
+							? `${crypto.randomUUID()}.${extension}`
+							: crypto.randomUUID();
+
+						return {
+							key: `attachment/${orgId}/${uniqueFilename}`,
+						};
+					},
 				};
 			},
 		}),

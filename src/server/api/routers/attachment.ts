@@ -65,6 +65,7 @@ export const attachmentRouter = createTRPCRouter({
 				where: { id: input.id },
 				select: {
 					key: true,
+					originalName: true,
 					expense: {
 						select: {
 							report: {
@@ -98,7 +99,10 @@ export const attachmentRouter = createTRPCRouter({
 				throw new TRPCError({ code: "UNAUTHORIZED" });
 			}
 
-			const url = await getPresignedDownloadUrl(attachment.key);
+			const url = await getPresignedDownloadUrl(
+				attachment.key,
+				attachment.originalName,
+			);
 
 			return { url };
 		}),

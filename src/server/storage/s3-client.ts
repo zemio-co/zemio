@@ -80,10 +80,11 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
  */
 export async function getPresignedDownloadUrl(
 	key: string,
+	downloadFilename?: string,
 	expiresInSeconds = 300,
 ): Promise<string> {
 	const client = getS3Client();
-	const filename = key.split("/").at(-1) ?? "attachment";
+	const filename = downloadFilename ?? (key.split("/").at(-1) ?? "attachment");
 	const command = new GetObjectCommand({
 		Bucket: env.STORAGE_BUCKET,
 		Key: key,
