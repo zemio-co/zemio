@@ -141,7 +141,13 @@ export const expenseRouter = createTRPCRouter({
 					description: input.description,
 					meta: meta,
 					attachments: {
-						createMany: { data: input.objectKeys.map((key) => ({ key })) },
+						createMany: {
+							data: input.attachments.map((a) => ({
+								key: a.key,
+								size: a.size,
+								originalName: a.originalName,
+							})),
+						},
 					},
 				},
 			});

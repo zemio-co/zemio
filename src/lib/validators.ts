@@ -48,9 +48,15 @@ export const baseCreateExpenseSchema = z.object({
 	reportId: z.string().min(1),
 });
 
+export const attachmentInputSchema = z.object({
+	key: z.string().min(1),
+	size: z.number().int().nonnegative(),
+	originalName: z.string().min(1),
+});
+
 export const createReceiptExpenseSchema = baseCreateExpenseSchema.and(
 	z.object({
-		objectKeys: z.string().array(),
+		attachments: attachmentInputSchema.array(),
 	}),
 );
 

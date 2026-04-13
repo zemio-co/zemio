@@ -59,7 +59,7 @@ export function CreateReceiptExpenseForm({
 			endDate: formatDate(new Date(), "dd.MM.yyyy"),
 			type: "RECEIPT",
 			reportId,
-			objectKeys: [] as string[],
+			attachments: [] as { key: string; size: number; originalName: string }[],
 			files: [] as File[],
 		},
 		validators: {
@@ -70,8 +70,9 @@ export function CreateReceiptExpenseForm({
 		onSubmit: async ({ value }) => {
 			// Rename files with unique hash before upload
 			const timestamp = Date.now();
+			const originalFiles = value.files;
 			const renamedFiles = await Promise.all(
-				value.files.map((file) => renameFileWithHash(file, reportId, timestamp)),
+				originalFiles.map((file) => renameFileWithHash(file, reportId, timestamp)),
 			);
 
 			const { files } = await uploader.upload(renamedFiles);
@@ -83,7 +84,11 @@ export function CreateReceiptExpenseForm({
 				endDate: value.endDate,
 				type: "RECEIPT",
 				reportId,
-				objectKeys: files.map((file) => file.objectInfo.key),
+				attachments: files.map((uploadedFile, index) => ({
+					key: uploadedFile.objectInfo.key,
+					size: originalFiles[index]!.size,
+					originalName: originalFiles[index]!.name,
+				})),
 			});
 
 			// TODO: Invalidate expense list for report
