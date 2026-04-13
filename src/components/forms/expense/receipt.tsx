@@ -65,9 +65,7 @@ export function CreateReceiptExpenseForm({
 			// Only validates fields that are tracked in the form.
 			// The attachments payload is built imperatively in onSubmit after upload
 			// and is validated server-side by the TRPC router.
-			onSubmit: baseCreateExpenseSchema.and(
-				z.object({ files: z.file().array() }),
-			),
+			onSubmit: baseCreateExpenseSchema.and(z.object({ files: z.file().array() })),
 		},
 		onSubmit: async ({ value }) => {
 			// Rename files with unique hash before upload
