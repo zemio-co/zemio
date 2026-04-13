@@ -20,13 +20,25 @@ export type AttachmentModel = runtime.Types.Result.DefaultSelection<Prisma.$Atta
 
 export type AggregateAttachment = {
   _count: AttachmentCountAggregateOutputType | null
+  _avg: AttachmentAvgAggregateOutputType | null
+  _sum: AttachmentSumAggregateOutputType | null
   _min: AttachmentMinAggregateOutputType | null
   _max: AttachmentMaxAggregateOutputType | null
+}
+
+export type AttachmentAvgAggregateOutputType = {
+  size: number | null
+}
+
+export type AttachmentSumAggregateOutputType = {
+  size: bigint | null
 }
 
 export type AttachmentMinAggregateOutputType = {
   id: string | null
   key: string | null
+  size: bigint | null
+  originalName: string | null
   createdAt: Date | null
   updatedAt: Date | null
   expenseId: string | null
@@ -35,6 +47,8 @@ export type AttachmentMinAggregateOutputType = {
 export type AttachmentMaxAggregateOutputType = {
   id: string | null
   key: string | null
+  size: bigint | null
+  originalName: string | null
   createdAt: Date | null
   updatedAt: Date | null
   expenseId: string | null
@@ -43,6 +57,8 @@ export type AttachmentMaxAggregateOutputType = {
 export type AttachmentCountAggregateOutputType = {
   id: number
   key: number
+  size: number
+  originalName: number
   createdAt: number
   updatedAt: number
   expenseId: number
@@ -50,9 +66,19 @@ export type AttachmentCountAggregateOutputType = {
 }
 
 
+export type AttachmentAvgAggregateInputType = {
+  size?: true
+}
+
+export type AttachmentSumAggregateInputType = {
+  size?: true
+}
+
 export type AttachmentMinAggregateInputType = {
   id?: true
   key?: true
+  size?: true
+  originalName?: true
   createdAt?: true
   updatedAt?: true
   expenseId?: true
@@ -61,6 +87,8 @@ export type AttachmentMinAggregateInputType = {
 export type AttachmentMaxAggregateInputType = {
   id?: true
   key?: true
+  size?: true
+  originalName?: true
   createdAt?: true
   updatedAt?: true
   expenseId?: true
@@ -69,6 +97,8 @@ export type AttachmentMaxAggregateInputType = {
 export type AttachmentCountAggregateInputType = {
   id?: true
   key?: true
+  size?: true
+  originalName?: true
   createdAt?: true
   updatedAt?: true
   expenseId?: true
@@ -113,6 +143,18 @@ export type AttachmentAggregateArgs<ExtArgs extends runtime.Types.Extensions.Int
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: AttachmentAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: AttachmentSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: AttachmentMinAggregateInputType
@@ -143,6 +185,8 @@ export type AttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   _count?: AttachmentCountAggregateInputType | true
+  _avg?: AttachmentAvgAggregateInputType
+  _sum?: AttachmentSumAggregateInputType
   _min?: AttachmentMinAggregateInputType
   _max?: AttachmentMaxAggregateInputType
 }
@@ -150,10 +194,14 @@ export type AttachmentGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inter
 export type AttachmentGroupByOutputType = {
   id: string
   key: string
+  size: bigint
+  originalName: string
   createdAt: Date
   updatedAt: Date
   expenseId: string
   _count: AttachmentCountAggregateOutputType | null
+  _avg: AttachmentAvgAggregateOutputType | null
+  _sum: AttachmentSumAggregateOutputType | null
   _min: AttachmentMinAggregateOutputType | null
   _max: AttachmentMaxAggregateOutputType | null
 }
@@ -179,6 +227,8 @@ export type AttachmentWhereInput = {
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   id?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntFilter<"Attachment"> | bigint | number
+  originalName?: Prisma.StringFilter<"Attachment"> | string
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   expenseId?: Prisma.StringFilter<"Attachment"> | string
@@ -188,6 +238,8 @@ export type AttachmentWhereInput = {
 export type AttachmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   expenseId?: Prisma.SortOrder
@@ -200,6 +252,8 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.AttachmentWhereInput[]
   NOT?: Prisma.AttachmentWhereInput | Prisma.AttachmentWhereInput[]
   key?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntFilter<"Attachment"> | bigint | number
+  originalName?: Prisma.StringFilter<"Attachment"> | string
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   expenseId?: Prisma.StringFilter<"Attachment"> | string
@@ -209,12 +263,16 @@ export type AttachmentWhereUniqueInput = Prisma.AtLeast<{
 export type AttachmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   expenseId?: Prisma.SortOrder
   _count?: Prisma.AttachmentCountOrderByAggregateInput
+  _avg?: Prisma.AttachmentAvgOrderByAggregateInput
   _max?: Prisma.AttachmentMaxOrderByAggregateInput
   _min?: Prisma.AttachmentMinOrderByAggregateInput
+  _sum?: Prisma.AttachmentSumOrderByAggregateInput
 }
 
 export type AttachmentScalarWhereWithAggregatesInput = {
@@ -223,6 +281,8 @@ export type AttachmentScalarWhereWithAggregatesInput = {
   NOT?: Prisma.AttachmentScalarWhereWithAggregatesInput | Prisma.AttachmentScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   key?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
+  size?: Prisma.BigIntWithAggregatesFilter<"Attachment"> | bigint | number
+  originalName?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Attachment"> | Date | string
   expenseId?: Prisma.StringWithAggregatesFilter<"Attachment"> | string
@@ -231,6 +291,8 @@ export type AttachmentScalarWhereWithAggregatesInput = {
 export type AttachmentCreateInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   expense: Prisma.ExpenseCreateNestedOneWithoutAttachmentsInput
@@ -239,6 +301,8 @@ export type AttachmentCreateInput = {
 export type AttachmentUncheckedCreateInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   expenseId: string
@@ -247,6 +311,8 @@ export type AttachmentUncheckedCreateInput = {
 export type AttachmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expense?: Prisma.ExpenseUpdateOneRequiredWithoutAttachmentsNestedInput
@@ -255,6 +321,8 @@ export type AttachmentUpdateInput = {
 export type AttachmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expenseId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -263,6 +331,8 @@ export type AttachmentUncheckedUpdateInput = {
 export type AttachmentCreateManyInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
   expenseId: string
@@ -271,6 +341,8 @@ export type AttachmentCreateManyInput = {
 export type AttachmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -278,6 +350,8 @@ export type AttachmentUpdateManyMutationInput = {
 export type AttachmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   expenseId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -296,14 +370,22 @@ export type AttachmentOrderByRelationAggregateInput = {
 export type AttachmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   expenseId?: Prisma.SortOrder
 }
 
+export type AttachmentAvgOrderByAggregateInput = {
+  size?: Prisma.SortOrder
+}
+
 export type AttachmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   expenseId?: Prisma.SortOrder
@@ -312,9 +394,15 @@ export type AttachmentMaxOrderByAggregateInput = {
 export type AttachmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  size?: Prisma.SortOrder
+  originalName?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   expenseId?: Prisma.SortOrder
+}
+
+export type AttachmentSumOrderByAggregateInput = {
+  size?: Prisma.SortOrder
 }
 
 export type AttachmentCreateNestedManyWithoutExpenseInput = {
@@ -359,9 +447,19 @@ export type AttachmentUncheckedUpdateManyWithoutExpenseNestedInput = {
   deleteMany?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
 }
 
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
 export type AttachmentCreateWithoutExpenseInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -369,6 +467,8 @@ export type AttachmentCreateWithoutExpenseInput = {
 export type AttachmentUncheckedCreateWithoutExpenseInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -405,6 +505,8 @@ export type AttachmentScalarWhereInput = {
   NOT?: Prisma.AttachmentScalarWhereInput | Prisma.AttachmentScalarWhereInput[]
   id?: Prisma.StringFilter<"Attachment"> | string
   key?: Prisma.StringFilter<"Attachment"> | string
+  size?: Prisma.BigIntFilter<"Attachment"> | bigint | number
+  originalName?: Prisma.StringFilter<"Attachment"> | string
   createdAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Attachment"> | Date | string
   expenseId?: Prisma.StringFilter<"Attachment"> | string
@@ -413,6 +515,8 @@ export type AttachmentScalarWhereInput = {
 export type AttachmentCreateManyExpenseInput = {
   id?: string
   key: string
+  size: bigint | number
+  originalName: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -420,6 +524,8 @@ export type AttachmentCreateManyExpenseInput = {
 export type AttachmentUpdateWithoutExpenseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -427,6 +533,8 @@ export type AttachmentUpdateWithoutExpenseInput = {
 export type AttachmentUncheckedUpdateWithoutExpenseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -434,6 +542,8 @@ export type AttachmentUncheckedUpdateWithoutExpenseInput = {
 export type AttachmentUncheckedUpdateManyWithoutExpenseInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  size?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  originalName?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -443,6 +553,8 @@ export type AttachmentUncheckedUpdateManyWithoutExpenseInput = {
 export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   key?: boolean
+  size?: boolean
+  originalName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   expenseId?: boolean
@@ -452,6 +564,8 @@ export type AttachmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   key?: boolean
+  size?: boolean
+  originalName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   expenseId?: boolean
@@ -461,6 +575,8 @@ export type AttachmentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   key?: boolean
+  size?: boolean
+  originalName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   expenseId?: boolean
@@ -470,12 +586,14 @@ export type AttachmentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type AttachmentSelectScalar = {
   id?: boolean
   key?: boolean
+  size?: boolean
+  originalName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   expenseId?: boolean
 }
 
-export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "createdAt" | "updatedAt" | "expenseId", ExtArgs["result"]["attachment"]>
+export type AttachmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "size" | "originalName" | "createdAt" | "updatedAt" | "expenseId", ExtArgs["result"]["attachment"]>
 export type AttachmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   expense?: boolean | Prisma.ExpenseDefaultArgs<ExtArgs>
 }
@@ -494,6 +612,8 @@ export type $AttachmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     key: string
+    size: bigint
+    originalName: string
     createdAt: Date
     updatedAt: Date
     expenseId: string
@@ -923,6 +1043,8 @@ export interface Prisma__AttachmentClient<T, Null = never, ExtArgs extends runti
 export interface AttachmentFieldRefs {
   readonly id: Prisma.FieldRef<"Attachment", 'String'>
   readonly key: Prisma.FieldRef<"Attachment", 'String'>
+  readonly size: Prisma.FieldRef<"Attachment", 'BigInt'>
+  readonly originalName: Prisma.FieldRef<"Attachment", 'String'>
   readonly createdAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Attachment", 'DateTime'>
   readonly expenseId: Prisma.FieldRef<"Attachment", 'String'>
