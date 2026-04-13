@@ -17,7 +17,7 @@ export type UploadControl = {
 	upload: (
 		files: File[],
 		options?: { metadata?: Record<string, unknown> },
-	) => void;
+	) => Promise<UploadResult>;
 	isPending: boolean;
 };
 

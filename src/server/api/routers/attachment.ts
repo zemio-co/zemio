@@ -143,7 +143,7 @@ export const attachmentRouter = createTRPCRouter({
 						? `${crypto.randomUUID()}.${extension}`
 						: crypto.randomUUID();
 					const key = `attachment/${ctx.organizationId}/${uniqueFilename}`;
-					const url = await getPresignedUploadUrl(key, file.contentType);
+					const url = await getPresignedUploadUrl(key, file.contentType, file.size);
 					return { url, key };
 				}),
 			);
