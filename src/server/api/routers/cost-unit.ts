@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import { NO_COST_UNIT_GROUP } from "@/lib/consts";
 import {
 	createCostUnitGroupSchema,
@@ -25,6 +26,52 @@ function isPrismaUniqueConstraintError(
 }
 
 export const costUnitRouter = createTRPCRouter({
+	listCostUnits: orgProcedure
+		.input(
+			z.object({
+				cursor: z.string().optional(),
+				pageSize: z.number().min(1).max(50).default(20),
+				search: z.string().optional(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const { cursor, pageSize, search } = input;
+
+			const where = {
+				organizationId: ctx.organizationId,
+				...(search
+					? {
+							OR: [
+								{ title: { contains: search, mode: "insensitive" as const } },
+								{ tag: { contains: search, mode: "insensitive" as const } },
+							],
+						}
+					: {}),
+			};
+
+			const items = await ctx.db.costUnit.findMany({
+				where,
+				take: pageSize + 1,
+				cursor: cursor ? { id: cursor } : undefined,
+				orderBy: { tag: "asc" },
+				select: {
+					id: true,
+					tag: true,
+					title: true,
+					examples: true,
+					costUnitGroupId: true,
+				},
+			});
+
+			let nextCursor: string | undefined;
+			if (items.length > pageSize) {
+				const nextItem = items.pop();
+				nextCursor = nextItem?.id;
+			}
+
+			return { items, nextCursor };
+		}),
+
 	listGroupsWithUnits: orgProcedure.query(async ({ ctx }) => {
 		const [groups, ungroupedCostUnits] = await ctx.db.$transaction([
 			// Fetch groups with their cost units

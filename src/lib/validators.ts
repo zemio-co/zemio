@@ -88,6 +88,10 @@ export const foodExpenseMetaSchema = z.object({
 	dinnerDeduction: z.number().min(0),
 });
 
+export const updateUserNameSchema = z.object({
+	name: z.string().min(1),
+});
+
 // Schema for form validation (formatted IBAN with spaces)
 export const updatePreferencesSchema = z.object({
 	notificationPreference: z.enum(NotificationPreference),

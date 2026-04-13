@@ -12,7 +12,7 @@ function Box({
 	return (
 		<ul
 			className={cn(
-				"group/box rounded-lg shadow-sm ring-1 ring-zinc-700/15",
+				"group/box rounded-lg bg-white shadow-sm ring-1 ring-zinc-700/15",
 				className,
 			)}
 			data-size={size}
@@ -28,7 +28,7 @@ function BoxItem({
 	children,
 	...props
 }: React.ComponentProps<"li"> & {
-	variant?: "default" | "clickable";
+	variant?: "default" | "clickable" | "grid";
 }) {
 	return (
 		<li
@@ -36,6 +36,7 @@ function BoxItem({
 				"group/item relative isolate flex items-center justify-start gap-4 px-5 py-4",
 				"before:absolute before:top-1 before:left-1 before:-z-30 before:hidden before:h-[calc(100%-0.5rem)] before:w-[calc(100%-0.5rem)] before:rounded-md before:bg-zinc-100 before:opacity-0 before:transition-opacity hover:before:opacity-100 data-[variant=clickable]:before:block before:['']",
 				"after:absolute after:bottom-0 after:left-5 after:block after:h-px after:w-[calc(100%-2.5rem)] after:bg-border last:after:hidden after:['']",
+				"data-[variant='grid']:grid data-[variant='grid']:grid-cols-1 data-[variant='grid']:gap-6 sm:data-[variant='grid']:grid-cols-2",
 				className,
 			)}
 			data-slot={"box-item"}

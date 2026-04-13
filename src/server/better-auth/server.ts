@@ -5,6 +5,7 @@ import { admin as adminPlugin, organization } from "better-auth/plugins";
 import { env } from "@/env";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
 import { db } from "@/server/db";
+import * as adminAc from "./ac/admin";
 import * as organizationAc from "./ac/organization";
 
 // Get configuration values
@@ -153,7 +154,13 @@ export const auth = betterAuth({
 		},
 	},
 	plugins: [
-		adminPlugin(),
+		adminPlugin({
+			ac: adminAc.ac,
+			roles: {
+				user: adminAc.user,
+				admin: adminAc.admin,
+			},
+		}),
 		nextCookies(),
 		organization({
 			// Only platform admins (user.role === "admin") may create organizations

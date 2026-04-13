@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -79,31 +80,31 @@ function MoreMenu({
 			{
 				id: "id",
 				icon: FingerprintIcon,
-				title: "Copy ID",
+				title: "ID",
 				value: report.id,
 			},
 			{
 				id: "iban",
 				icon: CreditCardIcon,
-				title: "Copy IBAN",
+				title: "IBAN",
 				value: report.iban,
 			},
 			{
 				id: "name",
 				icon: UserIcon,
-				title: "Copy Kontoname",
+				title: "Kontoname",
 				value: report.name,
 			},
 			{
 				id: "sum",
 				icon: CalculatorIcon,
-				title: "Copy Summe",
+				title: "Summe",
 				value: report.sum,
 			},
 			{
 				id: "title",
 				icon: TextIcon,
-				title: "Copy Titel",
+				title: "Titel",
 				value: report.title,
 			},
 		];
@@ -126,9 +127,10 @@ function MoreMenu({
 								key={action.id}
 								onClick={() => {
 									navigator.clipboard.writeText(action.value.toString());
+									toast.success(`${action.title} wurde zum Clipboard kopiert`);
 								}}
 							>
-								<Icon /> {action.title}
+								<Icon /> {action.title} kopieren
 							</DropdownMenuItem>
 						);
 					})}
