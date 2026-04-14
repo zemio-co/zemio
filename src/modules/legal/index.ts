@@ -1,0 +1,1 @@
+export { LegalOnboardingPage } from "./components";
