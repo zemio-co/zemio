@@ -121,6 +121,7 @@ model User {
   preferences Preferences?
 
   bankingDetails BankingDetails[]
+  legalAcceptances LegalAcceptance[]
 
   @@unique([email])
   @@map("user")
@@ -139,6 +140,8 @@ model Session {
 
   impersonatedBy String?
   activeOrganizationId String?
+  legalAcceptedAt DateTime?
+  legalAcceptedReleaseVersion String?
 
   @@unique([token])
   @@index([userId])
@@ -243,6 +246,27 @@ enum NotificationPreference {
   ALL
   STATUS_CHANGES
   NONE
+}
+
+model LegalAcceptance {
+  id               String              @id @default(cuid())
+  userId           String
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  releaseVersion   String
+  acceptanceType   LegalAcceptanceType
+  acceptedAt       DateTime            @default(now())
+  documentVersions Json
+
+  // One acceptance row per user/release is intentional. Repeated submissions for
+  // the same release are treated as idempotent confirmations, not append-only events.
+  @@unique([userId, releaseVersion])
+  @@index([userId])
+  @@index([releaseVersion])
+  @@map("legal_acceptance")
+}
+
+enum LegalAcceptanceType {
+  CHECKBOX_AND_BUTTON
 }
 
 model Settings {

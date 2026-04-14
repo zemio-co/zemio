@@ -13,7 +13,7 @@ export function AuthForm({ ...props }: React.ComponentProps<"form">) {
 	const signInWithMicrosoft = async () => {
 		const res = await authClient.signIn.social({
 			provider: "microsoft",
-			callbackURL: ROUTES.USER_DASHBOARD,
+			callbackURL: ROUTES.ONBOARDING,
 		});
 
 		if (res.error) {

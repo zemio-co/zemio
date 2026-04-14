@@ -9,6 +9,10 @@ import { ROUTES } from "@/lib/consts";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
+import {
+	buildLegalOnboardingRedirectPath,
+	hasAcceptedCurrentLegalRelease,
+} from "@/server/legal";
 
 export default async function ServerLayout({
 	children,
@@ -20,6 +24,10 @@ export default async function ServerLayout({
 	if (!session) {
 		// When the user is not logged in, redirect to the login page
 		redirect(ROUTES.AUTH);
+	}
+
+	if (!hasAcceptedCurrentLegalRelease(session)) {
+		redirect(buildLegalOnboardingRedirectPath(ROUTES.ADMIN_SETTINGS));
 	}
 
 	const member = await db.member.findFirst({

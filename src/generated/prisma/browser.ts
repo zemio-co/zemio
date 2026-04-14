@@ -73,6 +73,11 @@ export type Invitation = Prisma.InvitationModel
  */
 export type Preferences = Prisma.PreferencesModel
 /**
+ * Model LegalAcceptance
+ * 
+ */
+export type LegalAcceptance = Prisma.LegalAcceptanceModel
+/**
  * Model Settings
  * 
  */

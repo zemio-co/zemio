@@ -344,6 +344,23 @@ export type EnumNotificationPreferenceWithAggregatesFilter<$PrismaModel = never>
   _max?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
 }
 
+export type EnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+}
+
+export type EnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -658,6 +675,23 @@ export type NestedEnumNotificationPreferenceWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
+}
+
+export type NestedEnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+}
+
+export type NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
 }
 
 

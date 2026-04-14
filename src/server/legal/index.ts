@@ -1,0 +1,16 @@
+export { CURRENT_LEGAL_RELEASE } from "./current-release";
+export {
+	getCurrentLegalDocumentVersionSnapshots,
+	getCurrentLegalRelease,
+} from "./load-current-release";
+export {
+	buildLegalOnboardingRedirectPath,
+	getPostAcceptancePath,
+	getSafeReturnToPath,
+	hasAcceptedCurrentLegalRelease,
+} from "./session";
+export type {
+	LegalDocumentDefinition,
+	LegalDocumentVersionSnapshot,
+	LegalReleaseDefinition,
+} from "./types";

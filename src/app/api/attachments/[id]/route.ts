@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
+import { hasAcceptedCurrentLegalRelease } from "@/server/legal";
 import { getFileExtension, getFileFromStorage } from "@/server/storage";
 
 const MIME_TYPES: Record<string, string> = {
@@ -23,6 +24,10 @@ export async function GET(
 
 	if (!session?.user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	if (!hasAcceptedCurrentLegalRelease(session)) {
+		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 
 	const organizationId = session.session.activeOrganizationId;

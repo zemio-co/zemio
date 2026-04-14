@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/consts";
 import { AdminLayout } from "@/modules/admin";
 import { auth } from "@/server/better-auth";
+import {
+	buildLegalOnboardingRedirectPath,
+	hasAcceptedCurrentLegalRelease,
+} from "@/server/legal";
 
 export default async function ServerLayout(
 	props: LayoutProps<"/platform-admin">,
@@ -13,6 +17,12 @@ export default async function ServerLayout(
 
 	if (!session) {
 		redirect(ROUTES.AUTH);
+	}
+
+	if (!hasAcceptedCurrentLegalRelease(session)) {
+		redirect(
+			buildLegalOnboardingRedirectPath(ROUTES.PLATFORM_ADMIN_ORGANIZATIONS),
+		);
 	}
 
 	if (session.user.role !== "admin") {
