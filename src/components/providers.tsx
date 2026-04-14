@@ -13,9 +13,9 @@ export function Providers({
 		<NuqsAdapter>
 			<NextThemesProvider
 				attribute="class"
-				defaultTheme="system"
+				defaultTheme="light"
 				disableTransitionOnChange
-				enableSystem
+				forcedTheme="light"
 				{...props}
 			>
 				{children}
