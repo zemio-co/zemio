@@ -249,6 +249,33 @@ export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonFilter<$PrismaModel>
 }
 
+export type BigIntFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntFilter<$PrismaModel> | bigint | number
+}
+
+export type BigIntWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _max?: Prisma.NestedBigIntFilter<$PrismaModel>
+}
+
 export type BoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -315,6 +342,23 @@ export type EnumNotificationPreferenceWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
+}
+
+export type EnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+}
+
+export type EnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
 }
 
 export type NestedStringFilter<$PrismaModel = never> = {
@@ -538,6 +582,33 @@ export type NestedJsonFilterBase<$PrismaModel = never> = {
   not?: runtime.InputJsonValue | Prisma.JsonFieldRefInput<$PrismaModel> | Prisma.JsonNullValueFilter
 }
 
+export type NestedBigIntFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntFilter<$PrismaModel> | bigint | number
+}
+
+export type NestedBigIntWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  in?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  notIn?: bigint[] | number[] | Prisma.ListBigIntFieldRefInput<$PrismaModel>
+  lt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  lte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gt?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  gte?: bigint | number | Prisma.BigIntFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBigIntWithAggregatesFilter<$PrismaModel> | bigint | number
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _avg?: Prisma.NestedFloatFilter<$PrismaModel>
+  _sum?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBigIntFilter<$PrismaModel>
+  _max?: Prisma.NestedBigIntFilter<$PrismaModel>
+}
+
 export type NestedBoolFilter<$PrismaModel = never> = {
   equals?: boolean | Prisma.BooleanFieldRefInput<$PrismaModel>
   not?: Prisma.NestedBoolFilter<$PrismaModel> | boolean
@@ -604,6 +675,23 @@ export type NestedEnumNotificationPreferenceWithAggregatesFilter<$PrismaModel = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
   _max?: Prisma.NestedEnumNotificationPreferenceFilter<$PrismaModel>
+}
+
+export type NestedEnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+}
+
+export type NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel> | $Enums.LegalAcceptanceType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
 }
 
 

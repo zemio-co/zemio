@@ -1,6 +1,14 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const productionRequiredString =
+	process.env.NODE_ENV === "production"
+		? z.string().min(1)
+		: z.string().min(1).optional();
+
+const productionRequiredUrl =
+	process.env.NODE_ENV === "production" ? z.url() : z.url().optional();
+
 /**
  * Environment Variables (Secrets Only)
  *
@@ -152,6 +160,31 @@ export const env = createEnv({
 		 * Mail Adapter
 		 */
 		MAIL_ADAPTER: z.enum(["resend", "smtp"]),
+
+		// =================================================================
+		// Better Stack Error Tracking
+		// =================================================================
+
+		/**
+		 * Telemetry API token used by the Sentry webpack plugin to upload source maps
+		 * to Better Stack Errors.
+		 */
+		SENTRY_AUTH_TOKEN: productionRequiredString,
+
+		/**
+		 * Better Stack team identifier used for source map uploads.
+		 */
+		SENTRY_ORG: productionRequiredString,
+
+		/**
+		 * Better Stack application identifier used for source map uploads.
+		 */
+		SENTRY_PROJECT: productionRequiredString,
+
+		/**
+		 * Better Stack source map upload endpoint.
+		 */
+		SENTRY_URL: productionRequiredUrl,
 	},
 
 	/**
@@ -161,8 +194,14 @@ export const env = createEnv({
 	 * WARNING: Never expose secrets to the client!
 	 */
 	client: {
-		// Currently no client-side env vars needed
-		// NEXT_PUBLIC_EXAMPLE: z.string(),
+		/**
+		 * Better Stack Errors DSN used by the Sentry SDK in browser and server runtimes.
+		 */
+		NEXT_PUBLIC_BETTER_STACK_DSN: productionRequiredUrl,
+
+		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: productionRequiredString,
+
+		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: productionRequiredUrl,
 	},
 
 	/**
@@ -195,6 +234,18 @@ export const env = createEnv({
 		STORAGE_BUCKET: process.env.STORAGE_BUCKET,
 		EMAIL_FROM: process.env.EMAIL_FROM,
 		MAIL_ADAPTER: process.env.MAIL_ADAPTER,
+		SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
+		SENTRY_ORG: process.env.SENTRY_ORG,
+		SENTRY_PROJECT: process.env.SENTRY_PROJECT,
+		SENTRY_URL: process.env.SENTRY_URL,
+
+		// Public runtime config
+		NEXT_PUBLIC_BETTER_STACK_DSN: process.env.NEXT_PUBLIC_BETTER_STACK_DSN,
+
+		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN:
+			process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
+		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL:
+			process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL,
 	},
 
 	/**

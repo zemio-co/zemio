@@ -1,22 +1,36 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/server/better-auth";
+import {
+	buildLegalOnboardingRedirectPath,
+	getRequestReturnToPath,
+	hasAcceptedCurrentLegalRelease,
+} from "@/server/legal";
 
 export default async function ServerLayout(
 	props: LayoutProps<"/settings/admin">,
 ) {
 	const { children } = props;
 
+	const requestHeaders = await headers();
 	const session = await auth.api.getSession({
-		headers: await headers(),
+		headers: requestHeaders,
 	});
 
 	if (!session?.user) {
 		redirect("/auth");
 	}
 
+	if (!hasAcceptedCurrentLegalRelease(session)) {
+		redirect(
+			buildLegalOnboardingRedirectPath(
+				getRequestReturnToPath(requestHeaders) ?? "/settings/admin/orgs",
+			),
+		);
+	}
+
 	const hasPermission = await auth.api.userHasPermission({
-		headers: await headers(),
+		headers: requestHeaders,
 		body: {
 			userId: session.user.id,
 			permissions: {

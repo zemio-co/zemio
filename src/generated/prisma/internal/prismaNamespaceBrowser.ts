@@ -62,6 +62,7 @@ export const ModelName = {
   Member: 'Member',
   Invitation: 'Invitation',
   Preferences: 'Preferences',
+  LegalAcceptance: 'LegalAcceptance',
   Settings: 'Settings',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
@@ -118,6 +119,8 @@ export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeo
 export const AttachmentScalarFieldEnum = {
   id: 'id',
   key: 'key',
+  size: 'size',
+  originalName: 'originalName',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   expenseId: 'expenseId'
@@ -154,7 +157,9 @@ export const SessionScalarFieldEnum = {
   userAgent: 'userAgent',
   userId: 'userId',
   impersonatedBy: 'impersonatedBy',
-  activeOrganizationId: 'activeOrganizationId'
+  activeOrganizationId: 'activeOrganizationId',
+  legalAcceptedAt: 'legalAcceptedAt',
+  legalAcceptedReleaseVersion: 'legalAcceptedReleaseVersion'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -236,6 +241,18 @@ export const PreferencesScalarFieldEnum = {
 } as const
 
 export type PreferencesScalarFieldEnum = (typeof PreferencesScalarFieldEnum)[keyof typeof PreferencesScalarFieldEnum]
+
+
+export const LegalAcceptanceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  releaseVersion: 'releaseVersion',
+  acceptanceType: 'acceptanceType',
+  acceptedAt: 'acceptedAt',
+  documentVersions: 'documentVersions'
+} as const
+
+export type LegalAcceptanceScalarFieldEnum = (typeof LegalAcceptanceScalarFieldEnum)[keyof typeof LegalAcceptanceScalarFieldEnum]
 
 
 export const SettingsScalarFieldEnum = {

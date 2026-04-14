@@ -1,6 +1,7 @@
 import { adminRouter } from "@/server/api/routers/admin";
 import { costUnitRouter } from "@/server/api/routers/cost-unit";
 import { expenseRouter } from "@/server/api/routers/expense";
+import { legalRouter } from "@/server/api/routers/legal";
 import { platformAdminRouter } from "@/server/api/routers/platform-admin";
 import { reportRouter } from "@/server/api/routers/report";
 import { settingsRouter } from "@/server/api/routers/settings";
@@ -18,6 +19,7 @@ import { preferencesRouter } from "./routers/preferences";
 export const appRouter = createTRPCRouter({
 	report: reportRouter,
 	expense: expenseRouter,
+	legal: legalRouter,
 	settings: settingsRouter,
 	preferences: preferencesRouter,
 	user: userRouter,

@@ -44,8 +44,8 @@ export default function ReportReceivedEmail({
 							</Text>
 							<Hr />
 							<Text className="text-xs text-zinc-500">
-								Du erhältst diese E-Mail, da du im SpesenTool als Reviewer eingetragen
-								bist. Solltest du kein Reviewer sein, kannst du diese E-Mail ignorieren.
+								Du erhältst diese E-Mail, da du in Zemio als Reviewer eingetragen bist.
+								Solltest du kein Reviewer sein, kannst du diese E-Mail ignorieren.
 							</Text>
 						</Section>
 					</Container>

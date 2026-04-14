@@ -130,7 +130,7 @@ export function UserMenu() {
 					<DropdownMenuItem
 						render={
 							<Link
-								href={"https://github.com/move-ev/spesen-tool/blob/master/CHANGELOG.md"}
+								href={"https://github.com/zemio-co/zemio/blob/master/CHANGELOG.md"}
 								target="_blank"
 							>
 								<GitPullRequestArrowIcon />
@@ -140,7 +140,7 @@ export function UserMenu() {
 					/>
 					<DropdownMenuItem
 						render={
-							<Link href={"https://github.com/move-ev/spesen-tool"} target="_blank">
+							<Link href={"https://github.com/zemio-co/zemio"} target="_blank">
 								<BookOpenIcon />
 								Dokumentation
 							</Link>
@@ -149,7 +149,7 @@ export function UserMenu() {
 					<DropdownMenuItem
 						render={
 							<Link
-								href={"https://github.com/move-ev/spesen-tool/issues/new"}
+								href={"https://github.com/zemio-co/zemio/issues/new"}
 								target="_blank"
 							>
 								<LifeBuoyIcon />

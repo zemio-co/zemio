@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
+import { hasAcceptedCurrentLegalRelease } from "@/server/legal";
 import { getFileExtension, getFileFromStorage } from "@/server/storage";
 
 const MIME_TYPES: Record<string, string> = {
@@ -13,10 +14,6 @@ const MIME_TYPES: Record<string, string> = {
 	pdf: "application/pdf",
 };
 
-function getFilenameFromKey(key: string): string {
-	return key.split("/").at(-1) ?? "attachment";
-}
-
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> },
@@ -27,6 +24,10 @@ export async function GET(
 
 	if (!session?.user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	if (!hasAcceptedCurrentLegalRelease(session)) {
+		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 
 	const organizationId = session.session.activeOrganizationId;
@@ -53,6 +54,7 @@ export async function GET(
 		where: { id },
 		select: {
 			key: true,
+			originalName: true,
 			expense: {
 				select: {
 					report: {
@@ -87,8 +89,8 @@ export async function GET(
 		return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
 	}
 
-	const extension = getFileExtension(attachment.key);
-	const filename = getFilenameFromKey(attachment.key);
+	const extension = getFileExtension(attachment.originalName);
+	const filename = attachment.originalName;
 	const contentType = MIME_TYPES[extension] ?? "application/octet-stream";
 
 	return new NextResponse(new Uint8Array(file), {

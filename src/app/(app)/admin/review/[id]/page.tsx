@@ -53,7 +53,7 @@ export default async function ServerPage({
 						</div>
 						<div>
 							<h1 className="font-semibold text-2xl text-zinc-800">
-								E-Mail Provider (cc-tool & spesen-tool)
+								E-Mail Provider (cc-tool & zemio)
 							</h1>
 							<div className="mt-2 flex items-center justify-start gap-2">
 								<p className="text-sm text-zinc-500">12 April 2026, 17:54</p>

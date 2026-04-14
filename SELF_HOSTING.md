@@ -1,6 +1,6 @@
 # Self-Hosting Guide
 
-This guide explains how to deploy and configure Spesen Tool for self-hosted environments.
+This guide explains how to deploy and configure Zemio for self-hosted environments.
 
 ## Table of Contents
 
@@ -47,7 +47,7 @@ This guide explains how to deploy and configure Spesen Tool for self-hosted envi
 
 ## Configuration Overview
 
-Spesen Tool uses a two-tier configuration system:
+Zemio uses a two-tier configuration system:
 
 ### Config File (`config.ts`)
 Non-sensitive settings like URLs, IDs, and behavior configuration. This file is:
@@ -74,7 +74,7 @@ When both are set, the priority is:
 ```typescript
 app: {
   // Application name displayed in UI and emails
-  name: "Spesen Tool",
+  name: "Zemio",
   
   // Public URL where the application is accessible
   // Used for OAuth callbacks and email links
@@ -92,7 +92,7 @@ app: {
 database: {
   // PostgreSQL connection URL
   // Format: postgresql://user:password@host:port/database
-  url: "postgresql://postgres:password@localhost:5432/spesen_tool",
+  url: "postgresql://postgres:password@localhost:5432/zemio",
   
   // Optional: Logging levels for debugging
   // Default: ["error"] in production, ["query", "error", "warn"] in development
@@ -201,13 +201,13 @@ These can override config file values (useful for CI/CD):
 
 1. **Create the database:**
    ```sql
-   CREATE DATABASE spesen_tool;
+   CREATE DATABASE zemio;
    ```
 
 2. **Configure the connection URL in `config.ts`:**
    ```typescript
    database: {
-     url: "postgresql://user:password@localhost:5432/spesen_tool",
+     url: "postgresql://user:password@localhost:5432/zemio",
    }
    ```
 
@@ -225,14 +225,14 @@ docker-compose up -d postgres
 This starts PostgreSQL on port 5435 with:
 - User: `postgres`
 - Password: `postgres`
-- Database: `spesen_tool`
+- Database: `zemio`
 
 ## Microsoft Azure AD Setup
 
 1. Go to [Azure Portal](https://portal.azure.com)
 2. Navigate to **Azure Active Directory** > **App registrations**
 3. Click **New registration**:
-   - Name: "Spesen Tool" (or your preferred name)
+   - Name: "Zemio" (or your preferred name)
    - Supported account types: Single tenant (your organization)
    - Redirect URI: `https://your-domain.com/api/auth/callback/microsoft`
 
@@ -353,7 +353,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: spesen_tool
+      POSTGRES_DB: zemio
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -467,6 +467,6 @@ The configuration is cached at startup. Restart the application after making cha
 
 ## Getting Help
 
-- Check the [GitHub Issues](https://github.com/move-ev/spesen-tool/issues)
+- Check the [GitHub Issues](https://github.com/zemio-co/zemio/issues)
 - Review the example configuration in `config.example.ts`
 - Run `pnpm config:validate --verbose` for diagnostic output

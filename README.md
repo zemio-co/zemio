@@ -1,9 +1,9 @@
-# spesen-tool
+# zemio
 
 > [!IMPORTANT]
 > This project is under active development and is not yet ready for production. Use at your own risk.
 
-The spesen-tool is a tool for managing expenses and reports within your student initiative. While currently in development, it is only available for the Move-Ev student initiative but will be open-source and available for other student initiatives in the future.
+Zemio is a tool for managing expenses and reports within your student initiative. While currently in development, it is only available for the Move-Ev student initiative but will be open-source and available for other student initiatives in the future.
 
 ## Contributing
 

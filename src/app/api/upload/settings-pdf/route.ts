@@ -5,6 +5,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
+import { hasAcceptedCurrentLegalRelease } from "@/server/legal";
 
 export async function POST(request: NextRequest) {
 	try {
@@ -14,6 +15,10 @@ export async function POST(request: NextRequest) {
 
 		if (!session?.user) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		if (!hasAcceptedCurrentLegalRelease(session)) {
+			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 		}
 
 		const organizationId = session.session.activeOrganizationId;

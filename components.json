@@ -19,8 +19,5 @@
 		"ui": "@/components/ui",
 		"lib": "@/lib",
 		"hooks": "@/hooks"
-	},
-	"registries": {
-		"@better-upload": "https://better-upload.com/r/{name}.json"
 	}
 }
