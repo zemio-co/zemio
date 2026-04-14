@@ -29,20 +29,6 @@ export const legalRouter = createTRPCRouter({
 				});
 			}
 
-			const existingAcceptance = await ctx.db.legalAcceptance.findUnique({
-				where: {
-					userId_releaseVersion: {
-						userId: ctx.session.user.id,
-						releaseVersion: release.version,
-					},
-				},
-				select: {
-					id: true,
-					acceptedAt: true,
-					releaseVersion: true,
-				},
-			});
-
 			const documentVersions: Prisma.InputJsonArray = (
 				await getCurrentLegalDocumentVersionSnapshots()
 			).map(
@@ -53,21 +39,29 @@ export const legalRouter = createTRPCRouter({
 				}),
 			);
 
-			const acceptance =
-				existingAcceptance ??
-				(await ctx.db.legalAcceptance.create({
-					data: {
+			// Acceptance is intentionally idempotent per user/release. Re-submitting
+			// the same release must not create a second audit row or surface a
+			// unique-constraint error to the client.
+			const acceptance = await ctx.db.legalAcceptance.upsert({
+				where: {
+					userId_releaseVersion: {
 						userId: ctx.session.user.id,
 						releaseVersion: release.version,
-						acceptanceType: release.acceptanceType,
-						documentVersions,
 					},
-					select: {
-						id: true,
-						acceptedAt: true,
-						releaseVersion: true,
-					},
-				}));
+				},
+				create: {
+					userId: ctx.session.user.id,
+					releaseVersion: release.version,
+					acceptanceType: release.acceptanceType,
+					documentVersions,
+				},
+				update: {},
+				select: {
+					id: true,
+					acceptedAt: true,
+					releaseVersion: true,
+				},
+			});
 
 			await ctx.db.session.updateMany({
 				where: {

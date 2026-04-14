@@ -7,7 +7,6 @@ import { db } from "@/server/db";
 import {
 	getCurrentLegalRelease,
 	getPostAcceptancePath,
-	getSafeReturnToPath,
 	hasAcceptedCurrentLegalRelease,
 } from "@/server/legal";
 
@@ -25,7 +24,6 @@ export default async function OnboardingPage({
 	}
 
 	const { returnTo } = await searchParams;
-	const safeReturnTo = getSafeReturnToPath(returnTo);
 	const memberCount = await db.member.count({
 		where: {
 			userId: session.user.id,
@@ -36,7 +34,7 @@ export default async function OnboardingPage({
 		redirect(
 			getPostAcceptancePath({
 				hasOrganizationAccess: memberCount > 0,
-				returnTo: safeReturnTo,
+				returnTo,
 			}),
 		);
 	}
@@ -47,7 +45,7 @@ export default async function OnboardingPage({
 		<LegalOnboardingPage
 			postAcceptancePath={getPostAcceptancePath({
 				hasOrganizationAccess: memberCount > 0,
-				returnTo: safeReturnTo,
+				returnTo,
 			})}
 			release={release}
 		/>

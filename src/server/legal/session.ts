@@ -1,3 +1,5 @@
+import "server-only";
+
 import { ROUTES } from "@/lib/consts";
 import type { Session } from "@/server/better-auth";
 import { CURRENT_LEGAL_RELEASE } from "./current-release";

@@ -23,7 +23,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 	}
 
 	if (!hasAcceptedCurrentLegalRelease(session)) {
-		redirect(buildLegalOnboardingRedirectPath(ROUTES.USER_DASHBOARD));
+		redirect(buildLegalOnboardingRedirectPath());
 	}
 
 	const memberCount = await db.member.count({

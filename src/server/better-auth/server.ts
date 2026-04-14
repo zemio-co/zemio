@@ -158,6 +158,9 @@ export const auth = betterAuth({
 						orderBy: { createdAt: "asc" },
 					});
 
+					// This extra lookup keeps newly created sessions in sync with the
+					// immutable LegalAcceptance source of truth, including sessions
+					// created after the acceptance mutation updated existing sessions.
 					const legalAcceptance = await db.legalAcceptance.findUnique({
 						where: {
 							userId_releaseVersion: {

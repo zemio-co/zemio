@@ -28,11 +28,9 @@ function LegalOnboardingPage({
 }: LegalOnboardingPageProps) {
 	const [hasAcceptedAllDocuments, setHasAcceptedAllDocuments] = useState(false);
 	const [showAcceptanceError, setShowAcceptanceError] = useState(false);
-	const utils = api.useUtils();
 
 	const acceptCurrentRelease = api.legal.acceptCurrentRelease.useMutation({
-		onSuccess: async () => {
-			await utils.legal.getCurrentRelease.invalidate();
+		onSuccess: () => {
 			window.location.assign(postAcceptancePath);
 		},
 		onError: (error) => {
