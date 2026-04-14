@@ -2,6 +2,8 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
+
+import { withBetterStack } from "@logtail/next";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.js";
 
@@ -20,19 +22,21 @@ const sourceMapUploadConfig =
 			}
 		: {};
 
-export default withSentryConfig(config, {
-	// Only print logs for uploading source maps in CI
-	silent: !process.env.CI,
+export default withBetterStack(
+	withSentryConfig(config, {
+		// Only print logs for uploading source maps in CI
+		silent: !process.env.CI,
 
-	// Upload a larger set of source maps for prettier stack traces (increases build time)
-	widenClientFileUpload: true,
+		// Upload a larger set of source maps for prettier stack traces (increases build time)
+		widenClientFileUpload: true,
 
-	webpack: {
-		// Tree-shaking options for reducing bundle size
-		treeshake: {
-			// Automatically tree-shake Sentry logger statements to reduce bundle size
-			removeDebugLogging: true,
+		webpack: {
+			// Tree-shaking options for reducing bundle size
+			treeshake: {
+				// Automatically tree-shake Sentry logger statements to reduce bundle size
+				removeDebugLogging: true,
+			},
 		},
-	},
-	...sourceMapUploadConfig,
-});
+		...sourceMapUploadConfig,
+	}),
+);

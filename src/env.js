@@ -198,6 +198,10 @@ export const env = createEnv({
 		 * Better Stack Errors DSN used by the Sentry SDK in browser and server runtimes.
 		 */
 		NEXT_PUBLIC_BETTER_STACK_DSN: productionRequiredUrl,
+
+		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: productionRequiredString,
+
+		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: productionRequiredUrl,
 	},
 
 	/**
@@ -237,6 +241,11 @@ export const env = createEnv({
 
 		// Public runtime config
 		NEXT_PUBLIC_BETTER_STACK_DSN: process.env.NEXT_PUBLIC_BETTER_STACK_DSN,
+
+		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN:
+			process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
+		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL:
+			process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL,
 	},
 
 	/**
