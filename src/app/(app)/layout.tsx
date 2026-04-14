@@ -9,12 +9,14 @@ import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import {
 	buildLegalOnboardingRedirectPath,
+	getRequestReturnToPath,
 	hasAcceptedCurrentLegalRelease,
 } from "@/server/legal";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
+	const requestHeaders = await headers();
 	const session = await auth.api.getSession({
-		headers: await headers(),
+		headers: requestHeaders,
 	});
 
 	// When the user is not logged in, redirect to the login page
@@ -23,7 +25,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 	}
 
 	if (!hasAcceptedCurrentLegalRelease(session)) {
-		redirect(buildLegalOnboardingRedirectPath());
+		redirect(
+			buildLegalOnboardingRedirectPath(
+				getRequestReturnToPath(requestHeaders) ?? undefined,
+			),
+		);
 	}
 
 	const memberCount = await db.member.count({

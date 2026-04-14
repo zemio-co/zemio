@@ -22,6 +22,24 @@ export function buildLegalOnboardingRedirectPath(returnTo?: string): string {
 	return `${ROUTES.ONBOARDING}?returnTo=${encodeURIComponent(safeReturnTo)}`;
 }
 
+export function getRequestReturnToPath(requestHeaders: Headers): string | null {
+	const nextUrl = requestHeaders.get("next-url");
+
+	if (!nextUrl) {
+		return null;
+	}
+
+	try {
+		const currentUrl = nextUrl.startsWith("/")
+			? new URL(nextUrl, "http://localhost")
+			: new URL(nextUrl);
+
+		return getSafeReturnToPath(`${currentUrl.pathname}${currentUrl.search}`);
+	} catch {
+		return null;
+	}
+}
+
 export function getSafeReturnToPath(returnTo?: string | null): string | null {
 	if (!returnTo || !returnTo.startsWith("/")) {
 		return null;
