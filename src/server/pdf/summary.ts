@@ -8,6 +8,7 @@ import type {
 	Report,
 	User,
 } from "@/generated/prisma/client";
+import { logger } from "@/lib/logger";
 import { translateExpenseType, translateReportStatus } from "@/lib/utils";
 import {
 	foodExpenseMetaSchema,
@@ -79,7 +80,10 @@ async function fetchAttachments(
 	const fetchPromises = allAttachments.map(async (attachment) => {
 		const buffer = await getFileFromStorage(attachment.key);
 		if (!buffer) {
-			console.warn(`[PDF] Failed to fetch attachment: ${attachment.key}`);
+			logger.warn("PDF attachment fetch returned no data", {
+				key: attachment.key,
+			});
+			void logger.flush();
 			return null;
 		}
 		return { key: attachment.key, buffer };
@@ -148,7 +152,8 @@ function addImagesToPdf(
 				valign: "top",
 			});
 		} catch (error) {
-			console.error(`[PDF] Failed to embed image: ${image.key}`, error);
+			logger.error("PDF image embed failed", { key: image.key, error });
+			void logger.flush();
 			doc.fontSize(10);
 			doc.fillColor("#dc2626");
 			doc.text(`Fehler beim Einbetten des Bildes: ${filename}`);
@@ -187,10 +192,8 @@ async function mergePdfAttachments(
 					mergedPdf.addPage(page);
 				}
 			} catch (error) {
-				console.error(
-					`[PDF] Failed to merge PDF attachment: ${attachment.key}`,
-					error,
-				);
+				logger.error("PDF attachment merge failed", { key: attachment.key, error });
+				void logger.flush();
 				// Continue with other attachments
 			}
 		}
@@ -199,7 +202,8 @@ async function mergePdfAttachments(
 		const mergedBuffer = await mergedPdf.save();
 		return Buffer.from(mergedBuffer);
 	} catch (error) {
-		console.error("[PDF] Failed to merge PDF attachments", error);
+		logger.error("PDF attachment merge process failed", { error });
+		void logger.flush();
 		// Return original summary if merge fails
 		return summaryBuffer;
 	}
