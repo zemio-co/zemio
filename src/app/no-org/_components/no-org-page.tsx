@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
 import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/lib/consts";
+import { ROUTES as ROUTES_DEPR } from "@/lib/consts";
+import { ROUTES } from "@/lib/routes";
 import { authClient } from "@/server/better-auth/client";
 
 interface NoOrgPageContentProps {
@@ -22,7 +23,7 @@ export function NoOrgPageContent({
 
 	async function handleSignOut() {
 		await authClient.signOut();
-		router.push(ROUTES.AUTH);
+		router.push(ROUTES_DEPR.AUTH);
 	}
 
 	return (
@@ -36,7 +37,7 @@ export function NoOrgPageContent({
 								className={
 									"flex items-center justify-center gap-1.5 font-medium text-blue-600 text-sm"
 								}
-								href={ROUTES.PLATFORM_ADMIN_ORGANIZATIONS}
+								href={ROUTES.SETTINGS_ADMIN_ORGS()}
 							>
 								Organisationen verwalten
 								<ArrowRightIcon className="size-3.5" />
