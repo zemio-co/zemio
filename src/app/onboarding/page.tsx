@@ -10,10 +10,24 @@ import {
 	hasAcceptedCurrentLegalRelease,
 } from "@/server/legal";
 
+function getSingleSearchParamValue(
+	value: string | readonly string[] | undefined,
+): string | undefined {
+	if (typeof value === "string") {
+		return value;
+	}
+
+	if (!value || value.length === 0) {
+		return undefined;
+	}
+
+	return value[0];
+}
+
 export default async function OnboardingPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ returnTo?: string }>;
+	searchParams: Promise<{ returnTo?: string | string[] }>;
 }) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
@@ -23,7 +37,8 @@ export default async function OnboardingPage({
 		redirect(ROUTES.AUTH);
 	}
 
-	const { returnTo } = await searchParams;
+	const { returnTo: rawReturnTo } = await searchParams;
+	const returnTo = getSingleSearchParamValue(rawReturnTo);
 	const memberCount = await db.member.count({
 		where: {
 			userId: session.user.id,

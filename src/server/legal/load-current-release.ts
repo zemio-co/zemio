@@ -12,9 +12,21 @@ import type {
 	LegalReleaseDefinition,
 } from "./types";
 
+function normalizeLegalDocumentVersion(value: unknown): unknown {
+	if (!(value instanceof Date)) {
+		return value;
+	}
+
+	if (Number.isNaN(value.getTime())) {
+		return value;
+	}
+
+	return value.toISOString().slice(0, 10);
+}
+
 const legalDocumentFrontMatterSchema = z.object({
 	title: z.string().min(1),
-	version: z.string().min(1),
+	version: z.preprocess(normalizeLegalDocumentVersion, z.string().min(1)),
 	summary: z.string().min(1),
 });
 

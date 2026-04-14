@@ -6,6 +6,7 @@ export {
 export {
 	buildLegalOnboardingRedirectPath,
 	getPostAcceptancePath,
+	getRequestReturnToPath,
 	getSafeReturnToPath,
 	hasAcceptedCurrentLegalRelease,
 } from "./session";

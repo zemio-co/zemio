@@ -19,14 +19,14 @@ export default async function ServerLayout(
 		redirect(ROUTES.AUTH);
 	}
 
+	if (session.user.role !== "admin") {
+		redirect(ROUTES.USER_DASHBOARD);
+	}
+
 	if (!hasAcceptedCurrentLegalRelease(session)) {
 		redirect(
 			buildLegalOnboardingRedirectPath(ROUTES.PLATFORM_ADMIN_ORGANIZATIONS),
 		);
-	}
-
-	if (session.user.role !== "admin") {
-		redirect(ROUTES.USER_DASHBOARD);
 	}
 
 	return <AdminLayout {...props} />;

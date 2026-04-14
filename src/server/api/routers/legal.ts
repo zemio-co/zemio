@@ -42,35 +42,39 @@ export const legalRouter = createTRPCRouter({
 			// Acceptance is intentionally idempotent per user/release. Re-submitting
 			// the same release must not create a second audit row or surface a
 			// unique-constraint error to the client.
-			const acceptance = await ctx.db.legalAcceptance.upsert({
-				where: {
-					userId_releaseVersion: {
+			const acceptance = await ctx.db.$transaction(async (transaction) => {
+				const persistedAcceptance = await transaction.legalAcceptance.upsert({
+					where: {
+						userId_releaseVersion: {
+							userId: ctx.session.user.id,
+							releaseVersion: release.version,
+						},
+					},
+					create: {
 						userId: ctx.session.user.id,
 						releaseVersion: release.version,
+						acceptanceType: release.acceptanceType,
+						documentVersions,
 					},
-				},
-				create: {
-					userId: ctx.session.user.id,
-					releaseVersion: release.version,
-					acceptanceType: release.acceptanceType,
-					documentVersions,
-				},
-				update: {},
-				select: {
-					id: true,
-					acceptedAt: true,
-					releaseVersion: true,
-				},
-			});
+					update: {},
+					select: {
+						id: true,
+						acceptedAt: true,
+						releaseVersion: true,
+					},
+				});
 
-			await ctx.db.session.updateMany({
-				where: {
-					userId: ctx.session.user.id,
-				},
-				data: {
-					legalAcceptedAt: acceptance.acceptedAt,
-					legalAcceptedReleaseVersion: acceptance.releaseVersion,
-				},
+				await transaction.session.updateMany({
+					where: {
+						userId: ctx.session.user.id,
+					},
+					data: {
+						legalAcceptedAt: persistedAcceptance.acceptedAt,
+						legalAcceptedReleaseVersion: persistedAcceptance.releaseVersion,
+					},
+				});
+
+				return persistedAcceptance;
 			});
 
 			return acceptance;
