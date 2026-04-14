@@ -5,7 +5,7 @@ import { LegalOnboardingPage } from "@/modules/legal";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import {
-	CURRENT_LEGAL_RELEASE,
+	getCurrentLegalRelease,
 	getPostAcceptancePath,
 	getSafeReturnToPath,
 	hasAcceptedCurrentLegalRelease,
@@ -41,13 +41,15 @@ export default async function OnboardingPage({
 		);
 	}
 
+	const release = await getCurrentLegalRelease();
+
 	return (
 		<LegalOnboardingPage
 			postAcceptancePath={getPostAcceptancePath({
 				hasOrganizationAccess: memberCount > 0,
 				returnTo: safeReturnTo,
 			})}
-			release={CURRENT_LEGAL_RELEASE}
+			release={release}
 		/>
 	);
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +14,7 @@ import {
 	FieldLabel,
 	FieldTitle,
 } from "@/components/ui/field";
-import type { LegalReleaseDefinition } from "@/server/legal/current-release";
+import type { LegalReleaseDefinition } from "@/server/legal";
 import { api } from "@/trpc/react";
 
 interface LegalOnboardingPageProps {
@@ -91,10 +93,55 @@ function LegalOnboardingPage({
 										</div>
 										<p className="max-w-xl text-sm text-zinc-600">{document.summary}</p>
 									</div>
-									<div className="mt-5 space-y-4 text-sm text-zinc-700 leading-6">
-										{document.content.map((paragraph) => (
-											<p key={paragraph}>{paragraph}</p>
-										))}
+									<div className="mt-5 text-sm text-zinc-700 leading-6">
+										<ReactMarkdown
+											components={{
+												h1: ({ ...props }) => (
+													<h3
+														{...props}
+														className="mt-6 font-semibold text-lg text-zinc-900 first:mt-0"
+													/>
+												),
+												h2: ({ ...props }) => (
+													<h4
+														{...props}
+														className="mt-6 font-semibold text-base text-zinc-900 first:mt-0"
+													/>
+												),
+												h3: ({ ...props }) => (
+													<h5
+														{...props}
+														className="mt-5 font-medium text-base text-zinc-900 first:mt-0"
+													/>
+												),
+												p: ({ ...props }) => <p {...props} className="mt-4 first:mt-0" />,
+												ul: ({ ...props }) => (
+													<ul
+														{...props}
+														className="mt-4 ml-6 list-disc space-y-2 first:mt-0"
+													/>
+												),
+												ol: ({ ...props }) => (
+													<ol
+														{...props}
+														className="mt-4 ml-6 list-decimal space-y-2 first:mt-0"
+													/>
+												),
+												li: ({ ...props }) => <li {...props} className="pl-1" />,
+												strong: ({ ...props }) => (
+													<strong {...props} className="font-semibold text-zinc-900" />
+												),
+												a: ({ ...props }) => (
+													<a
+														{...props}
+														className="font-medium text-blue-700 underline underline-offset-4"
+													/>
+												),
+											}}
+											remarkPlugins={[remarkGfm]}
+										>
+											{document.content}
+										</ReactMarkdown>
 									</div>
 								</section>
 							))}

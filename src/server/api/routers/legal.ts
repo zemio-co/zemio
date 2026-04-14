@@ -2,8 +2,8 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import {
-	CURRENT_LEGAL_RELEASE,
 	getCurrentLegalDocumentVersionSnapshots,
+	getCurrentLegalRelease,
 } from "@/server/legal";
 import { authenticatedProcedure, createTRPCRouter } from "../trpc";
 
@@ -12,14 +12,16 @@ const acceptCurrentReleaseSchema = z.object({
 });
 
 export const legalRouter = createTRPCRouter({
-	getCurrentRelease: authenticatedProcedure.query(() => {
-		return CURRENT_LEGAL_RELEASE;
+	getCurrentRelease: authenticatedProcedure.query(async () => {
+		return await getCurrentLegalRelease();
 	}),
 
 	acceptCurrentRelease: authenticatedProcedure
 		.input(acceptCurrentReleaseSchema)
 		.mutation(async ({ ctx, input }) => {
-			if (input.releaseVersion !== CURRENT_LEGAL_RELEASE.version) {
+			const release = await getCurrentLegalRelease();
+
+			if (input.releaseVersion !== release.version) {
 				throw new TRPCError({
 					code: "CONFLICT",
 					message:
@@ -31,7 +33,7 @@ export const legalRouter = createTRPCRouter({
 				where: {
 					userId_releaseVersion: {
 						userId: ctx.session.user.id,
-						releaseVersion: CURRENT_LEGAL_RELEASE.version,
+						releaseVersion: release.version,
 					},
 				},
 				select: {
@@ -41,22 +43,23 @@ export const legalRouter = createTRPCRouter({
 				},
 			});
 
-			const documentVersions: Prisma.InputJsonArray =
-				getCurrentLegalDocumentVersionSnapshots().map(
-					(documentVersion): Prisma.InputJsonObject => ({
-						key: documentVersion.key,
-						title: documentVersion.title,
-						version: documentVersion.version,
-					}),
-				);
+			const documentVersions: Prisma.InputJsonArray = (
+				await getCurrentLegalDocumentVersionSnapshots()
+			).map(
+				(documentVersion): Prisma.InputJsonObject => ({
+					key: documentVersion.key,
+					title: documentVersion.title,
+					version: documentVersion.version,
+				}),
+			);
 
 			const acceptance =
 				existingAcceptance ??
 				(await ctx.db.legalAcceptance.create({
 					data: {
 						userId: ctx.session.user.id,
-						releaseVersion: CURRENT_LEGAL_RELEASE.version,
-						acceptanceType: CURRENT_LEGAL_RELEASE.acceptanceType,
+						releaseVersion: release.version,
+						acceptanceType: release.acceptanceType,
 						documentVersions,
 					},
 					select: {
