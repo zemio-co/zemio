@@ -28,7 +28,9 @@ import z from "zod";
 import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
-	legalAccepted: z.boolean(),
+	legalAccepted: z.boolean().refine((val) => val === true, {
+		error: "Please accept all conditions and policies",
+	}),
 });
 
 function LegalOnboardingPage({
@@ -111,14 +113,14 @@ function LegalOnboardingPage({
 															I have read and hereby accept the{" "}
 															<Link
 																className="inline-block font-medium text-zinc-700 hover:text-blue-500"
-																href={"/legal/tos"}
+																href={"/legal/terms-and-conditions"}
 															>
 																Terms and Conditions
 															</Link>
 															,{" "}
 															<Link
 																className="inline-block font-medium text-zinc-700 hover:text-blue-500"
-																href={"/legal/privacy"}
+																href={"/legal/privacy-policy"}
 															>
 																Privacy Policy
 															</Link>
@@ -140,6 +142,8 @@ function LegalOnboardingPage({
 									<div className="mt-6 flex w-full justify-end">
 										<Button
 											disabled={acceptCurrentRelease.isPending}
+											form="accept-legal"
+											type="submit"
 											variant={"secondary"}
 										>
 											Weiter <ArrowRightIcon />
