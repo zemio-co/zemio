@@ -2,28 +2,27 @@
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
  * for Docker builds.
  */
-import "./src/env.js";
 import { withSentryConfig } from "@sentry/nextjs";
+import { env } from "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
 	serverExternalPackages: ["pdfkit"],
 };
 
-// Injected content via Sentry wizard below
+const sourceMapUploadConfig =
+	env.SENTRY_AUTH_TOKEN && env.SENTRY_ORG && env.SENTRY_PROJECT && env.SENTRY_URL
+		? {
+				authToken: env.SENTRY_AUTH_TOKEN,
+				org: env.SENTRY_ORG,
+				project: env.SENTRY_PROJECT,
+				url: env.SENTRY_URL,
+			}
+		: {};
 
 export default withSentryConfig(config, {
-	// For all available options, see:
-	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
-
-	org: "move-studentische-unternehmens",
-	project: "zemio",
-
 	// Only print logs for uploading source maps in CI
 	silent: !process.env.CI,
-
-	// For all available options, see:
-	// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
 	// Upload a larger set of source maps for prettier stack traces (increases build time)
 	widenClientFileUpload: true,
@@ -35,4 +34,5 @@ export default withSentryConfig(config, {
 			removeDebugLogging: true,
 		},
 	},
+	...sourceMapUploadConfig,
 });
