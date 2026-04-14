@@ -36,3 +36,10 @@ export const NotificationPreference = {
 } as const
 
 export type NotificationPreference = (typeof NotificationPreference)[keyof typeof NotificationPreference]
+
+
+export const LegalAcceptanceType = {
+  CHECKBOX_AND_BUTTON: 'CHECKBOX_AND_BUTTON'
+} as const
+
+export type LegalAcceptanceType = (typeof LegalAcceptanceType)[keyof typeof LegalAcceptanceType]
