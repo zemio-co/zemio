@@ -3,16 +3,12 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { getErrorTrackingConfig } from "@/lib/error-tracking/options";
 
-Sentry.init({
-	dsn: "https://f4a6ba3b7c44b7e41b491abd08482bcd@o4508929955528704.ingest.de.sentry.io/4510767512027216",
+const errorTrackingConfig = getErrorTrackingConfig();
 
-	// Keep client-side monitoring limited to explicit error events.
-	tracesSampleRate: 0,
-	enableLogs: false,
-
-	// Session replay and automatic PII forwarding are intentionally disabled.
-	sendDefaultPii: false,
-});
+if (errorTrackingConfig) {
+	Sentry.init(errorTrackingConfig);
+}
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

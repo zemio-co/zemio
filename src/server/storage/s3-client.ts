@@ -6,6 +6,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "@/env";
+import { logger } from "@/lib/logger";
 
 /**
  * S3 client for fetching files from storage
@@ -58,7 +59,8 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
 		const response = await client.send(command);
 
 		if (!response.Body) {
-			console.error(`[S3] No body in response for key: ${key}`);
+			logger.error("S3 response missing body", { key });
+			void logger.flush();
 			return null;
 		}
 
@@ -70,7 +72,8 @@ export async function getFileFromStorage(key: string): Promise<Buffer | null> {
 
 		return Buffer.concat(chunks);
 	} catch (error) {
-		console.error(`[S3] Failed to fetch file with key: ${key}`, error);
+		logger.error("S3 file fetch failed", { key, error });
+		void logger.flush();
 		return null;
 	}
 }
@@ -107,7 +110,8 @@ export async function deleteFilesFromStorage(keys: string[]): Promise<void> {
 			);
 		}
 	} catch (error) {
-		console.error("[S3] Failed to delete files from storage", { keys, error });
+		logger.error("S3 file deletion failed", { keys, error });
+		await logger.flush();
 		throw error;
 	}
 }
