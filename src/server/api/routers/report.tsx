@@ -8,6 +8,7 @@ import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
 import { mailer } from "@/lib/email";
+import { logger } from "@/lib/logger";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { createReportSchema } from "@/lib/validators";
 import {
@@ -261,7 +262,8 @@ export const reportRouter = createTRPCRouter({
 						),
 					})
 					.catch((error) => {
-						console.error("Failed to send creator email:", error);
+						logger.error("Email dispatch failed: creator notification", { error });
+						void logger.flush();
 					});
 			}
 
@@ -281,7 +283,8 @@ export const reportRouter = createTRPCRouter({
 						),
 					})
 					.catch((error) => {
-						console.error("Failed to send reviewer email:", error);
+						logger.error("Email dispatch failed: reviewer notification", { error });
+						void logger.flush();
 					});
 			}
 
@@ -394,7 +397,8 @@ export const reportRouter = createTRPCRouter({
 						),
 					})
 					.catch((error) => {
-						console.error("Failed to send creator email:", error);
+						logger.error("Email dispatch failed: creator notification", { error });
+						void logger.flush();
 					});
 			}
 
@@ -415,7 +419,8 @@ export const reportRouter = createTRPCRouter({
 						),
 					})
 					.catch((error) => {
-						console.error("Failed to send reviewer email:", error);
+						logger.error("Email dispatch failed: reviewer notification", { error });
+						void logger.flush();
 					});
 			}
 
