@@ -235,14 +235,6 @@ export const reportRouter = createTRPCRouter({
 				})),
 			);
 
-			// Get settings to find reviewer email
-			const settings = await ctx.db.settings.findUnique({
-				where: { organizationId: ctx.organizationId },
-				select: {
-					reviewerEmail: true,
-				},
-			});
-
 			// Send email to creator (non-blocking)
 			if (
 				report.owner.email &&
