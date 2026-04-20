@@ -5,11 +5,17 @@ import {
 	Head,
 	Hr,
 	Html,
+	Img,
 	Preview,
 	Section,
 	Tailwind,
 	Text,
 } from "@react-email/components";
+
+const baseUrl =
+	process.env.NODE_ENV === "production"
+		? "https://app.zemio.co"
+		: "http://localhost:3000";
 
 interface ReportSubmittedEmailProps {
 	title: string;
@@ -23,10 +29,14 @@ export default function ReportSubmittedEmail({
 		<Html>
 			<Head />
 			<Tailwind config={{}}>
-				<Body className="font-sans">
+				<Body className="bg-zinc-50 font-sans">
 					<Preview>Dein Spesenbericht wurde eingereicht</Preview>
-					<Container>
-						<Text className="font-medium text-2xl">{title}</Text>
+					<Container className="bg-white px-6 py-8">
+						<Img
+							className="h-5 w-fit"
+							src={`${baseUrl}/assets/zemio-logo-woodmark.png`}
+						/>
+						<Text className="mt-16 font-medium text-2xl">{title}</Text>
 						<Section>
 							<Text>Hallo {name},</Text>
 							<Text>
@@ -36,12 +46,12 @@ export default function ReportSubmittedEmail({
 							</Text>
 							<Text>
 								Wende dich bei Fragen bitte an{" "}
-								<Button href="mailto:support@move-ev.de">support@move-ev.de</Button>.
+								<Button href="mailto:support@zemio.co">support@zemio.co</Button>.
 							</Text>
 							<Text>
 								Beste Grüße,
 								<br />
-								Dein move e.V. Team
+								Dein zemio Team
 							</Text>
 							<Hr />
 							<Text className="text-xs text-zinc-500">
