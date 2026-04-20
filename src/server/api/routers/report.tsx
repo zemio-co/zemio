@@ -235,14 +235,6 @@ export const reportRouter = createTRPCRouter({
 				})),
 			);
 
-			// Get settings to find reviewer email
-			const settings = await ctx.db.settings.findUnique({
-				where: { organizationId: ctx.organizationId },
-				select: {
-					reviewerEmail: true,
-				},
-			});
-
 			// Send email to creator (non-blocking)
 			if (
 				report.owner.email &&
@@ -263,27 +255,6 @@ export const reportRouter = createTRPCRouter({
 					})
 					.catch((error) => {
 						logger.error("Email dispatch failed: creator notification", { error });
-						void logger.flush();
-					});
-			}
-
-			// Send email to reviewer if configured (non-blocking)
-			if (settings?.reviewerEmail) {
-				mailer
-					.send({
-						from: DEFAULT_EMAIL_FROM,
-						to: [settings.reviewerEmail],
-						subject: "Neuer Spesenantrag erstellt",
-						react: (
-							<ExpenseReportCreatorNotification
-								attachments={attachments}
-								report={report}
-								totalAmount={totalAmount}
-							/>
-						),
-					})
-					.catch((error) => {
-						logger.error("Email dispatch failed: reviewer notification", { error });
 						void logger.flush();
 					});
 			}

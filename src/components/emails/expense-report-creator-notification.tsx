@@ -290,6 +290,7 @@ ExpenseReportCreatorNotification.PreviewProps = {
 		ownerId: "user-123",
 		createdAt: new Date("2024-01-15T10:00:00Z"),
 		lastUpdatedAt: new Date("2024-01-15T12:00:00Z"),
+		costUnit: { title: "Allgemeine Verwaltung" },
 	},
 	attachments: [{ key: "invoice-123.pdf" }],
 	totalAmount: 6.5,

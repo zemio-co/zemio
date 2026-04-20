@@ -156,11 +156,6 @@ export const env = createEnv({
 		 */
 		SECRET_ENCRYPTION_KEY: z.string(),
 
-		/**
-		 * Mail Adapter
-		 */
-		MAIL_ADAPTER: z.enum(["resend", "smtp"]),
-
 		// =================================================================
 		// Better Stack Error Tracking
 		// =================================================================
@@ -233,7 +228,6 @@ export const env = createEnv({
 		STORAGE_REGION: process.env.STORAGE_REGION,
 		STORAGE_BUCKET: process.env.STORAGE_BUCKET,
 		EMAIL_FROM: process.env.EMAIL_FROM,
-		MAIL_ADAPTER: process.env.MAIL_ADAPTER,
 		SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
 		SENTRY_ORG: process.env.SENTRY_ORG,
 		SENTRY_PROJECT: process.env.SENTRY_PROJECT,
