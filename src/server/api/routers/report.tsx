@@ -267,27 +267,6 @@ export const reportRouter = createTRPCRouter({
 					});
 			}
 
-			// Send email to reviewer if configured (non-blocking)
-			if (settings?.reviewerEmail) {
-				mailer
-					.send({
-						from: DEFAULT_EMAIL_FROM,
-						to: [settings.reviewerEmail],
-						subject: "Neuer Spesenantrag erstellt",
-						react: (
-							<ExpenseReportCreatorNotification
-								attachments={attachments}
-								report={report}
-								totalAmount={totalAmount}
-							/>
-						),
-					})
-					.catch((error) => {
-						logger.error("Email dispatch failed: reviewer notification", { error });
-						void logger.flush();
-					});
-			}
-
 			return report;
 		}),
 
