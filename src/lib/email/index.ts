@@ -1,15 +1,9 @@
 import { env } from "@/env";
 import { createResendAdapter } from "./adapters/resend";
-import { createSMTPAdapter } from "./adapters/smtp";
 import type { EmailAdapter } from "./types/adapter";
 
 function createMailer(): EmailAdapter {
-	switch (env.MAIL_ADAPTER) {
-		case "resend":
-			return createResendAdapter();
-		case "smtp":
-			return createSMTPAdapter();
-	}
+	return createResendAdapter();
 }
 
 const globalForEmail = globalThis as unknown as {
