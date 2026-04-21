@@ -16,7 +16,10 @@ import {
 	orgAdminProcedure,
 	orgProcedure,
 } from "@/server/api/trpc";
-import { generatePdfSummary } from "@/server/pdf/summary";
+import {
+	buildReportPdfFilename,
+	generatePdfSummary,
+} from "@/server/pdf/summary";
 
 export const reportRouter = createTRPCRouter({
 	// Get all reports for the current user
@@ -695,6 +698,12 @@ export const reportRouter = createTRPCRouter({
 						},
 					},
 					owner: true,
+					costUnit: {
+						select: {
+							tag: true,
+							title: true,
+						},
+					},
 					bankingDetails: true,
 				},
 			});
@@ -720,7 +729,7 @@ export const reportRouter = createTRPCRouter({
 
 			return {
 				pdf: base64Pdf,
-				filename: `${report.title.replace(/[^a-z0-9]/gi, "_")}_Zusammenfassung.pdf`,
+				filename: buildReportPdfFilename(report),
 			};
 		}),
 });

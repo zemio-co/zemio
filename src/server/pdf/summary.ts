@@ -20,6 +20,10 @@ interface SummaryProps {
 	report: Report & {
 		expenses: (Expense & { attachments: Attachment[] })[];
 		owner: User;
+		costUnit: {
+			tag: string;
+			title: string;
+		};
 		bankingDetails: {
 			iban: string;
 			fullName: string;
@@ -39,6 +43,30 @@ const COLUMN_WIDTHS = {
 	DETAILS: "*",
 	AMOUNT: 80,
 } as const;
+
+function formatEuroAmount(amount: number): string {
+	return `${amount.toFixed(2)}€`;
+}
+
+function toSnakeCaseFilenameSegment(value: string): string {
+	const normalizedValue = value
+		.normalize("NFKD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.toLowerCase();
+	const snakeCaseValue = normalizedValue
+		.replace(/[^a-z0-9]+/g, "_")
+		.replace(/^_+|_+$/g, "")
+		.replace(/_+/g, "_");
+
+	return snakeCaseValue || "report";
+}
+
+export function buildReportPdfFilename(
+	report: Pick<Report, "tag" | "title">,
+): string {
+	const escapedTitle = toSnakeCaseFilenameSegment(report.title);
+	return `Spesen_${report.tag}_${escapedTitle}.pdf`;
+}
 
 function formatExpenseMeta(expense: Expense): string {
 	if (expense.type === "TRAVEL") {
@@ -245,6 +273,9 @@ export async function generatePdfSummary({
 			align: "left",
 		},
 	);
+	doc.text(`Kostenstelle: ${report.costUnit.tag} | ${report.costUnit.title}`, {
+		align: "left",
+	});
 	doc.fillColor("black");
 	doc.moveDown(1);
 
@@ -331,7 +362,7 @@ export async function generatePdfSummary({
 				descriptionStr && metaStr
 					? `${descriptionStr} (${metaStr})`
 					: descriptionStr || metaStr || "-";
-			const amountStr = `${Number(expense.amount).toFixed(2)} €`;
+			const amountStr = formatEuroAmount(Number(expense.amount));
 
 			expensesTable.row([
 				typeStr,
@@ -344,7 +375,7 @@ export async function generatePdfSummary({
 
 		doc.font("Helvetica-Bold");
 		doc.fontSize(9);
-		expensesTable.row(["Gesamt", "", "", "", `${totalAmount.toFixed(2)} €`]);
+		expensesTable.row(["Gesamt", "", "", "", formatEuroAmount(totalAmount)]);
 	}
 
 	doc.moveDown(2);
