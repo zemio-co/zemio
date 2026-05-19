@@ -1,5 +1,9 @@
 "use client";
 
+import { CopyIcon } from "lucide-react";
+import React from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -69,6 +73,11 @@ function DetailCard({
 	title: string;
 	value: string;
 }) {
+	const handleCopy = React.useCallback(() => {
+		navigator.clipboard.writeText(value);
+		toast.info(`${title} zum Clipboard kopiert`);
+	}, [value, title]);
+
 	return (
 		<div
 			className={cn(
@@ -78,7 +87,17 @@ function DetailCard({
 			data-slot="detail-card"
 			{...props}
 		>
-			<p className="font-medium text-xs text-zinc-500">{title}</p>
+			<div className="flex items-start justify-between">
+				<p className="font-medium text-xs text-zinc-500">{title}</p>
+				<Button
+					className={"text-muted-foreground"}
+					onClick={handleCopy}
+					size={"icon-sm"}
+					variant={"ghost"}
+				>
+					<CopyIcon />
+				</Button>
+			</div>
 			<p className="truncate font-semibold text-lg text-zinc-800">{value}</p>
 		</div>
 	);
