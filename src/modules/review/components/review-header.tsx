@@ -22,24 +22,38 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { Report, ReportStatus } from "@/generated/prisma/client";
+import type { ReportStatus } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
 import { cn, translateReportStatus } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import type { ReviewLoadState, ReviewReport } from "./review-types";
 
 function ExpensesHeader({
 	className,
-	reportId,
+	errorMessage,
+	loading,
+	report,
 	...props
 }: React.ComponentProps<"header"> & {
-	reportId: string;
-}) {
-	const { data: report, isPending } = api.report.getById.useQuery({
-		id: reportId,
-	});
-
-	if (isPending) {
+	report?: ReviewReport;
+} & ReviewLoadState) {
+	if (loading) {
 		return <HeaderLoading />;
+	}
+
+	if (errorMessage) {
+		return (
+			<header
+				className={cn("flex flex-col items-start gap-1", className)}
+				data-slot="expenses-header-error"
+				{...props}
+			>
+				<p className="font-medium text-destructive text-sm">
+					Report konnte nicht geladen werden
+				</p>
+				<p className="text-muted-foreground text-xs">{errorMessage}</p>
+			</header>
+		);
 	}
 
 	if (!report) {
@@ -101,7 +115,7 @@ function ExpensesHeader({
 			</div>
 			<div className="mt-0.75 flex flex-nowrap gap-4">
 				<ReportActions report={report}>Bearbeiten</ReportActions>
-				<ExportReport reportId={reportId} />
+				<ExportReport reportId={report.id} />
 			</div>
 		</header>
 	);
@@ -130,7 +144,9 @@ function HeaderLoading({
 function ReportActions({
 	report,
 	...props
-}: React.ComponentProps<typeof Button> & { report: Report }) {
+}: React.ComponentProps<typeof Button> & {
+	report: Pick<ReviewReport, "id" | "status">;
+}) {
 	const utils = api.useUtils();
 
 	const { mutate: setStatus } = api.report.updateStatus.useMutation({
@@ -139,7 +155,7 @@ function ReportActions({
 		},
 		onSuccess: () => {
 			toast.success("Status erfolgreich aktualisiert");
-			utils.report.getById.invalidate({ id: report.id });
+			void utils.admin.getReview.invalidate({ id: report.id });
 		},
 		onError: () => {
 			toast.error("Fehler beim Aktualisieren des Reports");

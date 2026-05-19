@@ -23,6 +23,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Tooltip,
 	TooltipContent,
@@ -30,19 +31,23 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+type ReviewNavbarReport = {
+	id: string;
+	readableId: string;
+	iban: string;
+	name: string;
+	sum: number;
+	title: string;
+};
+
 function ReviewNavbar({
 	className,
+	loading,
 	report,
 	...props
 }: React.ComponentProps<"nav"> & {
-	report: {
-		id: string;
-		readableId: string;
-		iban: string;
-		name: string;
-		sum: number;
-		title: string;
-	};
+	loading?: boolean;
+	report?: ReviewNavbarReport;
 }) {
 	return (
 		<nav className={cn("w-full border-b", className)} {...props}>
@@ -52,29 +57,22 @@ function ReviewNavbar({
 						Reports
 					</Link>
 					<p className="font-medium text-xs text-zinc-400">/</p>
-					<Link className="font-medium text-sm text-zinc-800" href={"#"}>
-						#{report.readableId}
-					</Link>
+					{loading ? (
+						<Skeleton className="h-4 w-16" />
+					) : (
+						<Link className="font-medium text-sm text-zinc-800" href={"#"}>
+							{report ? `#${report.readableId}` : "Unbekannt"}
+						</Link>
+					)}
 				</div>
-				<MoreMenu report={report} />
+				{report ? <MoreMenu report={report} /> : null}
 				<Navigation className="ml-auto" />
 			</div>
 		</nav>
 	);
 }
 
-function MoreMenu({
-	report,
-}: {
-	report: {
-		id: string;
-		readableId: string;
-		iban: string;
-		name: string;
-		sum: number;
-		title: string;
-	};
-}) {
+function MoreMenu({ report }: { report: ReviewNavbarReport }) {
 	const copyActions = React.useMemo(() => {
 		return [
 			{

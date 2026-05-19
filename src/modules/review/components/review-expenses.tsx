@@ -6,13 +6,14 @@ import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Expense as ExpensePrimitive } from "@/generated/prisma/client";
 import { cn, translateExpenseType } from "@/lib/utils";
-import { api } from "@/trpc/react";
-
-type Expense = Omit<ExpensePrimitive, "amount"> & { amount: number };
+import type { ReviewExpense, ReviewLoadState } from "./review-types";
 
 const CSV_MIME_TYPE = "text/csv;charset=utf-8";
+const EUR_FORMATTER = new Intl.NumberFormat("de-DE", {
+	currency: "EUR",
+	style: "currency",
+});
 
 function escapeCsvValue(value: string | number): string {
 	const stringValue = String(value);
@@ -25,7 +26,7 @@ function escapeCsvValue(value: string | number): string {
 	return `"${stringValue.replaceAll('"', '""')}"`;
 }
 
-function buildExpensesCsv(expenses: Expense[]): string {
+function buildExpensesCsv(expenses: ReviewExpense[]): string {
 	const headers = [
 		"Titel",
 		"Startdatum",
@@ -63,20 +64,16 @@ function downloadCsvFile(csvContent: string, filename: string): void {
 
 function ReviewExpenses({
 	className,
-	reportId,
+	errorMessage,
+	expenses,
+	loading,
+	totalAmount,
 	...props
 }: React.ComponentProps<"section"> & {
-	reportId: string;
-}) {
-	const {
-		isPending,
-		data: expenses,
-		error,
-	} = api.expense.listForReport.useQuery({
-		reportId,
-	});
-
-	if (isPending) {
+	expenses?: ReviewExpense[];
+	totalAmount?: number;
+} & ReviewLoadState) {
+	if (loading) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
 				<ExpensesHeader expenses={[]} loading />
@@ -85,16 +82,16 @@ function ReviewExpenses({
 		);
 	}
 
-	if (error || !expenses) {
+	if (errorMessage || !expenses || totalAmount === undefined) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
 				<ExpensesHeader expenses={[]} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-destructive text-sm">
-						Fehler beim Laden der Anhänge
+						Fehler beim Laden der Ausgaben
 					</p>
 					<p className="text-center text-xs">
-						{error?.message ?? "Ein unbekannter Fehler ist aufgetreten"}
+						{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
 					</p>
 				</div>
 			</section>
@@ -118,7 +115,7 @@ function ReviewExpenses({
 	return (
 		<section className={cn("space-y-4", className)} {...props}>
 			<ExpensesHeader expenses={expenses} />
-			<ExpensesTable expenses={expenses} />
+			<ExpensesTable expenses={expenses} totalAmount={totalAmount} />
 		</section>
 	);
 }
@@ -126,9 +123,11 @@ function ReviewExpenses({
 function ExpensesTable({
 	className,
 	expenses,
+	totalAmount,
 	...props
 }: React.ComponentProps<"table"> & {
-	expenses: Expense[];
+	expenses: ReviewExpense[];
+	totalAmount: number;
 }) {
 	return (
 		<table className={cn("w-full", className)} data-slot="component" {...props}>
@@ -156,7 +155,7 @@ function ExpensesTable({
 						Summe
 					</td>
 					<td className="border-t py-3 text-right font-medium text-sm">
-						2345.12 EUR
+						{EUR_FORMATTER.format(totalAmount)}
 					</td>
 					<td className="rounded-br-md" />
 				</tr>
@@ -170,7 +169,7 @@ function ExpenseRow({
 	expense,
 	...props
 }: React.ComponentProps<"tr"> & {
-	expense: Expense;
+	expense: ReviewExpense;
 }) {
 	return (
 		<tr className={cn("", className)} data-slot="component" {...props}>
@@ -192,7 +191,7 @@ function ExpenseRow({
 				</span>
 			</td>
 			<td className="py-3 text-right font-medium text-sm text-zinc-800">
-				23.14 EUR
+				{EUR_FORMATTER.format(expense.amount)}
 			</td>
 			<td className="text-right">
 				<Button size={"icon-sm"} variant={"ghost"}>
@@ -209,7 +208,7 @@ function ExpensesHeader({
 	loading,
 	...props
 }: React.ComponentProps<"div"> & {
-	expenses: Expense[];
+	expenses: ReviewExpense[];
 	loading?: boolean;
 }) {
 	return (
@@ -240,7 +239,7 @@ function ExportButton({
 	onClick,
 	...props
 }: React.ComponentProps<typeof Button> & {
-	expenses: Expense[];
+	expenses: ReviewExpense[];
 }) {
 	const handleExport: NonNullable<
 		React.ComponentProps<typeof Button>["onClick"]

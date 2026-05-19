@@ -6,20 +6,27 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import type { ReviewLoadState, ReviewReadModel } from "./review-types";
+
+type ReviewDetailsSummary = ReviewReadModel["bankingSummary"];
+
+const EUR_FORMATTER = new Intl.NumberFormat("de-DE", {
+	currency: "EUR",
+	style: "currency",
+});
 
 function ReviewDetails({
+	bankingSummary,
 	className,
-	reportId,
+	errorMessage,
+	loading,
+	totalAmount,
 	...props
 }: React.ComponentProps<"div"> & {
-	reportId: string;
-}) {
-	const { data, error, isPending } = api.report.getDetails.useQuery({
-		id: reportId,
-	});
-
-	if (isPending) {
+	bankingSummary?: ReviewDetailsSummary;
+	totalAmount?: number;
+} & ReviewLoadState) {
+	if (loading) {
 		return (
 			<div
 				className={cn("grid gap-6", className)}
@@ -33,7 +40,7 @@ function ReviewDetails({
 		);
 	}
 
-	if (error || !data) {
+	if (errorMessage || !bankingSummary || totalAmount === undefined) {
 		return (
 			<div
 				className={cn(
@@ -45,7 +52,7 @@ function ReviewDetails({
 					Details konnten nicht geladen werden
 				</p>
 				<p className="text-center text-xs">
-					{error?.message ?? "Ein unbekannter Fehler ist aufgetreten"}
+					{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
 				</p>
 			</div>
 		);
@@ -57,9 +64,9 @@ function ReviewDetails({
 			data-slot="review-details"
 			{...props}
 		>
-			<DetailCard title="Gesamtkosten" value={`${data.totalAmount}€`} />
-			<DetailCard title="IBAN" value={data.iban} />
-			<DetailCard title="Kontoname" value={data.ownerName} />
+			<DetailCard title="Gesamtkosten" value={EUR_FORMATTER.format(totalAmount)} />
+			<DetailCard title="IBAN" value={bankingSummary.iban} />
+			<DetailCard title="Kontoname" value={bankingSummary.ownerName} />
 		</div>
 	);
 }

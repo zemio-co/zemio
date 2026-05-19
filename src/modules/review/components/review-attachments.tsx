@@ -2,7 +2,7 @@
 
 import { DownloadIcon, FileIcon } from "lucide-react";
 import type React from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
 	Box,
@@ -15,9 +15,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Attachment } from "@/generated/prisma/client";
 import { cn, formatBytes } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import type { ReviewAttachment, ReviewLoadState } from "./review-types";
 
 const DOWNLOAD_URL_REFRESH_INTERVAL_MS = 4 * 60 * 1000;
 
@@ -27,20 +27,22 @@ type BatchDownloadFile = {
 	url: string;
 };
 
-function ReviewAttachments({
-	reportId,
-	className,
-	...props
-}: React.ComponentProps<"section"> & { reportId: string }) {
-	const {
-		data: attachments,
-		isPending,
-		error,
-	} = api.attachment.listForReport.useQuery({
-		id: reportId,
-	});
+type DownloadFilesCache = {
+	files: BatchDownloadFile[];
+	idsKey: string;
+	updatedAt: number;
+};
 
-	if (isPending) {
+function ReviewAttachments({
+	attachments,
+	className,
+	errorMessage,
+	loading,
+	...props
+}: React.ComponentProps<"section"> & {
+	attachments?: ReviewAttachment[];
+} & ReviewLoadState) {
+	if (loading) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
 				<AttachmentsHeader attachments={[]} loading />
@@ -49,7 +51,7 @@ function ReviewAttachments({
 		);
 	}
 
-	if (error || !attachments) {
+	if (errorMessage || !attachments) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
 				<AttachmentsHeader attachments={[]} />
@@ -58,7 +60,7 @@ function ReviewAttachments({
 						Fehler beim Laden der Anhänge
 					</p>
 					<p className="text-center text-xs">
-						{error?.message ?? "Ein unbekannter Fehler ist aufgetreten"}
+						{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
 					</p>
 				</div>
 			</section>
@@ -97,7 +99,7 @@ function AttachmentsHeader({
 	loading,
 	...props
 }: React.ComponentProps<"div"> & {
-	attachments: Attachment[];
+	attachments: ReviewAttachment[];
 	loading?: boolean;
 }) {
 	return (
@@ -128,47 +130,47 @@ function AttachmentsDownloadAll({
 	onClick,
 	...props
 }: React.ComponentProps<typeof Button> & {
-	attachments: Attachment[];
+	attachments: ReviewAttachment[];
 }) {
 	const attachmentIds = useMemo(
 		() => attachments.map((attachment) => attachment.id),
 		[attachments],
 	);
-	const [downloadFiles, setDownloadFiles] = useState<BatchDownloadFile[]>([]);
-	const [downloadFilesUpdatedAt, setDownloadFilesUpdatedAt] = useState<
-		number | null
-	>(null);
+	const attachmentIdsKey = useMemo(
+		() => attachmentIds.join("\0"),
+		[attachmentIds],
+	);
+	const [downloadFilesCache, setDownloadFilesCache] =
+		useState<DownloadFilesCache | null>(null);
 	const { mutateAsync, isPending } =
 		api.attachment.getBatchDownloadUrls.useMutation();
 
-	const hasFreshDownloadFiles = useCallback(() => {
-		return (
-			downloadFiles.length === attachmentIds.length &&
-			downloadFilesUpdatedAt !== null &&
-			Date.now() - downloadFilesUpdatedAt < DOWNLOAD_URL_REFRESH_INTERVAL_MS
-		);
-	}, [attachmentIds.length, downloadFiles.length, downloadFilesUpdatedAt]);
+	const getFreshDownloadFiles = useCallback((): BatchDownloadFile[] | null => {
+		if (
+			!downloadFilesCache ||
+			downloadFilesCache.idsKey !== attachmentIdsKey ||
+			downloadFilesCache.files.length !== attachmentIds.length ||
+			Date.now() - downloadFilesCache.updatedAt >= DOWNLOAD_URL_REFRESH_INTERVAL_MS
+		) {
+			return null;
+		}
+
+		return downloadFilesCache.files;
+	}, [attachmentIds.length, attachmentIdsKey, downloadFilesCache]);
 
 	const prepareDownloadFiles = useCallback(async () => {
 		if (attachmentIds.length === 0) {
-			return;
+			return [];
 		}
 
 		const result = await mutateAsync({ ids: attachmentIds });
-		setDownloadFiles(result.files);
-		setDownloadFilesUpdatedAt(Date.now());
-	}, [attachmentIds, mutateAsync]);
-
-	useEffect(() => {
-		setDownloadFiles([]);
-		setDownloadFilesUpdatedAt(null);
-
-		if (attachmentIds.length === 0) {
-			return;
-		}
-
-		void prepareDownloadFiles();
-	}, [attachmentIds, prepareDownloadFiles]);
+		setDownloadFilesCache({
+			files: result.files,
+			idsKey: attachmentIdsKey,
+			updatedAt: Date.now(),
+		});
+		return result.files;
+	}, [attachmentIds, attachmentIdsKey, mutateAsync]);
 
 	function triggerDownload(url: string, filename: string) {
 		const link = document.createElement("a");
@@ -193,16 +195,24 @@ function AttachmentsDownloadAll({
 			return;
 		}
 
-		if (!hasFreshDownloadFiles()) {
-			toast.promise(prepareDownloadFiles(), {
-				loading: "Downloads werden vorbereitet…",
-				success: "Downloads vorbereitet",
-				error: "Downloads fehlgeschlagen",
-			});
+		const freshDownloadFiles = getFreshDownloadFiles();
+		if (!freshDownloadFiles) {
+			toast.promise(
+				prepareDownloadFiles().then((files) => {
+					for (const file of files) {
+						triggerDownload(file.url, file.filename);
+					}
+				}),
+				{
+					loading: "Downloads werden vorbereitet…",
+					success: "Downloads gestartet",
+					error: "Downloads fehlgeschlagen",
+				},
+			);
 			return;
 		}
 
-		for (const file of downloadFiles) {
+		for (const file of freshDownloadFiles) {
 			triggerDownload(file.url, file.filename);
 		}
 
@@ -224,7 +234,7 @@ function AttachmentsDownloadAll({
 	);
 }
 
-function AttachmentItem({ attachment }: { attachment: Attachment }) {
+function AttachmentItem({ attachment }: { attachment: ReviewAttachment }) {
 	const { mutateAsync, isPending } = api.attachment.getDownloadUrl.useMutation();
 
 	function handleDownload() {
