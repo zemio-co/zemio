@@ -15,6 +15,7 @@ import {
 	createTRPCRouter,
 	orgAdminProcedure,
 	orgProcedure,
+	protectedProcedure,
 } from "@/server/api/trpc";
 import {
 	buildReportPdfFilename,
@@ -67,6 +68,7 @@ export const reportRouter = createTRPCRouter({
 							id: true,
 							name: true,
 							email: true,
+							image: true,
 						},
 					},
 				},

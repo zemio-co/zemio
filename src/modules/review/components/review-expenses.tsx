@@ -107,7 +107,7 @@ function ReviewExpenses({
 				<ExpensesHeader expenses={expenses} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-sm">Keine Ausgaben gefunden.</p>
-					<p className="text-center text-xs">
+					<p className="text-center text-muted-foreground text-xs">
 						Für diesen Spesenbericht wurden noch keine Ausgaben eingetragen
 					</p>
 				</div>

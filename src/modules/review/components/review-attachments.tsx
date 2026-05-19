@@ -71,7 +71,7 @@ function ReviewAttachments({
 				<AttachmentsHeader attachments={attachments} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-sm">Keine Uploads gefunden</p>
-					<p className="text-center text-xs">
+					<p className="text-center text-muted-foreground text-xs">
 						Der Nutzer hat keine Dokumente hochgeladen.
 					</p>
 				</div>
