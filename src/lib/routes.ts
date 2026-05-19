@@ -11,4 +11,6 @@ export const ROUTES = {
 	// ======= ADMIN SETTINGS =========================================
 	SETTINGS_ADMIN_ORGS: () => "/settings/admin/orgs",
 	SETTINGS_ADMIN_ORG_DETAILS: (id: string) => `/settings/admin/orgs/${id}`,
+
+	ADMIN_REVIEW_REPORT: (reportId: string) => `/admin/review/${reportId}`,
 } as const;
