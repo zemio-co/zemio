@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import {
 	createTRPCRouter,
+	orgAdminProcedure,
 	orgProcedure,
 	protectedProcedure,
 } from "@/server/api/trpc";
@@ -114,6 +115,75 @@ export const attachmentRouter = createTRPCRouter({
 			);
 
 			return { url };
+		}),
+
+	getBatchDownloadUrls: orgAdminProcedure
+		.input(
+			z.object({
+				ids: z
+					.array(z.string().min(1))
+					.min(1)
+					.max(100)
+					.refine((ids) => new Set(ids).size === ids.length, {
+						message: "Attachment ids must be unique",
+					}),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const attachments = await ctx.db.attachment.findMany({
+				where: {
+					id: {
+						in: input.ids,
+					},
+					expense: {
+						report: {
+							organizationId: ctx.organizationId,
+						},
+					},
+				},
+				select: {
+					id: true,
+					key: true,
+					originalName: true,
+				},
+			});
+
+			if (attachments.length !== input.ids.length) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "One or more attachments were not found",
+				});
+			}
+
+			const attachmentsById = new Map(
+				attachments.map((attachment) => [attachment.id, attachment]),
+			);
+
+			const files = await Promise.all(
+				input.ids.map(async (id) => {
+					const attachment = attachmentsById.get(id);
+
+					if (!attachment) {
+						throw new TRPCError({
+							code: "NOT_FOUND",
+							message: "One or more attachments were not found",
+						});
+					}
+
+					const url = await getPresignedDownloadUrl(
+						attachment.key,
+						attachment.originalName,
+					);
+
+					return {
+						id: attachment.id,
+						filename: attachment.originalName,
+						url,
+					};
+				}),
+			);
+
+			return { files };
 		}),
 
 	getUploadUrls: orgProcedure
