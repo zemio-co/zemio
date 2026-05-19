@@ -52,7 +52,7 @@ function ReviewAttachments({
 	if (error || !attachments) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
-				<AttachmentsHeader attachments={[]} loading />
+				<AttachmentsHeader attachments={[]} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-destructive text-sm">
 						Fehler beim Laden der Anhänge

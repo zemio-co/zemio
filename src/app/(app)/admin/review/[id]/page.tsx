@@ -1,6 +1,5 @@
-import { ChevronDown, DownloadIcon, FileIcon } from "lucide-react";
+import { ChevronDown, FileIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ReviewAttachments } from "@/modules/review/components/review-attachments";
@@ -111,16 +110,9 @@ export default async function ServerPage({
 					</div>
 				</div>
 				<div className="mt-20">
-					<div className="flex items-center justify-start gap-2">
-						<p className="font-semibold text-zinc-800">Kostenaufstellung</p>
-						<Badge variant={"secondary"}>3</Badge>
-						<div className="ml-auto flex cursor-pointer items-center justify-center gap-1.5">
-							<p className="font-medium text-blue-500 text-sm">Exportieren</p>
-							<DownloadIcon className="size-3.5 text-blue-500" />
-						</div>
-					</div>
+					´
 					<div className="mt-4">
-						<ReviewExpenses expenses={expenses} />
+						<ReviewExpenses reportId={reportId} />
 						<table className="hidden w-full">
 							<thead>
 								<tr className="border-b">
