@@ -107,7 +107,7 @@ function ReasoningContent({
 			data-slot="reasoning-content"
 			{...props}
 		>
-			<p className="max-w-prose rounded-lg rounded-bl-none px-4 py-3 text-zinc-700 leading-7 shadow-sm ring-1 ring-zinc-700/15">
+			<p className="max-w-prose rounded-lg rounded-bl-none bg-background px-4 py-3 text-zinc-700 leading-7 shadow-sm ring-1 ring-zinc-700/15">
 				{reasoning.description}
 			</p>
 			<div className="flex items-center justify-start">

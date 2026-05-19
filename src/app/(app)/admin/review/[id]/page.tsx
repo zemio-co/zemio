@@ -2,6 +2,7 @@ import { ChevronDown, FileIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ReviewAttachments } from "@/modules/review/components/review-attachments";
+import { ReviewDetails } from "@/modules/review/components/review-details";
 import { ReviewExpenses } from "@/modules/review/components/review-expenses";
 import { ReviewNavbar } from "@/modules/review/components/review-navbar";
 import { ReviewReasoning } from "@/modules/review/components/review-reasoning";
@@ -14,25 +15,21 @@ export default async function ServerPage({
 
 	void (await Promise.all([
 		api.report.getById.prefetch({ id: reportId }),
+		api.report.getDetails.prefetch({ id: reportId }),
 		api.expense.listForReport.prefetch({ reportId }),
 		api.attachment.listForReport.prefetch({ id: reportId }),
 	]));
 
-	const [report, details] = await Promise.all([
-		api.report.getById({ id: reportId }),
-		api.report.getDetails({
-			id: reportId,
-		}),
-	]);
+	const [report] = await Promise.all([api.report.getById({ id: reportId })]);
 
 	return (
 		<HydrateClient>
-			<main className="pb-32">
+			<main className="bg-zinc-50 pb-32">
 				<ReviewNavbar
 					report={{
-						iban: details.iban,
+						iban: "details.iban",
 						id: report.id,
-						name: details.ownerName,
+						name: "details.ownerName",
 						readableId: report.tag.toString(),
 						sum: 99,
 						title: report.title,
@@ -63,24 +60,7 @@ export default async function ServerPage({
 								</ButtonGroup>
 							</div>
 						</div>
-						<div className="mt-10 grid grid-cols-3 gap-8">
-							<div className="space-y-4 rounded-lg p-4 shadow-sm ring-1 ring-zinc-700/15">
-								<p className="font-medium text-xs text-zinc-500">Gesamtkosten</p>
-								<p className="font-semibold text-lg text-zinc-800">231,31€</p>
-							</div>
-							<div className="space-y-4 rounded-lg p-4 shadow-sm ring-1 ring-zinc-700/15">
-								<p className="font-medium text-xs text-zinc-500">IBAN</p>
-								<p className="truncate font-semibold text-lg text-zinc-800">
-									DE72 2812 0000 7510 7581 83
-								</p>
-							</div>
-							<div className="space-y-4 rounded-lg p-4 shadow-sm ring-1 ring-zinc-700/15">
-								<p className="font-medium text-xs text-zinc-500">Kontoname</p>
-								<p className="font-semibold text-lg text-zinc-800">
-									Karsten Frank Meier
-								</p>
-							</div>
-						</div>
+						<ReviewDetails className="mt-10 lg:grid-cols-3" reportId={reportId} />
 					</div>
 				</section>
 				<div className="mx-auto mt-20 w-full max-w-5xl px-8">
