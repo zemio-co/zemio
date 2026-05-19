@@ -1,5 +1,4 @@
 import { ChevronDown, FileIcon } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { ReviewAttachments } from "@/modules/review/components/review-attachments";

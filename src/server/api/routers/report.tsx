@@ -15,7 +15,6 @@ import {
 	createTRPCRouter,
 	orgAdminProcedure,
 	orgProcedure,
-	protectedProcedure,
 } from "@/server/api/trpc";
 import {
 	buildReportPdfFilename,
