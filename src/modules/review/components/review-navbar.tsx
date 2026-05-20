@@ -30,6 +30,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 type ReviewNavbarReport = {
 	id: string;
@@ -42,13 +43,47 @@ type ReviewNavbarReport = {
 
 function ReviewNavbar({
 	className,
-	loading,
-	report,
+	reportId,
 	...props
 }: React.ComponentProps<"nav"> & {
-	loading?: boolean;
-	report?: ReviewNavbarReport;
+	reportId: string;
 }) {
+	const {
+		data: report,
+		error,
+		isPending,
+	} = api.admin.getReview.useQuery({ id: reportId });
+
+	if (isPending) {
+		return (
+			<nav className={cn("w-full border-b", className)} {...props}>
+				<div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-start gap-4 px-8 py-4">
+					<div className="flex w-fit items-center justify-center gap-3">
+						<Link className="font-medium text-sm text-zinc-600" href={"#"}>
+							Reports
+						</Link>
+						<p className="font-medium text-xs text-zinc-400">/</p>
+						<Skeleton className="h-4 w-16" />
+					</div>
+					<Navigation className="ml-auto" />
+				</div>
+			</nav>
+		);
+	}
+
+	if (error || !report) {
+		return null;
+	}
+
+	const navbarReport: ReviewNavbarReport = {
+		iban: report.bankingSummary.iban,
+		id: report.report.id,
+		name: report.bankingSummary.ownerName,
+		readableId: report.report.readableId,
+		sum: report.totalAmount,
+		title: report.report.title,
+	};
+
 	return (
 		<nav className={cn("w-full border-b", className)} {...props}>
 			<div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-start gap-4 px-8 py-4">
@@ -57,15 +92,11 @@ function ReviewNavbar({
 						Reports
 					</Link>
 					<p className="font-medium text-xs text-zinc-400">/</p>
-					{loading ? (
-						<Skeleton className="h-4 w-16" />
-					) : (
-						<Link className="font-medium text-sm text-zinc-800" href={"#"}>
-							{report ? `#${report.readableId}` : "Unbekannt"}
-						</Link>
-					)}
+					<Link className="font-medium text-sm text-zinc-800" href={"#"}>
+						{`#${navbarReport.readableId}`}
+					</Link>
 				</div>
-				{report ? <MoreMenu report={report} /> : null}
+				<MoreMenu report={navbarReport} />
 				<Navigation className="ml-auto" />
 			</div>
 		</nav>

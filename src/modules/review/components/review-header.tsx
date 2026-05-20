@@ -26,20 +26,29 @@ import type { ReportStatus } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
 import { cn, translateReportStatus } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import type { ReviewLoadState, ReviewReport } from "./review-types";
+import type { ReviewReport } from "./review-types";
 
 function ExpensesHeader({
 	className,
-	errorMessage,
-	loading,
-	report,
+	reportId,
 	...props
 }: React.ComponentProps<"header"> & {
-	report?: ReviewReport;
-} & ReviewLoadState) {
-	if (loading) {
-		return <HeaderLoading />;
+	reportId: string;
+}) {
+	const {
+		data: review,
+		error,
+		isPending,
+	} = api.admin.getReview.useQuery({
+		id: reportId,
+	});
+
+	if (isPending) {
+		return <HeaderLoading className={className} {...props} />;
 	}
+
+	const errorMessage = error?.message;
+	const report = review?.report;
 
 	if (errorMessage) {
 		return (
@@ -57,7 +66,7 @@ function ExpensesHeader({
 	}
 
 	if (!report) {
-		return;
+		return null;
 	}
 
 	const StatusIcon = StatusIcons[report.status];

@@ -26,28 +26,10 @@ function ReviewContent({
 
 	return (
 		<main className={cn("bg-zinc-50 pb-32", className)} {...props}>
-			<ReviewNavbar
-				loading={isPending}
-				report={
-					review
-						? {
-								iban: review.bankingSummary.iban,
-								id: review.report.id,
-								name: review.bankingSummary.ownerName,
-								readableId: review.report.readableId,
-								sum: review.totalAmount,
-								title: review.report.title,
-							}
-						: undefined
-				}
-			/>
+			<ReviewNavbar reportId={reportId} />
 			<section className="mt-20">
 				<div className="mx-auto w-full max-w-5xl px-8">
-					<ExpensesHeader
-						errorMessage={errorMessage}
-						loading={isPending}
-						report={review?.report}
-					/>
+					<ExpensesHeader reportId={reportId} />
 
 					<ReviewDetails
 						bankingSummary={review?.bankingSummary}
