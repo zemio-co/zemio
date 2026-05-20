@@ -2,6 +2,7 @@
 
 import { DownloadIcon, FileIcon } from "lucide-react";
 import type React from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
 	Box,
@@ -13,41 +14,76 @@ import {
 } from "@/components/box";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Attachment } from "@/generated/prisma/client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatBytes } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import type { ReviewAttachment, ReviewLoadState } from "./review-types";
+
+const DOWNLOAD_URL_REFRESH_INTERVAL_MS = 4 * 60 * 1000;
+
+type BatchDownloadFile = {
+	id: string;
+	filename: string;
+	url: string;
+};
+
+type DownloadFilesCache = {
+	files: BatchDownloadFile[];
+	idsKey: string;
+	updatedAt: number;
+};
 
 function ReviewAttachments({
-	reportId,
+	attachments,
 	className,
+	errorMessage,
+	loading,
 	...props
-}: React.ComponentProps<"section"> & { reportId: string }) {
-	const {
-		data: attachments,
-		isPending,
-		error,
-	} = api.attachment.listForReport.useQuery({
-		id: reportId,
-	});
-
-	if (isPending) {
-		return <p>Loading</p>;
+}: React.ComponentProps<"section"> & {
+	attachments?: ReviewAttachment[];
+} & ReviewLoadState) {
+	if (loading) {
+		return (
+			<section className={cn("space-y-4", className)} {...props}>
+				<AttachmentsHeader attachments={[]} loading />
+				<Skeleton className="min-h-32 w-full" />
+			</section>
+		);
 	}
 
-	if (error) {
-		return <p>{error.message}</p>;
+	if (errorMessage || !attachments) {
+		return (
+			<section className={cn("space-y-4", className)} {...props}>
+				<AttachmentsHeader attachments={[]} />
+				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
+					<p className="text-center font-medium text-destructive text-sm">
+						Fehler beim Laden der Anhänge
+					</p>
+					<p className="text-center text-xs">
+						{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
+					</p>
+				</div>
+			</section>
+		);
+	}
+
+	if (attachments.length === 0) {
+		return (
+			<section className={cn("space-y-4", className)} {...props}>
+				<AttachmentsHeader attachments={attachments} />
+				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
+					<p className="text-center font-medium text-sm">Keine Uploads gefunden</p>
+					<p className="text-center text-muted-foreground text-xs">
+						Der Nutzer hat keine Dokumente hochgeladen.
+					</p>
+				</div>
+			</section>
+		);
 	}
 
 	return (
 		<section className={cn("space-y-4", className)} {...props}>
-			<div className="flex items-center justify-start gap-2">
-				<p className="font-semibold text-zinc-800">Anhänge</p>
-				<Badge variant={"secondary"}>{attachments.length}</Badge>
-				<div className="ml-auto flex cursor-pointer items-center justify-center gap-1.5">
-					<p className="font-medium text-blue-500 text-sm">Alle herunterladen</p>
-					<DownloadIcon className="size-3.5 text-blue-500" />
-				</div>
-			</div>
+			<AttachmentsHeader attachments={attachments} />
 			<Box>
 				{attachments.map((attachment) => (
 					<AttachmentItem attachment={attachment} key={attachment.id} />
@@ -57,7 +93,148 @@ function ReviewAttachments({
 	);
 }
 
-function AttachmentItem({ attachment }: { attachment: Attachment }) {
+function AttachmentsHeader({
+	className,
+	attachments,
+	loading,
+	...props
+}: React.ComponentProps<"div"> & {
+	attachments: ReviewAttachment[];
+	loading?: boolean;
+}) {
+	return (
+		<div
+			className={cn("flex items-center justify-start gap-2", className)}
+			data-slot="attachments-header"
+			{...props}
+		>
+			<p className="font-semibold text-zinc-800">Anhänge</p>
+			{loading ? (
+				<Skeleton className="h-5 w-7 rounded-full" />
+			) : (
+				<Badge variant={"secondary"}>{attachments.length}</Badge>
+			)}
+			<AttachmentsDownloadAll
+				attachments={attachments}
+				className={"ml-auto translate-x-2.5"}
+				disabled={loading}
+			/>
+		</div>
+	);
+}
+
+function AttachmentsDownloadAll({
+	className,
+	attachments,
+	disabled,
+	onClick,
+	...props
+}: React.ComponentProps<typeof Button> & {
+	attachments: ReviewAttachment[];
+}) {
+	const attachmentIds = useMemo(
+		() => attachments.map((attachment) => attachment.id),
+		[attachments],
+	);
+	const attachmentIdsKey = useMemo(
+		() => attachmentIds.join("\0"),
+		[attachmentIds],
+	);
+	const [downloadFilesCache, setDownloadFilesCache] =
+		useState<DownloadFilesCache | null>(null);
+	const { mutateAsync, isPending } =
+		api.attachment.getBatchDownloadUrls.useMutation();
+
+	const getFreshDownloadFiles = useCallback((): BatchDownloadFile[] | null => {
+		if (
+			!downloadFilesCache ||
+			downloadFilesCache.idsKey !== attachmentIdsKey ||
+			downloadFilesCache.files.length !== attachmentIds.length ||
+			Date.now() - downloadFilesCache.updatedAt >= DOWNLOAD_URL_REFRESH_INTERVAL_MS
+		) {
+			return null;
+		}
+
+		return downloadFilesCache.files;
+	}, [attachmentIds.length, attachmentIdsKey, downloadFilesCache]);
+
+	const prepareDownloadFiles = useCallback(async () => {
+		if (attachmentIds.length === 0) {
+			return [];
+		}
+
+		const result = await mutateAsync({ ids: attachmentIds });
+		setDownloadFilesCache({
+			files: result.files,
+			idsKey: attachmentIdsKey,
+			updatedAt: Date.now(),
+		});
+		return result.files;
+	}, [attachmentIds, attachmentIdsKey, mutateAsync]);
+
+	function triggerDownload(url: string, filename: string) {
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = filename;
+		link.rel = "noopener";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
+
+	const handleDownloadAll: NonNullable<
+		React.ComponentProps<typeof Button>["onClick"]
+	> = (event) => {
+		onClick?.(event);
+
+		if (
+			event.defaultPrevented ||
+			event.baseUIHandlerPrevented ||
+			attachments.length === 0
+		) {
+			return;
+		}
+
+		const freshDownloadFiles = getFreshDownloadFiles();
+		if (!freshDownloadFiles) {
+			toast.promise(
+				prepareDownloadFiles().then((files) => {
+					for (const file of files) {
+						triggerDownload(file.url, file.filename);
+					}
+				}),
+				{
+					loading: "Downloads werden vorbereitet…",
+					success: "Downloads gestartet",
+					error: "Downloads fehlgeschlagen",
+				},
+			);
+			return;
+		}
+
+		for (const file of freshDownloadFiles) {
+			triggerDownload(file.url, file.filename);
+		}
+
+		toast.success("Downloads gestartet");
+	};
+
+	return (
+		<Button
+			className={cn("text-blue-500 hover:text-blue-500", className)}
+			data-slot="attachments-download-all"
+			disabled={disabled || isPending || attachments.length === 0}
+			onClick={handleDownloadAll}
+			variant={"ghost"}
+			{...props}
+		>
+			Alle herunterladen
+			<DownloadIcon />
+		</Button>
+	);
+}
+
+function AttachmentItem({ attachment }: { attachment: ReviewAttachment }) {
 	const { mutateAsync, isPending } = api.attachment.getDownloadUrl.useMutation();
 
 	function handleDownload() {

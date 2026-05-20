@@ -30,6 +30,7 @@ import type {
 	User,
 } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
+import { ROUTES } from "@/lib/routes";
 import { cn, formatTimeElapsed, translateReportStatus } from "@/lib/utils";
 
 export type ExtendedReport = Report & {
@@ -182,7 +183,7 @@ const titleColumn: ColumnDef<ExtendedReport> = {
 		return (
 			<Link
 				className="max-w-full font-medium text-foreground"
-				href={`/reports/${row.original.id}`}
+				href={ROUTES.ADMIN_REVIEW_REPORT(row.original.id)}
 			>
 				<span className="absolute inset-0 z-0 h-full w-full transition-colors" />
 				<span className="line-clamp-1">{row.original.title}</span>

@@ -1,1 +1,1 @@
-export * from "./components";
+export { ReviewContent } from "./components";

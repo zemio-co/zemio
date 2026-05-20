@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
@@ -25,7 +26,10 @@ export default function RootLayout({
 		<html className={inter.variable} lang="en" suppressHydrationWarning>
 			<body className="min-h-screen bg-background font-sans antialiased">
 				<Providers>
-					<TRPCReactProvider>{children}</TRPCReactProvider>
+					<TRPCReactProvider>
+						{children}
+						<ReactQueryDevtools />
+					</TRPCReactProvider>
 					<Toaster />
 				</Providers>
 			</body>

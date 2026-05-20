@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { ReportStatus } from "@/generated/prisma/enums";
+import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { createTRPCRouter, orgAdminProcedure } from "@/server/api/trpc";
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
@@ -12,6 +13,107 @@ const paginationInput = z.object({
 });
 
 export const adminRouter = createTRPCRouter({
+	getReview: orgAdminProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const report = await ctx.db.report.findFirst({
+				where: {
+					id: input.id,
+					organizationId: ctx.organizationId,
+				},
+				select: {
+					id: true,
+					tag: true,
+					title: true,
+					description: true,
+					status: true,
+					createdAt: true,
+					owner: {
+						select: {
+							id: true,
+							name: true,
+							email: true,
+							image: true,
+						},
+					},
+					bankingDetails: {
+						select: {
+							iban: true,
+							fullName: true,
+						},
+					},
+					expenses: {
+						select: {
+							id: true,
+							description: true,
+							amount: true,
+							startDate: true,
+							endDate: true,
+							type: true,
+							meta: true,
+							reportId: true,
+							attachments: {
+								select: {
+									id: true,
+									size: true,
+									originalName: true,
+									createdAt: true,
+									updatedAt: true,
+									expenseId: true,
+								},
+							},
+						},
+					},
+				},
+			});
+
+			if (!report) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Report not found",
+				});
+			}
+
+			const bankingDetails = decryptBankingDetails(report.bankingDetails);
+			const expenses = report.expenses.map((expense) => ({
+				id: expense.id,
+				description: expense.description,
+				amount: Number(expense.amount),
+				startDate: expense.startDate,
+				endDate: expense.endDate,
+				type: expense.type,
+				meta: expense.meta,
+				reportId: expense.reportId,
+			}));
+			const attachments = report.expenses.flatMap(
+				(expense) => expense.attachments,
+			);
+			const totalAmount = expenses.reduce(
+				(sum, expense) => sum + expense.amount,
+				0,
+			);
+
+			return {
+				report: {
+					id: report.id,
+					tag: report.tag,
+					readableId: report.tag.toString(),
+					title: report.title,
+					description: report.description,
+					status: report.status,
+					createdAt: report.createdAt,
+					owner: report.owner,
+				},
+				bankingSummary: {
+					iban: bankingDetails.iban,
+					ownerName: bankingDetails.fullName,
+				},
+				totalAmount,
+				expenses,
+				attachments,
+			};
+		}),
+
 	/**
 	 * Returns filter options for the admin reports list.
 	 * Fetches cost units and owners directly from their respective tables.
