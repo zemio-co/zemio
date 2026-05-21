@@ -10,6 +10,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@utility container {
+	@apply mx-auto max-w-6xl w-full px-8;
+}
+
 @theme inline {
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
@@ -55,8 +59,8 @@
 }
 
 :root {
-	--background: oklch(1 0 0);
-	--foreground: oklch(0.141 0.005 285.823);
+	--background: oklch(0.99 0 0);
+	--foreground: oklch(0.27 0.01 286);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.141 0.005 285.823);
 	--popover: oklch(1 0 0);

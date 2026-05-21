@@ -15,6 +15,7 @@ import {
 	createTRPCRouter,
 	orgAdminProcedure,
 	orgProcedure,
+	protectedProcedure,
 } from "@/server/api/trpc";
 import {
 	buildReportPdfFilename,
@@ -22,6 +23,39 @@ import {
 } from "@/server/pdf/summary";
 
 export const reportRouter = createTRPCRouter({
+	listOwn: protectedProcedure
+		.input(
+			z.object({
+				page: z.number().min(1),
+				pageSize: z.number(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const userId = ctx.session.user.id;
+
+			const reports = await ctx.db.report.findMany({
+				where: {
+					ownerId: userId,
+				},
+				include: {
+					expenses: {
+						select: {
+							amount: true,
+						},
+					},
+				},
+				take: input.pageSize,
+				skip: (input.page - 1) * input.pageSize,
+			});
+			return reports.map((report) => ({
+				...report,
+				sum: report.expenses.reduce(
+					(total, expense) => total + Number(expense.amount),
+					0,
+				),
+			}));
+		}),
+
 	// Get all reports for the current user
 	getAll: orgProcedure.query(async ({ ctx }) => {
 		const reports = await ctx.db.report.findMany({
@@ -50,6 +84,10 @@ export const reportRouter = createTRPCRouter({
 				...expense,
 				amount: Number(expense.amount),
 			})),
+			sum: report.expenses.reduce(
+				(sum, expense) => sum + Number(expense.amount),
+				0,
+			),
 		}));
 	}),
 
