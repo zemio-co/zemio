@@ -4,6 +4,7 @@ import ExpenseReportCreatorNotification from "@/components/emails/expense-report
 import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
+import type { Prisma } from "@/generated/prisma/client";
 import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
@@ -15,28 +16,104 @@ import {
 	createTRPCRouter,
 	orgAdminProcedure,
 	orgProcedure,
-	protectedProcedure,
 } from "@/server/api/trpc";
 import {
 	buildReportPdfFilename,
 	generatePdfSummary,
 } from "@/server/pdf/summary";
 
+const reportListFilterSchema = z
+	.object({
+		createdAt: z
+			.object({
+				end: z.coerce.date(),
+				start: z.coerce.date(),
+			})
+			.optional(),
+		status: z
+			.object({
+				operator: z.enum(["is", "is-not"]),
+				value: z.nativeEnum(ReportStatus),
+			})
+			.optional(),
+	})
+	.optional();
+
+const reportListSortingSchema = z
+	.array(
+		z.object({
+			desc: z.boolean(),
+			id: z.enum(["createdAt", "lastUpdatedAt", "status", "tag", "title"]),
+		}),
+	)
+	.max(1)
+	.optional();
+
+type ReportListFilters = z.infer<typeof reportListFilterSchema>;
+type ReportListSorting = z.infer<typeof reportListSortingSchema>;
+
+function buildReportListWhere(
+	userId: string,
+	organizationId: string,
+	filters: ReportListFilters,
+): Prisma.ReportWhereInput {
+	const where: Prisma.ReportWhereInput = {
+		organizationId,
+		ownerId: userId,
+	};
+
+	if (filters?.createdAt) {
+		where.createdAt = {
+			gte: filters.createdAt.start,
+			lte: filters.createdAt.end,
+		};
+	}
+
+	if (filters?.status) {
+		where.status =
+			filters.status.operator === "is"
+				? filters.status.value
+				: { not: filters.status.value };
+	}
+
+	return where;
+}
+
+function buildReportListOrderBy(
+	sorting: ReportListSorting,
+): Prisma.ReportOrderByWithRelationInput {
+	const sort = sorting?.[0];
+
+	if (!sort) {
+		return { createdAt: "desc" };
+	}
+
+	return {
+		[sort.id]: sort.desc ? "desc" : "asc",
+	};
+}
+
 export const reportRouter = createTRPCRouter({
-	listOwn: protectedProcedure
+	listOwn: orgProcedure
 		.input(
 			z.object({
-				page: z.number().min(1),
-				pageSize: z.number(),
+				filters: reportListFilterSchema,
+				limit: z.number().int().min(1).max(101).optional(),
+				page: z.number().int().min(1),
+				pageSize: z.number().int().min(1).max(100),
+				sorting: reportListSortingSchema,
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
+			const where = buildReportListWhere(
+				userId,
+				ctx.organizationId,
+				input.filters,
+			);
 
 			const reports = await ctx.db.report.findMany({
-				where: {
-					ownerId: userId,
-				},
+				where,
 				include: {
 					expenses: {
 						select: {
@@ -44,9 +121,11 @@ export const reportRouter = createTRPCRouter({
 						},
 					},
 				},
-				take: input.pageSize,
+				orderBy: buildReportListOrderBy(input.sorting),
+				take: Math.min(input.limit ?? input.pageSize, input.pageSize + 1),
 				skip: (input.page - 1) * input.pageSize,
 			});
+
 			return reports.map((report) => ({
 				...report,
 				sum: report.expenses.reduce(
