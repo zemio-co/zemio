@@ -1,5 +1,4 @@
-import { Navbar } from "@/components/navbar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Navbar, NavbarSidebarTrigger } from "@/components/navbar";
 import { cn } from "@/lib/utils";
 
 function DashboardNavbar({
@@ -9,7 +8,7 @@ function DashboardNavbar({
 	return (
 		<Navbar className={cn("", className)} data-slot="dashboard-navbar" {...props}>
 			<div className="container flex items-center justify-start">
-				<SidebarTrigger />
+				<NavbarSidebarTrigger />
 			</div>
 		</Navbar>
 	);

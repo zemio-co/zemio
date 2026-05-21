@@ -14,6 +14,6 @@ export const ROUTES = {
 
 	ADMIN_REVIEW_REPORT: (reportId: string) => `/admin/review/${reportId}`,
 
-	USER_REPORTS_LIST: () => "#",
+	USER_REPORTS_LIST: () => "/reports",
 	USER_REPORT_DETAILS: (reportId: string) => `/reports/${reportId}`,
 } as const;

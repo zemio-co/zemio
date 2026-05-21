@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { SidebarTrigger, useSidebar } from "./ui/sidebar";
 
 function Navbar({ className, ...props }: React.ComponentProps<"nav">) {
 	return (
@@ -10,4 +11,15 @@ function Navbar({ className, ...props }: React.ComponentProps<"nav">) {
 	);
 }
 
-export { Navbar };
+function NavbarSidebarTrigger({
+	className,
+	...props
+}: React.ComponentProps<typeof SidebarTrigger>) {
+	const { open } = useSidebar();
+
+	return (
+		<SidebarTrigger className={cn(open && "hidden", className)} {...props} />
+	);
+}
+
+export { Navbar, NavbarSidebarTrigger };
