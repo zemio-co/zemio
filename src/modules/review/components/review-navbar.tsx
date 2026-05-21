@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
+import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -23,6 +24,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Tooltip,
@@ -56,8 +58,9 @@ function ReviewNavbar({
 
 	if (isPending) {
 		return (
-			<nav className={cn("w-full border-b", className)} {...props}>
-				<div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-start gap-4 px-8 py-4">
+			<Navbar className={cn("", className)} {...props}>
+				<div className="container flex items-center justify-start gap-4 py-4">
+					<SidebarTrigger />
 					<div className="flex w-fit items-center justify-center gap-3">
 						<Link className="font-medium text-sm text-zinc-600" href={"#"}>
 							Reports
@@ -67,7 +70,7 @@ function ReviewNavbar({
 					</div>
 					<Navigation className="ml-auto" />
 				</div>
-			</nav>
+			</Navbar>
 		);
 	}
 
@@ -85,8 +88,9 @@ function ReviewNavbar({
 	};
 
 	return (
-		<nav className={cn("w-full border-b", className)} {...props}>
-			<div className="mx-auto flex h-12 w-full max-w-7xl items-center justify-start gap-4 px-8 py-4">
+		<Navbar className={cn("", className)} {...props}>
+			<div className="container flex items-center justify-start gap-4 py-4">
+				<SidebarTrigger />
 				<div className="flex w-fit items-center justify-center gap-3">
 					<Link className="font-medium text-sm text-zinc-600" href={"#"}>
 						Reports
@@ -99,7 +103,7 @@ function ReviewNavbar({
 				<MoreMenu report={navbarReport} />
 				<Navigation className="ml-auto" />
 			</div>
-		</nav>
+		</Navbar>
 	);
 }
 

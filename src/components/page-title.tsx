@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 export function PageTitle({ className, ...props }: React.ComponentProps<"h1">) {
 	return (
 		<h1
-			className={cn("font-semibold text-2xl text-foreground", className)}
+			className={cn("font-semibold text-foreground text-lg", className)}
 			data-slot="page-title"
 			{...props}
 		/>
