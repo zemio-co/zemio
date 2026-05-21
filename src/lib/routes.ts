@@ -18,4 +18,6 @@ export const ROUTES = {
 	USER_REPORTS_LIST: () => "/reports",
 	USER_REPORT_DETAILS: (reportId: string) => `/reports/${reportId}`,
 	USER_DASHBOARD: () => "/dashboard",
+
+	NEW_REPORT: () => "/reports/new",
 } as const;
