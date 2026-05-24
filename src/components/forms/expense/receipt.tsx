@@ -269,10 +269,15 @@ export function CreateReceiptExpenseForm({
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
 								<FieldLabel htmlFor={field.name}>Anhänge</FieldLabel>
 								<UploadDropzone
+									accept={{
+										"image/*": [],
+										"application/pdf": [".pdf"],
+									}}
 									control={uploader.control}
 									description={{
 										maxFiles: MAX_FILE_AMOUNT,
 										maxFileSize: "5MB",
+										fileTypes: "images and PDFs",
 									}}
 									id={field.name}
 									uploadOverride={(files) => {
