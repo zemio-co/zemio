@@ -22,6 +22,14 @@ import {
 	generatePdfSummary,
 } from "@/server/pdf/summary";
 
+const REPORT_STATUSES: ReportStatus[] = [
+	"ACCEPTED",
+	"DRAFT",
+	"NEEDS_REVISION",
+	"PENDING_APPROVAL",
+	"REJECTED",
+];
+
 const reportListFilterSchema = z
 	.object({
 		createdAt: z
@@ -52,7 +60,7 @@ const reportListSortingSchema = z
 type ReportListFilters = z.infer<typeof reportListFilterSchema>;
 type ReportListSorting = z.infer<typeof reportListSortingSchema>;
 
-function buildReportListWhere(
+function _buildReportListWhere(
 	userId: string,
 	organizationId: string,
 	filters: ReportListFilters,
@@ -79,7 +87,7 @@ function buildReportListWhere(
 	return where;
 }
 
-function buildReportListOrderBy(
+function _buildReportListOrderBy(
 	sorting: ReportListSorting,
 ): Prisma.ReportOrderByWithRelationInput {
 	const sort = sorting?.[0];
@@ -93,6 +101,160 @@ function buildReportListOrderBy(
 	};
 }
 
+const listFiltering = z.object({
+	status: z
+		.object({
+			filter: z.enum(["in", "not-in"]),
+			values: z.enum(REPORT_STATUSES).array(),
+		})
+		.optional(),
+	costUnit: z
+		.object({
+			filter: z.enum(["in", "not-in"]),
+			values: z.string().array(),
+		})
+		.optional(),
+	title: z
+		.object({
+			filter: z.literal("LIKE").optional().default("LIKE"),
+			value: z.string(),
+		})
+		.optional(),
+	owner: z
+		.object({
+			filter: z.enum(["in", "not-in"]),
+			values: z.string().array(),
+		})
+		.optional(),
+	createdAt: z
+		.object({
+			filter: z.enum(["between"]).optional().default("between"),
+			startDate: z.date(),
+			endDate: z.date(),
+		})
+		.optional(),
+	updatedAt: z
+		.object({
+			filter: z.enum(["between"]).optional().default("between"),
+			startDate: z.date(),
+			endDate: z.date(),
+		})
+		.optional(),
+});
+
+const listSorting = z.object({
+	column: z.enum(["updatedAt", "createdAt"]),
+	direction: z.enum(["asc", "desc"]).optional().default("asc"),
+});
+
+const buildListFilters = (
+	userId: string,
+	organizationId: string,
+	filters?: z.infer<typeof listFiltering>,
+) => {
+	const where: Prisma.ReportWhereInput = {
+		organizationId,
+		ownerId: userId,
+	};
+
+	if (filters?.status) {
+		const clause = filters.status;
+
+		if (clause.filter === "in") {
+			where.status = {
+				in: clause.values,
+			};
+		} else {
+			where.status = {
+				notIn: clause.values,
+			};
+		}
+	}
+
+	if (filters?.costUnit) {
+		const clause = filters.costUnit;
+
+		if (clause.filter === "in") {
+			where.costUnit = {
+				id: {
+					in: clause.values,
+				},
+			};
+		} else {
+			where.costUnit = {
+				id: {
+					notIn: clause.values,
+				},
+			};
+		}
+	}
+
+	if (filters?.title) {
+		const clause = filters.title;
+
+		if (clause.filter === "LIKE") {
+			where.title = {
+				contains: clause.value,
+				mode: "insensitive",
+			};
+		}
+	}
+
+	if (filters?.owner) {
+		const clause = filters.owner;
+
+		if (clause.filter === "in") {
+			where.owner = {
+				id: {
+					in: clause.values,
+				},
+			};
+		} else {
+			where.owner = {
+				id: {
+					notIn: clause.values,
+				},
+			};
+		}
+	}
+
+	if (filters?.createdAt) {
+		const clause = filters.createdAt;
+
+		if (clause.filter === "between") {
+			where.createdAt = {
+				gte: clause.startDate,
+				lte: clause.endDate,
+			};
+		}
+	}
+
+	if (filters?.updatedAt) {
+		const clause = filters.updatedAt;
+
+		if (clause.filter === "between") {
+			where.createdAt = {
+				gte: clause.startDate,
+				lte: clause.endDate,
+			};
+		}
+	}
+
+	return where;
+};
+
+const buildListSorting = (sorting?: z.infer<typeof listSorting>) => {
+	const res: Prisma.ReportOrderByWithRelationInput = {};
+
+	if (sorting?.column === "createdAt") {
+		const _res = {
+			createdAt: sorting.direction === "asc" ? "asc" : "desc",
+		};
+	}
+
+	return res;
+};
+
 export const reportRouter = createTRPCRouter({
 	listOwn: orgProcedure
 		.input(
@@ -102,37 +264,60 @@ export const reportRouter = createTRPCRouter({
 				page: z.number().int().min(1),
 				pageSize: z.number().int().min(1).max(100),
 				sorting: reportListSortingSchema,
+				sort: listSorting.optional(),
+				filter: listFiltering.optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const where = buildReportListWhere(
-				userId,
-				ctx.organizationId,
-				input.filters,
-			);
+			const where = buildListFilters(userId, ctx.organizationId, input.filter);
+			const orderBy = buildListSorting(input.sort);
 
-			const reports = await ctx.db.report.findMany({
-				where,
-				include: {
-					expenses: {
-						select: {
-							amount: true,
+			const [reports, count] = await ctx.db.$transaction([
+				ctx.db.report.findMany({
+					where,
+					orderBy,
+					include: {
+						expenses: {
+							select: {
+								amount: true,
+							},
+						},
+						owner: {
+							select: {
+								name: true,
+								image: true,
+								email: true,
+							},
+						},
+						costUnit: {
+							select: {
+								tag: true,
+							},
 						},
 					},
-				},
-				orderBy: buildReportListOrderBy(input.sorting),
-				take: Math.min(input.limit ?? input.pageSize, input.pageSize + 1),
-				skip: (input.page - 1) * input.pageSize,
-			});
+					take: Math.min(input.limit ?? input.pageSize, input.pageSize + 1),
+					skip: (input.page - 1) * input.pageSize,
+				}),
+				ctx.db.report.count({
+					where,
+				}),
+			]);
 
-			return reports.map((report) => ({
-				...report,
-				sum: report.expenses.reduce(
-					(total, expense) => total + Number(expense.amount),
-					0,
-				),
-			}));
+			return {
+				reports: reports.map((report) => ({
+					...report,
+					sum: report.expenses.reduce(
+						(total, expense) => total + Number(expense.amount),
+						0,
+					),
+				})),
+				pagination: {
+					page: input.page,
+					pageSize: input.pageSize,
+					pageCount: Math.ceil(count / input.pageSize),
+				},
+			};
 		}),
 
 	// Get all reports for the current user

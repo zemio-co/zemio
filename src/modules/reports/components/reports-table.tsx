@@ -294,7 +294,7 @@ function ReportsTable({ className, ...props }: React.ComponentProps<"div">) {
 	const table = useReactTable({
 		autoResetPageIndex: false,
 		columns,
-		data: reportsQuery.data ?? [],
+		data: reportsQuery.data?.reports ?? [],
 		manualFiltering: true,
 		manualPagination: true,
 		manualSorting: true,
