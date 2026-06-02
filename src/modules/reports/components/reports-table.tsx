@@ -73,15 +73,23 @@ type ReportListSorting = {
 	desc: boolean;
 	id: SortableColumnId;
 }[];
+type ReportListFilterRule =
+	| {
+			field: "createdAt";
+			op: "between";
+			value: {
+				end: Date;
+				start: Date;
+			};
+	  }
+	| {
+			field: "status";
+			op: "is" | "isNot";
+			value: ReportStatus;
+	  };
 type ReportListFilters = {
-	createdAt?: {
-		end: Date;
-		start: Date;
-	};
-	status?: {
-		operator: "is" | "is-not";
-		value: ReportStatus;
-	};
+	logic: "and";
+	rules: ReportListFilterRule[];
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -223,14 +231,18 @@ function normalizePageSize(pageSize: number): number {
 function buildReportListFilters(
 	columnFilters: ColumnFiltersState,
 ): ReportListFilters | undefined {
-	const filters: ReportListFilters = {};
+	const rules: ReportListFilterRule[] = [];
 
 	for (const filter of columnFilters) {
 		if (filter.id === "createdAt" && isDateRangeFilter(filter.value)) {
-			filters.createdAt = {
-				end: filter.value.end,
-				start: filter.value.start,
-			};
+			rules.push({
+				field: "createdAt",
+				op: "between",
+				value: {
+					end: filter.value.end,
+					start: filter.value.start,
+				},
+			});
 		}
 
 		if (
@@ -238,18 +250,22 @@ function buildReportListFilters(
 			isSelectFilter(filter.value) &&
 			isReportStatus(filter.value.value)
 		) {
-			filters.status = {
-				operator: filter.value.operator,
+			rules.push({
+				field: "status",
+				op: filter.value.operator === "is" ? "is" : "isNot",
 				value: filter.value.value,
-			};
+			});
 		}
 	}
 
-	if (!filters.createdAt && !filters.status) {
+	if (rules.length === 0) {
 		return undefined;
 	}
 
-	return filters;
+	return {
+		logic: "and",
+		rules,
+	};
 }
 
 function sanitizeSortingState(sorting: SortingState): ReportListSorting {

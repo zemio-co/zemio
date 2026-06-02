@@ -4,7 +4,6 @@ import ExpenseReportCreatorNotification from "@/components/emails/expense-report
 import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
-import type { Prisma } from "@/generated/prisma/client";
 import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
@@ -21,257 +20,23 @@ import {
 	buildReportPdfFilename,
 	generatePdfSummary,
 } from "@/server/pdf/summary";
-
-const REPORT_STATUSES: ReportStatus[] = [
-	"ACCEPTED",
-	"DRAFT",
-	"NEEDS_REVISION",
-	"PENDING_APPROVAL",
-	"REJECTED",
-];
-
-const reportListFilterSchema = z
-	.object({
-		createdAt: z
-			.object({
-				end: z.coerce.date(),
-				start: z.coerce.date(),
-			})
-			.optional(),
-		status: z
-			.object({
-				operator: z.enum(["is", "is-not"]),
-				value: z.nativeEnum(ReportStatus),
-			})
-			.optional(),
-	})
-	.optional();
-
-const reportListSortingSchema = z
-	.array(
-		z.object({
-			desc: z.boolean(),
-			id: z.enum(["createdAt", "lastUpdatedAt", "status", "tag", "title"]),
-		}),
-	)
-	.max(1)
-	.optional();
-
-type ReportListFilters = z.infer<typeof reportListFilterSchema>;
-type ReportListSorting = z.infer<typeof reportListSortingSchema>;
-
-function _buildReportListWhere(
-	userId: string,
-	organizationId: string,
-	filters: ReportListFilters,
-): Prisma.ReportWhereInput {
-	const where: Prisma.ReportWhereInput = {
-		organizationId,
-		ownerId: userId,
-	};
-
-	if (filters?.createdAt) {
-		where.createdAt = {
-			gte: filters.createdAt.start,
-			lte: filters.createdAt.end,
-		};
-	}
-
-	if (filters?.status) {
-		where.status =
-			filters.status.operator === "is"
-				? filters.status.value
-				: { not: filters.status.value };
-	}
-
-	return where;
-}
-
-function _buildReportListOrderBy(
-	sorting: ReportListSorting,
-): Prisma.ReportOrderByWithRelationInput {
-	const sort = sorting?.[0];
-
-	if (!sort) {
-		return { createdAt: "desc" };
-	}
-
-	return {
-		[sort.id]: sort.desc ? "desc" : "asc",
-	};
-}
-
-const listFiltering = z.object({
-	status: z
-		.object({
-			filter: z.enum(["in", "not-in"]),
-			values: z.enum(REPORT_STATUSES).array(),
-		})
-		.optional(),
-	costUnit: z
-		.object({
-			filter: z.enum(["in", "not-in"]),
-			values: z.string().array(),
-		})
-		.optional(),
-	title: z
-		.object({
-			filter: z.literal("LIKE").optional().default("LIKE"),
-			value: z.string(),
-		})
-		.optional(),
-	owner: z
-		.object({
-			filter: z.enum(["in", "not-in"]),
-			values: z.string().array(),
-		})
-		.optional(),
-	createdAt: z
-		.object({
-			filter: z.enum(["between"]).optional().default("between"),
-			startDate: z.date(),
-			endDate: z.date(),
-		})
-		.optional(),
-	updatedAt: z
-		.object({
-			filter: z.enum(["between"]).optional().default("between"),
-			startDate: z.date(),
-			endDate: z.date(),
-		})
-		.optional(),
-});
-
-const listSorting = z.object({
-	column: z.enum(["updatedAt", "createdAt"]),
-	direction: z.enum(["asc", "desc"]).optional().default("asc"),
-});
-
-const buildListFilters = (
-	userId: string,
-	organizationId: string,
-	filters?: z.infer<typeof listFiltering>,
-) => {
-	const where: Prisma.ReportWhereInput = {
-		organizationId,
-		ownerId: userId,
-	};
-
-	if (filters?.status) {
-		const clause = filters.status;
-
-		if (clause.filter === "in") {
-			where.status = {
-				in: clause.values,
-			};
-		} else {
-			where.status = {
-				notIn: clause.values,
-			};
-		}
-	}
-
-	if (filters?.costUnit) {
-		const clause = filters.costUnit;
-
-		if (clause.filter === "in") {
-			where.costUnit = {
-				id: {
-					in: clause.values,
-				},
-			};
-		} else {
-			where.costUnit = {
-				id: {
-					notIn: clause.values,
-				},
-			};
-		}
-	}
-
-	if (filters?.title) {
-		const clause = filters.title;
-
-		if (clause.filter === "LIKE") {
-			where.title = {
-				contains: clause.value,
-				mode: "insensitive",
-			};
-		}
-	}
-
-	if (filters?.owner) {
-		const clause = filters.owner;
-
-		if (clause.filter === "in") {
-			where.owner = {
-				id: {
-					in: clause.values,
-				},
-			};
-		} else {
-			where.owner = {
-				id: {
-					notIn: clause.values,
-				},
-			};
-		}
-	}
-
-	if (filters?.createdAt) {
-		const clause = filters.createdAt;
-
-		if (clause.filter === "between") {
-			where.createdAt = {
-				gte: clause.startDate,
-				lte: clause.endDate,
-			};
-		}
-	}
-
-	if (filters?.updatedAt) {
-		const clause = filters.updatedAt;
-
-		if (clause.filter === "between") {
-			where.createdAt = {
-				gte: clause.startDate,
-				lte: clause.endDate,
-			};
-		}
-	}
-
-	return where;
-};
-
-const buildListSorting = (sorting?: z.infer<typeof listSorting>) => {
-	const res: Prisma.ReportOrderByWithRelationInput = {};
-
-	if (sorting?.column === "createdAt") {
-		const _res = {
-			createdAt: sorting.direction === "asc" ? "asc" : "desc",
-		};
-	}
-
-	return res;
-};
+import {
+	buildReportListOrderBy,
+	buildReportListWhere,
+	reportListInputSchema,
+} from "./report-list-query";
 
 export const reportRouter = createTRPCRouter({
 	listOwn: orgProcedure
-		.input(
-			z.object({
-				filters: reportListFilterSchema,
-				limit: z.number().int().min(1).max(101).optional(),
-				page: z.number().int().min(1),
-				pageSize: z.number().int().min(1).max(100),
-				sorting: reportListSortingSchema,
-				sort: listSorting.optional(),
-				filter: listFiltering.optional(),
-			}),
-		)
+		.input(reportListInputSchema)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const where = buildListFilters(userId, ctx.organizationId, input.filter);
-			const orderBy = buildListSorting(input.sort);
+			const where = buildReportListWhere({
+				filters: input.filters,
+				organizationId: ctx.organizationId,
+				userId,
+			});
+			const orderBy = buildReportListOrderBy(input.sorting);
 
 			const [reports, count] = await ctx.db.$transaction([
 				ctx.db.report.findMany({

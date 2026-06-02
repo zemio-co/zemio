@@ -43,13 +43,10 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		[],
 	);
 
-	const _reportsQuery = api.report.listOwn.useQuery(
+	const reportsQuery = api.report.listOwn.useQuery(
 		{
-			filters: queryFilters,
-			limit: pageSize + 1,
 			page,
-			pageSize,
-			sorting: queryState.sorting,
+			pageSize: _PAGE_SIZE,
 		},
 		{
 			placeholderData: (previousData) => previousData,
@@ -61,7 +58,7 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		autoResetPageIndex: false, // Prevent state update during render/hydration
 		enableExpanding: true,
 		groupedColumnMode: false,
-		data: [],
+		data: reportsQuery.data?.reports ?? [],
 		columns,
 		state: {
 			columnFilters,
