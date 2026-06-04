@@ -181,11 +181,8 @@ const createOwnerColumn = (options: OwnerOption[]): ColumnDef<ListReport> => ({
 	accessorFn: (row) => row.owner.email,
 	enableGrouping: true,
 	enableColumnFilter: false,
-	enableSorting: true,
+	enableSorting: false,
 	enableHiding: true,
-	sortingFn: (rowA, rowB) => {
-		return rowA.original.owner.name.localeCompare(rowB.original.owner.name);
-	},
 	cell: ({ row }) => {
 		return (
 			<Tooltip>
@@ -244,7 +241,7 @@ const createCostUnitColumn = (
 	accessorFn: (row) => row.costUnit.tag,
 	enableGrouping: true,
 	enableColumnFilter: true,
-	enableSorting: true,
+	enableSorting: false,
 	enableHiding: true,
 	cell: ({ row }) => {
 		return (

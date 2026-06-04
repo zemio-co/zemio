@@ -7,7 +7,6 @@ import {
 	getCoreRowModel,
 	getExpandedRowModel,
 	getGroupedRowModel,
-	getSortedRowModel,
 	type RowSelectionState,
 	type SortingState,
 	type Updater,
@@ -33,6 +32,28 @@ import { ReportsListSkeleton } from "./reports-list-skeleton";
 import type { ListReport } from "./types";
 
 const PAGE_SIZE = 20;
+
+const SERVER_SORT_FIELDS = [
+	"createdAt",
+	"lastUpdatedAt",
+	"status",
+	"tag",
+	"title",
+] as const;
+
+type ServerSortField = (typeof SERVER_SORT_FIELDS)[number];
+
+function isServerSortField(id: string): id is ServerSortField {
+	return (SERVER_SORT_FIELDS as readonly string[]).includes(id);
+}
+
+function buildReportListSorting(
+	sortingState: SortingState,
+): Array<{ id: ServerSortField; desc: boolean }> | undefined {
+	const sort = sortingState[0];
+	if (!sort || !isServerSortField(sort.id)) return undefined;
+	return [{ id: sort.id, desc: sort.desc }];
+}
 
 const REPORT_STATUSES = [
 	"DRAFT",
@@ -139,11 +160,14 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		[columnFilters],
 	);
 
+	const querySorting = useMemo(() => buildReportListSorting(sorting), [sorting]);
+
 	const reportsQuery = api.report.listOwn.useQuery(
 		{
 			filters: queryFilters,
 			page,
 			pageSize: PAGE_SIZE,
+			sorting: querySorting,
 		},
 		{
 			placeholderData: (previousData) => previousData,
@@ -156,6 +180,7 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		enableExpanding: true,
 		groupedColumnMode: false,
 		manualFiltering: true,
+		manualSorting: true,
 		data: reportsQuery.data?.reports ?? [],
 		columns,
 		state: {
@@ -175,12 +200,15 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		onExpandedChange: setExpanded,
 		onRowSelectionChange: setRowSelection,
 		onGroupingChange: setGrouping,
-		onSortingChange: setSorting,
+		onSortingChange: (updater: Updater<SortingState>) => {
+			const next = typeof updater === "function" ? updater(sorting) : updater;
+			setSorting(next);
+			setPage(1);
+		},
 		onColumnVisibilityChange: setColumnVisibility,
 		getGroupedRowModel: getGroupedRowModel(),
 		getCoreRowModel: getCoreRowModel(),
 		getExpandedRowModel: getExpandedRowModel(),
-		getSortedRowModel: getSortedRowModel(),
 	});
 
 	const rows = table.getRowModel().rows;
