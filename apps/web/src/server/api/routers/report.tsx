@@ -5,6 +5,7 @@ import ExpenseReportCreatorNotification from "@/components/emails/expense-report
 import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
+import { env } from "@/env";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
 import { mailer } from "@/lib/email";
@@ -16,10 +17,6 @@ import {
 	orgAdminProcedure,
 	orgProcedure,
 } from "@/server/api/trpc";
-import {
-	buildReportPdfFilename,
-	generatePdfSummary,
-} from "@/server/pdf/summary";
 import {
 	buildReportListOrderBy,
 	buildReportListWhere,
@@ -695,74 +692,32 @@ export const reportRouter = createTRPCRouter({
 	exportToPdf: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
-			const existsReport = await ctx.db.report.findFirst({
-				where: {
-					id: input.id,
-					organizationId: ctx.organizationId,
-				},
-				select: {
-					ownerId: true,
+			const response = await fetch(`${env.API_URL}/pdf/report/${input.id}`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${ctx.session.session.token}`,
+					"X-Service-Key": env.INTERNAL_API_SECRET,
 				},
 			});
 
-			if (!existsReport) {
+			if (!response.ok) {
+				const body = await response.json().catch(() => ({}));
+				const message =
+					typeof body === "object" && body !== null && "error" in body
+						? String((body as { error: unknown }).error)
+						: "PDF generation failed";
 				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Report not found",
+					code:
+						response.status === 404
+							? "NOT_FOUND"
+							: response.status === 403
+								? "FORBIDDEN"
+								: "INTERNAL_SERVER_ERROR",
+					message,
 				});
 			}
 
-			if (
-				!isOrganizationAdminRole(ctx.orgRole) &&
-				existsReport.ownerId !== ctx.session.user.id
-			) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "You don't have permission to export this report to PDF",
-				});
-			}
-
-			const report = await ctx.db.report.findUnique({
-				where: { id: input.id },
-				include: {
-					expenses: {
-						include: {
-							attachments: true,
-						},
-					},
-					owner: true,
-					costUnit: {
-						select: {
-							tag: true,
-							title: true,
-						},
-					},
-					bankingDetails: true,
-				},
-			});
-
-			if (!report) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Report not found",
-				});
-			}
-
-			const decryptedBankingDetails = decryptBankingDetails(report.bankingDetails);
-
-			const pdfBuffer = await generatePdfSummary({
-				report: {
-					...report,
-					bankingDetails: decryptedBankingDetails,
-				},
-			});
-
-			// Convert buffer to base64 string for transmission
-			const base64Pdf = pdfBuffer.toString("base64");
-
-			return {
-				pdf: base64Pdf,
-				filename: buildReportPdfFilename(report),
-			};
+			const data = (await response.json()) as { url: string; filename: string };
+			return { url: data.url, filename: data.filename };
 		}),
 });

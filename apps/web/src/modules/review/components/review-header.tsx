@@ -244,25 +244,7 @@ function ExportReport({
 			});
 		},
 		onSuccess: (data) => {
-			// Convert base64 to blob and trigger download
-			const byteCharacters = atob(data.pdf);
-			const byteNumbers = new Array(byteCharacters.length);
-			for (let i = 0; i < byteCharacters.length; i++) {
-				byteNumbers[i] = byteCharacters.charCodeAt(i);
-			}
-			const byteArray = new Uint8Array(byteNumbers);
-			const blob = new Blob([byteArray], { type: "application/pdf" });
-
-			// Create download link and trigger download
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement("a");
-			link.href = url;
-			link.download = data.filename;
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-
+			window.open(data.url, "_blank");
 			toast.success("PDF Zusammenfassung erstellt", {
 				description: "Datei wird heruntergeladen",
 			});

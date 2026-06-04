@@ -156,6 +156,17 @@ export const env = createEnv({
 		 */
 		SECRET_ENCRYPTION_KEY: z.string(),
 
+		/**
+		 * URL of the internal Hono API server (apps/api)
+		 */
+		API_URL: z.string().url(),
+
+		/**
+		 * Shared secret for service-to-service auth with apps/api
+		 * Generate with: openssl rand -base64 32
+		 */
+		INTERNAL_API_SECRET: z.string().min(32),
+
 		// =================================================================
 		// Better Stack Error Tracking
 		// =================================================================
@@ -228,6 +239,8 @@ export const env = createEnv({
 		STORAGE_REGION: process.env.STORAGE_REGION,
 		STORAGE_BUCKET: process.env.STORAGE_BUCKET,
 		EMAIL_FROM: process.env.EMAIL_FROM,
+		API_URL: process.env.API_URL,
+		INTERNAL_API_SECRET: process.env.INTERNAL_API_SECRET,
 		SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
 		SENTRY_ORG: process.env.SENTRY_ORG,
 		SENTRY_PROJECT: process.env.SENTRY_PROJECT,
