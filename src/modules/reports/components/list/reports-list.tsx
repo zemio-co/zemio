@@ -34,13 +34,26 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 	const [expanded, setExpanded] = useState<ExpandedState>(true);
 
+	const costUnitsQuery = api.costUnit.listCostUnits.useQuery({
+		pageSize: 50,
+	});
+
+	const costUnitOptions = useMemo(
+		() =>
+			(costUnitsQuery.data?.items ?? []).map((cu) => ({
+				label: cu.tag,
+				value: cu.tag,
+			})),
+		[costUnitsQuery.data],
+	);
+
 	const columns = useMemo(
 		() =>
 			createColumns({
-				costUnits: [],
+				costUnits: costUnitOptions,
 				owners: [],
 			}),
-		[],
+		[costUnitOptions],
 	);
 
 	const reportsQuery = api.report.listOwn.useQuery(
