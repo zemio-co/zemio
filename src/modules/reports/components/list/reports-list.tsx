@@ -32,7 +32,7 @@ import { ReportsListHeader } from "./reports-list-header";
 import { ReportsListSkeleton } from "./reports-list-skeleton";
 import type { ListReport } from "./types";
 
-const _PAGE_SIZE = 20;
+const PAGE_SIZE = 20;
 
 const REPORT_STATUSES = [
 	"DRAFT",
@@ -143,7 +143,7 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		{
 			filters: queryFilters,
 			page,
-			pageSize: _PAGE_SIZE,
+			pageSize: PAGE_SIZE,
 		},
 		{
 			placeholderData: (previousData) => previousData,
