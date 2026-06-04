@@ -171,7 +171,7 @@ export const reportRouter = createTRPCRouter({
 				}),
 			]);
 
-			if (!report || !report.bankingDetails) {
+			if (!report?.bankingDetails) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
 					message: "Report not found",

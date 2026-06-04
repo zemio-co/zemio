@@ -563,7 +563,7 @@ interface UpdateCostUnitProps {
 	onClose?: () => void;
 }
 
-function _UpdateCostUnit({ costUnit, onClose }: UpdateCostUnitProps) {
+function UpdateCostUnit({ costUnit, onClose }: UpdateCostUnitProps) {
 	const [groups] = api.costUnit.listGroups.useSuspenseQuery();
 	const utils = api.useUtils();
 
@@ -707,4 +707,4 @@ function _UpdateCostUnit({ costUnit, onClose }: UpdateCostUnitProps) {
 	);
 }
 
-export { OrgSettingsCostUnits };
+export { OrgSettingsCostUnits, UpdateCostUnit };

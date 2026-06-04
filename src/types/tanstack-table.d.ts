@@ -6,7 +6,6 @@ import type {
 } from "@/components/data/filter-types";
 
 declare module "@tanstack/react-table" {
-	// biome-ignore lint/correctness/noUnusedVariables: Generic Args required for type inference
 	interface ColumnMeta<TData extends RowData, TValue> {
 		/**
 		 * Display label for the column in filter menus and chips.

@@ -49,9 +49,11 @@ function SettingsSidebarMenuItem({
 	);
 }
 
-export { SettingsSidebar, SettingsSidebarMenu, SettingsSidebarMenuItem };
 export {
+	SettingsSidebar,
 	SettingsSidebar as Root,
+	SettingsSidebarMenu,
 	SettingsSidebarMenu as Menu,
+	SettingsSidebarMenuItem,
 	SettingsSidebarMenuItem as Item,
 };
