@@ -41,7 +41,7 @@ export function getRequestReturnToPath(requestHeaders: Headers): string | null {
 }
 
 export function getSafeReturnToPath(returnTo?: string | null): string | null {
-	if (!returnTo || !returnTo.startsWith("/")) {
+	if (!returnTo?.startsWith("/")) {
 		return null;
 	}
 

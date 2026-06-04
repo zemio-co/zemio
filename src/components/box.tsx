@@ -127,8 +127,8 @@ export {
 	Box,
 	BoxItem,
 	BoxItemContent,
-	BoxItemTitle,
 	BoxItemDescription,
-	BoxItemLink,
 	BoxItemIcon,
+	BoxItemLink,
+	BoxItemTitle,
 };

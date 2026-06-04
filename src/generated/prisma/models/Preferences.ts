@@ -144,7 +144,7 @@ export type PreferencesGroupByOutputType = {
   _max: PreferencesMaxAggregateOutputType | null
 }
 
-type GetPreferencesGroupByPayload<T extends PreferencesGroupByArgs> = Prisma.PrismaPromise<
+export type GetPreferencesGroupByPayload<T extends PreferencesGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<PreferencesGroupByOutputType, T['by']> &
       {
@@ -1012,6 +1012,11 @@ export type PreferencesFindManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Skip the first `n` Preferences.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of Preferences.
+   */
   distinct?: Prisma.PreferencesScalarFieldEnum | Prisma.PreferencesScalarFieldEnum[]
 }
 

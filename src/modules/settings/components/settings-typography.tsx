@@ -21,4 +21,4 @@ function SettingsSubtitle({ className, ...props }: React.ComponentProps<"h1">) {
 	);
 }
 
-export { SettingsTitle, SettingsSubtitle };
+export { SettingsSubtitle, SettingsTitle };
