@@ -18,6 +18,7 @@
 	},
 	"dependencies": {
 		"@zemio/db": "workspace:*",
+		"@zemio/encryption": "workspace:*",
 		"@auth/prisma-adapter": "^2.7.2",
 		"@aws-sdk/client-s3": "^3.975.0",
 		"@aws-sdk/s3-request-presigner": "^3.1029.0",
