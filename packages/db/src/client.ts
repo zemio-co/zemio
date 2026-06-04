@@ -1,4 +1,4 @@
-import { PrismaClient } from "./generated/prisma/client";
+import type { PrismaClient } from "./generated/prisma/client";
 
 const g = globalThis as unknown as { __zemio_db: PrismaClient | undefined };
 
