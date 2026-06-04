@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import type { ReportStatus } from "@zemio/db";
 import { format } from "date-fns";
 import {
 	ALargeSmallIcon,
@@ -18,7 +19,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ReportStatus } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
 import { cn, formatTimeElapsed, translateReportStatus } from "@/lib/utils";

@@ -1,5 +1,6 @@
 "use client";
 
+import type { Report } from "@zemio/db";
 import {
 	CheckIcon,
 	ReceiptIcon,
@@ -20,7 +21,6 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Report } from "@/generated/prisma/client";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 

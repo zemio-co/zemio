@@ -1,11 +1,11 @@
 import type { Table } from "@tanstack/react-table";
+import type { ReportStatus } from "@zemio/db";
 import { ListFilterIcon, Settings2Icon } from "lucide-react";
 import { DisplayOptions } from "@/components/data/display-options";
 import { FilterList } from "@/components/data/filter-list";
 import { FilterMenu } from "@/components/data/filter-menu";
 import type { MultiSelectFilterValue } from "@/components/data/filter-types";
 import { Button } from "@/components/ui/button";
-import type { ReportStatus } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import type { ListReport } from "./types";
 

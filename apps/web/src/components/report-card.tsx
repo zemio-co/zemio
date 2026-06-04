@@ -1,6 +1,6 @@
+import type { Report } from "@zemio/db";
 import { format } from "date-fns";
 import Link from "next/link";
-import type { Report } from "@/generated/prisma/client";
 import { cn } from "@/lib/utils";
 import { ReportStatusBadge } from "./report-status-badge";
 import {

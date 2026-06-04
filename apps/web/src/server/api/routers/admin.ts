@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
+import { ReportStatus } from "@zemio/db";
 import { z } from "zod";
-import { ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { createTRPCRouter, orgAdminProcedure } from "@/server/api/trpc";
 

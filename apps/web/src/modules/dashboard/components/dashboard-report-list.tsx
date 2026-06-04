@@ -1,11 +1,11 @@
 "use client";
 
+import type { Report as ReportPrimitive } from "@zemio/db";
 import { format } from "date-fns";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Report as ReportPrimitive } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
 import { cn, translateReportStatus } from "@/lib/utils";

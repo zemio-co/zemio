@@ -1,10 +1,10 @@
 import { TRPCError } from "@trpc/server";
+import { NotificationPreference, ReportStatus } from "@zemio/db";
 import { z } from "zod";
 import ExpenseReportCreatorNotification from "@/components/emails/expense-report-creator-notification";
 import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
-import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
 import { mailer } from "@/lib/email";

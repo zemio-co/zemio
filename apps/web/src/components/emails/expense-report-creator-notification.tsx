@@ -11,7 +11,7 @@ import {
 	Section,
 	Text,
 } from "@react-email/components";
-import type { Report } from "@/generated/prisma/client";
+import type { Report } from "@zemio/db";
 
 const baseUrl =
 	process.env.NODE_ENV === "production"

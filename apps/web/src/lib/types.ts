@@ -1,4 +1,4 @@
-import type { Expense } from "@/generated/prisma/client";
+import type { Expense } from "@zemio/db";
 
 export type ClientExpense = Omit<Expense, "amount"> & {
 	amount: number;

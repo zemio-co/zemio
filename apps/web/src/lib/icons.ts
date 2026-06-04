@@ -1,3 +1,4 @@
+import type { ReportStatus } from "@zemio/db";
 import {
 	CircleCheckIcon,
 	CircleDotDashedIcon,
@@ -5,7 +6,6 @@ import {
 	CircleXIcon,
 	RefreshCwIcon,
 } from "lucide-react";
-import type { ReportStatus } from "@/generated/prisma/enums";
 
 export const StatusIcons: Record<
 	ReportStatus,

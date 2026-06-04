@@ -1,9 +1,12 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"tasks": {
+		"generate": {
+			"outputs": ["src/generated/**"]
+		},
 		"build": {
-			"dependsOn": ["^build"],
-			"outputs": [".next/**", "!.next/cache/**"]
+			"dependsOn": ["^build", "generate"],
+			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
 		},
 		"dev": {
 			"cache": false,
@@ -14,6 +17,7 @@
 			"persistent": true
 		},
 		"typecheck": {
+			"dependsOn": ["^build"],
 			"outputs": ["tsconfig.tsbuildinfo"]
 		},
 		"check": {

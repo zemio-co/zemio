@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReportStatus } from "@zemio/db";
 import { format, formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
 import { ChevronDownIcon, FileIcon, SheetIcon, TrashIcon } from "lucide-react";
@@ -22,7 +23,6 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ReportStatus } from "@/generated/prisma/client";
 import { StatusIcons } from "@/lib/icons";
 import { cn, translateReportStatus } from "@/lib/utils";
 import { api } from "@/trpc/react";

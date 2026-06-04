@@ -1,8 +1,4 @@
-import type {
-	CostUnit,
-	Report as ReportPrimitive,
-	User,
-} from "@/generated/prisma/client";
+import type { CostUnit, Report as ReportPrimitive, User } from "@zemio/db";
 
 export type ListReport = ReportPrimitive & {
 	sum: number;

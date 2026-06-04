@@ -1,0 +1,1214 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as $Enums from "../enums";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model LegalAcceptance
+ *
+ */
+export type LegalAcceptanceModel = runtime.Types.Result.DefaultSelection<Prisma.$LegalAcceptancePayload>;
+export type AggregateLegalAcceptance = {
+    _count: LegalAcceptanceCountAggregateOutputType | null;
+    _min: LegalAcceptanceMinAggregateOutputType | null;
+    _max: LegalAcceptanceMaxAggregateOutputType | null;
+};
+export type LegalAcceptanceMinAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    releaseVersion: string | null;
+    acceptanceType: $Enums.LegalAcceptanceType | null;
+    acceptedAt: Date | null;
+};
+export type LegalAcceptanceMaxAggregateOutputType = {
+    id: string | null;
+    userId: string | null;
+    releaseVersion: string | null;
+    acceptanceType: $Enums.LegalAcceptanceType | null;
+    acceptedAt: Date | null;
+};
+export type LegalAcceptanceCountAggregateOutputType = {
+    id: number;
+    userId: number;
+    releaseVersion: number;
+    acceptanceType: number;
+    acceptedAt: number;
+    documentVersions: number;
+    _all: number;
+};
+export type LegalAcceptanceMinAggregateInputType = {
+    id?: true;
+    userId?: true;
+    releaseVersion?: true;
+    acceptanceType?: true;
+    acceptedAt?: true;
+};
+export type LegalAcceptanceMaxAggregateInputType = {
+    id?: true;
+    userId?: true;
+    releaseVersion?: true;
+    acceptanceType?: true;
+    acceptedAt?: true;
+};
+export type LegalAcceptanceCountAggregateInputType = {
+    id?: true;
+    userId?: true;
+    releaseVersion?: true;
+    acceptanceType?: true;
+    acceptedAt?: true;
+    documentVersions?: true;
+    _all?: true;
+};
+export type LegalAcceptanceAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which LegalAcceptance to aggregate.
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of LegalAcceptances to fetch.
+     */
+    orderBy?: Prisma.LegalAcceptanceOrderByWithRelationInput | Prisma.LegalAcceptanceOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.LegalAcceptanceWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` LegalAcceptances from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` LegalAcceptances.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned LegalAcceptances
+    **/
+    _count?: true | LegalAcceptanceCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: LegalAcceptanceMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: LegalAcceptanceMaxAggregateInputType;
+};
+export type GetLegalAcceptanceAggregateType<T extends LegalAcceptanceAggregateArgs> = {
+    [P in keyof T & keyof AggregateLegalAcceptance]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateLegalAcceptance[P]> : Prisma.GetScalarType<T[P], AggregateLegalAcceptance[P]>;
+};
+export type LegalAcceptanceGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.LegalAcceptanceWhereInput;
+    orderBy?: Prisma.LegalAcceptanceOrderByWithAggregationInput | Prisma.LegalAcceptanceOrderByWithAggregationInput[];
+    by: Prisma.LegalAcceptanceScalarFieldEnum[] | Prisma.LegalAcceptanceScalarFieldEnum;
+    having?: Prisma.LegalAcceptanceScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: LegalAcceptanceCountAggregateInputType | true;
+    _min?: LegalAcceptanceMinAggregateInputType;
+    _max?: LegalAcceptanceMaxAggregateInputType;
+};
+export type LegalAcceptanceGroupByOutputType = {
+    id: string;
+    userId: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt: Date;
+    documentVersions: runtime.JsonValue;
+    _count: LegalAcceptanceCountAggregateOutputType | null;
+    _min: LegalAcceptanceMinAggregateOutputType | null;
+    _max: LegalAcceptanceMaxAggregateOutputType | null;
+};
+export type GetLegalAcceptanceGroupByPayload<T extends LegalAcceptanceGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<LegalAcceptanceGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof LegalAcceptanceGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], LegalAcceptanceGroupByOutputType[P]> : Prisma.GetScalarType<T[P], LegalAcceptanceGroupByOutputType[P]>;
+}>>;
+export type LegalAcceptanceWhereInput = {
+    AND?: Prisma.LegalAcceptanceWhereInput | Prisma.LegalAcceptanceWhereInput[];
+    OR?: Prisma.LegalAcceptanceWhereInput[];
+    NOT?: Prisma.LegalAcceptanceWhereInput | Prisma.LegalAcceptanceWhereInput[];
+    id?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    userId?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    releaseVersion?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFilter<"LegalAcceptance"> | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFilter<"LegalAcceptance"> | Date | string;
+    documentVersions?: Prisma.JsonFilter<"LegalAcceptance">;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+};
+export type LegalAcceptanceOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    releaseVersion?: Prisma.SortOrder;
+    acceptanceType?: Prisma.SortOrder;
+    acceptedAt?: Prisma.SortOrder;
+    documentVersions?: Prisma.SortOrder;
+    user?: Prisma.UserOrderByWithRelationInput;
+};
+export type LegalAcceptanceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    userId_releaseVersion?: Prisma.LegalAcceptanceUserIdReleaseVersionCompoundUniqueInput;
+    AND?: Prisma.LegalAcceptanceWhereInput | Prisma.LegalAcceptanceWhereInput[];
+    OR?: Prisma.LegalAcceptanceWhereInput[];
+    NOT?: Prisma.LegalAcceptanceWhereInput | Prisma.LegalAcceptanceWhereInput[];
+    userId?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    releaseVersion?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFilter<"LegalAcceptance"> | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFilter<"LegalAcceptance"> | Date | string;
+    documentVersions?: Prisma.JsonFilter<"LegalAcceptance">;
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>;
+}, "id" | "userId_releaseVersion">;
+export type LegalAcceptanceOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    releaseVersion?: Prisma.SortOrder;
+    acceptanceType?: Prisma.SortOrder;
+    acceptedAt?: Prisma.SortOrder;
+    documentVersions?: Prisma.SortOrder;
+    _count?: Prisma.LegalAcceptanceCountOrderByAggregateInput;
+    _max?: Prisma.LegalAcceptanceMaxOrderByAggregateInput;
+    _min?: Prisma.LegalAcceptanceMinOrderByAggregateInput;
+};
+export type LegalAcceptanceScalarWhereWithAggregatesInput = {
+    AND?: Prisma.LegalAcceptanceScalarWhereWithAggregatesInput | Prisma.LegalAcceptanceScalarWhereWithAggregatesInput[];
+    OR?: Prisma.LegalAcceptanceScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.LegalAcceptanceScalarWhereWithAggregatesInput | Prisma.LegalAcceptanceScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"LegalAcceptance"> | string;
+    userId?: Prisma.StringWithAggregatesFilter<"LegalAcceptance"> | string;
+    releaseVersion?: Prisma.StringWithAggregatesFilter<"LegalAcceptance"> | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeWithAggregatesFilter<"LegalAcceptance"> | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeWithAggregatesFilter<"LegalAcceptance"> | Date | string;
+    documentVersions?: Prisma.JsonWithAggregatesFilter<"LegalAcceptance">;
+};
+export type LegalAcceptanceCreateInput = {
+    id?: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    user: Prisma.UserCreateNestedOneWithoutLegalAcceptancesInput;
+};
+export type LegalAcceptanceUncheckedCreateInput = {
+    id?: string;
+    userId: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    user?: Prisma.UserUpdateOneRequiredWithoutLegalAcceptancesNestedInput;
+};
+export type LegalAcceptanceUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceCreateManyInput = {
+    id?: string;
+    userId: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    userId?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceListRelationFilter = {
+    every?: Prisma.LegalAcceptanceWhereInput;
+    some?: Prisma.LegalAcceptanceWhereInput;
+    none?: Prisma.LegalAcceptanceWhereInput;
+};
+export type LegalAcceptanceOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type LegalAcceptanceUserIdReleaseVersionCompoundUniqueInput = {
+    userId: string;
+    releaseVersion: string;
+};
+export type LegalAcceptanceCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    releaseVersion?: Prisma.SortOrder;
+    acceptanceType?: Prisma.SortOrder;
+    acceptedAt?: Prisma.SortOrder;
+    documentVersions?: Prisma.SortOrder;
+};
+export type LegalAcceptanceMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    releaseVersion?: Prisma.SortOrder;
+    acceptanceType?: Prisma.SortOrder;
+    acceptedAt?: Prisma.SortOrder;
+};
+export type LegalAcceptanceMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    userId?: Prisma.SortOrder;
+    releaseVersion?: Prisma.SortOrder;
+    acceptanceType?: Prisma.SortOrder;
+    acceptedAt?: Prisma.SortOrder;
+};
+export type LegalAcceptanceCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput> | Prisma.LegalAcceptanceCreateWithoutUserInput[] | Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput | Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.LegalAcceptanceCreateManyUserInputEnvelope;
+    connect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+};
+export type LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput = {
+    create?: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput> | Prisma.LegalAcceptanceCreateWithoutUserInput[] | Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput | Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput[];
+    createMany?: Prisma.LegalAcceptanceCreateManyUserInputEnvelope;
+    connect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+};
+export type LegalAcceptanceUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput> | Prisma.LegalAcceptanceCreateWithoutUserInput[] | Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput | Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.LegalAcceptanceUpsertWithWhereUniqueWithoutUserInput | Prisma.LegalAcceptanceUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.LegalAcceptanceCreateManyUserInputEnvelope;
+    set?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    disconnect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    delete?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    connect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    update?: Prisma.LegalAcceptanceUpdateWithWhereUniqueWithoutUserInput | Prisma.LegalAcceptanceUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.LegalAcceptanceUpdateManyWithWhereWithoutUserInput | Prisma.LegalAcceptanceUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.LegalAcceptanceScalarWhereInput | Prisma.LegalAcceptanceScalarWhereInput[];
+};
+export type LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput> | Prisma.LegalAcceptanceCreateWithoutUserInput[] | Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput[];
+    connectOrCreate?: Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput | Prisma.LegalAcceptanceCreateOrConnectWithoutUserInput[];
+    upsert?: Prisma.LegalAcceptanceUpsertWithWhereUniqueWithoutUserInput | Prisma.LegalAcceptanceUpsertWithWhereUniqueWithoutUserInput[];
+    createMany?: Prisma.LegalAcceptanceCreateManyUserInputEnvelope;
+    set?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    disconnect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    delete?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    connect?: Prisma.LegalAcceptanceWhereUniqueInput | Prisma.LegalAcceptanceWhereUniqueInput[];
+    update?: Prisma.LegalAcceptanceUpdateWithWhereUniqueWithoutUserInput | Prisma.LegalAcceptanceUpdateWithWhereUniqueWithoutUserInput[];
+    updateMany?: Prisma.LegalAcceptanceUpdateManyWithWhereWithoutUserInput | Prisma.LegalAcceptanceUpdateManyWithWhereWithoutUserInput[];
+    deleteMany?: Prisma.LegalAcceptanceScalarWhereInput | Prisma.LegalAcceptanceScalarWhereInput[];
+};
+export type EnumLegalAcceptanceTypeFieldUpdateOperationsInput = {
+    set?: $Enums.LegalAcceptanceType;
+};
+export type LegalAcceptanceCreateWithoutUserInput = {
+    id?: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUncheckedCreateWithoutUserInput = {
+    id?: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceCreateOrConnectWithoutUserInput = {
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+    create: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput>;
+};
+export type LegalAcceptanceCreateManyUserInputEnvelope = {
+    data: Prisma.LegalAcceptanceCreateManyUserInput | Prisma.LegalAcceptanceCreateManyUserInput[];
+    skipDuplicates?: boolean;
+};
+export type LegalAcceptanceUpsertWithWhereUniqueWithoutUserInput = {
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+    update: Prisma.XOR<Prisma.LegalAcceptanceUpdateWithoutUserInput, Prisma.LegalAcceptanceUncheckedUpdateWithoutUserInput>;
+    create: Prisma.XOR<Prisma.LegalAcceptanceCreateWithoutUserInput, Prisma.LegalAcceptanceUncheckedCreateWithoutUserInput>;
+};
+export type LegalAcceptanceUpdateWithWhereUniqueWithoutUserInput = {
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+    data: Prisma.XOR<Prisma.LegalAcceptanceUpdateWithoutUserInput, Prisma.LegalAcceptanceUncheckedUpdateWithoutUserInput>;
+};
+export type LegalAcceptanceUpdateManyWithWhereWithoutUserInput = {
+    where: Prisma.LegalAcceptanceScalarWhereInput;
+    data: Prisma.XOR<Prisma.LegalAcceptanceUpdateManyMutationInput, Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserInput>;
+};
+export type LegalAcceptanceScalarWhereInput = {
+    AND?: Prisma.LegalAcceptanceScalarWhereInput | Prisma.LegalAcceptanceScalarWhereInput[];
+    OR?: Prisma.LegalAcceptanceScalarWhereInput[];
+    NOT?: Prisma.LegalAcceptanceScalarWhereInput | Prisma.LegalAcceptanceScalarWhereInput[];
+    id?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    userId?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    releaseVersion?: Prisma.StringFilter<"LegalAcceptance"> | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFilter<"LegalAcceptance"> | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFilter<"LegalAcceptance"> | Date | string;
+    documentVersions?: Prisma.JsonFilter<"LegalAcceptance">;
+};
+export type LegalAcceptanceCreateManyUserInput = {
+    id?: string;
+    releaseVersion: string;
+    acceptanceType: $Enums.LegalAcceptanceType;
+    acceptedAt?: Date | string;
+    documentVersions: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUncheckedUpdateWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceUncheckedUpdateManyWithoutUserInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    releaseVersion?: Prisma.StringFieldUpdateOperationsInput | string;
+    acceptanceType?: Prisma.EnumLegalAcceptanceTypeFieldUpdateOperationsInput | $Enums.LegalAcceptanceType;
+    acceptedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    documentVersions?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+};
+export type LegalAcceptanceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    releaseVersion?: boolean;
+    acceptanceType?: boolean;
+    acceptedAt?: boolean;
+    documentVersions?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["legalAcceptance"]>;
+export type LegalAcceptanceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    releaseVersion?: boolean;
+    acceptanceType?: boolean;
+    acceptedAt?: boolean;
+    documentVersions?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["legalAcceptance"]>;
+export type LegalAcceptanceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    userId?: boolean;
+    releaseVersion?: boolean;
+    acceptanceType?: boolean;
+    acceptedAt?: boolean;
+    documentVersions?: boolean;
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["legalAcceptance"]>;
+export type LegalAcceptanceSelectScalar = {
+    id?: boolean;
+    userId?: boolean;
+    releaseVersion?: boolean;
+    acceptanceType?: boolean;
+    acceptedAt?: boolean;
+    documentVersions?: boolean;
+};
+export type LegalAcceptanceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "releaseVersion" | "acceptanceType" | "acceptedAt" | "documentVersions", ExtArgs["result"]["legalAcceptance"]>;
+export type LegalAcceptanceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+};
+export type LegalAcceptanceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+};
+export type LegalAcceptanceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>;
+};
+export type $LegalAcceptancePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "LegalAcceptance";
+    objects: {
+        user: Prisma.$UserPayload<ExtArgs>;
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        userId: string;
+        releaseVersion: string;
+        acceptanceType: $Enums.LegalAcceptanceType;
+        acceptedAt: Date;
+        documentVersions: runtime.JsonValue;
+    }, ExtArgs["result"]["legalAcceptance"]>;
+    composites: {};
+};
+export type LegalAcceptanceGetPayload<S extends boolean | null | undefined | LegalAcceptanceDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload, S>;
+export type LegalAcceptanceCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<LegalAcceptanceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: LegalAcceptanceCountAggregateInputType | true;
+};
+export interface LegalAcceptanceDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['LegalAcceptance'];
+        meta: {
+            name: 'LegalAcceptance';
+        };
+    };
+    /**
+     * Find zero or one LegalAcceptance that matches the filter.
+     * @param {LegalAcceptanceFindUniqueArgs} args - Arguments to find a LegalAcceptance
+     * @example
+     * // Get one LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LegalAcceptanceFindUniqueArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceFindUniqueArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one LegalAcceptance that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LegalAcceptanceFindUniqueOrThrowArgs} args - Arguments to find a LegalAcceptance
+     * @example
+     * // Get one LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LegalAcceptanceFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first LegalAcceptance that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceFindFirstArgs} args - Arguments to find a LegalAcceptance
+     * @example
+     * // Get one LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LegalAcceptanceFindFirstArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceFindFirstArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first LegalAcceptance that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceFindFirstOrThrowArgs} args - Arguments to find a LegalAcceptance
+     * @example
+     * // Get one LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LegalAcceptanceFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more LegalAcceptances that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all LegalAcceptances
+     * const legalAcceptances = await prisma.legalAcceptance.findMany()
+     *
+     * // Get first 10 LegalAcceptances
+     * const legalAcceptances = await prisma.legalAcceptance.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const legalAcceptanceWithIdOnly = await prisma.legalAcceptance.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends LegalAcceptanceFindManyArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a LegalAcceptance.
+     * @param {LegalAcceptanceCreateArgs} args - Arguments to create a LegalAcceptance.
+     * @example
+     * // Create one LegalAcceptance
+     * const LegalAcceptance = await prisma.legalAcceptance.create({
+     *   data: {
+     *     // ... data to create a LegalAcceptance
+     *   }
+     * })
+     *
+     */
+    create<T extends LegalAcceptanceCreateArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceCreateArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many LegalAcceptances.
+     * @param {LegalAcceptanceCreateManyArgs} args - Arguments to create many LegalAcceptances.
+     * @example
+     * // Create many LegalAcceptances
+     * const legalAcceptance = await prisma.legalAcceptance.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends LegalAcceptanceCreateManyArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many LegalAcceptances and returns the data saved in the database.
+     * @param {LegalAcceptanceCreateManyAndReturnArgs} args - Arguments to create many LegalAcceptances.
+     * @example
+     * // Create many LegalAcceptances
+     * const legalAcceptance = await prisma.legalAcceptance.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many LegalAcceptances and only return the `id`
+     * const legalAcceptanceWithIdOnly = await prisma.legalAcceptance.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends LegalAcceptanceCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a LegalAcceptance.
+     * @param {LegalAcceptanceDeleteArgs} args - Arguments to delete one LegalAcceptance.
+     * @example
+     * // Delete one LegalAcceptance
+     * const LegalAcceptance = await prisma.legalAcceptance.delete({
+     *   where: {
+     *     // ... filter to delete one LegalAcceptance
+     *   }
+     * })
+     *
+     */
+    delete<T extends LegalAcceptanceDeleteArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceDeleteArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one LegalAcceptance.
+     * @param {LegalAcceptanceUpdateArgs} args - Arguments to update one LegalAcceptance.
+     * @example
+     * // Update one LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends LegalAcceptanceUpdateArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceUpdateArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more LegalAcceptances.
+     * @param {LegalAcceptanceDeleteManyArgs} args - Arguments to filter LegalAcceptances to delete.
+     * @example
+     * // Delete a few LegalAcceptances
+     * const { count } = await prisma.legalAcceptance.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends LegalAcceptanceDeleteManyArgs>(args?: Prisma.SelectSubset<T, LegalAcceptanceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more LegalAcceptances.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many LegalAcceptances
+     * const legalAcceptance = await prisma.legalAcceptance.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends LegalAcceptanceUpdateManyArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more LegalAcceptances and returns the data updated in the database.
+     * @param {LegalAcceptanceUpdateManyAndReturnArgs} args - Arguments to update many LegalAcceptances.
+     * @example
+     * // Update many LegalAcceptances
+     * const legalAcceptance = await prisma.legalAcceptance.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more LegalAcceptances and only return the `id`
+     * const legalAcceptanceWithIdOnly = await prisma.legalAcceptance.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends LegalAcceptanceUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one LegalAcceptance.
+     * @param {LegalAcceptanceUpsertArgs} args - Arguments to update or create a LegalAcceptance.
+     * @example
+     * // Update or create a LegalAcceptance
+     * const legalAcceptance = await prisma.legalAcceptance.upsert({
+     *   create: {
+     *     // ... data to create a LegalAcceptance
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the LegalAcceptance we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LegalAcceptanceUpsertArgs>(args: Prisma.SelectSubset<T, LegalAcceptanceUpsertArgs<ExtArgs>>): Prisma.Prisma__LegalAcceptanceClient<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of LegalAcceptances.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceCountArgs} args - Arguments to filter LegalAcceptances to count.
+     * @example
+     * // Count the number of LegalAcceptances
+     * const count = await prisma.legalAcceptance.count({
+     *   where: {
+     *     // ... the filter for the LegalAcceptances we want to count
+     *   }
+     * })
+    **/
+    count<T extends LegalAcceptanceCountArgs>(args?: Prisma.Subset<T, LegalAcceptanceCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], LegalAcceptanceCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a LegalAcceptance.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LegalAcceptanceAggregateArgs>(args: Prisma.Subset<T, LegalAcceptanceAggregateArgs>): Prisma.PrismaPromise<GetLegalAcceptanceAggregateType<T>>;
+    /**
+     * Group by LegalAcceptance.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LegalAcceptanceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends LegalAcceptanceGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: LegalAcceptanceGroupByArgs['orderBy'];
+    } : {
+        orderBy?: LegalAcceptanceGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, LegalAcceptanceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLegalAcceptanceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the LegalAcceptance model
+     */
+    readonly fields: LegalAcceptanceFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for LegalAcceptance.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__LegalAcceptanceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the LegalAcceptance model
+ */
+export interface LegalAcceptanceFieldRefs {
+    readonly id: Prisma.FieldRef<"LegalAcceptance", 'String'>;
+    readonly userId: Prisma.FieldRef<"LegalAcceptance", 'String'>;
+    readonly releaseVersion: Prisma.FieldRef<"LegalAcceptance", 'String'>;
+    readonly acceptanceType: Prisma.FieldRef<"LegalAcceptance", 'LegalAcceptanceType'>;
+    readonly acceptedAt: Prisma.FieldRef<"LegalAcceptance", 'DateTime'>;
+    readonly documentVersions: Prisma.FieldRef<"LegalAcceptance", 'Json'>;
+}
+/**
+ * LegalAcceptance findUnique
+ */
+export type LegalAcceptanceFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter, which LegalAcceptance to fetch.
+     */
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+};
+/**
+ * LegalAcceptance findUniqueOrThrow
+ */
+export type LegalAcceptanceFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter, which LegalAcceptance to fetch.
+     */
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+};
+/**
+ * LegalAcceptance findFirst
+ */
+export type LegalAcceptanceFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter, which LegalAcceptance to fetch.
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of LegalAcceptances to fetch.
+     */
+    orderBy?: Prisma.LegalAcceptanceOrderByWithRelationInput | Prisma.LegalAcceptanceOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for LegalAcceptances.
+     */
+    cursor?: Prisma.LegalAcceptanceWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` LegalAcceptances from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` LegalAcceptances.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of LegalAcceptances.
+     */
+    distinct?: Prisma.LegalAcceptanceScalarFieldEnum | Prisma.LegalAcceptanceScalarFieldEnum[];
+};
+/**
+ * LegalAcceptance findFirstOrThrow
+ */
+export type LegalAcceptanceFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter, which LegalAcceptance to fetch.
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of LegalAcceptances to fetch.
+     */
+    orderBy?: Prisma.LegalAcceptanceOrderByWithRelationInput | Prisma.LegalAcceptanceOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for LegalAcceptances.
+     */
+    cursor?: Prisma.LegalAcceptanceWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` LegalAcceptances from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` LegalAcceptances.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of LegalAcceptances.
+     */
+    distinct?: Prisma.LegalAcceptanceScalarFieldEnum | Prisma.LegalAcceptanceScalarFieldEnum[];
+};
+/**
+ * LegalAcceptance findMany
+ */
+export type LegalAcceptanceFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter, which LegalAcceptances to fetch.
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of LegalAcceptances to fetch.
+     */
+    orderBy?: Prisma.LegalAcceptanceOrderByWithRelationInput | Prisma.LegalAcceptanceOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing LegalAcceptances.
+     */
+    cursor?: Prisma.LegalAcceptanceWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` LegalAcceptances from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` LegalAcceptances.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of LegalAcceptances.
+     */
+    distinct?: Prisma.LegalAcceptanceScalarFieldEnum | Prisma.LegalAcceptanceScalarFieldEnum[];
+};
+/**
+ * LegalAcceptance create
+ */
+export type LegalAcceptanceCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a LegalAcceptance.
+     */
+    data: Prisma.XOR<Prisma.LegalAcceptanceCreateInput, Prisma.LegalAcceptanceUncheckedCreateInput>;
+};
+/**
+ * LegalAcceptance createMany
+ */
+export type LegalAcceptanceCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many LegalAcceptances.
+     */
+    data: Prisma.LegalAcceptanceCreateManyInput | Prisma.LegalAcceptanceCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * LegalAcceptance createManyAndReturn
+ */
+export type LegalAcceptanceCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * The data used to create many LegalAcceptances.
+     */
+    data: Prisma.LegalAcceptanceCreateManyInput | Prisma.LegalAcceptanceCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * LegalAcceptance update
+ */
+export type LegalAcceptanceUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a LegalAcceptance.
+     */
+    data: Prisma.XOR<Prisma.LegalAcceptanceUpdateInput, Prisma.LegalAcceptanceUncheckedUpdateInput>;
+    /**
+     * Choose, which LegalAcceptance to update.
+     */
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+};
+/**
+ * LegalAcceptance updateMany
+ */
+export type LegalAcceptanceUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update LegalAcceptances.
+     */
+    data: Prisma.XOR<Prisma.LegalAcceptanceUpdateManyMutationInput, Prisma.LegalAcceptanceUncheckedUpdateManyInput>;
+    /**
+     * Filter which LegalAcceptances to update
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * Limit how many LegalAcceptances to update.
+     */
+    limit?: number;
+};
+/**
+ * LegalAcceptance updateManyAndReturn
+ */
+export type LegalAcceptanceUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * The data used to update LegalAcceptances.
+     */
+    data: Prisma.XOR<Prisma.LegalAcceptanceUpdateManyMutationInput, Prisma.LegalAcceptanceUncheckedUpdateManyInput>;
+    /**
+     * Filter which LegalAcceptances to update
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * Limit how many LegalAcceptances to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * LegalAcceptance upsert
+ */
+export type LegalAcceptanceUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the LegalAcceptance to update in case it exists.
+     */
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+    /**
+     * In case the LegalAcceptance found by the `where` argument doesn't exist, create a new LegalAcceptance with this data.
+     */
+    create: Prisma.XOR<Prisma.LegalAcceptanceCreateInput, Prisma.LegalAcceptanceUncheckedCreateInput>;
+    /**
+     * In case the LegalAcceptance was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.LegalAcceptanceUpdateInput, Prisma.LegalAcceptanceUncheckedUpdateInput>;
+};
+/**
+ * LegalAcceptance delete
+ */
+export type LegalAcceptanceDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+    /**
+     * Filter which LegalAcceptance to delete.
+     */
+    where: Prisma.LegalAcceptanceWhereUniqueInput;
+};
+/**
+ * LegalAcceptance deleteMany
+ */
+export type LegalAcceptanceDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which LegalAcceptances to delete
+     */
+    where?: Prisma.LegalAcceptanceWhereInput;
+    /**
+     * Limit how many LegalAcceptances to delete.
+     */
+    limit?: number;
+};
+/**
+ * LegalAcceptance without action
+ */
+export type LegalAcceptanceDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LegalAcceptance
+     */
+    select?: Prisma.LegalAcceptanceSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the LegalAcceptance
+     */
+    omit?: Prisma.LegalAcceptanceOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.LegalAcceptanceInclude<ExtArgs> | null;
+};
+//# sourceMappingURL=LegalAcceptance.d.ts.map
