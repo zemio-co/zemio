@@ -1,28 +1,25 @@
 import { Hono } from "hono";
 import { serviceAuth } from "../middleware/service-auth";
-import { userAuth } from "../middleware/user-auth";
 import { generateReportPdf } from "../services/pdf/service";
-import type { AuthVariables } from "../types/context";
 
-const pdf = new Hono<{ Variables: AuthVariables }>();
+const pdf = new Hono();
 
-pdf.post("/report/:id", serviceAuth, userAuth, async (c) => {
+pdf.post("/report/:id", serviceAuth, async (c) => {
 	const reportId = c.req.param("id");
-	const user = c.get("user");
-	const session = c.get("session");
-	const member = c.get("member");
+	const userId = c.req.header("X-User-Id");
+	const organizationId = c.req.header("X-Organization-Id");
+	const memberRole = c.req.header("X-Member-Role");
 
-	const organizationId = session.activeOrganizationId;
-	if (!organizationId) {
-		return c.json({ error: "No active organization" }, 403);
+	if (!userId || !organizationId || !memberRole) {
+		return c.json({ error: "Missing user context headers" }, 400);
 	}
 
 	try {
 		const result = await generateReportPdf(
 			reportId,
-			user.id,
+			userId,
 			organizationId,
-			member.role,
+			memberRole,
 		);
 		return c.json(result);
 	} catch (err) {

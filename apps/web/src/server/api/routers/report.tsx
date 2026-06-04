@@ -695,8 +695,10 @@ export const reportRouter = createTRPCRouter({
 			const response = await fetch(`${env.API_URL}/pdf/report/${input.id}`, {
 				method: "POST",
 				headers: {
-					Authorization: `Bearer ${ctx.session.session.token}`,
 					"X-Service-Key": env.INTERNAL_API_SECRET,
+					"X-User-Id": ctx.session.user.id,
+					"X-Organization-Id": ctx.organizationId,
+					"X-Member-Role": ctx.orgRole,
 				},
 			});
 
