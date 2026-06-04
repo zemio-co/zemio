@@ -7,6 +7,10 @@
 		".": {
 			"types": "./dist/index.d.ts",
 			"default": "./src/index.ts"
+		},
+		"./enums": {
+			"types": "./dist/generated/prisma/enums.d.ts",
+			"default": "./src/generated/prisma/enums.ts"
 		}
 	},
 	"scripts": {

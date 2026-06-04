@@ -1,4 +1,4 @@
-import { ExpenseType, NotificationPreference } from "@zemio/db";
+import { ExpenseType, NotificationPreference } from "@zemio/db/enums";
 import { isValid, parse } from "date-fns";
 import z from "zod";
 

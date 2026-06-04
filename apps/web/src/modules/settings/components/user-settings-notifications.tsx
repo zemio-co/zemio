@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { NotificationPreference } from "@zemio/db";
+import { NotificationPreference } from "@zemio/db/enums";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {

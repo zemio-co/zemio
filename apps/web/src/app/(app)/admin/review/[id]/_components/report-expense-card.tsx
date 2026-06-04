@@ -2,7 +2,7 @@
 
 import type { JsonValue } from "@prisma/client/runtime/client";
 import type { Attachment, ExpenseType } from "@zemio/db";
-import { ReportStatus } from "@zemio/db";
+import { ReportStatus } from "@zemio/db/enums";
 import { formatDate } from "date-fns";
 import {
 	CarIcon,
