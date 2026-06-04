@@ -193,19 +193,11 @@ const createOwnerColumn = (options: OwnerOption[]): ColumnDef<ListReport> => ({
 	id: "owner",
 	accessorFn: (row) => row.owner.email,
 	enableGrouping: true,
-	enableColumnFilter: true,
+	enableColumnFilter: false,
 	enableSorting: true,
 	enableHiding: true,
 	sortingFn: (rowA, rowB) => {
 		return rowA.original.owner.name.localeCompare(rowB.original.owner.name);
-	},
-	filterFn: (row, _columnId, filterValue) => {
-		const { operator = "is", value } = (filterValue ??
-			{}) as SelectFilterValue<string>;
-
-		return operator === "is"
-			? row.original.owner.email === value
-			: row.original.owner.email !== value;
 	},
 	cell: ({ row }) => {
 		return (
@@ -228,7 +220,7 @@ const createOwnerColumn = (options: OwnerOption[]): ColumnDef<ListReport> => ({
 		icon: UserCircleIcon,
 		options,
 		placeholder: "Ersteller",
-		filterType: "select",
+		filterType: "none",
 	},
 });
 
