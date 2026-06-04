@@ -71,6 +71,7 @@
 		"zod": "^4.3.5"
 	},
 	"devDependencies": {
+		"@zemio/typescript-config": "workspace:*",
 		"@react-email/preview-server": "5.2.5",
 		"@tailwindcss/postcss": "^4.0.15",
 		"@tanstack/react-query-devtools": "^5.69.0",
