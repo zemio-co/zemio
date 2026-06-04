@@ -14,9 +14,11 @@ import {
 	useReactTable,
 	type VisibilityState,
 } from "@tanstack/react-table";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataListGroupHeader } from "@/components/data/data-list";
 import { List, ListItem } from "@/components/list";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { createColumns } from "./reports-list-columns";
@@ -28,7 +30,7 @@ import type { ListReport } from "./types";
 const _PAGE_SIZE = 20;
 
 function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
-	const [page, _setPage] = useState<number>(1);
+	const [page, setPage] = useState<number>(1);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [grouping, setGrouping] = useState<string[]>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
@@ -152,6 +154,30 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 						);
 					})}
 				</List>
+			)}
+
+			{reportsQuery.data && reportsQuery.data.pagination.pageCount > 1 && (
+				<div className="container flex max-w-none items-center justify-end gap-2 py-4">
+					<span className="text-xs text-zinc-500">
+						Seite {page} von {reportsQuery.data.pagination.pageCount}
+					</span>
+					<Button
+						disabled={page <= 1}
+						onClick={() => setPage((p) => p - 1)}
+						size="icon-sm"
+						variant="outline"
+					>
+						<ChevronLeftIcon />
+					</Button>
+					<Button
+						disabled={page >= reportsQuery.data.pagination.pageCount}
+						onClick={() => setPage((p) => p + 1)}
+						size="icon-sm"
+						variant="outline"
+					>
+						<ChevronRightIcon />
+					</Button>
+				</div>
 			)}
 		</div>
 	);
