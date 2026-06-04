@@ -1,5 +1,10 @@
-import { Navbar } from "@/components/navbar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Navbar, NavbarSidebarTrigger } from "@/components/navbar";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbList,
+	BreadcrumbPage,
+} from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
 
 function ReportsNavbar({
@@ -7,9 +12,16 @@ function ReportsNavbar({
 	...props
 }: React.ComponentProps<typeof Navbar>) {
 	return (
-		<Navbar className={cn("", className)} data-slot="component" {...props}>
-			<div className="container flex items-center justify-start">
-				<SidebarTrigger />
+		<Navbar className={cn("", className)} data-slot="reports-navbar" {...props}>
+			<div className="container flex max-w-none items-center justify-start">
+				<NavbarSidebarTrigger className={"mr-4"} />
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbPage>Reports</BreadcrumbPage>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 			</div>
 		</Navbar>
 	);

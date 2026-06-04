@@ -17,10 +17,13 @@ function NavbarSidebarTrigger({
 	className,
 	...props
 }: React.ComponentProps<typeof SidebarTrigger>) {
-	const { open } = useSidebar();
+	const { open, isMobile } = useSidebar();
 
 	return (
-		<SidebarTrigger className={cn(open && "hidden", className)} {...props} />
+		<SidebarTrigger
+			className={cn(open && !isMobile && "hidden", "-translate-x-1.5", className)}
+			{...props}
+		/>
 	);
 }
 

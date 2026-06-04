@@ -30,7 +30,7 @@ export const costUnitRouter = createTRPCRouter({
 		.input(
 			z.object({
 				cursor: z.string().optional(),
-				pageSize: z.number().min(1).max(50).default(20),
+				pageSize: z.number().min(1).max(200).default(20),
 				search: z.string().optional(),
 			}),
 		)

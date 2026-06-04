@@ -4,7 +4,6 @@ import ExpenseReportCreatorNotification from "@/components/emails/expense-report
 import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
-import type { Prisma } from "@/generated/prisma/client";
 import { NotificationPreference, ReportStatus } from "@/generated/prisma/enums";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
@@ -21,154 +20,70 @@ import {
 	buildReportPdfFilename,
 	generatePdfSummary,
 } from "@/server/pdf/summary";
-
-const reportListFilterSchema = z
-	.object({
-		createdAt: z
-			.object({
-				end: z.coerce.date(),
-				start: z.coerce.date(),
-			})
-			.optional(),
-		status: z
-			.object({
-				operator: z.enum(["is", "is-not"]),
-				value: z.nativeEnum(ReportStatus),
-			})
-			.optional(),
-	})
-	.optional();
-
-const reportListSortingSchema = z
-	.array(
-		z.object({
-			desc: z.boolean(),
-			id: z.enum(["createdAt", "lastUpdatedAt", "status", "tag", "title"]),
-		}),
-	)
-	.max(1)
-	.optional();
-
-type ReportListFilters = z.infer<typeof reportListFilterSchema>;
-type ReportListSorting = z.infer<typeof reportListSortingSchema>;
-
-function buildReportListWhere(
-	userId: string,
-	organizationId: string,
-	filters: ReportListFilters,
-): Prisma.ReportWhereInput {
-	const where: Prisma.ReportWhereInput = {
-		organizationId,
-		ownerId: userId,
-	};
-
-	if (filters?.createdAt) {
-		where.createdAt = {
-			gte: filters.createdAt.start,
-			lte: filters.createdAt.end,
-		};
-	}
-
-	if (filters?.status) {
-		where.status =
-			filters.status.operator === "is"
-				? filters.status.value
-				: { not: filters.status.value };
-	}
-
-	return where;
-}
-
-function buildReportListOrderBy(
-	sorting: ReportListSorting,
-): Prisma.ReportOrderByWithRelationInput {
-	const sort = sorting?.[0];
-
-	if (!sort) {
-		return { createdAt: "desc" };
-	}
-
-	return {
-		[sort.id]: sort.desc ? "desc" : "asc",
-	};
-}
+import {
+	buildReportListOrderBy,
+	buildReportListWhere,
+	reportListInputSchema,
+} from "./report-list-query";
 
 export const reportRouter = createTRPCRouter({
 	listOwn: orgProcedure
-		.input(
-			z.object({
-				filters: reportListFilterSchema,
-				limit: z.number().int().min(1).max(101).optional(),
-				page: z.number().int().min(1),
-				pageSize: z.number().int().min(1).max(100),
-				sorting: reportListSortingSchema,
-			}),
-		)
+		.input(reportListInputSchema)
 		.query(async ({ ctx, input }) => {
 			const userId = ctx.session.user.id;
-			const where = buildReportListWhere(
+			const where = buildReportListWhere({
+				filters: input.filters,
+				organizationId: ctx.organizationId,
 				userId,
-				ctx.organizationId,
-				input.filters,
-			);
+			});
+			const orderBy = buildReportListOrderBy(input.sorting);
 
-			const reports = await ctx.db.report.findMany({
-				where,
-				include: {
-					expenses: {
-						select: {
-							amount: true,
+			const [reports, count] = await Promise.all([
+				ctx.db.report.findMany({
+					where,
+					orderBy,
+					include: {
+						expenses: {
+							select: {
+								amount: true,
+							},
+						},
+						owner: {
+							select: {
+								name: true,
+								image: true,
+								email: true,
+							},
+						},
+						costUnit: {
+							select: {
+								tag: true,
+							},
 						},
 					},
-				},
-				orderBy: buildReportListOrderBy(input.sorting),
-				take: Math.min(input.limit ?? input.pageSize, input.pageSize + 1),
-				skip: (input.page - 1) * input.pageSize,
-			});
+					take: Math.min(input.limit ?? input.pageSize, input.pageSize + 1),
+					skip: (input.page - 1) * input.pageSize,
+				}),
+				ctx.db.report.count({
+					where,
+				}),
+			]);
 
-			return reports.map((report) => ({
-				...report,
-				sum: report.expenses.reduce(
-					(total, expense) => total + Number(expense.amount),
-					0,
-				),
-			}));
+			return {
+				reports: reports.map((report) => ({
+					...report,
+					sum: report.expenses.reduce(
+						(total, expense) => total + Number(expense.amount),
+						0,
+					),
+				})),
+				pagination: {
+					page: input.page,
+					pageSize: input.pageSize,
+					pageCount: Math.ceil(count / input.pageSize),
+				},
+			};
 		}),
-
-	// Get all reports for the current user
-	getAll: orgProcedure.query(async ({ ctx }) => {
-		const reports = await ctx.db.report.findMany({
-			where: {
-				organizationId: ctx.organizationId,
-				ownerId: ctx.session.user.id,
-			},
-			include: {
-				expenses: true,
-				owner: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
-
-		return reports.map((report) => ({
-			...report,
-			expenses: report.expenses.map((expense) => ({
-				...expense,
-				amount: Number(expense.amount),
-			})),
-			sum: report.expenses.reduce(
-				(sum, expense) => sum + Number(expense.amount),
-				0,
-			),
-		}));
-	}),
 
 	getById: orgProcedure
 		.input(z.object({ id: z.string() }))

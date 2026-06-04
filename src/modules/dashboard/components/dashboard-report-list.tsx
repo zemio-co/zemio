@@ -19,11 +19,10 @@ function DashboardReportList({
 	className,
 	...props
 }: React.ComponentProps<"section">) {
-	const {
-		data: reports,
-		isPending,
-		error,
-	} = api.report.listOwn.useQuery({ page: 1, pageSize: 10 });
+	const { data, isPending, error } = api.report.listOwn.useQuery({
+		page: 1,
+		pageSize: 10,
+	});
 
 	if (isPending) {
 		return (
@@ -38,7 +37,7 @@ function DashboardReportList({
 		);
 	}
 
-	if (!reports || error) {
+	if (!data || error) {
 		return (
 			<section
 				className={cn("space-y-4", className)}
@@ -57,6 +56,8 @@ function DashboardReportList({
 			</section>
 		);
 	}
+
+	const { reports } = data;
 
 	if (reports.length === 0) {
 		return (
