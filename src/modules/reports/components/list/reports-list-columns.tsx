@@ -175,7 +175,7 @@ const titleColumn: ColumnDef<ListReport> = {
 		return (
 			<Link
 				className="max-w-full font-medium text-foreground"
-				href={ROUTES.ADMIN_REVIEW_REPORT(row.original.id)}
+				href={ROUTES.USER_REPORT_DETAILS(row.original.id)}
 			>
 				<span className="absolute inset-0 z-0 h-full w-full transition-colors" />
 				<span className="line-clamp-1">{row.original.title}</span>
