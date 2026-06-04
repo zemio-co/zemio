@@ -43,18 +43,23 @@ export function DisplayOptions<TData>({
 					)}
 
 					{grouping && (
-						<div className="grid gap-2">
-							<Label htmlFor="grouping">Grouping</Label>
-							<DataDisplayGrouping display={display} id="grouping" />
+						<div className="grid grid-cols-5 gap-2">
+							<Label className="col-span-2" htmlFor="grouping">
+								Grouping
+							</Label>
+							<div className="col-span-3">
+								<DataDisplayGrouping display={display} id="grouping" />
+							</div>
 						</div>
 					)}
-				</div>
-				<Separator />
-				<div className="grid gap-4 p-4">
 					{sorting && (
-						<div className="grid gap-2">
-							<Label htmlFor="sorting">Sorting</Label>
-							<DataDisplaySorting display={display} id="sorting" />
+						<div className="grid grid-cols-5 gap-2">
+							<Label className="col-span-2" htmlFor="sorting">
+								Sorting
+							</Label>
+							<div className="col-span-3">
+								<DataDisplaySorting display={display} id="sorting" />
+							</div>
 						</div>
 					)}
 				</div>
@@ -134,6 +139,20 @@ function DataDisplaySorting<TData>({
 
 	return (
 		<div className="flex items-center gap-2">
+			{sorting[0] !== undefined && (
+				<Button
+					className="shrink-0"
+					onClick={() => handleSortingDirectionChange(sorting[0]?.id ?? "")}
+					size="icon-sm"
+					variant="outline"
+				>
+					{sorting[0]?.desc ? (
+						<ArrowDownNarrowWideIcon />
+					) : (
+						<ArrowUpNarrowWideIcon />
+					)}
+				</Button>
+			)}
 			<NativeSelect
 				className="grow"
 				onChange={(e) => {
@@ -163,20 +182,6 @@ function DataDisplaySorting<TData>({
 					);
 				})}
 			</NativeSelect>
-			{sorting[0] !== undefined && (
-				<Button
-					className="shrink-0"
-					onClick={() => handleSortingDirectionChange(sorting[0]?.id ?? "")}
-					size="icon-sm"
-					variant="outline"
-				>
-					{sorting[0]?.desc ? (
-						<ArrowDownNarrowWideIcon />
-					) : (
-						<ArrowUpNarrowWideIcon />
-					)}
-				</Button>
-			)}
 		</div>
 	);
 }
