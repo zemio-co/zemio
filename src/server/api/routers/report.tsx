@@ -85,41 +85,6 @@ export const reportRouter = createTRPCRouter({
 			};
 		}),
 
-	// Get all reports for the current user
-	getAll: orgProcedure.query(async ({ ctx }) => {
-		const reports = await ctx.db.report.findMany({
-			where: {
-				organizationId: ctx.organizationId,
-				ownerId: ctx.session.user.id,
-			},
-			include: {
-				expenses: true,
-				owner: {
-					select: {
-						id: true,
-						name: true,
-						email: true,
-					},
-				},
-			},
-			orderBy: {
-				createdAt: "desc",
-			},
-		});
-
-		return reports.map((report) => ({
-			...report,
-			expenses: report.expenses.map((expense) => ({
-				...expense,
-				amount: Number(expense.amount),
-			})),
-			sum: report.expenses.reduce(
-				(sum, expense) => sum + Number(expense.amount),
-				0,
-			),
-		}));
-	}),
-
 	getById: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
