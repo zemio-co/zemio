@@ -113,7 +113,7 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 	const [expanded, setExpanded] = useState<ExpandedState>(true);
 
 	const costUnitsQuery = api.costUnit.listCostUnits.useQuery({
-		pageSize: 50,
+		pageSize: 200,
 	});
 
 	const costUnitOptions = useMemo(
