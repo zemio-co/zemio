@@ -40,9 +40,12 @@ model Report {
 
   @@index([ownerId])
   @@index([organizationId])
+  @@index([ownerId, organizationId])
   @@index([status])
   @@index([costUnitId])
   @@index([bankingDetailsId])
+  @@index([createdAt])
+  @@index([lastUpdatedAt])
   @@map("report")
 }
 
