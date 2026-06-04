@@ -161,7 +161,7 @@ export type LegalAcceptanceGroupByOutputType = {
   _max: LegalAcceptanceMaxAggregateOutputType | null
 }
 
-type GetLegalAcceptanceGroupByPayload<T extends LegalAcceptanceGroupByArgs> = Prisma.PrismaPromise<
+export type GetLegalAcceptanceGroupByPayload<T extends LegalAcceptanceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<LegalAcceptanceGroupByOutputType, T['by']> &
       {
@@ -1161,6 +1161,11 @@ export type LegalAcceptanceFindManyArgs<ExtArgs extends runtime.Types.Extensions
    * Skip the first `n` LegalAcceptances.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of LegalAcceptances.
+   */
   distinct?: Prisma.LegalAcceptanceScalarFieldEnum | Prisma.LegalAcceptanceScalarFieldEnum[]
 }
 

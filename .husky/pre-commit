@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # Run lint-staged on staged files
-pnpm dlx lint-staged
+bunx lint-staged
 
 # Run full lint and format check
-pnpm check
+bun run check
