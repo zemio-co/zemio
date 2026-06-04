@@ -2,7 +2,7 @@
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
 	"root": true,
 	"files": {
-		"includes": ["**", "!generated", "!src/generated"]
+		"includes": ["**", "!generated", "!apps/web/src/generated"]
 	},
 	"vcs": {
 		"enabled": true,

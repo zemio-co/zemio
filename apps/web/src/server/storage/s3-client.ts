@@ -136,7 +136,7 @@ export async function getPresignedDownloadUrl(
 		Key: key,
 		ResponseContentDisposition: `attachment; filename="${filename}"`,
 	});
-	// @ts-expect-error Issue with types from S3
+
 	return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
 }
 
@@ -167,7 +167,7 @@ export async function getPresignedUploadUrl(
 		ContentType: contentType,
 		ContentLength: size,
 	});
-	// @ts-expect-error Issue with types from S3
+
 	return getSignedUrl(client, command, {
 		expiresIn: expiresInSeconds,
 		signableHeaders: new Set(["content-length"]),
