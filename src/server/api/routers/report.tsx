@@ -38,7 +38,7 @@ export const reportRouter = createTRPCRouter({
 			});
 			const orderBy = buildReportListOrderBy(input.sorting);
 
-			const [reports, count] = await ctx.db.$transaction([
+			const [reports, count] = await Promise.all([
 				ctx.db.report.findMany({
 					where,
 					orderBy,
