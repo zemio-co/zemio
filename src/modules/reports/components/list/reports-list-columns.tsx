@@ -12,7 +12,6 @@ import Link from "next/link";
 import type {
 	DateRangeFilterValue,
 	MultiSelectFilterValue,
-	SelectFilterValue,
 } from "@/components/data/filter-types";
 import { ListActionSlot } from "@/components/list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -85,12 +84,14 @@ const statusColumn: ColumnDef<ListReport> = {
 		);
 	},
 	filterFn: (row, _columnId, filterValue) => {
-		const { operator = "is", value = "DRAFT" } = (filterValue ??
-			{}) as SelectFilterValue<ReportStatus>;
+		if (!filterValue) return true;
 
-		return operator === "is"
-			? row.original.status === value
-			: row.original.status !== value;
+		const { operator, value } =
+			filterValue as MultiSelectFilterValue<ReportStatus>;
+
+		return operator === "in"
+			? value.includes(row.original.status)
+			: !value.includes(row.original.status);
 	},
 	cell: ({ row }) => {
 		const Icon = StatusIcons[row.original.status];
@@ -136,7 +137,7 @@ const statusColumn: ColumnDef<ListReport> = {
 			icon: StatusIcons[status],
 		})),
 		placeholder: "Status",
-		filterType: "select",
+		filterType: "multiselect",
 	},
 };
 
