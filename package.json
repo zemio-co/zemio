@@ -2,7 +2,7 @@
 	"name": "zemio",
 	"version": "0.3.0-alpha.1",
 	"private": true,
-	"workspaces": ["apps/*"],
+	"workspaces": ["apps/*", "packages/*"],
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
