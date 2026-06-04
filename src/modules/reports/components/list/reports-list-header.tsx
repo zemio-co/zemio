@@ -25,7 +25,7 @@ function ReportsListHeader({
 			data-slot="reports-list-header"
 			{...props}
 		>
-			<div className="container flex items-center justify-between">
+			<div className="container flex max-w-none items-center justify-between">
 				<ReportsListQuickActions table={table} />
 				<div className="flex items-center justify-center gap-2">
 					<FilterMenu size={"icon-sm"} table={table} variant={"outline"}>
@@ -36,7 +36,7 @@ function ReportsListHeader({
 					</DisplayOptions>
 				</div>
 			</div>
-			<div className={cn("container", hasActiveFilters && "block")}>
+			<div className={cn("container max-w-none", hasActiveFilters && "block")}>
 				<div
 					className={cn(
 						"hidden rounded-lg bg-zinc-100 p-4",

@@ -21,7 +21,7 @@ function NavbarSidebarTrigger({
 
 	return (
 		<SidebarTrigger
-			className={cn(open && !isMobile && "hidden", className)}
+			className={cn(open && !isMobile && "hidden", "-translate-x-1.5", className)}
 			{...props}
 		/>
 	);

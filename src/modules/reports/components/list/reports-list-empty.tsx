@@ -12,7 +12,7 @@ function ReportsListEmpty({
 }: React.ComponentProps<"div">) {
 	return (
 		<div className={cn("", className)} data-slot="reports-list-empty" {...props}>
-			<div className="mx-auto max-w-md">
+			<div className="container max-w-md">
 				<div className="mb-8 flex w-fit items-center justify-center rounded-sm bg-zinc-100 p-2">
 					<TrafficConeIcon className="size-5" />
 				</div>
@@ -47,7 +47,7 @@ function ReportsListNoResults({
 			data-slot="reports-list-no-results"
 			{...props}
 		>
-			<div className="mx-auto max-w-md">
+			<div className="container max-w-md">
 				<div className="mb-8 flex w-fit items-center justify-center rounded-sm bg-zinc-100 p-2">
 					<FilterIcon className="size-5" />
 				</div>
