@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { format } from "date-fns";
 import { PDFDocument as PDFLibDocument } from "pdf-lib";
 import PDFDocument from "pdfkit";
+import sharp from "sharp";
 import type {
 	Attachment,
 	Expense,
@@ -14,7 +15,7 @@ import {
 	foodExpenseMetaSchema,
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
-import { getFileFromStorage, isImageFile, isPdfFile } from "@/server/storage";
+import { getFileFromStorage, isPdfFile } from "@/server/storage";
 
 interface SummaryProps {
 	report: Report & {
@@ -93,7 +94,30 @@ function formatExpenseMeta(expense: Expense): string {
 }
 
 /**
- * Fetch all attachments from storage and categorize them
+ * Convert an arbitrary image buffer to JPEG using sharp.
+ * Returns null if the buffer cannot be interpreted as an image.
+ */
+async function convertToJpeg(
+	buffer: Buffer,
+	key: string,
+): Promise<Buffer | null> {
+	try {
+		const jpeg = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
+		return jpeg;
+	} catch (error) {
+		logger.warn("Image conversion to JPEG failed — attachment skipped", {
+			key,
+			error,
+		});
+		void logger.flush();
+		return null;
+	}
+}
+
+/**
+ * Fetch all attachments from storage and categorize them.
+ * Non-PDF attachments are converted to JPEG via sharp so that any image
+ * format (HEIC, WebP, GIF, TIFF, …) can be embedded by pdfkit.
  */
 async function fetchAttachments(
 	expenses: (Expense & { attachments: Attachment[] })[],
@@ -101,10 +125,8 @@ async function fetchAttachments(
 	const images: AttachmentData[] = [];
 	const pdfs: AttachmentData[] = [];
 
-	// Collect all attachments from all expenses
 	const allAttachments = expenses.flatMap((expense) => expense.attachments);
 
-	// Fetch all attachments in parallel
 	const fetchPromises = allAttachments.map(async (attachment) => {
 		const buffer = await getFileFromStorage(attachment.key);
 		if (!buffer) {
@@ -119,16 +141,17 @@ async function fetchAttachments(
 
 	const results = await Promise.all(fetchPromises);
 
-	// Categorize fetched attachments
 	for (const result of results) {
 		if (!result) continue;
 
-		if (isImageFile(result.key)) {
-			images.push(result);
-		} else if (isPdfFile(result.key)) {
+		if (isPdfFile(result.key)) {
 			pdfs.push(result);
+		} else {
+			const jpeg = await convertToJpeg(result.buffer, result.key);
+			if (jpeg) {
+				images.push({ key: result.key, buffer: jpeg });
+			}
 		}
-		// Skip other file types (cannot be rendered)
 	}
 
 	return { images, pdfs };
