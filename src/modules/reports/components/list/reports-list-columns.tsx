@@ -9,10 +9,6 @@ import {
 	UserCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
-import type {
-	DateRangeFilterValue,
-	MultiSelectFilterValue,
-} from "@/components/data/filter-types";
 import { ListActionSlot } from "@/components/list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -82,16 +78,6 @@ const statusColumn: ColumnDef<ListReport> = {
 		return (
 			order.indexOf(rowA.original.status) - order.indexOf(rowB.original.status)
 		);
-	},
-	filterFn: (row, _columnId, filterValue) => {
-		if (!filterValue) return true;
-
-		const { operator, value } =
-			filterValue as MultiSelectFilterValue<ReportStatus>;
-
-		return operator === "in"
-			? value.includes(row.original.status)
-			: !value.includes(row.original.status);
 	},
 	cell: ({ row }) => {
 		const Icon = StatusIcons[row.original.status];
@@ -260,17 +246,6 @@ const createCostUnitColumn = (
 	enableColumnFilter: true,
 	enableSorting: true,
 	enableHiding: true,
-	filterFn: (row, _columnId, filterValue) => {
-		const { operator = "in", value = [] } = (filterValue ??
-			{}) as MultiSelectFilterValue<string>;
-
-		// If no values selected, include all rows
-		if (value.length === 0) return true;
-
-		return operator === "in"
-			? value.includes(row.original.costUnit.tag)
-			: !value.includes(row.original.costUnit.tag);
-	},
 	cell: ({ row }) => {
 		return (
 			<Badge variant="outline">
@@ -296,13 +271,6 @@ const createdAtColumn: ColumnDef<ListReport> = {
 	enableColumnFilter: true,
 	enableSorting: true,
 	enableHiding: true,
-	filterFn: (row, _columnId, filterValue) => {
-		const { start, end } = (filterValue ?? {}) as DateRangeFilterValue;
-		if (!start || !end) return true;
-
-		const createdAt = row.original.createdAt;
-		return createdAt >= start && createdAt <= end;
-	},
 	cell: ({ row }) => {
 		return (
 			<Tooltip>
