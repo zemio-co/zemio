@@ -22,6 +22,7 @@ import { api } from "@/trpc/react";
 import { createColumns } from "./reports-list-columns";
 import { ReportsListEmpty, ReportsListNoResults } from "./reports-list-empty";
 import { ReportsListHeader } from "./reports-list-header";
+import { ReportsListSkeleton } from "./reports-list-skeleton";
 import type { ListReport } from "./types";
 
 const _PAGE_SIZE = 20;
@@ -101,51 +102,57 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 		<div className={cn("", className)} data-slot="reports-list" {...props}>
 			<ReportsListHeader table={table} />
 
-			{reportsQuery.data?.reports.length === 0 && columnFilters.length === 0 && (
-				<ReportsListEmpty className="mt-32" />
-			)}
-			{rows.length === 0 && columnFilters.length > 0 && (
-				<ReportsListNoResults
-					className="mt-32"
-					onClearFilters={() => setColumnFilters([])}
-				/>
-			)}
+			{reportsQuery.isPending && <ReportsListSkeleton />}
 
-			<List>
-				{rows.map((row) => {
-					if (row.getIsGrouped()) {
+			{!reportsQuery.isPending &&
+				reportsQuery.data?.reports.length === 0 &&
+				columnFilters.length === 0 && <ReportsListEmpty className="mt-32" />}
+			{!reportsQuery.isPending &&
+				rows.length === 0 &&
+				columnFilters.length > 0 && (
+					<ReportsListNoResults
+						className="mt-32"
+						onClearFilters={() => setColumnFilters([])}
+					/>
+				)}
+
+			{!reportsQuery.isPending && (
+				<List>
+					{rows.map((row) => {
+						if (row.getIsGrouped()) {
+							return (
+								<DataListGroupHeader
+									className="first:border-t-0"
+									display={table}
+									key={row.id}
+									row={row}
+								/>
+							);
+						}
 						return (
-							<DataListGroupHeader
-								className="first:border-t-0"
-								display={table}
+							<ListItem
 								key={row.id}
-								row={row}
-							/>
+								{...(row.getIsSelected() ? { "data-selected": true } : {})}
+								className="relative pr-8"
+							>
+								{row.getVisibleCells().map((cell) => (
+									<div
+										className={cn(
+											"has-data-spacer:grow",
+											cell.column.columnDef.meta?.hideOnMobile
+												? "hidden sm:block"
+												: "block",
+										)}
+										key={cell.id}
+									>
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+									</div>
+								))}
+							</ListItem>
 						);
-					}
-					return (
-						<ListItem
-							key={row.id}
-							{...(row.getIsSelected() ? { "data-selected": true } : {})}
-							className="relative pr-8"
-						>
-							{row.getVisibleCells().map((cell) => (
-								<div
-									className={cn(
-										"has-data-spacer:grow",
-										cell.column.columnDef.meta?.hideOnMobile
-											? "hidden sm:block"
-											: "block",
-									)}
-									key={cell.id}
-								>
-									{flexRender(cell.column.columnDef.cell, cell.getContext())}
-								</div>
-							))}
-						</ListItem>
-					);
-				})}
-			</List>
+					})}
+				</List>
+			)}
 		</div>
 	);
 }

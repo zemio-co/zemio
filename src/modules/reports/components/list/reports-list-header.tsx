@@ -72,6 +72,23 @@ function ReportsListQuickActions({
 				variant={"outline"}
 			>
 				Alle
+			</Button>{" "}
+			<Button
+				onClick={() => {
+					const column = table.getColumn("status");
+
+					const filter: MultiSelectFilterValue<ReportStatus> = {
+						filterType: "multiselect",
+						operator: "in",
+						value: ["DRAFT"],
+					};
+
+					column?.setFilterValue(filter);
+				}}
+				size={"sm"}
+				variant={"outline"}
+			>
+				Entwurf
 			</Button>
 			<Button
 				onClick={() => {
