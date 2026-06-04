@@ -20,6 +20,7 @@ import { List, ListItem } from "@/components/list";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { createColumns } from "./reports-list-columns";
+import { ReportsListEmpty, ReportsListNoResults } from "./reports-list-empty";
 import { ReportsListHeader } from "./reports-list-header";
 import type { ListReport } from "./types";
 
@@ -99,6 +100,17 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div className={cn("", className)} data-slot="reports-list" {...props}>
 			<ReportsListHeader table={table} />
+
+			{reportsQuery.data?.reports.length === 0 && columnFilters.length === 0 && (
+				<ReportsListEmpty className="mt-32" />
+			)}
+			{rows.length === 0 && columnFilters.length > 0 && (
+				<ReportsListNoResults
+					className="mt-32"
+					onClearFilters={() => setColumnFilters([])}
+				/>
+			)}
+
 			<List>
 				{rows.map((row) => {
 					if (row.getIsGrouped()) {
