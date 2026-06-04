@@ -29,6 +29,7 @@ export type FilterMenuProps<TData> = React.ComponentProps<typeof Button> & {
 type FilterMenuItemProps<TData> = {
 	column: Column<TData, unknown>;
 	table: Table<TData>;
+	filterValue?: unknown;
 };
 
 // ============================================================================
@@ -42,7 +43,10 @@ type FilterMenuItemProps<TData> = {
 const FilterMenuItem = memo(function FilterMenuItem<TData>({
 	column,
 	table,
-}: FilterMenuItemProps<TData>) {
+}: // filterValue is intentionally unused — it exists solely to break memo
+// when the column's filter value changes, ensuring the submenu re-renders
+// with fresh state (fixes stale checked indicators and stale closure in handleToggle)
+FilterMenuItemProps<TData>) {
 	const meta = column.columnDef.meta;
 	const menuContent = renderFilterMenuContent(column, table);
 
@@ -102,7 +106,14 @@ export function FilterMenu<TData>({
 			>
 				<DropdownMenuGroup>
 					{filterableColumns.map((column) => (
-						<FilterMenuItem column={column} key={column.id} table={table} />
+						<FilterMenuItem
+							column={column}
+							filterValue={
+								table.getState().columnFilters.find((f) => f.id === column.id)?.value
+							}
+							key={column.id}
+							table={table}
+						/>
 					))}
 				</DropdownMenuGroup>
 			</DropdownMenuContent>

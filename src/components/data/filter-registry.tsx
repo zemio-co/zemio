@@ -296,26 +296,22 @@ function MultiSelectMenuContent<TData, TValue>({
 }: FilterMenuContentProps<TData, TValue>) {
 	const meta = column.columnDef.meta;
 	const options = meta?.options ?? [];
-	const currentFilterValue = column.getFilterValue();
-
-	// Get currently selected values from the filter
-	const selectedValues: string[] = isMultiSelectFilter(currentFilterValue)
-		? currentFilterValue.value
+	const filterValue = column.getFilterValue();
+	const selectedValues: string[] = isMultiSelectFilter(filterValue)
+		? filterValue.value
 		: [];
 
 	const handleToggle = (optionValue: string) => {
-		const isSelected = selectedValues.includes(optionValue);
+		const latestFilterValue = column.getFilterValue();
+		const latestSelected: string[] = isMultiSelectFilter(latestFilterValue)
+			? latestFilterValue.value
+			: [];
 
-		let newValues: string[];
-		if (isSelected) {
-			// Remove the value from the list
-			newValues = selectedValues.filter((v) => v !== optionValue);
-		} else {
-			// Add the value to the list
-			newValues = [...selectedValues, optionValue];
-		}
+		const isSelected = latestSelected.includes(optionValue);
+		const newValues = isSelected
+			? latestSelected.filter((v) => v !== optionValue)
+			: [...latestSelected, optionValue];
 
-		// If no values are selected, clear the filter
 		if (newValues.length === 0) {
 			column.setFilterValue(undefined);
 			return;
@@ -323,8 +319,8 @@ function MultiSelectMenuContent<TData, TValue>({
 
 		const value: MultiSelectFilterValue = {
 			filterType: "multiselect",
-			operator: isMultiSelectFilter(currentFilterValue)
-				? currentFilterValue.operator
+			operator: isMultiSelectFilter(latestFilterValue)
+				? latestFilterValue.operator
 				: "in",
 			value: newValues,
 		};
