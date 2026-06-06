@@ -37,10 +37,11 @@ COPY . .
 # must re-run generate here to produce a complete client.
 RUN bun --cwd packages/db run generate
 
-ENV SKIP_ENV_VALIDATION=1
 ENV NODE_ENV=production
 
-RUN bun run turbo build --filter=@zemio/web
+# Inline SKIP_ENV_VALIDATION so it is guaranteed to reach the Next.js process
+# even if turbo's env passthrough does not forward Dockerfile ENV instructions.
+RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the
 # standalone directory so the server can serve them correctly.
