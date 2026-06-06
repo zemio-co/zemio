@@ -12,11 +12,9 @@ import { env } from "./src/env.js";
 const config = {
 	output: "standalone",
 	serverExternalPackages: ["pdfkit"],
-	experimental: {
-		// Required for standalone output to correctly trace workspace package files
-		// (packages/db, packages/encryption) in the monorepo.
-		outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
-	},
+	// Required for standalone output to correctly trace workspace package files
+	// (packages/db, packages/encryption) in the monorepo.
+	outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
 };
 
 const sourceMapUploadConfig =
