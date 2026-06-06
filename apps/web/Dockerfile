@@ -43,7 +43,8 @@ RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the
 # standalone directory so the server can serve them correctly.
-RUN cp -r apps/web/.next/static apps/web/.next/standalone/.next/static && \
+RUN mkdir -p apps/web/.next/standalone/.next && \
+    cp -r apps/web/.next/static apps/web/.next/standalone/.next/static && \
     cp -r apps/web/public apps/web/.next/standalone/public
 
 # ── Runner: slim Node.js image ────────────────────────────────────────────────
