@@ -28,6 +28,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Expose workspace binaries (e.g. prisma) to shell PATH so turbo-invoked
+# scripts can find them on Alpine where bun doesn't inject the root
+# node_modules/.bin automatically.
+ENV PATH="/app/node_modules/.bin:$PATH"
+
 # Regenerate the Prisma client now that full source is present.
 # The postinstall in the deps stage ran without packages/db/src, so we
 # must re-run generate here to produce a complete client.
