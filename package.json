@@ -2,12 +2,17 @@
 	"name": "zemio",
 	"version": "0.3.0-alpha.1",
 	"private": true,
-	"workspaces": ["apps/*", "packages/*"],
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",
 		"start": "turbo run start",
 		"check": "turbo run check",
+		"check:unsafe": "biome check --write --unsafe .",
+		"check:write": "biome check --write .",
 		"typecheck": "turbo run typecheck",
 		"prepare": "husky"
 	},

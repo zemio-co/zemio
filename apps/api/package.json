@@ -7,7 +7,9 @@
 		"dev": "bun --watch src/index.ts",
 		"start": "bun src/index.ts",
 		"typecheck": "tsc --noEmit",
-		"check": "biome check ."
+		"check": "biome check .",
+		"check:unsafe": "biome check --write --unsafe .",
+		"check:write": "biome check --write ."
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.975.0",
@@ -17,6 +19,7 @@
 		"@zemio/db": "workspace:*",
 		"@zemio/encryption": "workspace:*",
 		"date-fns": "^4.1.0",
+		"heic-convert": "^2.1.0",
 		"hono": "^4",
 		"pdf-lib": "^1.17.1",
 		"pdfkit": "^0.17.1",
@@ -27,8 +30,9 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
 		"@types/bun": "latest",
-		"@types/pg": "^8",
+		"@types/heic-convert": "^2.1.1",
 		"@types/pdfkit": "^0.17.4",
+		"@types/pg": "^8",
 		"@zemio/typescript-config": "workspace:*",
 		"typescript": "^5.8.2"
 	}

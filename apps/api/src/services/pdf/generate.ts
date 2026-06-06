@@ -1,5 +1,6 @@
 import type { Attachment, Expense, Report, User } from "@zemio/db";
 import { format } from "date-fns";
+import heicConvert from "heic-convert";
 import { PDFDocument as PDFLibDocument } from "pdf-lib";
 import PDFDocument from "pdfkit";
 import sharp from "sharp";
@@ -114,6 +115,11 @@ async function convertToJpeg(
 	key: string,
 ): Promise<Buffer | null> {
 	try {
+		const ext = key.split(".").pop()?.toLowerCase();
+		if (ext === "heic" || ext === "heif") {
+			const output = await heicConvert({ buffer, format: "JPEG", quality: 0.9 });
+			return Buffer.from(output);
+		}
 		return await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
 	} catch (error) {
 		logger.warn("Image conversion to JPEG failed — attachment skipped", {
