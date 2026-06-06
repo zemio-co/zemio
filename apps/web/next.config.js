@@ -3,13 +3,20 @@
  * for Docker builds.
  */
 
+import path from "node:path";
 import { withBetterStack } from "@logtail/next";
 import { withSentryConfig } from "@sentry/nextjs";
 import { env } from "./src/env.js";
 
 /** @type {import("next").NextConfig} */
 const config = {
+	output: "standalone",
 	serverExternalPackages: ["pdfkit"],
+	experimental: {
+		// Required for standalone output to correctly trace workspace package files
+		// (packages/db, packages/encryption) in the monorepo.
+		outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
+	},
 };
 
 const sourceMapUploadConfig =
