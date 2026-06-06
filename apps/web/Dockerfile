@@ -13,6 +13,7 @@ WORKDIR /app
 # script runs `prisma generate` during bun install.
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/api/package.json ./apps/api/
 COPY packages/db/package.json ./packages/db/
 COPY packages/db/prisma/ ./packages/db/prisma/
 COPY packages/encryption/package.json ./packages/encryption/
