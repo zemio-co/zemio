@@ -26,11 +26,10 @@ FROM base AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
+# packages/db keeps prisma (and its bin) in its own node_modules because bun
+# does not hoist sub-workspace devDependencies to the root node_modules/.bin.
+COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 COPY . .
-
-# Symlink workspace binaries into /usr/local/bin so they are always on PATH
-# regardless of how bun resets PATH when invoking child scripts on Alpine.
-RUN ln -s /app/node_modules/.bin/prisma /usr/local/bin/prisma
 
 # Regenerate the Prisma client now that full source is present.
 # The postinstall in the deps stage ran without packages/db/src, so we
