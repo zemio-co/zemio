@@ -26,9 +26,10 @@ FROM base AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-# packages/db keeps prisma (and its bin) in its own node_modules because bun
-# does not hoist sub-workspace devDependencies to the root node_modules/.bin.
+# Bun does not hoist sub-workspace devDependencies to the root node_modules/.bin,
+# so each package that owns critical binaries must be copied explicitly.
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
 
 # Regenerate the Prisma client now that full source is present.
