@@ -1,4 +1,4 @@
-import { LegalAcceptanceType } from "@/generated/prisma/enums";
+import { LegalAcceptanceType } from "@zemio/db";
 
 export interface CurrentLegalReleaseDefinition {
 	version: string;

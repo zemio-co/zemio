@@ -1,3 +1,5 @@
+import type { Prisma } from "@zemio/db";
+import { ReportStatus } from "@zemio/db";
 import {
 	addMonths,
 	addYears,
@@ -6,8 +8,6 @@ import {
 	subMonths,
 	subYears,
 } from "date-fns";
-import type { Prisma } from "@/generated/prisma/client";
-import { ReportStatus } from "@/generated/prisma/enums";
 import { createTRPCRouter, orgProcedure } from "@/server/api/trpc";
 
 type PeriodRange = {

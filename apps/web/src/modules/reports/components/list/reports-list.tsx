@@ -13,6 +13,7 @@ import {
 	useReactTable,
 	type VisibilityState,
 } from "@tanstack/react-table";
+import type { ReportStatus } from "@zemio/db";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { DataListGroupHeader } from "@/components/data/data-list";
@@ -22,7 +23,6 @@ import {
 } from "@/components/data/filter-types";
 import { List, ListItem } from "@/components/list";
 import { Button } from "@/components/ui/button";
-import type { ReportStatus } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { createColumns } from "./reports-list-columns";

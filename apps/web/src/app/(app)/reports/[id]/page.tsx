@@ -1,9 +1,9 @@
+import { ReportStatus } from "@zemio/db/enums";
 import { ArrowLeftIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ReportStatus } from "@/generated/prisma/enums";
 import { ROUTES } from "@/lib/consts";
 import { api, HydrateClient } from "@/trpc/server";
 import { ReportExpensesList } from "./_components/report-expenses-list";

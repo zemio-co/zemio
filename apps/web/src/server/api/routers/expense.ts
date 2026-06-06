@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@zemio/db";
+import { ExpenseType, ReportStatus } from "@zemio/db";
 import { z } from "zod";
-import type { Prisma } from "@/generated/prisma/client";
-import { ExpenseType, ReportStatus } from "@/generated/prisma/enums";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import {
 	createFoodExpenseSchema,

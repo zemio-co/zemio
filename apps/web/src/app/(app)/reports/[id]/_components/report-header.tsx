@@ -1,5 +1,6 @@
 "use client";
 
+import type { Report, User } from "@zemio/db";
 import { format } from "date-fns";
 import { CheckIcon, ShieldUserIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import type { Report, User } from "@/generated/prisma/client";
 import { ROUTES } from "@/lib/consts";
 import { ADMINS_UPDATE_OWN_REPORT } from "@/lib/flags";
 import { isOrganizationAdminRole } from "@/lib/organization";

@@ -1,5 +1,6 @@
 "use client";
 
+import type { BankingDetails } from "@zemio/db";
 import { format } from "date-fns";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { BankingDetails } from "@/generated/prisma/client";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { CreateBankingDetailsForm } from "./create-banking-details";

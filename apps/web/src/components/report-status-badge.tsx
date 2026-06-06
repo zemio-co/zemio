@@ -1,6 +1,6 @@
+import type { ReportStatus } from "@zemio/db";
 import { CircleIcon } from "lucide-react";
 import type React from "react";
-import type { ReportStatus } from "@/generated/prisma/enums";
 import { cn, translateReportStatus } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 

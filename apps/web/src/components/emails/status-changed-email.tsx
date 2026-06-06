@@ -10,7 +10,7 @@ import {
 	Tailwind,
 	Text,
 } from "@react-email/components";
-import type { ReportStatus } from "@/generated/prisma/enums";
+import type { ReportStatus } from "@zemio/db";
 import { translateReportStatus } from "@/lib/utils";
 
 interface StatusChangedEmailProps {

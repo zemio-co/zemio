@@ -1,6 +1,8 @@
 "use client";
 
 import type { JsonValue } from "@prisma/client/runtime/client";
+import type { Attachment, ExpenseType } from "@zemio/db";
+import { ReportStatus } from "@zemio/db/enums";
 import { formatDate } from "date-fns";
 import {
 	CarIcon,
@@ -44,8 +46,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Attachment, ExpenseType } from "@/generated/prisma/client";
-import { ReportStatus } from "@/generated/prisma/enums";
 import type { ClientExpense } from "@/lib/types";
 import { translateExpenseType } from "@/lib/utils";
 import {

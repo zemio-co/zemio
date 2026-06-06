@@ -1,5 +1,6 @@
 "use client";
 
+import { ReportStatus } from "@zemio/db/enums";
 import { FileSearchCornerIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import type React from "react";
@@ -12,7 +13,6 @@ import {
 	EmptyMedia,
 	EmptyTitle,
 } from "@/components/ui/empty";
-import { ReportStatus } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { ReportExpenseCard } from "./report-expense-card";

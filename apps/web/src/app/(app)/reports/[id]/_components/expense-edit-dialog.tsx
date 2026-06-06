@@ -2,6 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm, useStore } from "@tanstack/react-form";
+import type { Attachment } from "@zemio/db";
 import { differenceInDays, formatDate, isValid, parse } from "date-fns";
 import React from "react";
 import { toast } from "sonner";
@@ -28,7 +29,6 @@ import {
 	InputGroupText,
 } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
-import type { Attachment } from "@/generated/prisma/client";
 import type { ClientExpense } from "@/lib/types";
 import { translateExpenseType } from "@/lib/utils";
 import {

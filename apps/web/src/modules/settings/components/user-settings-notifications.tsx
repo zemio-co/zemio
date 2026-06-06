@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { NotificationPreference } from "@zemio/db/enums";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { NotificationPreference } from "@/generated/prisma/enums";
 import { updatePreferencesSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import { SettingsSubtitle, SettingsTitle } from "./settings-typography";

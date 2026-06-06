@@ -1,14 +1,9 @@
 import { writeFile } from "node:fs/promises";
+import type { Attachment, Expense, Report, User } from "@zemio/db";
 import { format } from "date-fns";
 import { PDFDocument as PDFLibDocument } from "pdf-lib";
 import PDFDocument from "pdfkit";
 import sharp from "sharp";
-import type {
-	Attachment,
-	Expense,
-	Report,
-	User,
-} from "@/generated/prisma/client";
 import { logger } from "@/lib/logger";
 import { translateExpenseType, translateReportStatus } from "@/lib/utils";
 import {

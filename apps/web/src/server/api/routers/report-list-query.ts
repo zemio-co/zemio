@@ -1,6 +1,6 @@
+import type { Prisma } from "@zemio/db";
+import { ReportStatus } from "@zemio/db";
 import { z } from "zod";
-import type { Prisma } from "@/generated/prisma/client";
-import { ReportStatus } from "@/generated/prisma/enums";
 
 const MAX_FILTER_RULES = 50;
 const MAX_FILTER_DEPTH = 3;

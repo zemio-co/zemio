@@ -1,0 +1,1304 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model CostUnitGroup
+ *
+ */
+export type CostUnitGroupModel = runtime.Types.Result.DefaultSelection<Prisma.$CostUnitGroupPayload>;
+export type AggregateCostUnitGroup = {
+    _count: CostUnitGroupCountAggregateOutputType | null;
+    _min: CostUnitGroupMinAggregateOutputType | null;
+    _max: CostUnitGroupMaxAggregateOutputType | null;
+};
+export type CostUnitGroupMinAggregateOutputType = {
+    id: string | null;
+    title: string | null;
+    organizationId: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type CostUnitGroupMaxAggregateOutputType = {
+    id: string | null;
+    title: string | null;
+    organizationId: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type CostUnitGroupCountAggregateOutputType = {
+    id: number;
+    title: number;
+    organizationId: number;
+    createdAt: number;
+    updatedAt: number;
+    _all: number;
+};
+export type CostUnitGroupMinAggregateInputType = {
+    id?: true;
+    title?: true;
+    organizationId?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type CostUnitGroupMaxAggregateInputType = {
+    id?: true;
+    title?: true;
+    organizationId?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type CostUnitGroupCountAggregateInputType = {
+    id?: true;
+    title?: true;
+    organizationId?: true;
+    createdAt?: true;
+    updatedAt?: true;
+    _all?: true;
+};
+export type CostUnitGroupAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which CostUnitGroup to aggregate.
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of CostUnitGroups to fetch.
+     */
+    orderBy?: Prisma.CostUnitGroupOrderByWithRelationInput | Prisma.CostUnitGroupOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.CostUnitGroupWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` CostUnitGroups from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` CostUnitGroups.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned CostUnitGroups
+    **/
+    _count?: true | CostUnitGroupCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: CostUnitGroupMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: CostUnitGroupMaxAggregateInputType;
+};
+export type GetCostUnitGroupAggregateType<T extends CostUnitGroupAggregateArgs> = {
+    [P in keyof T & keyof AggregateCostUnitGroup]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateCostUnitGroup[P]> : Prisma.GetScalarType<T[P], AggregateCostUnitGroup[P]>;
+};
+export type CostUnitGroupGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.CostUnitGroupWhereInput;
+    orderBy?: Prisma.CostUnitGroupOrderByWithAggregationInput | Prisma.CostUnitGroupOrderByWithAggregationInput[];
+    by: Prisma.CostUnitGroupScalarFieldEnum[] | Prisma.CostUnitGroupScalarFieldEnum;
+    having?: Prisma.CostUnitGroupScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: CostUnitGroupCountAggregateInputType | true;
+    _min?: CostUnitGroupMinAggregateInputType;
+    _max?: CostUnitGroupMaxAggregateInputType;
+};
+export type CostUnitGroupGroupByOutputType = {
+    id: string;
+    title: string;
+    organizationId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: CostUnitGroupCountAggregateOutputType | null;
+    _min: CostUnitGroupMinAggregateOutputType | null;
+    _max: CostUnitGroupMaxAggregateOutputType | null;
+};
+export type GetCostUnitGroupGroupByPayload<T extends CostUnitGroupGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<CostUnitGroupGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof CostUnitGroupGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], CostUnitGroupGroupByOutputType[P]> : Prisma.GetScalarType<T[P], CostUnitGroupGroupByOutputType[P]>;
+}>>;
+export type CostUnitGroupWhereInput = {
+    AND?: Prisma.CostUnitGroupWhereInput | Prisma.CostUnitGroupWhereInput[];
+    OR?: Prisma.CostUnitGroupWhereInput[];
+    NOT?: Prisma.CostUnitGroupWhereInput | Prisma.CostUnitGroupWhereInput[];
+    id?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    title?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    organizationId?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    createdAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+    organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>;
+    costUnits?: Prisma.CostUnitListRelationFilter;
+};
+export type CostUnitGroupOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    title?: Prisma.SortOrder;
+    organizationId?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    organization?: Prisma.OrganizationOrderByWithRelationInput;
+    costUnits?: Prisma.CostUnitOrderByRelationAggregateInput;
+};
+export type CostUnitGroupWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    organizationId_title?: Prisma.CostUnitGroupOrganizationIdTitleCompoundUniqueInput;
+    AND?: Prisma.CostUnitGroupWhereInput | Prisma.CostUnitGroupWhereInput[];
+    OR?: Prisma.CostUnitGroupWhereInput[];
+    NOT?: Prisma.CostUnitGroupWhereInput | Prisma.CostUnitGroupWhereInput[];
+    title?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    organizationId?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    createdAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+    organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>;
+    costUnits?: Prisma.CostUnitListRelationFilter;
+}, "id" | "organizationId_title">;
+export type CostUnitGroupOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    title?: Prisma.SortOrder;
+    organizationId?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    _count?: Prisma.CostUnitGroupCountOrderByAggregateInput;
+    _max?: Prisma.CostUnitGroupMaxOrderByAggregateInput;
+    _min?: Prisma.CostUnitGroupMinOrderByAggregateInput;
+};
+export type CostUnitGroupScalarWhereWithAggregatesInput = {
+    AND?: Prisma.CostUnitGroupScalarWhereWithAggregatesInput | Prisma.CostUnitGroupScalarWhereWithAggregatesInput[];
+    OR?: Prisma.CostUnitGroupScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.CostUnitGroupScalarWhereWithAggregatesInput | Prisma.CostUnitGroupScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"CostUnitGroup"> | string;
+    title?: Prisma.StringWithAggregatesFilter<"CostUnitGroup"> | string;
+    organizationId?: Prisma.StringWithAggregatesFilter<"CostUnitGroup"> | string;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"CostUnitGroup"> | Date | string;
+    updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CostUnitGroup"> | Date | string;
+};
+export type CostUnitGroupCreateInput = {
+    id?: string;
+    title: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    organization: Prisma.OrganizationCreateNestedOneWithoutCostUnitGroupsInput;
+    costUnits?: Prisma.CostUnitCreateNestedManyWithoutCostUnitGroupInput;
+};
+export type CostUnitGroupUncheckedCreateInput = {
+    id?: string;
+    title: string;
+    organizationId: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    costUnits?: Prisma.CostUnitUncheckedCreateNestedManyWithoutCostUnitGroupInput;
+};
+export type CostUnitGroupUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    organization?: Prisma.OrganizationUpdateOneRequiredWithoutCostUnitGroupsNestedInput;
+    costUnits?: Prisma.CostUnitUpdateManyWithoutCostUnitGroupNestedInput;
+};
+export type CostUnitGroupUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    costUnits?: Prisma.CostUnitUncheckedUpdateManyWithoutCostUnitGroupNestedInput;
+};
+export type CostUnitGroupCreateManyInput = {
+    id?: string;
+    title: string;
+    organizationId: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type CostUnitGroupUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type CostUnitGroupUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type CostUnitGroupListRelationFilter = {
+    every?: Prisma.CostUnitGroupWhereInput;
+    some?: Prisma.CostUnitGroupWhereInput;
+    none?: Prisma.CostUnitGroupWhereInput;
+};
+export type CostUnitGroupOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type CostUnitGroupOrganizationIdTitleCompoundUniqueInput = {
+    organizationId: string;
+    title: string;
+};
+export type CostUnitGroupCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    title?: Prisma.SortOrder;
+    organizationId?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type CostUnitGroupMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    title?: Prisma.SortOrder;
+    organizationId?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type CostUnitGroupMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    title?: Prisma.SortOrder;
+    organizationId?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type CostUnitGroupNullableScalarRelationFilter = {
+    is?: Prisma.CostUnitGroupWhereInput | null;
+    isNot?: Prisma.CostUnitGroupWhereInput | null;
+};
+export type CostUnitGroupCreateNestedManyWithoutOrganizationInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput> | Prisma.CostUnitGroupCreateWithoutOrganizationInput[] | Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput[];
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput | Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput[];
+    createMany?: Prisma.CostUnitGroupCreateManyOrganizationInputEnvelope;
+    connect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+};
+export type CostUnitGroupUncheckedCreateNestedManyWithoutOrganizationInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput> | Prisma.CostUnitGroupCreateWithoutOrganizationInput[] | Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput[];
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput | Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput[];
+    createMany?: Prisma.CostUnitGroupCreateManyOrganizationInputEnvelope;
+    connect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+};
+export type CostUnitGroupUpdateManyWithoutOrganizationNestedInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput> | Prisma.CostUnitGroupCreateWithoutOrganizationInput[] | Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput[];
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput | Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput[];
+    upsert?: Prisma.CostUnitGroupUpsertWithWhereUniqueWithoutOrganizationInput | Prisma.CostUnitGroupUpsertWithWhereUniqueWithoutOrganizationInput[];
+    createMany?: Prisma.CostUnitGroupCreateManyOrganizationInputEnvelope;
+    set?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    disconnect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    delete?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    connect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    update?: Prisma.CostUnitGroupUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.CostUnitGroupUpdateWithWhereUniqueWithoutOrganizationInput[];
+    updateMany?: Prisma.CostUnitGroupUpdateManyWithWhereWithoutOrganizationInput | Prisma.CostUnitGroupUpdateManyWithWhereWithoutOrganizationInput[];
+    deleteMany?: Prisma.CostUnitGroupScalarWhereInput | Prisma.CostUnitGroupScalarWhereInput[];
+};
+export type CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput> | Prisma.CostUnitGroupCreateWithoutOrganizationInput[] | Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput[];
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput | Prisma.CostUnitGroupCreateOrConnectWithoutOrganizationInput[];
+    upsert?: Prisma.CostUnitGroupUpsertWithWhereUniqueWithoutOrganizationInput | Prisma.CostUnitGroupUpsertWithWhereUniqueWithoutOrganizationInput[];
+    createMany?: Prisma.CostUnitGroupCreateManyOrganizationInputEnvelope;
+    set?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    disconnect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    delete?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    connect?: Prisma.CostUnitGroupWhereUniqueInput | Prisma.CostUnitGroupWhereUniqueInput[];
+    update?: Prisma.CostUnitGroupUpdateWithWhereUniqueWithoutOrganizationInput | Prisma.CostUnitGroupUpdateWithWhereUniqueWithoutOrganizationInput[];
+    updateMany?: Prisma.CostUnitGroupUpdateManyWithWhereWithoutOrganizationInput | Prisma.CostUnitGroupUpdateManyWithWhereWithoutOrganizationInput[];
+    deleteMany?: Prisma.CostUnitGroupScalarWhereInput | Prisma.CostUnitGroupScalarWhereInput[];
+};
+export type CostUnitGroupCreateNestedOneWithoutCostUnitsInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedCreateWithoutCostUnitsInput>;
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutCostUnitsInput;
+    connect?: Prisma.CostUnitGroupWhereUniqueInput;
+};
+export type CostUnitGroupUpdateOneWithoutCostUnitsNestedInput = {
+    create?: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedCreateWithoutCostUnitsInput>;
+    connectOrCreate?: Prisma.CostUnitGroupCreateOrConnectWithoutCostUnitsInput;
+    upsert?: Prisma.CostUnitGroupUpsertWithoutCostUnitsInput;
+    disconnect?: Prisma.CostUnitGroupWhereInput | boolean;
+    delete?: Prisma.CostUnitGroupWhereInput | boolean;
+    connect?: Prisma.CostUnitGroupWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.CostUnitGroupUpdateToOneWithWhereWithoutCostUnitsInput, Prisma.CostUnitGroupUpdateWithoutCostUnitsInput>, Prisma.CostUnitGroupUncheckedUpdateWithoutCostUnitsInput>;
+};
+export type CostUnitGroupCreateWithoutOrganizationInput = {
+    id?: string;
+    title: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    costUnits?: Prisma.CostUnitCreateNestedManyWithoutCostUnitGroupInput;
+};
+export type CostUnitGroupUncheckedCreateWithoutOrganizationInput = {
+    id?: string;
+    title: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    costUnits?: Prisma.CostUnitUncheckedCreateNestedManyWithoutCostUnitGroupInput;
+};
+export type CostUnitGroupCreateOrConnectWithoutOrganizationInput = {
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+    create: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput>;
+};
+export type CostUnitGroupCreateManyOrganizationInputEnvelope = {
+    data: Prisma.CostUnitGroupCreateManyOrganizationInput | Prisma.CostUnitGroupCreateManyOrganizationInput[];
+    skipDuplicates?: boolean;
+};
+export type CostUnitGroupUpsertWithWhereUniqueWithoutOrganizationInput = {
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+    update: Prisma.XOR<Prisma.CostUnitGroupUpdateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedUpdateWithoutOrganizationInput>;
+    create: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedCreateWithoutOrganizationInput>;
+};
+export type CostUnitGroupUpdateWithWhereUniqueWithoutOrganizationInput = {
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateWithoutOrganizationInput, Prisma.CostUnitGroupUncheckedUpdateWithoutOrganizationInput>;
+};
+export type CostUnitGroupUpdateManyWithWhereWithoutOrganizationInput = {
+    where: Prisma.CostUnitGroupScalarWhereInput;
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateManyMutationInput, Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationInput>;
+};
+export type CostUnitGroupScalarWhereInput = {
+    AND?: Prisma.CostUnitGroupScalarWhereInput | Prisma.CostUnitGroupScalarWhereInput[];
+    OR?: Prisma.CostUnitGroupScalarWhereInput[];
+    NOT?: Prisma.CostUnitGroupScalarWhereInput | Prisma.CostUnitGroupScalarWhereInput[];
+    id?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    title?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    organizationId?: Prisma.StringFilter<"CostUnitGroup"> | string;
+    createdAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"CostUnitGroup"> | Date | string;
+};
+export type CostUnitGroupCreateWithoutCostUnitsInput = {
+    id?: string;
+    title: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    organization: Prisma.OrganizationCreateNestedOneWithoutCostUnitGroupsInput;
+};
+export type CostUnitGroupUncheckedCreateWithoutCostUnitsInput = {
+    id?: string;
+    title: string;
+    organizationId: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type CostUnitGroupCreateOrConnectWithoutCostUnitsInput = {
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+    create: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedCreateWithoutCostUnitsInput>;
+};
+export type CostUnitGroupUpsertWithoutCostUnitsInput = {
+    update: Prisma.XOR<Prisma.CostUnitGroupUpdateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedUpdateWithoutCostUnitsInput>;
+    create: Prisma.XOR<Prisma.CostUnitGroupCreateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedCreateWithoutCostUnitsInput>;
+    where?: Prisma.CostUnitGroupWhereInput;
+};
+export type CostUnitGroupUpdateToOneWithWhereWithoutCostUnitsInput = {
+    where?: Prisma.CostUnitGroupWhereInput;
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateWithoutCostUnitsInput, Prisma.CostUnitGroupUncheckedUpdateWithoutCostUnitsInput>;
+};
+export type CostUnitGroupUpdateWithoutCostUnitsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    organization?: Prisma.OrganizationUpdateOneRequiredWithoutCostUnitGroupsNestedInput;
+};
+export type CostUnitGroupUncheckedUpdateWithoutCostUnitsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    organizationId?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type CostUnitGroupCreateManyOrganizationInput = {
+    id?: string;
+    title: string;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type CostUnitGroupUpdateWithoutOrganizationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    costUnits?: Prisma.CostUnitUpdateManyWithoutCostUnitGroupNestedInput;
+};
+export type CostUnitGroupUncheckedUpdateWithoutOrganizationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    costUnits?: Prisma.CostUnitUncheckedUpdateManyWithoutCostUnitGroupNestedInput;
+};
+export type CostUnitGroupUncheckedUpdateManyWithoutOrganizationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    title?: Prisma.StringFieldUpdateOperationsInput | string;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+/**
+ * Count Type CostUnitGroupCountOutputType
+ */
+export type CostUnitGroupCountOutputType = {
+    costUnits: number;
+};
+export type CostUnitGroupCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    costUnits?: boolean | CostUnitGroupCountOutputTypeCountCostUnitsArgs;
+};
+/**
+ * CostUnitGroupCountOutputType without action
+ */
+export type CostUnitGroupCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroupCountOutputType
+     */
+    select?: Prisma.CostUnitGroupCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * CostUnitGroupCountOutputType without action
+ */
+export type CostUnitGroupCountOutputTypeCountCostUnitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.CostUnitWhereInput;
+};
+export type CostUnitGroupSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    title?: boolean;
+    organizationId?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+    costUnits?: boolean | Prisma.CostUnitGroup$costUnitsArgs<ExtArgs>;
+    _count?: boolean | Prisma.CostUnitGroupCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["costUnitGroup"]>;
+export type CostUnitGroupSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    title?: boolean;
+    organizationId?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["costUnitGroup"]>;
+export type CostUnitGroupSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    title?: boolean;
+    organizationId?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["costUnitGroup"]>;
+export type CostUnitGroupSelectScalar = {
+    id?: boolean;
+    title?: boolean;
+    organizationId?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+};
+export type CostUnitGroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "organizationId" | "createdAt" | "updatedAt", ExtArgs["result"]["costUnitGroup"]>;
+export type CostUnitGroupInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+    costUnits?: boolean | Prisma.CostUnitGroup$costUnitsArgs<ExtArgs>;
+    _count?: boolean | Prisma.CostUnitGroupCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type CostUnitGroupIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+};
+export type CostUnitGroupIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>;
+};
+export type $CostUnitGroupPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "CostUnitGroup";
+    objects: {
+        organization: Prisma.$OrganizationPayload<ExtArgs>;
+        costUnits: Prisma.$CostUnitPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        title: string;
+        organizationId: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }, ExtArgs["result"]["costUnitGroup"]>;
+    composites: {};
+};
+export type CostUnitGroupGetPayload<S extends boolean | null | undefined | CostUnitGroupDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload, S>;
+export type CostUnitGroupCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<CostUnitGroupFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: CostUnitGroupCountAggregateInputType | true;
+};
+export interface CostUnitGroupDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['CostUnitGroup'];
+        meta: {
+            name: 'CostUnitGroup';
+        };
+    };
+    /**
+     * Find zero or one CostUnitGroup that matches the filter.
+     * @param {CostUnitGroupFindUniqueArgs} args - Arguments to find a CostUnitGroup
+     * @example
+     * // Get one CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CostUnitGroupFindUniqueArgs>(args: Prisma.SelectSubset<T, CostUnitGroupFindUniqueArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one CostUnitGroup that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CostUnitGroupFindUniqueOrThrowArgs} args - Arguments to find a CostUnitGroup
+     * @example
+     * // Get one CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CostUnitGroupFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, CostUnitGroupFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first CostUnitGroup that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupFindFirstArgs} args - Arguments to find a CostUnitGroup
+     * @example
+     * // Get one CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CostUnitGroupFindFirstArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupFindFirstArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first CostUnitGroup that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupFindFirstOrThrowArgs} args - Arguments to find a CostUnitGroup
+     * @example
+     * // Get one CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CostUnitGroupFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more CostUnitGroups that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CostUnitGroups
+     * const costUnitGroups = await prisma.costUnitGroup.findMany()
+     *
+     * // Get first 10 CostUnitGroups
+     * const costUnitGroups = await prisma.costUnitGroup.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const costUnitGroupWithIdOnly = await prisma.costUnitGroup.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends CostUnitGroupFindManyArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a CostUnitGroup.
+     * @param {CostUnitGroupCreateArgs} args - Arguments to create a CostUnitGroup.
+     * @example
+     * // Create one CostUnitGroup
+     * const CostUnitGroup = await prisma.costUnitGroup.create({
+     *   data: {
+     *     // ... data to create a CostUnitGroup
+     *   }
+     * })
+     *
+     */
+    create<T extends CostUnitGroupCreateArgs>(args: Prisma.SelectSubset<T, CostUnitGroupCreateArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many CostUnitGroups.
+     * @param {CostUnitGroupCreateManyArgs} args - Arguments to create many CostUnitGroups.
+     * @example
+     * // Create many CostUnitGroups
+     * const costUnitGroup = await prisma.costUnitGroup.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends CostUnitGroupCreateManyArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many CostUnitGroups and returns the data saved in the database.
+     * @param {CostUnitGroupCreateManyAndReturnArgs} args - Arguments to create many CostUnitGroups.
+     * @example
+     * // Create many CostUnitGroups
+     * const costUnitGroup = await prisma.costUnitGroup.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many CostUnitGroups and only return the `id`
+     * const costUnitGroupWithIdOnly = await prisma.costUnitGroup.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends CostUnitGroupCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a CostUnitGroup.
+     * @param {CostUnitGroupDeleteArgs} args - Arguments to delete one CostUnitGroup.
+     * @example
+     * // Delete one CostUnitGroup
+     * const CostUnitGroup = await prisma.costUnitGroup.delete({
+     *   where: {
+     *     // ... filter to delete one CostUnitGroup
+     *   }
+     * })
+     *
+     */
+    delete<T extends CostUnitGroupDeleteArgs>(args: Prisma.SelectSubset<T, CostUnitGroupDeleteArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one CostUnitGroup.
+     * @param {CostUnitGroupUpdateArgs} args - Arguments to update one CostUnitGroup.
+     * @example
+     * // Update one CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends CostUnitGroupUpdateArgs>(args: Prisma.SelectSubset<T, CostUnitGroupUpdateArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more CostUnitGroups.
+     * @param {CostUnitGroupDeleteManyArgs} args - Arguments to filter CostUnitGroups to delete.
+     * @example
+     * // Delete a few CostUnitGroups
+     * const { count } = await prisma.costUnitGroup.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends CostUnitGroupDeleteManyArgs>(args?: Prisma.SelectSubset<T, CostUnitGroupDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more CostUnitGroups.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CostUnitGroups
+     * const costUnitGroup = await prisma.costUnitGroup.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends CostUnitGroupUpdateManyArgs>(args: Prisma.SelectSubset<T, CostUnitGroupUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more CostUnitGroups and returns the data updated in the database.
+     * @param {CostUnitGroupUpdateManyAndReturnArgs} args - Arguments to update many CostUnitGroups.
+     * @example
+     * // Update many CostUnitGroups
+     * const costUnitGroup = await prisma.costUnitGroup.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more CostUnitGroups and only return the `id`
+     * const costUnitGroupWithIdOnly = await prisma.costUnitGroup.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends CostUnitGroupUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, CostUnitGroupUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one CostUnitGroup.
+     * @param {CostUnitGroupUpsertArgs} args - Arguments to update or create a CostUnitGroup.
+     * @example
+     * // Update or create a CostUnitGroup
+     * const costUnitGroup = await prisma.costUnitGroup.upsert({
+     *   create: {
+     *     // ... data to create a CostUnitGroup
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CostUnitGroup we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CostUnitGroupUpsertArgs>(args: Prisma.SelectSubset<T, CostUnitGroupUpsertArgs<ExtArgs>>): Prisma.Prisma__CostUnitGroupClient<runtime.Types.Result.GetResult<Prisma.$CostUnitGroupPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of CostUnitGroups.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupCountArgs} args - Arguments to filter CostUnitGroups to count.
+     * @example
+     * // Count the number of CostUnitGroups
+     * const count = await prisma.costUnitGroup.count({
+     *   where: {
+     *     // ... the filter for the CostUnitGroups we want to count
+     *   }
+     * })
+    **/
+    count<T extends CostUnitGroupCountArgs>(args?: Prisma.Subset<T, CostUnitGroupCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], CostUnitGroupCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a CostUnitGroup.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CostUnitGroupAggregateArgs>(args: Prisma.Subset<T, CostUnitGroupAggregateArgs>): Prisma.PrismaPromise<GetCostUnitGroupAggregateType<T>>;
+    /**
+     * Group by CostUnitGroup.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CostUnitGroupGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends CostUnitGroupGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: CostUnitGroupGroupByArgs['orderBy'];
+    } : {
+        orderBy?: CostUnitGroupGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, CostUnitGroupGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCostUnitGroupGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the CostUnitGroup model
+     */
+    readonly fields: CostUnitGroupFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for CostUnitGroup.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__CostUnitGroupClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    organization<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    costUnits<T extends Prisma.CostUnitGroup$costUnitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CostUnitGroup$costUnitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CostUnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the CostUnitGroup model
+ */
+export interface CostUnitGroupFieldRefs {
+    readonly id: Prisma.FieldRef<"CostUnitGroup", 'String'>;
+    readonly title: Prisma.FieldRef<"CostUnitGroup", 'String'>;
+    readonly organizationId: Prisma.FieldRef<"CostUnitGroup", 'String'>;
+    readonly createdAt: Prisma.FieldRef<"CostUnitGroup", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"CostUnitGroup", 'DateTime'>;
+}
+/**
+ * CostUnitGroup findUnique
+ */
+export type CostUnitGroupFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter, which CostUnitGroup to fetch.
+     */
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+};
+/**
+ * CostUnitGroup findUniqueOrThrow
+ */
+export type CostUnitGroupFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter, which CostUnitGroup to fetch.
+     */
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+};
+/**
+ * CostUnitGroup findFirst
+ */
+export type CostUnitGroupFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter, which CostUnitGroup to fetch.
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of CostUnitGroups to fetch.
+     */
+    orderBy?: Prisma.CostUnitGroupOrderByWithRelationInput | Prisma.CostUnitGroupOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for CostUnitGroups.
+     */
+    cursor?: Prisma.CostUnitGroupWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` CostUnitGroups from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` CostUnitGroups.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of CostUnitGroups.
+     */
+    distinct?: Prisma.CostUnitGroupScalarFieldEnum | Prisma.CostUnitGroupScalarFieldEnum[];
+};
+/**
+ * CostUnitGroup findFirstOrThrow
+ */
+export type CostUnitGroupFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter, which CostUnitGroup to fetch.
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of CostUnitGroups to fetch.
+     */
+    orderBy?: Prisma.CostUnitGroupOrderByWithRelationInput | Prisma.CostUnitGroupOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for CostUnitGroups.
+     */
+    cursor?: Prisma.CostUnitGroupWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` CostUnitGroups from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` CostUnitGroups.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of CostUnitGroups.
+     */
+    distinct?: Prisma.CostUnitGroupScalarFieldEnum | Prisma.CostUnitGroupScalarFieldEnum[];
+};
+/**
+ * CostUnitGroup findMany
+ */
+export type CostUnitGroupFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter, which CostUnitGroups to fetch.
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of CostUnitGroups to fetch.
+     */
+    orderBy?: Prisma.CostUnitGroupOrderByWithRelationInput | Prisma.CostUnitGroupOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing CostUnitGroups.
+     */
+    cursor?: Prisma.CostUnitGroupWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` CostUnitGroups from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` CostUnitGroups.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of CostUnitGroups.
+     */
+    distinct?: Prisma.CostUnitGroupScalarFieldEnum | Prisma.CostUnitGroupScalarFieldEnum[];
+};
+/**
+ * CostUnitGroup create
+ */
+export type CostUnitGroupCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a CostUnitGroup.
+     */
+    data: Prisma.XOR<Prisma.CostUnitGroupCreateInput, Prisma.CostUnitGroupUncheckedCreateInput>;
+};
+/**
+ * CostUnitGroup createMany
+ */
+export type CostUnitGroupCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CostUnitGroups.
+     */
+    data: Prisma.CostUnitGroupCreateManyInput | Prisma.CostUnitGroupCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * CostUnitGroup createManyAndReturn
+ */
+export type CostUnitGroupCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * The data used to create many CostUnitGroups.
+     */
+    data: Prisma.CostUnitGroupCreateManyInput | Prisma.CostUnitGroupCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * CostUnitGroup update
+ */
+export type CostUnitGroupUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a CostUnitGroup.
+     */
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateInput, Prisma.CostUnitGroupUncheckedUpdateInput>;
+    /**
+     * Choose, which CostUnitGroup to update.
+     */
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+};
+/**
+ * CostUnitGroup updateMany
+ */
+export type CostUnitGroupUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CostUnitGroups.
+     */
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateManyMutationInput, Prisma.CostUnitGroupUncheckedUpdateManyInput>;
+    /**
+     * Filter which CostUnitGroups to update
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * Limit how many CostUnitGroups to update.
+     */
+    limit?: number;
+};
+/**
+ * CostUnitGroup updateManyAndReturn
+ */
+export type CostUnitGroupUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * The data used to update CostUnitGroups.
+     */
+    data: Prisma.XOR<Prisma.CostUnitGroupUpdateManyMutationInput, Prisma.CostUnitGroupUncheckedUpdateManyInput>;
+    /**
+     * Filter which CostUnitGroups to update
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * Limit how many CostUnitGroups to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * CostUnitGroup upsert
+ */
+export type CostUnitGroupUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the CostUnitGroup to update in case it exists.
+     */
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+    /**
+     * In case the CostUnitGroup found by the `where` argument doesn't exist, create a new CostUnitGroup with this data.
+     */
+    create: Prisma.XOR<Prisma.CostUnitGroupCreateInput, Prisma.CostUnitGroupUncheckedCreateInput>;
+    /**
+     * In case the CostUnitGroup was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.CostUnitGroupUpdateInput, Prisma.CostUnitGroupUncheckedUpdateInput>;
+};
+/**
+ * CostUnitGroup delete
+ */
+export type CostUnitGroupDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+    /**
+     * Filter which CostUnitGroup to delete.
+     */
+    where: Prisma.CostUnitGroupWhereUniqueInput;
+};
+/**
+ * CostUnitGroup deleteMany
+ */
+export type CostUnitGroupDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which CostUnitGroups to delete
+     */
+    where?: Prisma.CostUnitGroupWhereInput;
+    /**
+     * Limit how many CostUnitGroups to delete.
+     */
+    limit?: number;
+};
+/**
+ * CostUnitGroup.costUnits
+ */
+export type CostUnitGroup$costUnitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnit
+     */
+    select?: Prisma.CostUnitSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnit
+     */
+    omit?: Prisma.CostUnitOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitInclude<ExtArgs> | null;
+    where?: Prisma.CostUnitWhereInput;
+    orderBy?: Prisma.CostUnitOrderByWithRelationInput | Prisma.CostUnitOrderByWithRelationInput[];
+    cursor?: Prisma.CostUnitWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.CostUnitScalarFieldEnum | Prisma.CostUnitScalarFieldEnum[];
+};
+/**
+ * CostUnitGroup without action
+ */
+export type CostUnitGroupDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CostUnitGroup
+     */
+    select?: Prisma.CostUnitGroupSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the CostUnitGroup
+     */
+    omit?: Prisma.CostUnitGroupOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.CostUnitGroupInclude<ExtArgs> | null;
+};
+//# sourceMappingURL=CostUnitGroup.d.ts.map

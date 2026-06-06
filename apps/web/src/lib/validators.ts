@@ -1,6 +1,6 @@
+import { ExpenseType, NotificationPreference } from "@zemio/db/enums";
 import { isValid, parse } from "date-fns";
 import z from "zod";
-import { ExpenseType, NotificationPreference } from "@/generated/prisma/enums";
 
 export const createReportSchema = z.object({
 	title: z.string().min(1),

@@ -1,5 +1,5 @@
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prismaAdapter } from "@better-auth/prisma-adapter";
+import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization } from "better-auth/plugins";
 import { env } from "@/env";
@@ -68,6 +68,7 @@ export const auth = betterAuth({
 			prompt: "select_account",
 		},
 	},
+
 	databaseHooks: {
 		user: {
 			create: {
@@ -186,6 +187,7 @@ export const auth = betterAuth({
 			},
 		},
 	},
+
 	plugins: [
 		adminPlugin({
 			ac: adminAc.ac,
@@ -194,7 +196,6 @@ export const auth = betterAuth({
 				admin: adminAc.admin,
 			},
 		}),
-		nextCookies(),
 		organization({
 			// Only platform admins (user.role === "admin") may create organizations
 			// via the server-side platform admin API. Regular users cannot.
@@ -210,6 +211,7 @@ export const auth = betterAuth({
 				owner: organizationAc.owner,
 			},
 		}),
+		nextCookies(),
 	],
 });
 

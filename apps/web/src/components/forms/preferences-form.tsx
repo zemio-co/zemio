@@ -1,8 +1,8 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { NotificationPreference } from "@zemio/db/enums";
 import { toast } from "sonner";
-import { NotificationPreference } from "@/generated/prisma/enums";
 import { updatePreferencesSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import { Button } from "../ui/button";

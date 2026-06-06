@@ -1,3 +1,4 @@
+import type { ExpenseType, ReportStatus } from "@zemio/db";
 import { type ClassValue, clsx } from "clsx";
 import {
 	differenceInDays,
@@ -6,7 +7,6 @@ import {
 	format,
 } from "date-fns";
 import { twMerge } from "tailwind-merge";
-import type { ExpenseType, ReportStatus } from "@/generated/prisma/enums";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

@@ -12,6 +12,6 @@ export interface LegalDocumentDefinition extends LegalDocumentVersionSnapshot {
 export interface LegalReleaseDefinition {
 	version: string;
 	publishedAt: string;
-	acceptanceType: import("@/generated/prisma/enums").LegalAcceptanceType;
+	acceptanceType: import("@zemio/db").LegalAcceptanceType;
 	documents: readonly LegalDocumentDefinition[];
 }
