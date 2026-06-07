@@ -1,6 +1,14 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+const productionRequiredString =
+	process.env.NODE_ENV === "production"
+		? z.string().min(1)
+		: z.string().min(1).optional();
+
+const productionRequiredUrl =
+	process.env.NODE_ENV === "production" ? z.url() : z.url().optional();
+
 /**
  * Environment Variables (Secrets Only)
  *
@@ -194,12 +202,14 @@ export const env = createEnv({
 	 * WARNING: Never expose secrets to the client!
 	 */
 	client: {
-		// Optional — the server/browser gracefully skips error tracking when absent.
-		NEXT_PUBLIC_BETTER_STACK_DSN: z.url().optional(),
+		/**
+		 * Better Stack Errors DSN used by the Sentry SDK in browser and server runtimes.
+		 */
+		NEXT_PUBLIC_BETTER_STACK_DSN: productionRequiredUrl,
 
-		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string().optional(),
+		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: productionRequiredString,
 
-		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.url().optional(),
+		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: productionRequiredUrl,
 	},
 
 	/**
