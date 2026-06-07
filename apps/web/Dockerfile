@@ -65,9 +65,12 @@ RUN groupadd --system --gid 1001 nodejs && \
 RUN npm install -g prisma@7 --quiet
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-# Schema and config are required by `prisma migrate deploy` at pre-deploy time.
+# Schema and JS config are required by `prisma migrate deploy` at pre-deploy time.
+# prisma.config.js is plain JavaScript (no TypeScript compilation, no external imports)
+# so it loads correctly when only the global prisma CLI is available in the runner.
+# Locally, prisma.config.ts takes precedence (Prisma 7 searches .ts before .js).
 COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma ./packages/db/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
+COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma.config.js ./packages/db/prisma.config.js
 
 USER nextjs
 

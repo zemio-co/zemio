@@ -4,7 +4,7 @@ dockerfilePath = "apps/web/Dockerfile"
 watchPatterns = ["apps/web/**", "packages/**"]
 
 [deploy]
-preDeployCommand = "cd packages/db && prisma migrate deploy 2>&1; EXIT_CODE=$?; echo \"PRISMA_EXIT_CODE=$EXIT_CODE\"; exit $EXIT_CODE"
+preDeployCommand = "cd packages/db && prisma migrate deploy"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
