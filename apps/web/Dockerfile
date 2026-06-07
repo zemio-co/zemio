@@ -65,8 +65,9 @@ RUN groupadd --system --gid 1001 nodejs && \
 RUN npm install -g prisma@7 --quiet
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-# Schema is required by `prisma migrate deploy` at pre-deploy time.
+# Schema and config are required by `prisma migrate deploy` at pre-deploy time.
 COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma ./packages/db/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma.config.ts ./packages/db/prisma.config.ts
 
 USER nextjs
 

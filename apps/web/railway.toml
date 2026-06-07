@@ -4,7 +4,7 @@ dockerfilePath = "apps/web/Dockerfile"
 watchPatterns = ["apps/web/**", "packages/**"]
 
 [deploy]
-preDeployCommand = ["prisma migrate deploy --schema=packages/db/prisma/schema.prisma"]
+preDeployCommand = ["sh", "-c", "cd packages/db && prisma migrate deploy"]
 healthcheckPath = "/api/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
