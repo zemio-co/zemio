@@ -43,9 +43,11 @@ RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the
 # standalone directory so the server can serve them correctly.
-RUN mkdir -p apps/web/.next/standalone/.next && \
-    cp -r apps/web/.next/static apps/web/.next/standalone/.next/static && \
-    cp -r apps/web/public apps/web/.next/standalone/public
+# With outputFileTracingRoot at the monorepo root, server.js lives at
+# apps/web/server.js inside standalone, so assets must be placed relative to it.
+RUN mkdir -p apps/web/.next/standalone/apps/web/.next && \
+    cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static && \
+    cp -r apps/web/public apps/web/.next/standalone/apps/web/public
 
 # ── Runner: slim Node.js image ────────────────────────────────────────────────
 # node:22-slim (Debian) is required because the Prisma migration CLI needs
@@ -76,4 +78,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "(cd packages/db && prisma migrate deploy) && node server.js"]
+CMD ["sh", "-c", "(cd packages/db && prisma migrate deploy) && node apps/web/server.js"]
