@@ -1,14 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
-const productionRequiredString =
-	process.env.NODE_ENV === "production"
-		? z.string().min(1)
-		: z.string().min(1).optional();
-
-const productionRequiredUrl =
-	process.env.NODE_ENV === "production" ? z.url() : z.url().optional();
-
 /**
  * Environment Variables (Secrets Only)
  *
