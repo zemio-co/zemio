@@ -1,12 +1,18 @@
 import { Logtail } from "@logtail/node";
 import type { LogFields, Logger, LoggerOptions } from "./types";
 
-export function createLogger({ token, service }: LoggerOptions): Logger {
+export function createLogger({
+	token,
+	service,
+	endpoint,
+}: LoggerOptions): Logger {
 	if (!token) {
 		return createFallbackLogger(service);
 	}
 
-	const logtail = new Logtail(token);
+	const logtail = new Logtail(token, {
+		endpoint,
+	});
 	const base = { service };
 
 	return {
