@@ -11,6 +11,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { logger } from "@/lib/logger";
+
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
@@ -128,6 +130,33 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 	return result;
 });
 
+const loggingMiddleware = t.middleware(async ({ next, path, type, ctx }) => {
+	const start = Date.now();
+	const result = await next();
+	const durationMs = Date.now() - start;
+
+	const base = {
+		path,
+		type,
+		durationMs,
+		userId: ctx.session?.user?.id,
+		organizationId: ctx.activeMember?.organizationId,
+	};
+
+	if (result.ok) {
+		logger.info("trpc.request", { ...base, ok: true });
+	} else {
+		const { code, message } = result.error;
+		if (code === "INTERNAL_SERVER_ERROR") {
+			logger.error("trpc.request", { ...base, ok: false, code, message });
+		} else {
+			logger.info("trpc.request", { ...base, ok: false, code });
+		}
+	}
+
+	return result;
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -135,7 +164,9 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure
+	.use(timingMiddleware)
+	.use(loggingMiddleware);
 
 /**
  * Protected (authenticated) procedure

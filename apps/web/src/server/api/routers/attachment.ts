@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 import {
 	createTRPCRouter,
 	orgAdminProcedure,
@@ -217,6 +218,12 @@ export const attachmentRouter = createTRPCRouter({
 					return { url, key };
 				}),
 			);
+
+			logger.info("attachment.upload_initiated", {
+				organizationId: ctx.organizationId,
+				actorId: ctx.session.user.id,
+				count: input.files.length,
+			});
 
 			return { presignedUrls };
 		}),

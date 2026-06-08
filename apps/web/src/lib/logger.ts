@@ -1,12 +1,10 @@
 import "server-only";
 
-import { Logger } from "@logtail/next";
+import { createLogger } from "@zemio/logger";
 
-/**
- * Server-side structured logger backed by Better Stack Logs.
- *
- * Use this in any server-only code (tRPC routers, storage clients, PDF generation, etc.).
- * Always call `void logger.flush()` after logging in fire-and-forget contexts, or
- * `await logger.flush()` before re-throwing errors to guarantee delivery.
- */
-export const logger = new Logger();
+import { env } from "@/env";
+
+export const logger = createLogger({
+	token: env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
+	service: "web",
+});

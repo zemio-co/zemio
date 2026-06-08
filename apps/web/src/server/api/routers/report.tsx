@@ -525,6 +525,13 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
+			logger.info("report.status_changed", {
+				reportId: input.id,
+				organizationId: ctx.organizationId,
+				actorId: ctx.session.user.id,
+				status: input.status,
+			});
+
 			if (
 				!input.notify ||
 				result.owner.preferences?.notifications === NotificationPreference.NONE
@@ -625,6 +632,13 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
+			logger.info("report.submitted", {
+				reportId: input.id,
+				organizationId: ctx.organizationId,
+				actorId: ctx.session.user.id,
+				previousStatus: status,
+			});
+
 			// Update the status to pending approval
 			const res = await ctx.db.report.update({
 				where: { id: input.id },
@@ -692,6 +706,8 @@ export const reportRouter = createTRPCRouter({
 	exportToPdf: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ ctx, input }) => {
+			const start = Date.now();
+
 			const response = await fetch(`${env.API_URL}/pdf/report/${input.id}`, {
 				method: "POST",
 				headers: {
@@ -720,6 +736,14 @@ export const reportRouter = createTRPCRouter({
 			}
 
 			const data = (await response.json()) as { url: string; filename: string };
+
+			logger.info("report.pdf_exported", {
+				reportId: input.id,
+				organizationId: ctx.organizationId,
+				actorId: ctx.session.user.id,
+				durationMs: Date.now() - start,
+			});
+
 			return { url: data.url, filename: data.filename };
 		}),
 });
