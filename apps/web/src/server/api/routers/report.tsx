@@ -8,7 +8,7 @@ import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
 import { env } from "@/env";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
-import { mailer } from "@/lib/email";
+import { getMailer } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { createReportSchema } from "@/lib/validators";
@@ -273,7 +273,7 @@ export const reportRouter = createTRPCRouter({
 				report.owner.email &&
 				report.owner.preferences?.notifications === NotificationPreference.ALL
 			) {
-				mailer
+				getMailer()
 					.send({
 						from: DEFAULT_EMAIL_FROM,
 						to: [report.owner.email],
@@ -387,7 +387,7 @@ export const reportRouter = createTRPCRouter({
 				report.owner.email &&
 				report.owner.preferences?.notifications === NotificationPreference.ALL
 			) {
-				mailer
+				getMailer()
 					.send({
 						from: DEFAULT_EMAIL_FROM,
 						to: [report.owner.email],
@@ -408,7 +408,7 @@ export const reportRouter = createTRPCRouter({
 
 			// Send email to reviewer if configured (non-blocking)
 			if (settings?.reviewerEmail) {
-				mailer
+				getMailer()
 					.send({
 						from: DEFAULT_EMAIL_FROM,
 						to: [settings.reviewerEmail],
@@ -543,7 +543,7 @@ export const reportRouter = createTRPCRouter({
 				})),
 			);
 
-			const emailResult = await mailer.send({
+			const emailResult = await getMailer().send({
 				from: DEFAULT_EMAIL_FROM,
 				to: [result.owner.email],
 				subject: "Report status changed",
@@ -656,7 +656,7 @@ export const reportRouter = createTRPCRouter({
 				return res;
 			}
 
-			const emailResult = await mailer.send({
+			const emailResult = await getMailer().send({
 				from: DEFAULT_EMAIL_FROM,
 				to: [settings.reviewerEmail],
 				subject: "Report submitted",
@@ -674,7 +674,7 @@ export const reportRouter = createTRPCRouter({
 				return res;
 			}
 
-			const confirmEmailResult = await mailer.send({
+			const confirmEmailResult = await getMailer().send({
 				from: DEFAULT_EMAIL_FROM,
 				to: [report.owner.email],
 				subject: "Report submitted",

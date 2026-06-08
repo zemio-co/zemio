@@ -175,22 +175,24 @@ export const env = createEnv({
 		 * Telemetry API token used by the Sentry webpack plugin to upload source maps
 		 * to Better Stack Errors.
 		 */
-		SENTRY_AUTH_TOKEN: productionRequiredString,
+		// Build-time only — used by the Sentry webpack plugin to upload source maps.
+		// Not required at runtime; the server must start even when these are absent.
+		SENTRY_AUTH_TOKEN: z.string().optional(),
 
 		/**
 		 * Better Stack team identifier used for source map uploads.
 		 */
-		SENTRY_ORG: productionRequiredString,
+		SENTRY_ORG: z.string().optional(),
 
 		/**
 		 * Better Stack application identifier used for source map uploads.
 		 */
-		SENTRY_PROJECT: productionRequiredString,
+		SENTRY_PROJECT: z.string().optional(),
 
 		/**
 		 * Better Stack source map upload endpoint.
 		 */
-		SENTRY_URL: productionRequiredUrl,
+		SENTRY_URL: z.url().optional(),
 	},
 
 	/**

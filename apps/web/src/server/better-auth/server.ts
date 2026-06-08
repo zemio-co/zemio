@@ -34,6 +34,12 @@ function extractMicrosoftTenantId(idToken: string): string | null {
 }
 
 export const auth = betterAuth({
+	// Explicit secret with a build-time fallback so Docker builds (which run without
+	// secrets) don't throw during Next.js module evaluation. At runtime the real
+	// BETTER_AUTH_SECRET env var is always present.
+	secret:
+		process.env.BETTER_AUTH_SECRET ??
+		"docker-build-placeholder-not-used-at-runtime",
 	database: prismaAdapter(db, {
 		provider: "postgresql",
 	}),

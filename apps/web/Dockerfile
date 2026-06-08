@@ -39,14 +39,15 @@ RUN bun --cwd packages/db run generate
 
 ENV NODE_ENV=production
 
-# Inline SKIP_ENV_VALIDATION so it is guaranteed to reach the Next.js process
-# even if turbo's env passthrough does not forward Dockerfile ENV instructions.
 RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the
 # standalone directory so the server can serve them correctly.
-RUN cp -r apps/web/.next/static apps/web/.next/standalone/.next/static && \
-    cp -r apps/web/public apps/web/.next/standalone/public
+# With outputFileTracingRoot at the monorepo root, server.js lives at
+# apps/web/server.js inside standalone, so assets must be placed relative to it.
+RUN mkdir -p apps/web/.next/standalone/apps/web/.next && \
+    cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static && \
+    cp -r apps/web/public apps/web/.next/standalone/apps/web/public
 
 # ── Runner: slim Node.js image ────────────────────────────────────────────────
 # node:22-slim (Debian) is required because the Prisma migration CLI needs
@@ -66,11 +67,15 @@ RUN groupadd --system --gid 1001 nodejs && \
 RUN npm install -g prisma@7 --quiet
 
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-# Schema is required by `prisma migrate deploy` at pre-deploy time.
+# Schema and JS config are required by `prisma migrate deploy` at pre-deploy time.
+# prisma.config.js is plain JavaScript (no TypeScript compilation, no external imports)
+# so it loads correctly when only the global prisma CLI is available in the runner.
+# Locally, prisma.config.ts takes precedence (Prisma 7 searches .ts before .js).
 COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma ./packages/db/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/packages/db/prisma.config.js ./packages/db/prisma.config.js
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "(cd packages/db && prisma migrate deploy) && node apps/web/server.js"]

@@ -1,5 +1,5 @@
 import { DEFAULT_EMAIL_FROM, ROUTES } from "@/lib/consts";
-import { resend } from "@/server/resend";
+import { getResend } from "@/server/resend";
 
 type OrganizationInvitationEmailData = {
 	email: string;
@@ -23,7 +23,7 @@ export async function sendOrgInvitationEmail(
 		process.env.BETTER_AUTH_URL,
 	).toString();
 
-	await resend.emails.send({
+	await getResend().emails.send({
 		from: DEFAULT_EMAIL_FROM,
 		to: data.email,
 		subject: `Einladung zu ${data.organization.name}`,
