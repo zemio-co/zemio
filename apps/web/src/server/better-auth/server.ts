@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import { admin as adminPlugin, organization } from "better-auth/plugins";
 import { env } from "@/env";
+import { logger } from "@/lib/logger";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
 import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
@@ -84,6 +85,10 @@ export const auth = betterAuth({
 		},
 		session: {
 			create: {
+				after: async (session) => {
+					logger.info("auth.session_created", { userId: session.userId });
+					void logger.flush();
+				},
 				before: async (session) => {
 					// Resolve the user's Microsoft Entra ID tenant from the stored
 					// idToken. The idToken is written to the account record by
