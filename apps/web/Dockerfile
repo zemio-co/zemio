@@ -17,6 +17,7 @@ COPY apps/api/package.json ./apps/api/
 COPY packages/db/package.json ./packages/db/
 COPY packages/db/prisma/ ./packages/db/prisma/
 COPY packages/encryption/package.json ./packages/encryption/
+COPY packages/logger/package.json ./packages/logger/
 COPY packages/typescript-config/package.json ./packages/typescript-config/
 
 RUN bun install --frozen-lockfile

@@ -26,6 +26,7 @@ FROM oven/bun:1.3.14-alpine AS runner
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=pruner /app/out/full/ .
 
 # Regenerate the Prisma client now that full source is present.
