@@ -51,7 +51,6 @@
         "@aws-sdk/s3-request-presigner": "^3.1029.0",
         "@base-ui/react": "^1.1.0",
         "@better-auth/prisma-adapter": "^1.6.14",
-        "@logtail/next": "^0.3.1",
         "@prisma/adapter-neon": "^7.2.0",
         "@prisma/client": "^7.2.0",
         "@react-email/components": "1.0.4",
@@ -67,6 +66,7 @@
         "@trpc/server": "^11.0.0",
         "@zemio/db": "workspace:*",
         "@zemio/encryption": "workspace:*",
+        "@zemio/logger": "workspace:*",
         "better-auth": "^1.6.14",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -471,8 +471,6 @@
     "@kurkle/color": ["@kurkle/color@0.3.4", "", {}, "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="],
 
     "@logtail/core": ["@logtail/core@0.3.0", "", { "dependencies": { "@logtail/tools": "^0.3.0", "@logtail/types": "^0.3.0" } }, "sha512-PK/n/r9DriHoOnnhHuBi5u303x5QU2wJCeOIRQr7e+bVBmvn8gF+LdBS/CSkZQkKQo8v0xrp4I1cdnBfH4LtQg=="],
-
-    "@logtail/next": ["@logtail/next@0.3.1", "", { "dependencies": { "use-deep-compare": "^1.2.1", "whatwg-fetch": "^3.6.2" }, "peerDependencies": { "next": ">=15.0", "react": ">=18.0.0" } }, "sha512-RiIYLO51ax/TI67h6/TdCSh/mUmcSTtP5JbkcERcBK2/KIWylxLiPMK5SO5PA7NUfLJVaUIMYkqGHKIcVCKljw=="],
 
     "@logtail/node": ["@logtail/node@0.3.3", "", { "dependencies": { "@logtail/core": "^0.3.0", "@logtail/types": "^0.3.0", "@msgpack/msgpack": "^2.5.1", "@types/stack-trace": "^0.0.29", "cross-fetch": "^3.0.4", "minimatch": "^3.0.4", "stack-trace": "^0.0.10" } }, "sha512-Wf19kXPhX4V9OHAYfFj0NtNffqHCgCP3TVg2A3/vCbBmFpmkvqsI0x2Tx1i4+MYzyzkVfam2MiSQAXzQ7uEFVQ=="],
 
@@ -1832,8 +1830,6 @@
 
     "update-browserslist-db": ["update-browserslist-db@1.2.3", "", { "dependencies": { "escalade": "^3.2.0", "picocolors": "^1.1.1" }, "peerDependencies": { "browserslist": ">= 4.21.0" }, "bin": { "update-browserslist-db": "cli.js" } }, "sha512-Js0m9cx+qOgDxo0eMiFGEueWztz+d4+M3rGlmKPT+T4IS/jP4ylw3Nwpu6cpTTP8R1MAC1kF4VbdLt3ARf209w=="],
 
-    "use-deep-compare": ["use-deep-compare@1.3.0", "", { "dependencies": { "dequal": "2.0.3" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-94iG+dEdEP/Sl3WWde+w9StIunlV8Dgj+vkt5wTwMoFQLaijiEZSXXy8KtcStpmEDtIptRJiNeD4ACTtVvnIKA=="],
-
     "use-sync-external-store": ["use-sync-external-store@1.6.0", "", { "peerDependencies": { "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0" } }, "sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w=="],
 
     "valibot": ["valibot@1.2.0", "", { "peerDependencies": { "typescript": ">=5" }, "optionalPeers": ["typescript"] }, "sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg=="],
@@ -1851,8 +1847,6 @@
     "webpack": ["webpack@5.107.2", "", { "dependencies": { "@types/estree": "^1.0.8", "@types/json-schema": "^7.0.15", "@webassemblyjs/ast": "^1.14.1", "@webassemblyjs/wasm-edit": "^1.14.1", "@webassemblyjs/wasm-parser": "^1.14.1", "acorn": "^8.16.0", "acorn-import-phases": "^1.0.3", "browserslist": "^4.28.1", "chrome-trace-event": "^1.0.2", "enhanced-resolve": "^5.22.0", "es-module-lexer": "^2.1.0", "eslint-scope": "5.1.1", "events": "^3.2.0", "glob-to-regexp": "^0.4.1", "graceful-fs": "^4.2.11", "loader-runner": "^4.3.2", "mime-db": "^1.54.0", "neo-async": "^2.6.2", "schema-utils": "^4.3.3", "tapable": "^2.3.0", "terser-webpack-plugin": "^5.5.0", "watchpack": "^2.5.1", "webpack-sources": "^3.5.0" }, "peerDependencies": { "webpack-cli": "*" }, "optionalPeers": ["webpack-cli"], "bin": { "webpack": "bin/webpack.js" } }, "sha512-v7RhXaJbpMlV0D7hC7lb2EbnxkoeUqf9qhKr6lozx3Q48pmFrqqNRmZFUEGmi7pSwm6fCQ2H1IjvCkHqdpVdjQ=="],
 
     "webpack-sources": ["webpack-sources@3.5.0", "", {}, "sha512-HPuy+uuoTCaaoEoI1LQ3JN9+vrPBvEesnnX1jADHy728cHSMlq4wUc4afYqahq2B1mhQVZxCXOkNTnXltr+2vQ=="],
-
-    "whatwg-fetch": ["whatwg-fetch@3.6.20", "", {}, "sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg=="],
 
     "whatwg-url": ["whatwg-url@5.0.0", "", { "dependencies": { "tr46": "~0.0.3", "webidl-conversions": "^3.0.0" } }, "sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw=="],
 

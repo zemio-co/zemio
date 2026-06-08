@@ -22,7 +22,7 @@
 		"@aws-sdk/s3-request-presigner": "^3.1029.0",
 		"@base-ui/react": "^1.1.0",
 		"@better-auth/prisma-adapter": "^1.6.14",
-		"@logtail/next": "^0.3.1",
+		"@zemio/logger": "workspace:*",
 		"@prisma/adapter-neon": "^7.2.0",
 		"@prisma/client": "^7.2.0",
 		"@react-email/components": "1.0.4",
