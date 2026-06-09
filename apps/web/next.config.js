@@ -27,6 +27,7 @@ const sourceMapUploadConfig =
 		: {};
 
 export default withSentryConfig(config, {
+	tunnelRoute: "/monitoring",
 	// Be verbose precisely when we are actually uploading source maps (i.e. when
 	// the Sentry credentials are present — the CI image build). Stay quiet locally
 	// where no auth token is configured. Using process.env.CI here does not work:
