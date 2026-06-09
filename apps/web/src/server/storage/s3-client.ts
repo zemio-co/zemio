@@ -18,7 +18,9 @@ function createS3Client(): S3Client {
 	const forcePathStyle = env.STORAGE_FORCE_PATH_STYLE;
 
 	const protocol = secure ? "https" : "http";
-	const endpoint = `${protocol}://${host}`;
+	// Strip any accidentally-included protocol from STORAGE_HOST
+	const hostname = host.replace(/^https?:\/\//, "");
+	const endpoint = `${protocol}://${hostname}`;
 
 	return new S3Client({
 		region,

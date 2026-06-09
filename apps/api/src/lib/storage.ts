@@ -8,9 +8,10 @@ import { env } from "../env";
 
 function createS3Client(): S3Client {
 	const protocol = env.STORAGE_SECURE ? "https" : "http";
+	const hostname = env.STORAGE_HOST.replace(/^https?:\/\//, "");
 	return new S3Client({
 		region: env.STORAGE_REGION,
-		endpoint: `${protocol}://${env.STORAGE_HOST}`,
+		endpoint: `${protocol}://${hostname}`,
 		forcePathStyle: env.STORAGE_FORCE_PATH_STYLE,
 		credentials: {
 			accessKeyId: env.STORAGE_ACCESS_KEY_ID,
