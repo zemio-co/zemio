@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useState } from "react";
 import { api } from "@/trpc/react";
 
@@ -83,6 +84,10 @@ export function usePresignedUpload() {
 					uploadedFiles.push({ objectInfo: { key: result.value }, name: file.name });
 				} else {
 					failedFiles.push(file);
+					Sentry.captureException(result.reason, {
+						tags: { feature: "attachment-upload" },
+						extra: { fileName: file.name, fileSize: file.size },
+					});
 				}
 			}
 
@@ -95,6 +100,10 @@ export function usePresignedUpload() {
 			return { files: uploadedFiles, failedFiles };
 		} catch (error) {
 			const err = error instanceof Error ? error : new Error("Upload failed");
+			Sentry.captureException(err, {
+				tags: { feature: "attachment-upload" },
+				extra: { fileCount: files.length },
+			});
 			setState({ status: "error", error: err });
 			return { files: [], failedFiles: files };
 		}
