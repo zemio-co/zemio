@@ -74,12 +74,12 @@ Expense-report application for student initiatives.
 
 - **Framework:** Next.js 16 App Router, React 19, TypeScript
 - **API:** tRPC v11 — all app logic goes through `src/server/api/routers/` (exceptions: Better Auth handler, file upload/download routes)
-- **ORM:** Prisma 7 with generated client at `src/generated/prisma`
+- **ORM:** Prisma 7 with generated client at `packages/db/src/generated/prisma`
 - **Auth:** Better Auth with Microsoft OAuth only (no email/password)
 - **Frontend state:** TanStack Query, TanStack Table, nuqs (URL state), TanStack Form
 - **Styling:** Tailwind v4
 - **Linting/formatting:** Biome
-- **Validation:** `pnpm typecheck` and `pnpm check` (no automated test suite)
+- **Validation:** `bun run typecheck` and `bun run check` (no automated test suite)
 
 ### Architecture conventions
 

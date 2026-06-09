@@ -2,10 +2,10 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 /**
- * Environment Variables (Secrets Only)
+ * Environment Variables
  *
- * This file validates environment variables that contain sensitive values (secrets).
- * Non-sensitive configuration should be placed in config.ts at the project root.
+ * Validates the environment variables consumed by the web app. Secrets and
+ * runtime configuration are provided by the host at container start.
  *
  * For self-hosting documentation, see SELF_HOSTING.md
  */
