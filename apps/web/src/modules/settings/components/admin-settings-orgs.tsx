@@ -97,9 +97,9 @@ function OrgsList() {
 			<Box>
 				<BoxItem className="min-h-24">
 					<BoxItemContent className="flex w-full flex-col items-center justify-center text-center">
-						<BoxItemTitle>Noch keine Bankverbindung hinterlegt</BoxItemTitle>
+						<BoxItemTitle>Noch keine Organisationen hinterlegt</BoxItemTitle>
 						<BoxItemDescription>
-							Hinterlege eine Bankverbindung um Zahlungen zu erhalten
+							Hinterlege eine neue Organisation um Mitglieder zu verwalten
 						</BoxItemDescription>
 					</BoxItemContent>
 				</BoxItem>
