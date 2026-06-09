@@ -27,8 +27,12 @@ const sourceMapUploadConfig =
 		: {};
 
 export default withSentryConfig(config, {
-	// Only print logs for uploading source maps in CI
-	silent: !process.env.CI,
+	// Be verbose precisely when we are actually uploading source maps (i.e. when
+	// the Sentry credentials are present — the CI image build). Stay quiet locally
+	// where no auth token is configured. Using process.env.CI here does not work:
+	// CI is not propagated into the Docker build, so the upload would be silent in
+	// the one place we need its logs.
+	silent: !sourceMapUploadConfig.authToken,
 
 	// Upload a larger set of source maps for prettier stack traces (increases build time)
 	widenClientFileUpload: true,
