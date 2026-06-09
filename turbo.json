@@ -7,13 +7,16 @@
 		"build": {
 			"dependsOn": ["^build", "generate"],
 			"outputs": [".next/**", "!.next/cache/**", "dist/**"],
+			"env": ["SENTRY_AUTH_TOKEN", "SENTRY_ORG", "SENTRY_PROJECT", "SENTRY_URL"],
 			"passThroughEnv": ["SKIP_ENV_VALIDATION"]
 		},
 		"dev": {
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
 		"start": {
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},

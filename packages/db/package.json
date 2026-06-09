@@ -3,18 +3,22 @@
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"default": "./src/index.ts"
+			"default": "./dist/index.js"
 		},
 		"./enums": {
 			"types": "./dist/generated/prisma/enums.d.ts",
-			"default": "./src/generated/prisma/enums.ts"
+			"default": "./dist/generated/prisma/enums.js"
 		}
 	},
 	"scripts": {
-		"build": "tsc --build",
+		"build": "prisma generate && tsc --build",
+		"clean": "rm -rf dist tsconfig.tsbuildinfo",
 		"generate": "prisma generate",
 		"db:migrate": "prisma migrate deploy",
 		"db:push": "prisma db push",

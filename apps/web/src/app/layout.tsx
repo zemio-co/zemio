@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
+import { PublicEnvScript } from "@/lib/runtime-env/public-env-script";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
@@ -24,6 +25,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html className={inter.variable} lang="en" suppressHydrationWarning>
+			<head>
+				{/* Injects runtime public env before deferred client bundles run. */}
+				<PublicEnvScript />
+			</head>
 			<body className="min-h-screen bg-background font-sans antialiased">
 				<Providers>
 					<TRPCReactProvider>

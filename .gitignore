@@ -21,6 +21,9 @@ apps/web/next-env.d.ts
 # production
 /build
 
+# compiled package output (built by turbo / CI / Docker)
+packages/*/dist
+
 # turborepo
 .turbo/
 

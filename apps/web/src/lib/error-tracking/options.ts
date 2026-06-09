@@ -1,18 +1,24 @@
 import type { BrowserOptions } from "@sentry/nextjs";
-import { env } from "@/env";
 
-type ErrorTrackingConfig = Pick<
+export type ErrorTrackingConfig = Pick<
 	BrowserOptions,
 	"dsn" | "enableLogs" | "sendDefaultPii" | "tracesSampleRate"
 >;
 
-export function getErrorTrackingConfig(): ErrorTrackingConfig | null {
-	if (!env.NEXT_PUBLIC_BETTER_STACK_DSN) {
+/**
+ * Builds the Sentry init options from a DSN, or returns null when tracking is
+ * disabled (no DSN configured). The DSN source differs per runtime: the server
+ * reads it from the environment, the browser from the injected runtime env.
+ */
+export function buildErrorTrackingConfig(
+	dsn: string | undefined,
+): ErrorTrackingConfig | null {
+	if (!dsn) {
 		return null;
 	}
 
 	return {
-		dsn: env.NEXT_PUBLIC_BETTER_STACK_DSN,
+		dsn,
 		tracesSampleRate: 0,
 		enableLogs: false,
 		sendDefaultPii: false,
