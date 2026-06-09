@@ -35,20 +35,27 @@ ENV NODE_ENV=production
 
 # Runtime config (Better Stack DSN/logging) is NOT baked at build — it is read
 # from the environment at container start, so no build args are needed for it.
-# SENTRY_* vars are build-time only: required by the Sentry webpack plugin to
-# upload source maps.
-ARG SENTRY_AUTH_TOKEN
+#
+# Source map upload (build-time only): the Sentry webpack plugin needs the
+# project coordinates plus an auth token. The coordinates are not sensitive and
+# are passed as build args; the auth token is passed as a BuildKit secret so it
+# never lands in an image layer or the build history. This image is built in CI
+# (see .github/workflows/build-images.yml), which supports secret mounts —
+# Railway's builder does not, which is why deploys consume the prebuilt image.
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
 ARG SENTRY_URL
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 ENV SENTRY_ORG=$SENTRY_ORG
 ENV SENTRY_PROJECT=$SENTRY_PROJECT
 ENV SENTRY_URL=$SENTRY_URL
 
 # turbo build runs ^build first, so workspace packages (db, encryption, logger)
-# are compiled to dist before next build consumes them.
-RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
+# are compiled to dist before next build consumes them. SENTRY_AUTH_TOKEN is
+# sourced from the mounted secret only for this step; when the secret is absent
+# the token is empty and the Sentry plugin skips the source map upload.
+RUN --mount=type=secret,id=sentry_auth_token \
+    SENTRY_AUTH_TOKEN="$(cat /run/secrets/sentry_auth_token 2>/dev/null || true)" \
+    SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the
 # standalone directory so the server can serve them correctly.
