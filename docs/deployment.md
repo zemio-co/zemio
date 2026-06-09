@@ -19,13 +19,21 @@ environment-agnostic.
 
 `.github/workflows/build-images.yml`:
 
-- **Pull requests** build both images **without** pushing — this catches
-  Docker/build breakage before merge.
-- **Pushes to `master`** and **version tags (`v*`)** build and push to:
+- **Pull requests** (into `master` or `canary`) build both images **without**
+  pushing — this catches Docker/build breakage before merge.
+- **Pushes to `master`** (production), **`canary`** (staging), and **version
+  tags (`v*`)** build and push to:
   - `ghcr.io/<owner>/zemio-web`
   - `ghcr.io/<owner>/zemio-api`
-- Tags published: the full commit SHA (`sha-<40hex>`), the git tag (for `v*`),
-  and `latest` on the default branch.
+- Image tags published per build:
+  - `sha-<40hex>` — immutable, every build (use for reproducible pins/rollback).
+  - the **branch name** — a moving tag per branch (`master`, `canary`), always
+    pointing at that branch's latest build.
+  - the git tag — for `v*` pushes.
+  - `latest` — on the default branch (`master`) only.
+
+  So production tracks `latest` (or `master`) and staging tracks `canary`, while
+  any deploy can still be pinned to an exact `sha-…`.
 
 ### Required GitHub repository secrets
 
@@ -47,8 +55,11 @@ Each service must be switched from "build from Dockerfile" to "deploy a registry
 image":
 
 1. In the service settings, set the **source** to the image
-   `ghcr.io/<owner>/zemio-web` (or `zemio-api`), pinned to a tag — use the commit
-   SHA tag for reproducible, promotable deploys (recommended over `latest`).
+   `ghcr.io/<owner>/zemio-web` (or `zemio-api`), pinned to a tag:
+   - **Production** service: the `sha-…` tag for reproducible, promotable
+     deploys (recommended), or `latest`/`master` to auto-track the prod branch.
+   - **Staging** service: the `canary` tag to auto-track the staging branch, or
+     a `sha-…` tag to pin.
 2. Add **registry credentials** so Railway can pull the private image: a GitHub
    personal access token (or fine-grained token) with `read:packages`.
 3. Leave the existing **runtime variables** in place (see below). They are

@@ -7,15 +7,19 @@ name: Build and Push Images
 #
 # - pull_request: build both images without pushing, to catch Docker breakage
 #   before merge.
-# - push to master / version tags: build and push.
+# - push to master (production) / canary (staging) / version tags: build and push.
+#   Each branch publishes a moving tag named after it (e.g. `canary`) plus the
+#   immutable per-commit SHA tag; `master` additionally publishes `latest`.
 
 on:
   pull_request:
     branches:
       - master
+      - canary
   push:
     branches:
       - master
+      - canary
     tags:
       - "v*"
   workflow_dispatch:
@@ -61,6 +65,7 @@ jobs:
           images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           tags: |
             type=sha,format=long
+            type=ref,event=branch
             type=ref,event=tag
             type=raw,value=latest,enable={{is_default_branch}}
 
