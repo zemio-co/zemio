@@ -10,10 +10,12 @@
 			"passThroughEnv": ["SKIP_ENV_VALIDATION"]
 		},
 		"dev": {
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
 		"start": {
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
