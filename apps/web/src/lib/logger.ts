@@ -2,10 +2,12 @@ import "server-only";
 
 import { createLogger } from "@zemio/logger";
 
-import { env } from "@/env";
+import { getServerRuntimeEnv } from "@/lib/runtime-env/server";
+
+const runtimeEnv = getServerRuntimeEnv();
 
 export const logger = createLogger({
-	token: env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
+	token: runtimeEnv.betterStackSourceToken,
 	service: "web",
-	endpoint: env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL,
+	endpoint: runtimeEnv.betterStackIngestingUrl,
 });

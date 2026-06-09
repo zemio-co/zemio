@@ -33,19 +33,14 @@ COPY --from=pruner /app/out/full/ .
 
 ENV NODE_ENV=production
 
-# NEXT_PUBLIC_* vars are inlined at build time — they must be declared as ARGs
-# so Railway's build arguments are forwarded into this stage.
-# SENTRY_* vars are required by the Sentry webpack plugin for source map uploads.
-ARG NEXT_PUBLIC_BETTER_STACK_DSN
-ARG NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN
-ARG NEXT_PUBLIC_BETTER_STACK_INGESTING_URL
+# Runtime config (Better Stack DSN/logging) is NOT baked at build — it is read
+# from the environment at container start, so no build args are needed for it.
+# SENTRY_* vars are build-time only: required by the Sentry webpack plugin to
+# upload source maps.
 ARG SENTRY_AUTH_TOKEN
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
 ARG SENTRY_URL
-ENV NEXT_PUBLIC_BETTER_STACK_DSN=$NEXT_PUBLIC_BETTER_STACK_DSN
-ENV NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN=$NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN
-ENV NEXT_PUBLIC_BETTER_STACK_INGESTING_URL=$NEXT_PUBLIC_BETTER_STACK_INGESTING_URL
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 ENV SENTRY_ORG=$SENTRY_ORG
 ENV SENTRY_PROJECT=$SENTRY_PROJECT

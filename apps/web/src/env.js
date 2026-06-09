@@ -185,24 +185,40 @@ export const env = createEnv({
 		 * Better Stack source map upload endpoint.
 		 */
 		SENTRY_URL: z.url().optional(),
+
+		// =================================================================
+		// Better Stack Runtime Error Tracking & Logging
+		// =================================================================
+		// Read at runtime (not inlined at build). The DSN is the only value
+		// exposed to the browser; it is injected into the document at request
+		// time rather than baked into the client bundle, keeping the image
+		// environment-agnostic. The source token and ingesting URL are used by
+		// the server-only logger.
+
+		/**
+		 * Better Stack Errors DSN used by the Sentry SDK (server runtimes and,
+		 * via runtime injection, the browser).
+		 */
+		BETTER_STACK_DSN: z.url().optional(),
+
+		/**
+		 * Better Stack source token used by the server-side logger.
+		 */
+		BETTER_STACK_SOURCE_TOKEN: z.string().min(1).optional(),
+
+		/**
+		 * Better Stack log ingesting endpoint used by the server-side logger.
+		 */
+		BETTER_STACK_INGESTING_URL: z.url().optional(),
 	},
 
 	/**
 	 * Client-side environment variables schema
 	 *
-	 * Variables exposed to the client must be prefixed with NEXT_PUBLIC_
-	 * WARNING: Never expose secrets to the client!
+	 * No build-time client variables: values the browser needs are injected at
+	 * runtime (see src/lib/runtime-env) so the built image stays environment-agnostic.
 	 */
-	client: {
-		/**
-		 * Better Stack Errors DSN used by the Sentry SDK in browser and server runtimes.
-		 */
-		NEXT_PUBLIC_BETTER_STACK_DSN: z.url().optional(),
-
-		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: z.string().min(1).optional(),
-
-		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL: z.url().optional(),
-	},
+	client: {},
 
 	/**
 	 * Runtime environment variable mapping
@@ -240,13 +256,10 @@ export const env = createEnv({
 		SENTRY_PROJECT: process.env.SENTRY_PROJECT,
 		SENTRY_URL: process.env.SENTRY_URL,
 
-		// Public runtime config
-		NEXT_PUBLIC_BETTER_STACK_DSN: process.env.NEXT_PUBLIC_BETTER_STACK_DSN,
-
-		NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN:
-			process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
-		NEXT_PUBLIC_BETTER_STACK_INGESTING_URL:
-			process.env.NEXT_PUBLIC_BETTER_STACK_INGESTING_URL,
+		// Better Stack runtime error tracking & logging
+		BETTER_STACK_DSN: process.env.BETTER_STACK_DSN,
+		BETTER_STACK_SOURCE_TOKEN: process.env.BETTER_STACK_SOURCE_TOKEN,
+		BETTER_STACK_INGESTING_URL: process.env.BETTER_STACK_INGESTING_URL,
 	},
 
 	/**

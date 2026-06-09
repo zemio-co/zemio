@@ -3,9 +3,9 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
-import { getErrorTrackingConfig } from "./src/lib/error-tracking/options";
+import { getServerErrorTrackingConfig } from "./src/lib/error-tracking/server";
 
-const errorTrackingConfig = getErrorTrackingConfig();
+const errorTrackingConfig = getServerErrorTrackingConfig();
 
 if (errorTrackingConfig) {
 	Sentry.init(errorTrackingConfig);
