@@ -4,21 +4,23 @@
 FROM oven/bun:1.3.14-alpine AS base
 RUN apk add --no-cache nodejs
 
-# ── Deps: install all workspace dependencies ──────────────────────────────────
+# ── Pruner: extract the minimal workspace subset for @zemio/web ───────────────
+# turbo prune emits out/json (manifests only, for a cached install layer) and
+# out/full (the source) for @zemio/web and its transitive workspace packages.
+# New packages require no Dockerfile changes.
+FROM base AS pruner
+WORKDIR /app
+COPY . .
+RUN bunx turbo prune @zemio/web --docker
+
+# ── Deps: install only the pruned dependencies ────────────────────────────────
 FROM base AS deps
 WORKDIR /app
 
-# Copy manifests before source so Docker can cache the install layer.
-# packages/db/prisma is required because the @zemio/db postinstall
-# script runs `prisma generate` during bun install.
-COPY package.json bun.lock ./
-COPY apps/web/package.json ./apps/web/
-COPY apps/api/package.json ./apps/api/
-COPY packages/db/package.json ./packages/db/
-COPY packages/db/prisma/ ./packages/db/prisma/
-COPY packages/encryption/package.json ./packages/encryption/
-COPY packages/logger/package.json ./packages/logger/
-COPY packages/typescript-config/package.json ./packages/typescript-config/
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/bun.lock ./bun.lock
+# The @zemio/db postinstall runs `prisma generate`, which needs the schema.
+COPY --from=pruner /app/out/full/packages/db/prisma/ ./packages/db/prisma/
 
 RUN bun install --frozen-lockfile
 
@@ -26,18 +28,8 @@ RUN bun install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-# Bun does not hoist sub-workspace devDependencies to the root node_modules/.bin,
-# so each package that owns critical binaries must be copied explicitly.
-COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
-COPY --from=deps /app/packages/logger/node_modules ./packages/logger/node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY . .
-
-# Regenerate the Prisma client now that full source is present.
-# The postinstall in the deps stage ran without packages/db/src, so we
-# must re-run generate here to produce a complete client.
-RUN bun --cwd packages/db run generate
+COPY --from=deps /app/ .
+COPY --from=pruner /app/out/full/ .
 
 ENV NODE_ENV=production
 
@@ -59,6 +51,8 @@ ENV SENTRY_ORG=$SENTRY_ORG
 ENV SENTRY_PROJECT=$SENTRY_PROJECT
 ENV SENTRY_URL=$SENTRY_URL
 
+# turbo build runs ^build first, so workspace packages (db, encryption, logger)
+# are compiled to dist before next build consumes them.
 RUN SKIP_ENV_VALIDATION=1 bun run turbo build --filter=@zemio/web
 
 # Next.js standalone does not include static assets; copy them into the

@@ -29,8 +29,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY --from=pruner /app/out/full/ .
 
-# Regenerate the Prisma client now that full source is present.
-RUN bun --cwd packages/db run generate
+# Build workspace dependencies to dist now that full source is present.
+# turbo build --filter=@zemio/api runs ^build, which regenerates the Prisma
+# client and compiles @zemio/db and @zemio/encryption to dist — the form the
+# app imports at runtime.
+RUN bun run turbo build --filter=@zemio/api
 
 ENV NODE_ENV=production
 
