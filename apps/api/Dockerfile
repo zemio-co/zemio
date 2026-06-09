@@ -25,8 +25,11 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1.3.14-alpine AS runner
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
+# Copy the whole installed tree (root + every package's node_modules), then
+# overlay the full source. Per-package node_modules carry binaries that Bun does
+# not hoist (e.g. packages/db's prisma, packages/encryption's tsc), which the
+# build scripts need — copying them selectively is what broke the build.
+COPY --from=deps /app/ .
 COPY --from=pruner /app/out/full/ .
 
 # Build workspace dependencies to dist now that full source is present.
