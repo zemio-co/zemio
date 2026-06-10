@@ -13,7 +13,15 @@ import {
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
-import { Navbar } from "@/components/navbar";
+import { Navbar, NavbarSidebarTrigger } from "@/components/navbar";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import {
@@ -24,13 +32,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd } from "@/components/ui/kbd";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
@@ -59,15 +67,27 @@ function ReviewNavbar({
 	if (isPending) {
 		return (
 			<Navbar className={cn("", className)} {...props}>
-				<div className="container flex items-center justify-start gap-4 py-4">
-					<SidebarTrigger />
-					<div className="flex w-fit items-center justify-center gap-3">
-						<Link className="font-medium text-sm text-zinc-600" href={"#"}>
-							Reports
-						</Link>
-						<p className="font-medium text-xs text-zinc-400">/</p>
-						<Skeleton className="h-4 w-16" />
-					</div>
+				<div className="container flex max-w-none items-center justify-start gap-4 py-4">
+					<NavbarSidebarTrigger />
+					<Breadcrumb>
+						<BreadcrumbList>
+							<BreadcrumbItem>
+								<BreadcrumbLink
+									render={<Link href={ROUTES.ADMIN_REVIEW_OVERVIEW()}>Admin</Link>}
+								/>
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<BreadcrumbLink
+									render={<Link href={ROUTES.ADMIN_REVIEW_OVERVIEW()}>Reports</Link>}
+								/>
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<Skeleton className="h-4 w-16" />
+							</BreadcrumbItem>
+						</BreadcrumbList>
+					</Breadcrumb>
 					<Navigation className="ml-auto" />
 				</div>
 			</Navbar>
@@ -89,17 +109,27 @@ function ReviewNavbar({
 
 	return (
 		<Navbar className={cn("", className)} {...props}>
-			<div className="container flex items-center justify-start gap-4 py-4">
-				<SidebarTrigger />
-				<div className="flex w-fit items-center justify-center gap-3">
-					<Link className="font-medium text-sm text-zinc-600" href={"#"}>
-						Reports
-					</Link>
-					<p className="font-medium text-xs text-zinc-400">/</p>
-					<Link className="font-medium text-sm text-zinc-800" href={"#"}>
-						{`#${navbarReport.readableId}`}
-					</Link>
-				</div>
+			<div className="container flex max-w-none items-center justify-start gap-4 py-4">
+				<NavbarSidebarTrigger />
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink
+								render={<Link href={ROUTES.ADMIN_REVIEW_OVERVIEW()}>Admin</Link>}
+							/>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbLink
+								render={<Link href={ROUTES.ADMIN_REVIEW_OVERVIEW()}>Reports</Link>}
+							/>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbPage>#{navbarReport.readableId}</BreadcrumbPage>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 				<MoreMenu report={navbarReport} />
 				<Navigation className="ml-auto" />
 			</div>
