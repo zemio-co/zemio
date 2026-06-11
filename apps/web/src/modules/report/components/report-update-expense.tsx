@@ -42,10 +42,11 @@ function ReportUpdateExpense({
 	canModify,
 	children,
 	...props
-}: React.ComponentProps<typeof Sheet> & {
+}: Omit<React.ComponentProps<typeof Sheet>, "children"> & {
 	expenseId: string;
 	expenseType: ExpenseType;
 	canModify: boolean;
+	children?: React.ReactNode;
 }) {
 	return (
 		<Sheet {...props}>
