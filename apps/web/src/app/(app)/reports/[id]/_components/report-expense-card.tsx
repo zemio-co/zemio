@@ -52,8 +52,8 @@ import {
 	foodExpenseMetaSchema,
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
+import { ReportUpdateExpense } from "@/modules/report";
 import { api } from "@/trpc/react";
-import { ExpenseEditDialog } from "./expense-edit-dialog";
 
 export function ReportExpenseCard({
 	className,
@@ -170,16 +170,18 @@ export function ReportExpenseCard({
 				</CardContent>
 			</Card>
 
+			<ReportUpdateExpense
+				canModify={canModify}
+				expenseId={expense.id}
+				expenseType={expense.type}
+				onOpenChange={setEditOpen}
+				open={editOpen}
+			/>
+
 			<ExpenseDetails
 				expense={expense}
 				onOpenChange={setDetailsOpen}
 				open={detailsOpen}
-			/>
-
-			<ExpenseEditDialog
-				expense={expense}
-				onOpenChange={setEditOpen}
-				open={editOpen}
 			/>
 
 			<AlertDialog onOpenChange={setDeleteOpen} open={deleteOpen}>

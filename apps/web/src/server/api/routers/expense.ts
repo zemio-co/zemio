@@ -472,7 +472,46 @@ export const expenseRouter = createTRPCRouter({
 				where: { id: input.id },
 			});
 		}),
+	getById: orgProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			const expense = await ctx.db.expense.findUnique({
+				where: { id: input.id },
+				include: {
+					report: {
+						select: {
+							ownerId: true,
+							organizationId: true,
+						},
+					},
+				},
+			});
 
+			if (!expense) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Expense not found",
+				});
+			}
+
+			if (expense.report.organizationId !== ctx.organizationId) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Expense not found",
+				});
+			}
+
+			// Only allow admins and owners to access the expense
+			const isAdmin = isOrganizationAdminRole(ctx.orgRole);
+			if (!isAdmin && expense.report.ownerId !== ctx.session.user.id) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "You don't have permission to access this expense",
+				});
+			}
+
+			return expense;
+		}),
 	get: orgProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ ctx, input }) => {
