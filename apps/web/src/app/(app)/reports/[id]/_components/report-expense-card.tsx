@@ -52,6 +52,10 @@ import {
 	foodExpenseMetaSchema,
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
+import {
+	ReportUpdateExpense,
+	ReportUpdateExpenseTrigger,
+} from "@/modules/report";
 import { api } from "@/trpc/react";
 import { ExpenseEditDialog } from "./expense-edit-dialog";
 
@@ -167,6 +171,15 @@ export function ReportExpenseCard({
 							</div>
 						</div>
 					) : null}
+					<div>
+						<ReportUpdateExpense
+							canModify={canModify}
+							expenseId={expense.id}
+							expenseType={expense.type}
+						>
+							<ReportUpdateExpenseTrigger>Bearbeiten</ReportUpdateExpenseTrigger>
+						</ReportUpdateExpense>
+					</div>
 				</CardContent>
 			</Card>
 

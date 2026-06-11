@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { ExpenseType, ReportStatus } from "@zemio/db";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import {
@@ -60,6 +61,61 @@ export const attachmentRouter = createTRPCRouter({
 				where: {
 					expense: {
 						reportId: input.id,
+					},
+				},
+			});
+		}),
+
+	listForExpense: protectedProcedure
+		.input(
+			z.object({
+				expenseId: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const expense = await ctx.db.expense.findUnique({
+				where: {
+					id: input.expenseId,
+				},
+				select: {
+					report: {
+						select: {
+							organizationId: true,
+							ownerId: true,
+						},
+					},
+				},
+			});
+
+			if (!expense) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+				});
+			}
+
+			const hasPermission = await auth.api.hasPermission({
+				headers: ctx.headers,
+				body: {
+					organizationId: expense.report.organizationId,
+					permissions: {
+						report: ["readAll"],
+					},
+				},
+			});
+
+			if (
+				!hasPermission.success &&
+				expense.report.ownerId !== ctx.session.user.id
+			) {
+				throw new TRPCError({
+					code: "UNAUTHORIZED",
+				});
+			}
+
+			return await db.attachment.findMany({
+				where: {
+					expense: {
+						id: input.expenseId,
 					},
 				},
 			});
@@ -226,6 +282,160 @@ export const attachmentRouter = createTRPCRouter({
 			});
 
 			return { presignedUrls };
+		}),
+
+	delete: orgProcedure
+		.input(z.object({ id: z.string() }))
+		.mutation(async ({ ctx, input }) => {
+			const attachment = await ctx.db.attachment.findUnique({
+				where: { id: input.id },
+				select: {
+					key: true,
+					expense: {
+						select: {
+							report: {
+								select: {
+									ownerId: true,
+									organizationId: true,
+									status: true,
+								},
+							},
+						},
+					},
+				},
+			});
+
+			if (!attachment) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			const { report } = attachment.expense;
+
+			if (report.organizationId !== ctx.organizationId) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			if (report.ownerId !== ctx.session.user.id) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "You don't have permission to delete this attachment",
+				});
+			}
+
+			if (
+				report.status !== ReportStatus.DRAFT &&
+				report.status !== ReportStatus.NEEDS_REVISION
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message:
+						"Attachments can only be deleted from draft or needs revision reports",
+				});
+			}
+
+			await deleteFilesFromStorage([attachment.key]);
+
+			return ctx.db.attachment.delete({ where: { id: input.id } });
+		}),
+
+	addToExpense: orgProcedure
+		.input(
+			z.object({
+				expenseId: z.string(),
+				attachments: z
+					.array(
+						z.object({
+							key: z
+								.string()
+								.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+							size: z
+								.number()
+								.int()
+								.nonnegative()
+								.max(5 * 1024 * 1024),
+							originalName: z.string().min(1),
+						}),
+					)
+					.min(1)
+					.max(5),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const expense = await ctx.db.expense.findUnique({
+				where: { id: input.expenseId },
+				select: {
+					type: true,
+					report: {
+						select: {
+							ownerId: true,
+							organizationId: true,
+							status: true,
+						},
+					},
+					_count: { select: { attachments: true } },
+				},
+			});
+
+			if (!expense) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			if (expense.report.organizationId !== ctx.organizationId) {
+				throw new TRPCError({ code: "NOT_FOUND" });
+			}
+
+			if (expense.report.ownerId !== ctx.session.user.id) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "You don't have permission to add attachments to this expense",
+				});
+			}
+
+			if (
+				expense.report.status !== ReportStatus.DRAFT &&
+				expense.report.status !== ReportStatus.NEEDS_REVISION
+			) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message:
+						"Attachments can only be added to draft or needs revision reports",
+				});
+			}
+
+			if (expense.type !== ExpenseType.RECEIPT) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Attachments can only be added to receipt expenses",
+				});
+			}
+
+			const newTotal = expense._count.attachments + input.attachments.length;
+			if (newTotal > 5) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: `Adding these attachments would exceed the 5-attachment limit (currently ${expense._count.attachments})`,
+				});
+			}
+
+			const expectedKeyPrefix = `attachment/${ctx.organizationId}/`;
+			const hasInvalidKey = input.attachments.some(
+				(a) => !a.key.startsWith(expectedKeyPrefix),
+			);
+			if (hasInvalidKey) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "One or more attachment keys do not belong to this organization",
+				});
+			}
+
+			return ctx.db.attachment.createMany({
+				data: input.attachments.map((a) => ({
+					expenseId: input.expenseId,
+					key: a.key,
+					size: a.size,
+					originalName: a.originalName,
+				})),
+			});
 		}),
 
 	deletePendingUploads: orgProcedure
