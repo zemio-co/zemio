@@ -5,12 +5,14 @@ import {
 	Head,
 	Hr,
 	Html,
+	Img,
 	Preview,
 	Section,
 	Tailwind,
 	Text,
 } from "@react-email/components";
 import type { ReportStatus } from "@zemio/db";
+import { ROUTES } from "@/lib/routes";
 import { translateReportStatus } from "@/lib/utils";
 
 interface StatusChangedEmailProps {
@@ -35,15 +37,17 @@ export default function StatusChangedEmail({
 		<Html>
 			<Head />
 			<Tailwind config={{}}>
-				<Body className="font-sans">
+				<Body className="bg-zinc-50 font-sans">
 					<Preview>
 						Der Status deines Spesenberichts wurde zu "{translateReportStatus(status)}
 						" geändert.
 					</Preview>
-					<Container>
-						<Text className="font-medium text-2xl">
-							Status geändert: {translateReportStatus(status)}
-						</Text>
+					<Container className="bg-white px-6 py-8">
+						<Img
+							className="h-5 w-fit"
+							src={`${baseUrl}/assets/zemio-logo-woodmark.png`}
+						/>
+						<Text className="mt-16 font-medium text-2xl">{title}</Text>
 						<Section>
 							<Text>Hallo {name},</Text>
 							<Text>
@@ -51,22 +55,26 @@ export default function StatusChangedEmail({
 								<strong className="font-medium">"{title}"</strong> wurde zu{" "}
 								<strong className="font-medium">{translateReportStatus(status)}</strong>{" "}
 								geändert. Du kannst den Bericht{" "}
-								<Button href={`${baseUrl}/reports/${reportId}`}>hier</Button> ansehen.
+								<Button href={`${baseUrl}${ROUTES.USER_REPORT_DETAILS(reportId)}`}>
+									hier
+								</Button>{" "}
+								ansehen.
 							</Text>
+
 							<Text>
 								Wende dich bei Fragen bitte an{" "}
-								<Button href="mailto:support@move-ev.de">support@move-ev.de</Button>.
+								<Button href="mailto:support@zemio.co">support@zemio.co</Button>.
 							</Text>
 							<Text>
 								Beste Grüße,
 								<br />
-								Dein move e.V. Team
+								Dein zemio Team
 							</Text>
 							<Hr />
 							<Text className="text-xs text-zinc-500">
-								Du erhältst diese E-Mail, da du einen Spesenbericht erstellt hast und
-								der Status des Berichts geändert wurde. Solltest du keinen Spesenbericht
-								erstellt haben, kannst du diese E-Mail ignorieren.
+								Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast.
+								Solltest du keinen Spesenbericht eingereicht haben, kannst du diese
+								E-Mail ignorieren.
 							</Text>
 						</Section>
 					</Container>

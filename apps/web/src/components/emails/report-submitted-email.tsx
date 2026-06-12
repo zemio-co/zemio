@@ -21,6 +21,7 @@ interface ReportSubmittedEmailProps {
 	title: string;
 	name: string;
 }
+
 export default function ReportSubmittedEmail({
 	title,
 	name,
@@ -30,7 +31,7 @@ export default function ReportSubmittedEmail({
 			<Head />
 			<Tailwind config={{}}>
 				<Body className="bg-zinc-50 font-sans">
-					<Preview>Dein Spesenbericht wurde eingereicht</Preview>
+					<Preview>Dein Spesenbericht wurde erfolgreich eingereicht</Preview>
 					<Container className="bg-white px-6 py-8">
 						<Img
 							className="h-5 w-fit"
