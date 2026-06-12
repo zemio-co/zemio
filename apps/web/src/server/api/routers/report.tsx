@@ -1,10 +1,9 @@
 import { TRPCError } from "@trpc/server";
 import { NotificationPreference, ReportStatus } from "@zemio/db";
 import { z } from "zod";
-import ExpenseReportCreatorNotification from "@/components/emails/expense-report-creator-notification";
-import ExpenseReportReviewerNotification from "@/components/emails/expense-report-reviewer-notification";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
+import StatusChangedEmail from "@/components/emails/status-changed-email";
 import { env } from "@/env";
 import { decryptBankingDetails } from "@/lib/banking/cryptic";
 import { DEFAULT_EMAIL_FROM } from "@/lib/consts";
@@ -231,11 +230,6 @@ export const reportRouter = createTRPCRouter({
 					status: ReportStatus.DRAFT,
 				},
 				include: {
-					expenses: {
-						include: {
-							attachments: true,
-						},
-					},
 					owner: {
 						select: {
 							id: true,
@@ -255,42 +249,6 @@ export const reportRouter = createTRPCRouter({
 					},
 				},
 			});
-
-			// Calculate total amount and collect attachments
-			const totalAmount = report.expenses.reduce(
-				(sum, expense) => sum + Number(expense.amount),
-				0,
-			);
-			const attachments = report.expenses.flatMap((expense) =>
-				expense.attachments.map((attachment) => ({
-					id: attachment.id,
-					key: attachment.key,
-				})),
-			);
-
-			// Send email to creator (non-blocking)
-			if (
-				report.owner.email &&
-				report.owner.preferences?.notifications === NotificationPreference.ALL
-			) {
-				getMailer()
-					.send({
-						from: DEFAULT_EMAIL_FROM,
-						to: [report.owner.email],
-						subject: "Spesenantrag erstellt",
-						react: (
-							<ExpenseReportCreatorNotification
-								attachments={attachments}
-								report={report}
-								totalAmount={totalAmount}
-							/>
-						),
-					})
-					.catch((error) => {
-						logger.error("Email dispatch failed: creator notification", { error });
-						void logger.flush();
-					});
-			}
 
 			return report;
 		}),
@@ -337,11 +295,6 @@ export const reportRouter = createTRPCRouter({
 				where: { id },
 				data,
 				include: {
-					expenses: {
-						include: {
-							attachments: true,
-						},
-					},
 					owner: {
 						select: {
 							id: true,
@@ -354,31 +307,6 @@ export const reportRouter = createTRPCRouter({
 							},
 						},
 					},
-					costUnit: {
-						select: {
-							title: true,
-						},
-					},
-				},
-			});
-
-			// Calculate total amount and collect attachments
-			const totalAmount = report.expenses.reduce(
-				(sum, expense) => sum + Number(expense.amount),
-				0,
-			);
-			const attachments = report.expenses.flatMap((expense) =>
-				expense.attachments.map((attachment) => ({
-					id: attachment.id,
-					key: attachment.key,
-				})),
-			);
-
-			// Get settings to find reviewer email
-			const settings = await ctx.db.settings.findUnique({
-				where: { organizationId: ctx.organizationId },
-				select: {
-					reviewerEmail: true,
 				},
 			});
 
@@ -393,37 +321,16 @@ export const reportRouter = createTRPCRouter({
 						to: [report.owner.email],
 						subject: "Spesenantrag geändert",
 						react: (
-							<ExpenseReportCreatorNotification
-								attachments={attachments}
-								report={report}
-								totalAmount={totalAmount}
+							<StatusChangedEmail
+								name={report.owner.name}
+								reportId={report.id}
+								status={report.status}
+								title={report.title}
 							/>
 						),
 					})
 					.catch((error) => {
 						logger.error("Email dispatch failed: creator notification", { error });
-						void logger.flush();
-					});
-			}
-
-			// Send email to reviewer if configured (non-blocking)
-			if (settings?.reviewerEmail) {
-				getMailer()
-					.send({
-						from: DEFAULT_EMAIL_FROM,
-						to: [settings.reviewerEmail],
-						subject: "Spesenantrag geändert",
-						react: (
-							<ExpenseReportReviewerNotification
-								attachments={attachments}
-								ownerName={report.owner.name ?? "Unbekannt"}
-								report={report}
-								totalAmount={totalAmount}
-							/>
-						),
-					})
-					.catch((error) => {
-						logger.error("Email dispatch failed: reviewer notification", { error });
 						void logger.flush();
 					});
 			}
@@ -494,11 +401,6 @@ export const reportRouter = createTRPCRouter({
 				where: { id: input.id },
 				data: { status: input.status },
 				include: {
-					expenses: {
-						include: {
-							attachments: true,
-						},
-					},
 					owner: {
 						select: {
 							email: true,
@@ -539,27 +441,16 @@ export const reportRouter = createTRPCRouter({
 				return result;
 			}
 
-			const totalAmount = result.expenses.reduce(
-				(sum, expense) => sum + Number(expense.amount),
-				0,
-			);
-			const attachments = result.expenses.flatMap((expense) =>
-				expense.attachments.map((attachment) => ({
-					id: attachment.id,
-					key: attachment.key,
-				})),
-			);
-
 			const emailResult = await getMailer().send({
 				from: DEFAULT_EMAIL_FROM,
 				to: [result.owner.email],
 				subject: "Report status changed",
 				react: (
-					<ExpenseReportReviewerNotification
-						attachments={attachments}
-						ownerName={result.owner.name ?? "Unbekannt"}
-						report={result}
-						totalAmount={totalAmount}
+					<StatusChangedEmail
+						name={result.owner.name}
+						reportId={result.id}
+						status={result.status}
+						title={result.title}
 					/>
 				),
 			});
@@ -673,8 +564,14 @@ export const reportRouter = createTRPCRouter({
 			const emailResult = await getMailer().send({
 				from: DEFAULT_EMAIL_FROM,
 				to: [settings.reviewerEmail],
-				subject: "Report submitted",
-				react: <ReportReceivedEmail from={res.owner.name} title={res.title} />,
+				subject: "New Report received",
+				react: (
+					<ReportReceivedEmail
+						from={res.owner.name}
+						reportId={input.id}
+						title={res.title}
+					/>
+				),
 			});
 
 			if (emailResult.ok === false) {
