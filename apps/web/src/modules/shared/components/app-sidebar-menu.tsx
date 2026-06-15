@@ -241,6 +241,10 @@ function SidebarMenuOrgsButton({
 		);
 	}
 
+	if (organizations.data.length <= 1) {
+		return null;
+	}
+
 	return (
 		<DropdownMenuSub>
 			<DropdownMenuSubTrigger
