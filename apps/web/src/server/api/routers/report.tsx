@@ -221,7 +221,6 @@ export const reportRouter = createTRPCRouter({
 				});
 			}
 
-			// Create the report
 			const report = await ctx.db.report.create({
 				data: {
 					...input,
@@ -229,24 +228,8 @@ export const reportRouter = createTRPCRouter({
 					organizationId: ctx.organizationId,
 					status: ReportStatus.DRAFT,
 				},
-				include: {
-					owner: {
-						select: {
-							id: true,
-							name: true,
-							email: true,
-							preferences: {
-								select: {
-									notifications: true,
-								},
-							},
-						},
-					},
-					costUnit: {
-						select: {
-							title: true,
-						},
-					},
+				select: {
+					id: true,
 				},
 			});
 
