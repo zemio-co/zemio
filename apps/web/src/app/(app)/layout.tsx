@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/consts";
+import { AppSidebar } from "@/modules/shared";
 import { AppNavbar } from "@/modules/shared/components/app-navbar";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";

@@ -17,5 +17,7 @@ export const ROUTES = {
 
 	USER_REPORTS_LIST: () => "/reports",
 	USER_REPORT_DETAILS: (reportId: string) => `/reports/${reportId}`,
-	USER_DASHBOARD: () => "/dashboard",
+	USER_DASHBOARD: () => "/",
+
+	AUTH: () => "/auth",
 } as const;
