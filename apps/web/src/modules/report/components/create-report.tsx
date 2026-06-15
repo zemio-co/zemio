@@ -365,10 +365,6 @@ function CreateReportForm({
 									Bankverbindung
 								</FieldLabel>
 								<Select
-									items={bankingDetails.map((detail) => ({
-										label: detail.title,
-										value: detail.id,
-									}))}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 									value={field.state.value}
 								>
@@ -422,7 +418,6 @@ function CreateReportForm({
 									Kostenstelle
 								</FieldLabel>
 								<Select
-									items={allCostUnits}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 									value={field.state.value}
 								>
