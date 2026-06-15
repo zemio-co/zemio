@@ -321,7 +321,8 @@ function CreateReportForm({
 									className="mb-1 font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Beschreibung
+									Beschreibung{" "}
+									<span className="font-normal text-slate-400">(optional)</span>
 								</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
