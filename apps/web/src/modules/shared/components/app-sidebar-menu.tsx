@@ -7,6 +7,7 @@ import {
 	SettingsIcon,
 	UserIcon,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -75,7 +76,15 @@ function SidebarMenuTrigger({
 			{...props}
 		>
 			{data.logo ? (
-				<span>logo</span>
+				<span className="flex size-6 overflow-hidden rounded-xs">
+					<Image
+						alt={data.name}
+						className="object-cover"
+						height={24}
+						src={data.logo}
+						width={24}
+					/>
+				</span>
 			) : (
 				<span className="flex size-6 items-center justify-center rounded-xs bg-slate-100 font-medium text-slate-600 text-xs leading-none">
 					{data.name.charAt(0).toUpperCase()}
@@ -304,7 +313,15 @@ function SidebarMenuContentHeader({
 			{...props}
 		>
 			{data.logo ? (
-				<span>logo</span>
+				<span className="flex size-8 overflow-hidden rounded-sm">
+					<Image
+						alt={data.name}
+						className="object-cover"
+						height={32}
+						src={data.logo}
+						width={32}
+					/>
+				</span>
 			) : (
 				<span className="flex size-8 items-center justify-center rounded-sm bg-slate-100 py-4 font-medium text-slate-600 text-sm leading-none">
 					{data.name.charAt(0).toUpperCase()}
