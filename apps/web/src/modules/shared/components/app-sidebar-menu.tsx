@@ -179,13 +179,13 @@ function SidebarMenuOrgsButton({
 	...props
 }: React.ComponentProps<typeof DropdownMenuItem>) {
 	const organizations = authClient.useListOrganizations();
+	const router = useRouter();
 
 	const handleOrgChange = async (organizationId: string) => {
 		await authClient.organization.setActive({
 			organizationId,
 		});
-		// Refresh so new organization data is fetched
-		window.location.reload();
+		router.refresh();
 	};
 
 	if (organizations.isPending) {
