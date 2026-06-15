@@ -204,7 +204,7 @@ function SidebarMenuOrgsButton({
 		await authClient.organization.setActive({
 			organizationId,
 		});
-		router.refresh();
+		window.location.reload();
 	};
 
 	if (organizations.isPending) {
