@@ -224,7 +224,21 @@ function SidebarMenuOrgsButton({
 	}
 
 	if (!organizations.data) {
-		return <p>ERROR</p>;
+		return (
+			<DropdownMenuItem
+				className={cn(
+					"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm",
+					className,
+				)}
+				disabled
+				{...props}
+			>
+				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
+				<span className="text-destructive text-xs">
+					Organisationen konnten nicht geladen werden.
+				</span>
+			</DropdownMenuItem>
+		);
 	}
 
 	return (
