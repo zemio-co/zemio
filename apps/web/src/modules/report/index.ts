@@ -1,1 +1,5 @@
-export { ReportUpdateExpense, ReportUpdateExpenseTrigger } from "./components";
+export {
+	CreateReport,
+	ReportUpdateExpense,
+	ReportUpdateExpenseTrigger,
+} from "./components";
