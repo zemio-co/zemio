@@ -4,7 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,12 +39,18 @@ import { cn } from "@/lib/utils";
 import { createReportSchema } from "@/lib/validators";
 import { api, type RouterOutputs } from "@/trpc/react";
 
-function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
+function CreateReport({
+	children,
+	...props
+}: Omit<React.ComponentProps<typeof Sheet>, "children"> & {
+	children?: ReactNode;
+}) {
 	const formId = useId();
 	const [isFormPending, setIsFormPending] = useState(false);
 
 	return (
 		<Sheet data-slot="create-report" {...props}>
+			{children}
 			<SheetContent>
 				<SheetHeader>
 					<SheetTitle>Neuer Antrag</SheetTitle>
@@ -325,8 +331,7 @@ function CreateReportForm({
 									className="mb-1 font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Beschreibung{" "}
-									<span className="font-normal text-slate-400">(optional)</span>
+									Beschreibung
 								</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
@@ -339,7 +344,7 @@ function CreateReportForm({
 									value={field.state.value}
 								/>
 								<FieldDescription>
-									Wird deinem Antrag als erste Notiz hinzugefügt.
+									Optional. Wird deinem Antrag als erste Notiz hinzugefügt.
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>

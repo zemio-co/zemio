@@ -3,9 +3,11 @@
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { PageTitle } from "@/components/page-title";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { SheetTrigger } from "@/components/ui/sheet";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { CreateReport } from "@/modules/report";
 import { DashboardNavbar } from "./dashboard-navbar";
 import { DashboardReportList } from "./dashboard-report-list";
 import { DashboardStats } from "./dashboard-stats";
@@ -41,10 +43,15 @@ function DashboarHeader({
 			{...props}
 		>
 			<PageTitle>Dashboard</PageTitle>
-			<Link className={buttonVariants()} href={ROUTES.NEW_REPORT()}>
-				<PlusIcon />
-				Neuer Antrag
-			</Link>
+			<CreateReport>
+				<SheetTrigger
+					render={
+						<Button size={"sm"}>
+							<PlusIcon /> Neuer Antrag
+						</Button>
+					}
+				/>
+			</CreateReport>
 		</section>
 	);
 }
