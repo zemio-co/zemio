@@ -178,7 +178,7 @@ function CreateReportErrorState({
 	);
 }
 
-export function CreateReportForm({
+function CreateReportForm({
 	costUnitsGroups,
 	bankingDetails,
 	onPendingChange,
