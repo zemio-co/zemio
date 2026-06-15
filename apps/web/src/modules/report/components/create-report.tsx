@@ -51,7 +51,7 @@ function CreateReport({
 	return (
 		<Sheet data-slot="create-report" {...props}>
 			{children}
-			<SheetContent>
+			<SheetContent className={"data-[side=left]:w-full"}>
 				<SheetHeader>
 					<SheetTitle>Neuer Antrag</SheetTitle>
 				</SheetHeader>
