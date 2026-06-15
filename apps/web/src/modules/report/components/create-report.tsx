@@ -95,7 +95,7 @@ function CreateReportBody({
 		);
 	}
 
-	if (costUnitsQuery.error || !costUnitsQuery.data) {
+	if (costUnitsQuery.isError) {
 		return (
 			<SheetBody
 				className={cn("", className)}
@@ -111,7 +111,7 @@ function CreateReportBody({
 		);
 	}
 
-	if (bankingDetailsQuery.error || !bankingDetailsQuery.data) {
+	if (bankingDetailsQuery.isError) {
 		return (
 			<SheetBody
 				className={cn("", className)}
@@ -120,11 +120,15 @@ function CreateReportBody({
 			>
 				<CreateReportErrorState
 					code={bankingDetailsQuery.error.data?.code ?? "UNKNOWN"}
-					description="We were unable to load your bankingDetails for this action."
+					description="We were unable to load your banking details for this action."
 					title="Error when loading banking details."
 				/>
 			</SheetBody>
 		);
+	}
+
+	if (!costUnitsQuery.data || !bankingDetailsQuery.data) {
+		return null;
 	}
 
 	return (
