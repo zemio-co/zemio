@@ -8,6 +8,7 @@ import {
 	Sidebar,
 	SidebarContent,
 	SidebarGroup,
+	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -70,8 +71,8 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>
-					<SidebarAdminMenu pathname={pathname} />
 				</SidebarGroup>
+				<SidebarAdminMenu pathname={pathname} />
 			</SidebarContent>
 		</Sidebar>
 	);
@@ -88,12 +89,7 @@ const sidebarAdminItems = [
 	},
 ];
 
-function SidebarAdminMenu({
-	pathname,
-	...props
-}: React.ComponentProps<typeof SidebarMenu> & {
-	pathname: string;
-}) {
+function SidebarAdminMenu({ pathname }: { pathname: string }) {
 	const { isPending: rolePending, data: roleData } =
 		authClient.useActiveMemberRole();
 
@@ -106,21 +102,24 @@ function SidebarAdminMenu({
 	if (!isOrgAdmin) return null;
 
 	return (
-		<SidebarMenu {...props}>
-			{sidebarAdminItems.map((item) => (
-				<SidebarMenuItem key={item.href}>
-					<SidebarMenuButton
-						isActive={item.active(pathname)}
-						render={
-							<Link href={item.href}>
-								<item.icon />
-								{item.label}
-							</Link>
-						}
-					/>
-				</SidebarMenuItem>
-			))}
-		</SidebarMenu>
+		<SidebarGroup>
+			<SidebarGroupLabel>Administration</SidebarGroupLabel>
+			<SidebarMenu>
+				{sidebarAdminItems.map((item) => (
+					<SidebarMenuItem key={item.href}>
+						<SidebarMenuButton
+							isActive={item.active(pathname)}
+							render={
+								<Link href={item.href}>
+									<item.icon />
+									{item.label}
+								</Link>
+							}
+						/>
+					</SidebarMenuItem>
+				))}
+			</SidebarMenu>
+		</SidebarGroup>
 	);
 }
 
