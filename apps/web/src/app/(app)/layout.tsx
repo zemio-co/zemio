@@ -2,9 +2,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ROUTES } from "@/lib/consts";
+import { AppNavbar } from "@/modules/shared/components/app-navbar";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
 import {
@@ -46,7 +46,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 		<SidebarProvider>
 			<AppSidebar />
 			<div className="flex-1">
-				<SiteHeader className="hidden" />
+				<AppNavbar className="sticky top-0" />
 				{children}
 			</div>
 		</SidebarProvider>

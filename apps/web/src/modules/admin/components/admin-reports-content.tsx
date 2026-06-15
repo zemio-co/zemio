@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { AdminReportsNavbar } from "./admin-reports-navbar";
 
 function AdminReportsContent({
 	className,
@@ -11,7 +10,7 @@ function AdminReportsContent({
 			data-slot="admin-reports-content"
 			{...props}
 		>
-			<AdminReportsNavbar />
+			{/* TODO: Move app content to this component */}
 		</div>
 	);
 }

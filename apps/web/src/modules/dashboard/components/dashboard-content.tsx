@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CreateReport } from "@/modules/report";
-import { DashboardNavbar } from "./dashboard-navbar";
 import { DashboardReportList } from "./dashboard-report-list";
 import { DashboardStats } from "./dashboard-stats";
 
@@ -16,7 +15,6 @@ function DashboardContent({
 }: React.ComponentProps<"div">) {
 	return (
 		<div className={cn("", className)} data-slot="dashboard-content" {...props}>
-			<DashboardNavbar />
 			<main className="py-12">
 				<DashboarHeader />
 				<section className="container mt-8">

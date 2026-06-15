@@ -14,13 +14,13 @@ const buttonVariants = cva(
 				default:
 					"inset-ring-red-300 inset-shadow-2xs inset-shadow-white/25 border-0 bg-violet-600 text-white ring-1 ring-violet-700 hover:bg-violet-500 hover:ring-violet-600 focus-visible:ring-violet-400 [&_svg:not([class*='text-'])]:text-violet-200",
 				outline:
-					"border-0 bg-white text-zinc-700 shadow-sm ring-1 ring-zinc-700/15 hover:bg-zinc-50 hover:ring-zinc-700/25 [&_svg:not([class*='text-'])]:text-zinc-500",
+					"border-0 bg-white text-slate-700 shadow-sm ring-1 ring-slate-700/15 hover:bg-slate-50 hover:ring-slate-700/25 [&_svg:not([class*='text-'])]:text-slate-500",
 				secondary:
 					"bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
 				ghost:
-					"border-0 hover:bg-muted hover:text-foreground hover:ring-1 hover:ring-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 [&_svg:not([class*='text-'])]:text-zinc-500",
+					"border-0 hover:bg-muted hover:text-foreground hover:ring-1 hover:ring-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 [&_svg:not([class*='text-'])]:text-slate-500",
 				destructive:
-					"border-0 bg-white text-red-600 shadow-sm ring-1 ring-zinc-700/15 hover:bg-red-50 hover:ring-red-700/25 focus-visible:ring-red-200 [&_svg:not([class*='text-'])]:text-red-600",
+					"border-0 bg-white text-red-600 shadow-sm ring-1 ring-slate-700/15 hover:bg-red-50 hover:ring-red-700/25 focus-visible:ring-red-200 [&_svg:not([class*='text-'])]:text-red-600",
 				link: "text-primary underline-offset-4 hover:underline",
 			},
 			size: {
@@ -34,7 +34,7 @@ const buttonVariants = cva(
 					"size-6 in-data-[slot=button-group]:rounded-lg rounded-[min(var(--radius-md),10px)] [&_svg:not([class*='size-'])]:size-3",
 				"icon-sm":
 					"size-7 in-data-[slot=button-group]:rounded-lg rounded-[min(var(--radius-md),12px)]",
-				"icon-lg": "size-9",
+				"icon-lg": "size-8 [&_svg:not([class*='size-'])]:size-4.5",
 			},
 		},
 		defaultVariants: {
