@@ -5,7 +5,7 @@ import type { BankingDetails, CostUnit } from "@zemio/db";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,16 +41,19 @@ import { createReportSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 
 function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
+	const [isFormPending, setIsFormPending] = useState(false);
+
 	return (
 		<Sheet data-slot="create-report" {...props}>
 			<SheetContent>
 				<SheetHeader>
 					<SheetTitle>Neuer Antrag</SheetTitle>
 				</SheetHeader>
-				<CreateReportBody />
+				<CreateReportBody onPendingChange={setIsFormPending} />
 				<SheetFooter className="flex-row justify-end">
 					<Button
 						className={"w-fit"}
+						disabled={isFormPending}
 						form="form-create-report"
 						size={"sm"}
 						type="submit"
@@ -65,8 +68,11 @@ function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 
 function CreateReportBody({
 	className,
+	onPendingChange,
 	...props
-}: React.ComponentProps<typeof SheetBody>) {
+}: React.ComponentProps<typeof SheetBody> & {
+	onPendingChange: (isPending: boolean) => void;
+}) {
 	const costUnitsQuery = api.costUnit.listGroupsWithUnits.useQuery();
 	const bankingDetailsQuery = api.bankingDetails.list.useQuery();
 
@@ -138,6 +144,7 @@ function CreateReportBody({
 			<CreateReportForm
 				bankingDetails={bankingDetailsQuery.data}
 				costUnitsGroups={costUnitsQuery.data}
+				onPendingChange={onPendingChange}
 			/>
 		</SheetBody>
 	);
@@ -174,6 +181,7 @@ function CreateReportErrorState({
 export function CreateReportForm({
 	costUnitsGroups,
 	bankingDetails,
+	onPendingChange,
 	...props
 }: React.ComponentProps<"form"> & {
 	costUnitsGroups: {
@@ -185,6 +193,7 @@ export function CreateReportForm({
 		BankingDetails,
 		"iban" | "fullName" | "userId" | "updatedAt"
 	>[];
+	onPendingChange?: (isPending: boolean) => void;
 }) {
 	const allCostUnits = useMemo(() => {
 		return costUnitsGroups.flatMap((group) =>
@@ -227,6 +236,10 @@ export function CreateReportForm({
 			});
 		},
 	});
+
+	useEffect(() => {
+		onPendingChange?.(createReport.isPending);
+	}, [createReport.isPending, onPendingChange]);
 
 	const form = useForm({
 		defaultValues: {
