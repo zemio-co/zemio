@@ -44,10 +44,9 @@ function SidebarMenuTrigger({
 	className,
 	...props
 }: React.ComponentProps<typeof DropdownMenuTrigger>) {
-	const { data, error, isPending, isRefetching } =
-		authClient.useActiveOrganization();
+	const { data, error, isPending } = authClient.useActiveOrganization();
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		return <Skeleton className="h-7 w-full" />;
 	}
 
@@ -146,7 +145,7 @@ function SidebarMenuUserButton({
 }: React.ComponentProps<typeof DropdownMenuItem>) {
 	const session = authClient.useSession();
 
-	if (session.isPending || session.isRefetching) {
+	if (session.isPending) {
 		return (
 			<DropdownMenuItem
 				className={cn(
@@ -189,7 +188,7 @@ function SidebarMenuOrgsButton({
 		window.location.reload();
 	};
 
-	if (organizations.isPending || organizations.isRefetching) {
+	if (organizations.isPending) {
 		return (
 			<DropdownMenuItem
 				className={cn(
@@ -247,10 +246,9 @@ function SidebarMenuContentHeader({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
-	const { data, error, isPending, isRefetching } =
-		authClient.useActiveOrganization();
+	const { data, error, isPending } = authClient.useActiveOrganization();
 
-	if (isPending || isRefetching) {
+	if (isPending) {
 		return (
 			<div
 				className={cn(
