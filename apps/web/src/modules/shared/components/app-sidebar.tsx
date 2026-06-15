@@ -90,7 +90,7 @@ const sidebarAdminItems = [
 	},
 ];
 
-export function SidebarAdminMenu({
+function SidebarAdminMenu({
 	pathname,
 	...props
 }: React.ComponentProps<typeof SidebarMenu> & {
