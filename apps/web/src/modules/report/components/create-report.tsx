@@ -135,6 +135,32 @@ function CreateReportBody({
 		return null;
 	}
 
+	if (bankingDetailsQuery.data.length === 0) {
+		return (
+			<SheetBody
+				className={cn("", className)}
+				data-slot="create-report-body"
+				{...props}
+			>
+				<div className="flex w-full flex-col items-center justify-center border border-slate-200 border-dashed p-8 px-8 py-10 text-center">
+					<p className="font-medium text-slate-800">
+						Keine Bankverbindung vorhanden
+					</p>
+					<p className="mt-1 text-slate-500 text-xs">
+						Um einen Antrag zu erstellen, musst du zuerst eine{" "}
+						<Link
+							className="no-underline! font-semibold text-violet-600 transition-colors hover:text-violet-400"
+							href={ROUTES.SETTINGS_USER_BANK_DETAILS()}
+						>
+							Bankverbindung hinterlegen
+						</Link>
+						.
+					</p>
+				</div>
+			</SheetBody>
+		);
+	}
+
 	return (
 		<SheetBody
 			className={cn("grid h-fit grow-0 gap-12", className)}
