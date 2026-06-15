@@ -7,7 +7,6 @@ import type React from "react";
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
 	SidebarGroup,
 	SidebarHeader,
 	SidebarMenu,
@@ -74,7 +73,6 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<SidebarAdminMenu pathname={pathname} />
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter></SidebarFooter>
 		</Sidebar>
 	);
 }
