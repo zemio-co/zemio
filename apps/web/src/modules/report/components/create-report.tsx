@@ -28,7 +28,6 @@ import {
 import {
 	Sheet,
 	SheetBody,
-	SheetClose,
 	SheetContent,
 	SheetFooter,
 	SheetHeader,
@@ -47,7 +46,6 @@ function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 			<SheetContent>
 				<SheetHeader>
 					<SheetTitle>Neuer Antrag</SheetTitle>
-					<SheetClose />
 				</SheetHeader>
 				<CreateReportBody />
 				<SheetFooter className="flex-row justify-end">
