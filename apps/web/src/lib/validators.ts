@@ -3,10 +3,10 @@ import { isValid, parse } from "date-fns";
 import z from "zod";
 
 export const createReportSchema = z.object({
-	title: z.string().min(1),
+	title: z.string().min(1, "Bitte gib einen Titel ein."),
 	description: z.string(),
-	costUnitId: z.string().min(1),
-	bankingDetailsId: z.string().min(1),
+	costUnitId: z.string().min(1, "Bitte wähle eine Kostenstelle aus."),
+	bankingDetailsId: z.string().min(1, "Bitte wähle eine Bankverbindung aus."),
 });
 
 export const ibanSchema = z
