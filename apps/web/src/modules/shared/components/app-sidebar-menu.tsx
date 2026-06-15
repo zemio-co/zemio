@@ -88,21 +88,20 @@ function SidebarMenuContent({
 	const [pending, setPending] = useState<boolean>(false);
 	const router = useRouter();
 
-	const handleSignOut = () => {
+	const handleSignOut = async () => {
 		setPending(true);
-
-		const res = authClient.signOut();
-
-		toast.promise(res, {
+		const signOutPromise = authClient.signOut();
+		toast.promise(signOutPromise, {
 			loading: "Du wirst abgemeldet",
 			success: "Du wurdest erfolgreich abgemeldet",
 			error: "Fehler beim Abmelden",
 		});
-
-		res.then(() => {
+		try {
+			await signOutPromise;
 			router.push(ROUTES.AUTH());
+		} finally {
 			setPending(false);
-		});
+		}
 	};
 
 	return (
