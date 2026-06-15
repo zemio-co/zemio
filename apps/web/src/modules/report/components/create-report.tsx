@@ -4,7 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,7 @@ import { createReportSchema } from "@/lib/validators";
 import { api, type RouterOutputs } from "@/trpc/react";
 
 function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
+	const formId = useId();
 	const [isFormPending, setIsFormPending] = useState(false);
 
 	return (
@@ -48,12 +49,12 @@ function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 				<SheetHeader>
 					<SheetTitle>Neuer Antrag</SheetTitle>
 				</SheetHeader>
-				<CreateReportBody onPendingChange={setIsFormPending} />
+				<CreateReportBody formId={formId} onPendingChange={setIsFormPending} />
 				<SheetFooter className="flex-row justify-end">
 					<Button
 						className={"w-fit"}
 						disabled={isFormPending}
-						form="form-create-report"
+						form={formId}
 						size={"sm"}
 						type="submit"
 					>
@@ -67,9 +68,11 @@ function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 
 function CreateReportBody({
 	className,
+	formId,
 	onPendingChange,
 	...props
 }: React.ComponentProps<typeof SheetBody> & {
+	formId: string;
 	onPendingChange: (isPending: boolean) => void;
 }) {
 	const costUnitsQuery = api.costUnit.listGroupsWithUnits.useQuery();
@@ -169,6 +172,7 @@ function CreateReportBody({
 			<CreateReportForm
 				bankingDetails={bankingDetailsQuery.data}
 				costUnitsGroups={costUnitsQuery.data}
+				formId={formId}
 				onPendingChange={onPendingChange}
 			/>
 		</SheetBody>
@@ -206,11 +210,13 @@ function CreateReportErrorState({
 function CreateReportForm({
 	costUnitsGroups,
 	bankingDetails,
+	formId,
 	onPendingChange,
 	...props
 }: React.ComponentProps<"form"> & {
 	costUnitsGroups: RouterOutputs["costUnit"]["listGroupsWithUnits"];
 	bankingDetails: RouterOutputs["bankingDetails"]["list"];
+	formId: string;
 	onPendingChange?: (isPending: boolean) => void;
 }) {
 	const costUnitMap = useMemo(() => {
@@ -271,7 +277,7 @@ function CreateReportForm({
 			aria-disabled={createReport.isPending}
 			className={cn(createReport.isPending && "pointer-events-none opacity-50")}
 			data-disabled={createReport.isPending}
-			id="form-create-report"
+			id={formId}
 			onSubmit={(e) => {
 				e.preventDefault();
 				form.handleSubmit();
