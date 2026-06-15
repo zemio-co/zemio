@@ -1,7 +1,6 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import type { BankingDetails, CostUnit } from "@zemio/db";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,7 +37,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { createReportSchema } from "@/lib/validators";
-import { api } from "@/trpc/react";
+import { api, type RouterOutputs } from "@/trpc/react";
 
 function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 	const [isFormPending, setIsFormPending] = useState(false);
@@ -210,15 +209,8 @@ function CreateReportForm({
 	onPendingChange,
 	...props
 }: React.ComponentProps<"form"> & {
-	costUnitsGroups: {
-		id: string;
-		title: string;
-		costUnits: CostUnit[];
-	}[];
-	bankingDetails: Omit<
-		BankingDetails,
-		"iban" | "fullName" | "userId" | "updatedAt"
-	>[];
+	costUnitsGroups: RouterOutputs["costUnit"]["listGroupsWithUnits"];
+	bankingDetails: RouterOutputs["bankingDetails"]["list"];
 	onPendingChange?: (isPending: boolean) => void;
 }) {
 	const costUnitMap = useMemo(() => {
