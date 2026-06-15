@@ -35,7 +35,7 @@ function AppSidebarMenu({
 	return (
 		<DropdownMenu data-slot="app-sidebar-menu" {...props}>
 			<SidebarMenuTrigger />
-			<SiderbarMenuContent />
+			<SidebarMenuContent />
 		</DropdownMenu>
 	);
 }
@@ -81,7 +81,7 @@ function SidebarMenuTrigger({
 	);
 }
 
-function SiderbarMenuContent({
+function SidebarMenuContent({
 	className,
 	...props
 }: React.ComponentProps<typeof DropdownMenuContent>) {
@@ -112,7 +112,7 @@ function SiderbarMenuContent({
 			data-slot="sidebar-menu-content"
 			{...props}
 		>
-			<SiderbarMenuContentHeader />
+			<SidebarMenuContentHeader />
 			<DropdownMenuGroup className={"p-1"}>
 				<DropdownMenuItem
 					className="flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700"
@@ -244,7 +244,7 @@ function SidebarMenuOrgsButton({
 	);
 }
 
-function SiderbarMenuContentHeader({
+function SidebarMenuContentHeader({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
@@ -258,7 +258,7 @@ function SiderbarMenuContentHeader({
 					"flex min-h-28 flex-col items-center justify-center text-center",
 					className,
 				)}
-				data-slot="siderbar-menu-content-header"
+				data-slot="sidebar-menu-content-header"
 				{...props}
 			>
 				<Skeleton className="size-8" />
@@ -274,7 +274,7 @@ function SiderbarMenuContentHeader({
 					"flex min-h-28 flex-col items-center justify-center border border-dashed text-center",
 					className,
 				)}
-				data-slot="siderbar-menu-content-header"
+				data-slot="sidebar-menu-content-header"
 				{...props}
 			>
 				<span className="font-medium text-destructive text-xs">
@@ -290,7 +290,7 @@ function SiderbarMenuContentHeader({
 				"flex min-h-28 flex-col items-center justify-center px-8 text-center",
 				className,
 			)}
-			data-slot="siderbar-menu-content-header"
+			data-slot="sidebar-menu-content-header"
 			{...props}
 		>
 			{data.logo ? (
