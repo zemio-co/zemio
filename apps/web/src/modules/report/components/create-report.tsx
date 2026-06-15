@@ -2,7 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import type { BankingDetails, CostUnit } from "@zemio/db";
-import { ArrowRightIcon, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -16,12 +16,6 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupInput,
-	InputGroupText,
-} from "@/components/ui/input-group";
 import {
 	Select,
 	SelectContent,
@@ -46,50 +40,6 @@ import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { createReportSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
-
-export default function ServerPage() {
-	return (
-		<main className="p-20">
-			<div className="flex items-center justify-start gap-4">
-				<Button>
-					<PlusIcon />
-					Hinzufügen
-				</Button>
-				<Button variant={"outline"}>
-					<PencilIcon />
-					Bearbeiten
-				</Button>
-				<Button variant={"destructive"}>
-					<TrashIcon />
-					Löschen
-				</Button>
-				<Button variant={"ghost"}>
-					Next Page
-					<ArrowRightIcon />
-				</Button>
-				<Button size={"icon-sm"} variant={"outline"}>
-					<ArrowRightIcon />
-				</Button>
-				<Button size={"sm"} variant={"outline"}>
-					Bearbeiten
-				</Button>
-			</div>
-			<div className="mt-20">
-				<Input placeholder="Hello world" />
-				<Textarea className="my-12" placeholder="Type something here..." />
-				<InputGroup>
-					<InputGroupInput placeholder="hello world" />
-					<InputGroupAddon>
-						<InputGroupText>Hello world</InputGroupText>
-					</InputGroupAddon>
-				</InputGroup>
-			</div>
-			<div className="mt-20">
-				<CreateReport open />
-			</div>
-		</main>
-	);
-}
 
 function CreateReport({ ...props }: React.ComponentProps<typeof Sheet>) {
 	return (
@@ -481,3 +431,5 @@ export function CreateReportForm({
 		</form>
 	);
 }
+
+export { CreateReport };
