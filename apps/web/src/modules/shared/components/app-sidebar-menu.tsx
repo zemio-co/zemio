@@ -29,22 +29,29 @@ import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
 
+type ActiveOrgQuery = ReturnType<typeof authClient.useActiveOrganization>;
+
 function AppSidebarMenu({
 	...props
 }: React.ComponentProps<typeof DropdownMenu>) {
+	const activeOrgQuery = authClient.useActiveOrganization();
+
 	return (
 		<DropdownMenu data-slot="app-sidebar-menu" {...props}>
-			<SidebarMenuTrigger />
-			<SidebarMenuContent />
+			<SidebarMenuTrigger activeOrgQuery={activeOrgQuery} />
+			<SidebarMenuContent activeOrgQuery={activeOrgQuery} />
 		</DropdownMenu>
 	);
 }
 
 function SidebarMenuTrigger({
 	className,
+	activeOrgQuery,
 	...props
-}: React.ComponentProps<typeof DropdownMenuTrigger>) {
-	const { data, error, isPending } = authClient.useActiveOrganization();
+}: React.ComponentProps<typeof DropdownMenuTrigger> & {
+	activeOrgQuery: ActiveOrgQuery;
+}) {
+	const { data, error, isPending } = activeOrgQuery;
 
 	if (isPending) {
 		return <Skeleton className="h-7 w-full" />;
@@ -82,8 +89,11 @@ function SidebarMenuTrigger({
 
 function SidebarMenuContent({
 	className,
+	activeOrgQuery,
 	...props
-}: React.ComponentProps<typeof DropdownMenuContent>) {
+}: React.ComponentProps<typeof DropdownMenuContent> & {
+	activeOrgQuery: ActiveOrgQuery;
+}) {
 	const [pending, setPending] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -110,7 +120,7 @@ function SidebarMenuContent({
 			data-slot="sidebar-menu-content"
 			{...props}
 		>
-			<SidebarMenuContentHeader />
+			<SidebarMenuContentHeader activeOrgQuery={activeOrgQuery} />
 			<DropdownMenuGroup className={"p-1"}>
 				<DropdownMenuItem
 					className="flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700"
@@ -244,9 +254,12 @@ function SidebarMenuOrgsButton({
 
 function SidebarMenuContentHeader({
 	className,
+	activeOrgQuery,
 	...props
-}: React.ComponentProps<"div">) {
-	const { data, error, isPending } = authClient.useActiveOrganization();
+}: React.ComponentProps<"div"> & {
+	activeOrgQuery: ActiveOrgQuery;
+}) {
+	const { data, error, isPending } = activeOrgQuery;
 
 	if (isPending) {
 		return (
