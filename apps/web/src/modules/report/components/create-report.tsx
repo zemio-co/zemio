@@ -108,8 +108,8 @@ function CreateReportBody({
 			>
 				<CreateReportErrorState
 					code={costUnitsQuery.error.data?.code ?? "UNKNOWN"}
-					description="We were unable to load the cost units for this action."
-					title="Error when loading cost units."
+					description="Die Kostenstellen konnten nicht geladen werden."
+					title="Fehler beim Laden der Kostenstellen."
 				/>
 			</SheetBody>
 		);
@@ -124,8 +124,8 @@ function CreateReportBody({
 			>
 				<CreateReportErrorState
 					code={bankingDetailsQuery.error.data?.code ?? "UNKNOWN"}
-					description="We were unable to load your banking details for this action."
-					title="Error when loading banking details."
+					description="Die Bankverbindungen konnten nicht geladen werden."
+					title="Fehler beim Laden der Bankverbindungen."
 				/>
 			</SheetBody>
 		);
