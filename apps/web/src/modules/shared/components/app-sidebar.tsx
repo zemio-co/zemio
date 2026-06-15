@@ -41,7 +41,7 @@ const sidebarItems = [
 		href: ROUTES.SETTINGS_USER_GENERAL(),
 		icon: SettingsIcon,
 		active: (pathname: string) => {
-			return pathname === ROUTES.SETTINGS_USER_GENERAL();
+			return pathname.startsWith("/settings/user");
 		},
 	},
 ];
