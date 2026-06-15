@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRightIcon, PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,8 +10,9 @@ import {
 	InputGroupText,
 } from "@/components/ui/input-group";
 import { Textarea } from "@/components/ui/textarea";
+import { CreateReport } from "@/modules/report";
 
-export default async function ServerPage() {
+export default function ServerPage() {
 	return (
 		<main className="p-20">
 			<div className="flex items-center justify-start gap-4">
@@ -45,6 +48,9 @@ export default async function ServerPage() {
 						<InputGroupText>Hello world</InputGroupText>
 					</InputGroupAddon>
 				</InputGroup>
+			</div>
+			<div className="mt-20">
+				<CreateReport open />
 			</div>
 		</main>
 	);

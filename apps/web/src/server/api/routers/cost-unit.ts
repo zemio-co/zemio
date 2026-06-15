@@ -74,35 +74,46 @@ export const costUnitRouter = createTRPCRouter({
 
 	listGroupsWithUnits: orgProcedure.query(async ({ ctx }) => {
 		const [groups, ungroupedCostUnits] = await ctx.db.$transaction([
-			// Fetch groups with their cost units
 			ctx.db.costUnitGroup.findMany({
 				where: {
 					organizationId: ctx.organizationId,
 				},
-				include: {
-					costUnits: true,
+				select: {
+					id: true,
+					title: true,
+					costUnits: {
+						select: {
+							id: true,
+							title: true,
+							tag: true,
+							examples: true,
+						},
+						orderBy: { tag: "asc" },
+					},
 				},
 				orderBy: { title: "asc" },
 			}),
-			// Fetch ungrouped cost units (those with costUnitGroupId = null)
 			ctx.db.costUnit.findMany({
 				where: {
 					organizationId: ctx.organizationId,
 					costUnitGroupId: null,
 				},
+				select: {
+					id: true,
+					title: true,
+					tag: true,
+					examples: true,
+				},
 				orderBy: { tag: "asc" },
 			}),
 		]);
 
-		// If there are ungrouped cost units, add them as a synthetic group
 		if (ungroupedCostUnits.length > 0) {
 			return [
 				{
 					id: NO_COST_UNIT_GROUP,
 					title: "Ohne Gruppe",
 					costUnits: ungroupedCostUnits,
-					createdAt: new Date(),
-					updatedAt: new Date(),
 				},
 				...groups,
 			];

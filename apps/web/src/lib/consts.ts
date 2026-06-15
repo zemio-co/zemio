@@ -5,7 +5,6 @@ export const ROUTES = {
 	NO_ORG: "/no-org",
 	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
 	REPORT_DETAIL: (id: string) => `/reports/${id}`,
-	REPORT_NEW: "/reports/new",
 	ADMIN_DASHBOARD: "/admin",
 	ADMIN_SETTINGS: "/admin/settings",
 	USER_SETTINGS: "/preferences",

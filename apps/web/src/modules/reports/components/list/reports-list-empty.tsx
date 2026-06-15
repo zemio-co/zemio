@@ -1,10 +1,10 @@
 "use client";
 
 import { FilterIcon, PlusIcon, TrafficConeIcon, XIcon } from "lucide-react";
-import Link from "next/link";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { ROUTES } from "@/lib/routes";
+import { Button } from "@/components/ui/button";
+import { SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { CreateReport } from "@/modules/report/components";
 
 function ReportsListEmpty({
 	className,
@@ -21,13 +21,15 @@ function ReportsListEmpty({
 					You haven't created any reports yet. Create a new report to get started.
 				</p>
 				<div className="mt-4">
-					<Link
-						className={buttonVariants({ size: "sm" })}
-						href={ROUTES.USER_REPORT_NEW()}
-					>
-						Create new report
-						<PlusIcon />
-					</Link>
+					<CreateReport>
+						<SheetTrigger
+							render={
+								<Button size={"sm"}>
+									<PlusIcon /> Neuer Antrag
+								</Button>
+							}
+						/>
+					</CreateReport>
 				</div>
 			</div>
 		</div>
