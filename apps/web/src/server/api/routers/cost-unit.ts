@@ -81,7 +81,15 @@ export const costUnitRouter = createTRPCRouter({
 				select: {
 					id: true,
 					title: true,
-					costUnits: true,
+					costUnits: {
+						select: {
+							id: true,
+							title: true,
+							tag: true,
+							examples: true,
+						},
+						orderBy: { tag: "asc" },
+					},
 				},
 				orderBy: { title: "asc" },
 			}),
@@ -89,6 +97,12 @@ export const costUnitRouter = createTRPCRouter({
 				where: {
 					organizationId: ctx.organizationId,
 					costUnitGroupId: null,
+				},
+				select: {
+					id: true,
+					title: true,
+					tag: true,
+					examples: true,
 				},
 				orderBy: { tag: "asc" },
 			}),
