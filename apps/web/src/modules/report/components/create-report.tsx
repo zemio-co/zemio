@@ -195,8 +195,8 @@ function CreateReportForm({
 	>[];
 	onPendingChange?: (isPending: boolean) => void;
 }) {
-	const allCostUnits = useMemo(() => {
-		return costUnitsGroups.flatMap((group) =>
+	const { allCostUnits, costUnitMap } = useMemo(() => {
+		const units = costUnitsGroups.flatMap((group) =>
 			group.costUnits.map((costUnit) => ({
 				label: costUnit.title,
 				value: costUnit.id,
@@ -204,15 +204,12 @@ function CreateReportForm({
 				tag: costUnit.tag,
 			})),
 		);
-	}, [costUnitsGroups]);
 
-	// Create a Map for O(1) cost unit lookups by ID
-	const costUnitMap = useMemo(() => {
 		const map = new Map<
 			string,
 			{ id: string; tag: string; title: string; examples: string[] }
 		>();
-		for (const costUnit of allCostUnits) {
+		for (const costUnit of units) {
 			map.set(costUnit.value, {
 				id: costUnit.value,
 				tag: costUnit.tag,
@@ -220,8 +217,9 @@ function CreateReportForm({
 				examples: costUnit.examples,
 			});
 		}
-		return map;
-	}, [allCostUnits]);
+
+		return { allCostUnits: units, costUnitMap: map };
+	}, [costUnitsGroups]);
 
 	const router = useRouter();
 
