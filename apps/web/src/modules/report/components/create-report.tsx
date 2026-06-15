@@ -383,6 +383,12 @@ function CreateReportForm({
 				<form.Field
 					children={(field) => {
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+						const selectedCostUnit = costUnitMap.get(field.state.value);
+						const costUnitExamples =
+							selectedCostUnit?.examples && selectedCostUnit.examples.length > 0
+								? selectedCostUnit.examples
+								: null;
+
 						return (
 							<Field className="gap-3" data-invalid={isInvalid}>
 								<FieldLabel
@@ -414,28 +420,18 @@ function CreateReportForm({
 									</SelectContent>
 								</Select>
 
-								{(() => {
-									const selectedCostUnit = costUnitMap.get(field.state.value);
-
-									if (
-										selectedCostUnit?.examples &&
-										selectedCostUnit.examples.length > 0
-									) {
-										return (
-											<div className="mt-1 rounded-lg border border-slate-300 p-4 text-muted-foreground text-sm">
-												<p className="mb-2">
-													Zu der ausgewählten Kostenstelle gehören die folgenden Anliegen:
-												</p>
-												<ul className="list-inside list-disc font-medium text-slate-800 marker:text-slate-500">
-													{selectedCostUnit.examples.map((example) => (
-														<li key={example}>{example}</li>
-													))}
-												</ul>
-											</div>
-										);
-									}
-									return null;
-								})()}
+								{costUnitExamples && (
+									<div className="mt-1 rounded-lg border border-slate-300 p-4 text-muted-foreground text-sm">
+										<p className="mb-2">
+											Zu der ausgewählten Kostenstelle gehören die folgenden Anliegen:
+										</p>
+										<ul className="list-inside list-disc font-medium text-slate-800 marker:text-slate-500">
+											{costUnitExamples.map((example) => (
+												<li key={example}>{example}</li>
+											))}
+										</ul>
+									</div>
+								)}
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
