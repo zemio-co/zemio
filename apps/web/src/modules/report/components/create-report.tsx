@@ -219,11 +219,13 @@ function CreateReportForm({
 	formId: string;
 	onPendingChange?: (isPending: boolean) => void;
 }) {
-	const costUnitMap = useMemo(() => {
+	const { costUnitMap, costUnitSelectItems } = useMemo(() => {
 		const map = new Map<
 			string,
 			{ id: string; tag: string; title: string; examples: string[] }
 		>();
+		const items: { value: string; label: string }[] = [];
+
 		for (const group of costUnitsGroups) {
 			for (const costUnit of group.costUnits) {
 				map.set(costUnit.id, {
@@ -232,9 +234,11 @@ function CreateReportForm({
 					title: costUnit.title,
 					examples: costUnit.examples,
 				});
+				items.push({ value: costUnit.id, label: costUnit.title });
 			}
 		}
-		return map;
+
+		return { costUnitMap: map, costUnitSelectItems: items };
 	}, [costUnitsGroups]);
 
 	const router = useRouter();
@@ -356,6 +360,7 @@ function CreateReportForm({
 									Bankverbindung
 								</FieldLabel>
 								<Select
+									items={bankingDetails.map((d) => ({ value: d.id, label: d.title }))}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 									value={field.state.value}
 								>
@@ -409,6 +414,7 @@ function CreateReportForm({
 									Kostenstelle
 								</FieldLabel>
 								<Select
+									items={costUnitSelectItems}
 									onValueChange={(value) => field.handleChange(value ?? "")}
 									value={field.state.value}
 								>
