@@ -1,66 +1,66 @@
 "use client";
 
 import { FileIcon, HomeIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type React from "react";
-import { ROUTES as DEPR_ROUTES } from "@/lib/consts";
-import { isOrganizationAdminRole } from "@/lib/organization";
-import { ROUTES } from "@/lib/routes";
-import { authClient } from "@/server/better-auth/client";
-import ZemioLogo from "../../public/assets/zemio-logo.svg";
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarTrigger,
-	useSidebar,
-} from "./ui/sidebar";
-import { UserMenu } from "./user-menu";
+} from "@/components/ui/sidebar";
+import { isOrganizationAdminRole } from "@/lib/organization";
+import { ROUTES } from "@/lib/routes";
+import { authClient } from "@/server/better-auth/client";
+import { AppSidebarMenu } from "./app-sidebar-menu";
 
 const sidebarItems = [
 	{
 		label: "Dashboard",
-		href: DEPR_ROUTES.USER_DASHBOARD,
+		href: ROUTES.USER_DASHBOARD(),
 		icon: HomeIcon,
+		active: (pathname: string) => {
+			return pathname === ROUTES.USER_DASHBOARD();
+		},
 	},
 	{
 		label: "Meine Anträge",
 		href: ROUTES.USER_REPORTS_LIST(),
 		icon: FileIcon,
+		active: (pathname: string) => {
+			return pathname.startsWith(ROUTES.USER_REPORTS_LIST());
+		},
 	},
 	{
 		label: "Einstellungen",
 		href: ROUTES.SETTINGS_USER_GENERAL(),
 		icon: SettingsIcon,
+		active: (pathname: string) => {
+			return pathname.startsWith("/settings/user");
+		},
 	},
 ];
 
 function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const { isMobile, open } = useSidebar();
+	const pathname = usePathname();
 
 	return (
 		<Sidebar {...props}>
-			<SidebarHeader className="flex h-12 flex-row items-center justify-between border-b px-4 py-4">
-				<Image alt="zemio logo" className="h-5 w-fit" src={ZemioLogo} />
-				<SidebarTrigger
-					className={"hidden data-[visible=true]:flex"}
-					data-visible={open && !isMobile}
-				/>
+			<SidebarHeader className="h-16 px-4 py-4">
+				<AppSidebarMenu />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 					<SidebarMenu>
 						{sidebarItems.map((item) => (
 							<SidebarMenuItem key={item.href}>
 								<SidebarMenuButton
+									isActive={item.active(pathname)}
 									render={
 										<Link href={item.href}>
 											<item.icon />
@@ -71,12 +71,9 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>
-					<SidebarAdminMenu />
 				</SidebarGroup>
+				<SidebarAdminMenu pathname={pathname} />
 			</SidebarContent>
-			<SidebarFooter>
-				<UserMenu />
-			</SidebarFooter>
 		</Sidebar>
 	);
 }
@@ -86,12 +83,13 @@ const sidebarAdminItems = [
 		label: "Admin Dashboard",
 		href: ROUTES.ADMIN_REVIEW_OVERVIEW(),
 		icon: ShieldUserIcon,
+		active: (pathname: string) => {
+			return pathname.startsWith(ROUTES.ADMIN_REVIEW_OVERVIEW());
+		},
 	},
 ];
 
-export function SidebarAdminMenu({
-	...props
-}: React.ComponentProps<typeof SidebarMenu>) {
+function SidebarAdminMenu({ pathname }: { pathname: string }) {
 	const { isPending: rolePending, data: roleData } =
 		authClient.useActiveMemberRole();
 
@@ -104,20 +102,24 @@ export function SidebarAdminMenu({
 	if (!isOrgAdmin) return null;
 
 	return (
-		<SidebarMenu {...props}>
-			{sidebarAdminItems.map((item) => (
-				<SidebarMenuItem key={item.href}>
-					<SidebarMenuButton
-						render={
-							<Link href={item.href}>
-								<item.icon />
-								{item.label}
-							</Link>
-						}
-					/>
-				</SidebarMenuItem>
-			))}
-		</SidebarMenu>
+		<SidebarGroup>
+			<SidebarGroupLabel>Administration</SidebarGroupLabel>
+			<SidebarMenu>
+				{sidebarAdminItems.map((item) => (
+					<SidebarMenuItem key={item.href}>
+						<SidebarMenuButton
+							isActive={item.active(pathname)}
+							render={
+								<Link href={item.href}>
+									<item.icon />
+									{item.label}
+								</Link>
+							}
+						/>
+					</SidebarMenuItem>
+				))}
+			</SidebarMenu>
+		</SidebarGroup>
 	);
 }
 

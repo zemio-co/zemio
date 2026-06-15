@@ -3,4 +3,5 @@ export {
 	AppCommandProvider,
 	AppCommandTrigger,
 	AppNavbar,
+	AppSidebar,
 } from "./components";
