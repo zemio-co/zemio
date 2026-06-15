@@ -221,30 +221,22 @@ function CreateReportForm({
 	>[];
 	onPendingChange?: (isPending: boolean) => void;
 }) {
-	const { allCostUnits, costUnitMap } = useMemo(() => {
-		const units = costUnitsGroups.flatMap((group) =>
-			group.costUnits.map((costUnit) => ({
-				label: costUnit.title,
-				value: costUnit.id,
-				examples: costUnit.examples,
-				tag: costUnit.tag,
-			})),
-		);
-
+	const costUnitMap = useMemo(() => {
 		const map = new Map<
 			string,
 			{ id: string; tag: string; title: string; examples: string[] }
 		>();
-		for (const costUnit of units) {
-			map.set(costUnit.value, {
-				id: costUnit.value,
-				tag: costUnit.tag,
-				title: costUnit.label,
-				examples: costUnit.examples,
-			});
+		for (const group of costUnitsGroups) {
+			for (const costUnit of group.costUnits) {
+				map.set(costUnit.id, {
+					id: costUnit.id,
+					tag: costUnit.tag,
+					title: costUnit.title,
+					examples: costUnit.examples,
+				});
+			}
 		}
-
-		return { allCostUnits: units, costUnitMap: map };
+		return map;
 	}, [costUnitsGroups]);
 
 	const router = useRouter();
