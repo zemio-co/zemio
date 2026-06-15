@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CreateReport } from "@/modules/report";
-import { AppNavbar } from "@/modules/shared/components/app-navbar";
 import { DashboardReportList } from "./dashboard-report-list";
 import { DashboardStats } from "./dashboard-stats";
 
@@ -15,13 +14,7 @@ function DashboardContent({
 	...props
 }: React.ComponentProps<"div">) {
 	return (
-		<div
-			className={cn("bg-white", className)}
-			data-slot="dashboard-content"
-			{...props}
-		>
-			{/* <DashboardNavbar /> */}
-			<AppNavbar />
+		<div className={cn("", className)} data-slot="dashboard-content" {...props}>
 			<main className="py-12">
 				<DashboarHeader />
 				<section className="container mt-8">

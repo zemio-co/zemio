@@ -7,7 +7,6 @@ import { ReviewAttachments } from "./review-attachments";
 import { ReviewDetails } from "./review-details";
 import { ReviewExpenses } from "./review-expenses";
 import { ExpensesHeader } from "./review-header";
-import { ReviewNavbar } from "./review-navbar";
 import { ReviewReasoning } from "./review-reasoning";
 
 function ReviewContent({
@@ -25,8 +24,7 @@ function ReviewContent({
 	const errorMessage = error?.message;
 
 	return (
-		<main className={cn("bg-zinc-50 pb-32", className)} {...props}>
-			<ReviewNavbar reportId={reportId} />
+		<main className={cn("pb-32", className)} {...props}>
 			<section className="mt-20">
 				<div className="mx-auto w-full max-w-5xl px-8">
 					<ExpensesHeader reportId={reportId} />

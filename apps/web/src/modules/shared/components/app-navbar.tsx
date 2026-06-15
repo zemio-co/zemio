@@ -12,7 +12,11 @@ import { AppCommandProvider, AppCommandTrigger } from "./app-command";
 
 function AppNavbar({ className, ...props }: React.ComponentProps<"nav">) {
 	return (
-		<nav className={cn("", className)} data-slot="app-navbar" {...props}>
+		<nav
+			className={cn("bg-background", className)}
+			data-slot="app-navbar"
+			{...props}
+		>
 			<div className="container flex h-16 max-w-7xl items-center justify-start">
 				<SidebarTrigger className={"mr-6"} />
 				<AppCommandProvider>
