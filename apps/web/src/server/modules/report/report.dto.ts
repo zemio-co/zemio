@@ -31,14 +31,7 @@ export function toReportDetailDTO(report: ReportDetail): ReportDetailDTO {
 	};
 }
 
-/**
- * Transport contract for an admin review-list row. Identical to the repository
- * projection (no `Decimal` to convert), but named so every list endpoint exposes
- * a DTO-typed contract rather than leaking the persistence shape directly.
- */
-export type ReviewListItemDTO = ReportListRow;
-
-/** A row in the owner's report list, carrying its expense total. */
+/** A row in the report list, carrying its expense total. */
 export type ReportListItemDTO = ReportListRow & { sum: number };
 
 export function toReportListItemDTO(

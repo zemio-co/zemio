@@ -7,16 +7,11 @@ import { isOrganizationAdminRole } from "@/lib/organization";
 import type { createReportSchema } from "@/lib/validators";
 import { mapPrismaError } from "@/server/shared/errors";
 import { nullableDecimalToNumber } from "@/server/shared/money";
-import type {
-	CursorPage,
-	CursorPaginationInput,
-} from "@/server/shared/pagination";
-import { toCursorPage } from "@/server/shared/pagination";
+import { offsetPageArgs, pageCount } from "@/server/shared/pagination";
 import {
 	type FinancialSummaryDTO,
 	type ReportListItemDTO,
 	type ReviewDTO,
-	type ReviewListItemDTO,
 	toFinancialSummaryDTO,
 	toReportListItemDTO,
 	toReviewDTO,
@@ -72,18 +67,24 @@ export function createReportService(deps: {
 			reports: ReportListItemDTO[];
 			pagination: { page: number; pageSize: number; pageCount: number };
 		}> {
+			if (input.scope === "all" && !isOrganizationAdminRole(ctx.orgRole)) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "Only organization admins may list all reports.",
+				});
+			}
+
 			const where = buildReportListWhere({
-				scope: "own",
+				scope: input.scope,
 				filters: input.filters,
 				organizationId: ctx.organizationId,
 				userId: ctx.userId,
 			});
 			const orderBy = buildReportListOrderBy(input.sorting);
-			const take = input.pageSize;
-			const skip = (input.page - 1) * input.pageSize;
+			const { skip, take } = offsetPageArgs(input);
 
 			const [rows, count] = await Promise.all([
-				repo.listOwned(ctx.db, { where, orderBy, take, skip }),
+				repo.listPage(ctx.db, { where, orderBy, take, skip }),
 				repo.count(ctx.db, where),
 			]);
 
@@ -105,27 +106,9 @@ export function createReportService(deps: {
 				pagination: {
 					page: input.page,
 					pageSize: input.pageSize,
-					pageCount: Math.ceil(count / input.pageSize),
+					pageCount: pageCount(count, input.pageSize),
 				},
 			};
-		},
-
-		async reviewList(
-			ctx: ReportServiceContext,
-			input: CursorPaginationInput,
-		): Promise<CursorPage<ReviewListItemDTO>> {
-			// Same scope-aware query core as `list`, widened to the whole org.
-			const where = buildReportListWhere({
-				scope: "all",
-				organizationId: ctx.organizationId,
-				userId: ctx.userId,
-			});
-			const { rows, totalCount } = await repo.reviewListPage(ctx.db, {
-				where,
-				limit: input.limit,
-				cursor: input.cursor,
-			});
-			return toCursorPage(rows, input.limit, totalCount, (row) => row.id);
 		},
 
 		async review(

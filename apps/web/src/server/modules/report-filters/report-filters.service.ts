@@ -9,7 +9,11 @@ export type ReportFiltersContext = {
 	organizationId: string;
 };
 
-/** Filter dropdown options for the admin report list. Not a projection of Report itself. */
+/**
+ * Filter dropdown options for the admin report list. Not a projection of Report
+ * itself. Values are ids (cost-unit id / user id) so they map directly onto the
+ * report list filter DSL (`costUnitId` / `ownerId`); labels are display text.
+ */
 export type ReportFilterOptionsDTO = {
 	costUnits: Array<{ label: string; value: string }>;
 	owners: Array<{ label: string; value: string; image: string | null }>;
@@ -30,11 +34,11 @@ export function createReportFiltersService(deps: {
 			return {
 				costUnits: costUnits.map((costUnit) => ({
 					label: costUnit.tag,
-					value: costUnit.tag,
+					value: costUnit.id,
 				})),
 				owners: owners.map((owner) => ({
 					label: owner.name,
-					value: owner.email,
+					value: owner.id,
 					image: owner.image,
 				})),
 			};

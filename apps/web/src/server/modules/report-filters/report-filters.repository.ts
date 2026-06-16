@@ -8,12 +8,12 @@ export const reportFiltersRepository = {
 		return db.$transaction([
 			db.costUnit.findMany({
 				where: { organizationId },
-				select: { tag: true },
+				select: { id: true, tag: true },
 				orderBy: { tag: "asc" },
 			}),
 			db.user.findMany({
 				where: { ownReports: { some: { organizationId } } },
-				select: { email: true, name: true, image: true },
+				select: { id: true, name: true, image: true },
 				orderBy: { name: "asc" },
 			}),
 		]);

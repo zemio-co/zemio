@@ -14,7 +14,6 @@ import {
 } from "@/server/modules/report/report.procedure";
 import { reportListInputSchema } from "@/server/modules/report/report.query";
 import { reportService } from "@/server/modules/report/report.service";
-import { cursorPaginationInput } from "@/server/shared/pagination";
 
 // Wire the email side-effects to the report event bus when the router loads.
 registerReportEmailSubscribers();
@@ -24,18 +23,6 @@ export const reportRouter = createTRPCRouter({
 		.input(reportListInputSchema)
 		.query(({ ctx, input }) =>
 			reportService.list(toReportServiceContext(ctx), input),
-		),
-
-	/**
-	 * @deprecated Transitional admin list adapter. The destination is a single
-	 * scope-widened `list` (see docs/trpc-migration-report-slice.md); this stays
-	 * until the admin table migrates off cursor/infinite-scroll. Shares the
-	 * scope-aware query core with `list`.
-	 */
-	reviewList: orgAdminProcedure
-		.input(cursorPaginationInput)
-		.query(({ ctx, input }) =>
-			reportService.reviewList(toReportServiceContext(ctx), input),
 		),
 
 	review: orgAdminProcedure

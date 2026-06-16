@@ -67,6 +67,18 @@ const costUnitArrayFilterSchema = z.object({
 	value: nonEmptyStringArraySchema,
 });
 
+const ownerSingleFilterSchema = z.object({
+	field: z.literal("ownerId"),
+	op: z.enum(["is", "isNot"]),
+	value: nonEmptyStringSchema,
+});
+
+const ownerArrayFilterSchema = z.object({
+	field: z.literal("ownerId"),
+	op: z.enum(["in", "notIn"]),
+	value: nonEmptyStringArraySchema,
+});
+
 const tagSingleFilterSchema = z.object({
 	field: z.literal("tag"),
 	op: z.enum(["eq", "gt", "lt"]),
@@ -104,6 +116,8 @@ const reportListFilterRuleSchema = z.union([
 	titleArrayFilterSchema,
 	costUnitSingleFilterSchema,
 	costUnitArrayFilterSchema,
+	ownerSingleFilterSchema,
+	ownerArrayFilterSchema,
 	tagSingleFilterSchema,
 	tagArrayFilterSchema,
 	tagRangeFilterSchema,
@@ -124,6 +138,7 @@ const reportListSortingSchema = z
 export const reportListInputSchema = z
 	.object({
 		filters: z.lazy(() => reportListFilterGroupSchema).optional(),
+		scope: z.enum(["own", "all"]).default("own"),
 		page: z.number().int().min(1),
 		pageSize: z.number().int().min(1).max(100),
 		sorting: reportListSortingSchema,
@@ -270,6 +285,8 @@ function compileFilterRule(
 	switch (rule.field) {
 		case "costUnitId":
 			return compileStringFilter("costUnitId", rule);
+		case "ownerId":
+			return compileStringFilter("ownerId", rule);
 		case "createdAt":
 			return compileDateFilter("createdAt", rule);
 		case "lastUpdatedAt":
@@ -299,8 +316,11 @@ function compileStatusFilter(
 }
 
 function compileStringFilter(
-	field: "costUnitId" | "title",
-	rule: Extract<ReportListFilterRule, { field: "costUnitId" | "title" }>,
+	field: "costUnitId" | "title" | "ownerId",
+	rule: Extract<
+		ReportListFilterRule,
+		{ field: "costUnitId" | "title" | "ownerId" }
+	>,
 ): Prisma.ReportWhereInput {
 	switch (rule.op) {
 		case "in":

@@ -86,12 +86,6 @@ type ListPageArgs = {
 	skip: number;
 };
 
-type ReviewListArgs = {
-	where: Prisma.ReportWhereInput;
-	limit: number;
-	cursor: string | null | undefined;
-};
-
 export const reportRepository = {
 	findById(db: Db, args: { id: string; organizationId: string }) {
 		return db.report.findFirst({
@@ -100,7 +94,7 @@ export const reportRepository = {
 		});
 	},
 
-	listOwned(db: Db, args: ListPageArgs): Promise<ReportListRow[]> {
+	listPage(db: Db, args: ListPageArgs): Promise<ReportListRow[]> {
 		return db.report.findMany({
 			where: args.where,
 			orderBy: args.orderBy,
@@ -125,26 +119,6 @@ export const reportRepository = {
 			where: { reportId: { in: reportIds } },
 			_sum: { amount: true },
 		});
-	},
-
-	async reviewListPage(
-		db: Db,
-		args: ReviewListArgs,
-	): Promise<{ rows: ReportListRow[]; totalCount: number }> {
-		const [rows, totalCount] = await db.$transaction([
-			db.report.findMany({
-				take: args.limit + 1,
-				cursor: args.cursor ? { id: args.cursor } : undefined,
-				where: args.where,
-				// `id` is a deterministic tiebreaker so cursor pagination cannot skip
-				// or duplicate rows that share a `lastUpdatedAt` timestamp.
-				orderBy: [{ lastUpdatedAt: "desc" }, { id: "desc" }],
-				select: reportListRowSelect,
-			}),
-			db.report.count({ where: args.where }),
-		]);
-
-		return { rows, totalCount };
 	},
 
 	reviewDetail(
