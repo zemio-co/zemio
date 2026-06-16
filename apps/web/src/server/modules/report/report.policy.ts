@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
-import { ReportStatus } from "@zemio/db";
+import type { ReportStatus } from "@zemio/db";
+import { isEditable } from "./report.state";
 
 /**
  * The request-scoped facts an authorization decision is derived from. Resolved
@@ -23,10 +24,6 @@ export type ReportAction =
 	| "delete"
 	| "transition"
 	| "review";
-
-function isEditable(status: ReportStatus): boolean {
-	return status === ReportStatus.DRAFT || status === ReportStatus.NEEDS_REVISION;
-}
 
 const RULES: Record<
 	ReportAction,

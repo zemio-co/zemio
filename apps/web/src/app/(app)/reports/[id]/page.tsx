@@ -19,7 +19,7 @@ export default async function ServerPage({
 
 	// Prefetch additional data for client components
 	void api.report.financialSummary.prefetch({ id: reportId });
-	void api.expense.listForReport.prefetch({ reportId });
+	void api.expense.list.prefetch({ reportId });
 
 	const canAddExpense =
 		report.status === ReportStatus.DRAFT ||

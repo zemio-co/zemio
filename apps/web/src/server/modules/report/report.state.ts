@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { ReportStatus } from "@zemio/db";
 
+export function isEditable(status: ReportStatus): boolean {
+	return status === ReportStatus.DRAFT || status === ReportStatus.NEEDS_REVISION;
+}
+
 /**
  * Statuses from which a report **owner** may submit for approval. The owner flow
  * is deliberately strict; broader status changes go through the admin transition.
