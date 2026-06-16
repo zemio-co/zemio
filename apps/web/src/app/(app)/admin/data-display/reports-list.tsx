@@ -34,7 +34,7 @@ const OVERSCAN = 5; // Number of items to render outside visible area
 
 export function ReportsList() {
 	// Fetch filter options from server (separate query, cached independently)
-	const [filterOptions] = api.admin.getFilterOptions.useSuspenseQuery();
+	const [filterOptions] = api.reportFilters.options.useSuspenseQuery();
 
 	// Infinite query for paginated reports
 	const {
@@ -42,7 +42,7 @@ export function ReportsList() {
 		fetchNextPage,
 		hasNextPage,
 		isFetchingNextPage,
-	} = api.admin.listAllPaginated.useInfiniteQuery(
+	} = api.report.reviewList.useInfiniteQuery(
 		{ limit: PAGE_SIZE },
 		{
 			getNextPageParam: (lastPage) => lastPage.nextCursor,

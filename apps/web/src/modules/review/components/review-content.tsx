@@ -18,7 +18,7 @@ function ReviewContent({
 		data: review,
 		error,
 		isPending,
-	} = api.admin.getReview.useQuery({
+	} = api.report.review.useQuery({
 		id: reportId,
 	});
 	const errorMessage = error?.message;

@@ -8,8 +8,8 @@ import { ReportsList } from "./data-display/reports-list";
 
 export default async function ServerPage() {
 	// Prefetch filter options and first page of reports in parallel
-	void api.admin.getFilterOptions.prefetch();
-	void api.admin.listAllPaginated.prefetchInfinite({ limit: 50 });
+	void api.reportFilters.options.prefetch();
+	void api.report.reviewList.prefetchInfinite({ limit: 50 });
 
 	return (
 		<>

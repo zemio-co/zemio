@@ -6,7 +6,7 @@ export default async function ServerPage({
 }: PageProps<"/reports/[id]">) {
 	const { id: reportId } = await params;
 
-	void api.admin.getReview.prefetch({ id: reportId });
+	void api.report.review.prefetch({ id: reportId });
 
 	return (
 		<HydrateClient>

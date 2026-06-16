@@ -17,7 +17,7 @@ export function ReportStats({
 	reportId,
 	...props
 }: React.ComponentProps<"div"> & { reportId: string }) {
-	const [stats] = api.report.getDetails.useSuspenseQuery({ id: reportId });
+	const [stats] = api.report.financialSummary.useSuspenseQuery({ id: reportId });
 
 	return (
 		<div

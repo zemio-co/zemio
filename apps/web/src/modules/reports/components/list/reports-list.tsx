@@ -162,7 +162,7 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 
 	const querySorting = useMemo(() => buildReportListSorting(sorting), [sorting]);
 
-	const reportsQuery = api.report.listOwn.useQuery(
+	const reportsQuery = api.report.list.useQuery(
 		{
 			filters: queryFilters,
 			page,

@@ -50,7 +50,7 @@ export function ReportAdministration({
 		},
 	});
 
-	const updateStatus = api.report.updateStatus.useMutation({
+	const updateStatus = api.report.transition.useMutation({
 		onMutate: () => {
 			toast.info("Status wird aktualisiert...");
 		},
@@ -58,7 +58,7 @@ export function ReportAdministration({
 			toast.success("Status aktualisiert", {
 				description: "Antragsteller wurde per E-Mail informiert",
 			});
-			utils.report.getById.invalidate({ id: report.id });
+			utils.report.byId.invalidate({ id: report.id });
 		},
 		onError: ({ message }) => {
 			toast.error("Fehler beim Aktualisieren des Reports", {
