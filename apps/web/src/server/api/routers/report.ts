@@ -6,14 +6,14 @@ import {
 	orgAdminProcedure,
 	orgProcedure,
 } from "@/server/api/trpc";
-import { toReportDetailDTO } from "@/server/modules/report/report.dto";
-import { registerReportEmailSubscribers } from "@/server/modules/report/report.emails";
 import {
+	registerReportEmailSubscribers,
+	reportListInputSchema,
 	reportProcedure,
+	reportService,
+	toReportDetailDTO,
 	toReportServiceContext,
-} from "@/server/modules/report/report.procedure";
-import { reportListInputSchema } from "@/server/modules/report/report.query";
-import { reportService } from "@/server/modules/report/report.service";
+} from "@/server/modules/report";
 
 // Wire the email side-effects to the report event bus when the router loads.
 registerReportEmailSubscribers();

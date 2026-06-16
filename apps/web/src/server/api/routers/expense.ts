@@ -1,15 +1,14 @@
 import { z } from "zod";
+import { createTRPCRouter, orgProcedure } from "@/server/api/trpc";
 import {
 	createFoodExpenseSchema,
 	createReceiptExpenseSchema,
 	createTravelExpenseSchema,
-} from "@/lib/validators";
-import { createTRPCRouter, orgProcedure } from "@/server/api/trpc";
-import {
 	expenseProcedure,
+	expenseService,
 	toExpenseServiceContext,
-} from "@/server/modules/expense/expense.procedure";
-import { expenseService } from "@/server/modules/expense/expense.service";
+	updateExpenseSchema,
+} from "@/server/modules/expense";
 
 export const expenseRouter = createTRPCRouter({
 	list: orgProcedure
@@ -41,21 +40,7 @@ export const expenseRouter = createTRPCRouter({
 		),
 
 	update: expenseProcedure("update")
-		.input(
-			z.object({
-				description: z.string().optional(),
-				amount: z.number().min(0).optional(),
-				startDate: z.date().optional(),
-				endDate: z.date().optional(),
-				from: z.string().min(1).optional(),
-				to: z.string().min(1).optional(),
-				distance: z.number().min(1).optional(),
-				days: z.number().min(1).optional(),
-				breakfastDeduction: z.number().min(0).optional(),
-				lunchDeduction: z.number().min(0).optional(),
-				dinnerDeduction: z.number().min(0).optional(),
-			}),
-		)
+		.input(updateExpenseSchema)
 		.mutation(({ ctx, input }) =>
 			expenseService.update(toExpenseServiceContext(ctx), ctx.expense, input),
 		),

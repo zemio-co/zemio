@@ -6,10 +6,10 @@ import {
 } from "@/server/api/trpc";
 import {
 	attachmentProcedure,
+	attachmentService,
 	toAttachmentServiceContext,
-} from "@/server/modules/attachment/attachment.procedure";
-import { attachmentService } from "@/server/modules/attachment/attachment.service";
-import { expenseProcedure } from "@/server/modules/expense/expense.procedure";
+} from "@/server/modules/attachment/";
+import { expenseProcedure } from "@/server/modules/expense";
 
 export const attachmentRouter = createTRPCRouter({
 	list: expenseProcedure("read").query(({ ctx }) =>
