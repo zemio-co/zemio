@@ -120,3 +120,12 @@ Expense-report application for student initiatives.
 - Reports UI: `src/modules/reports/` — TanStack Table, nuqs-backed pagination/sorting/filters, server-validated by `src/server/api/routers/report-list-query.ts`
 - Forms: TanStack Form + local Zod schemas from `src/lib/validators/`
 - Admin review UI: `src/modules/review/` (newer); older duplicates exist under `src/app/(app)/admin/review` and `src/app/(app)/reports/[id]`
+
+# Response format
+
+End **every** reponse with the following line:
+
+```
+---
+Request completed [succesfully | with errors].
+```
