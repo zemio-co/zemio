@@ -124,7 +124,6 @@ const reportListSortingSchema = z
 export const reportListInputSchema = z
 	.object({
 		filters: z.lazy(() => reportListFilterGroupSchema).optional(),
-		limit: z.number().int().min(1).max(101).optional(),
 		page: z.number().int().min(1),
 		pageSize: z.number().int().min(1).max(100),
 		sorting: reportListSortingSchema,
@@ -151,6 +150,8 @@ export const reportListInputSchema = z
 		}
 	});
 
+export type ReportListInput = z.infer<typeof reportListInputSchema>;
+
 type ReportListFilterRule = z.infer<typeof reportListFilterRuleSchema>;
 
 type ReportListFilterGroup = {
@@ -162,7 +163,15 @@ type ReportListFilterNode = ReportListFilterGroup | ReportListFilterRule;
 
 type ReportListSorting = z.infer<typeof reportListSortingSchema>;
 
+/**
+ * Whose reports the list should return:
+ * - `own`: the requesting user's reports (owner views)
+ * - `all`: every report in the org (admin views; the policy must permit it)
+ */
+export type ReportListScope = "own" | "all";
+
 type ReportListWhereInput = {
+	scope: ReportListScope;
 	filters?: ReportListFilterGroup;
 	organizationId: string;
 	userId: string;
@@ -206,21 +215,20 @@ function getFilterDepth(group: ReportListFilterGroup): number {
 }
 
 export function buildReportListWhere({
+	scope,
 	filters,
 	organizationId,
 	userId,
 }: ReportListWhereInput): Prisma.ReportWhereInput {
-	const scope: Prisma.ReportWhereInput = {
-		organizationId,
-		ownerId: userId,
-	};
+	const base: Prisma.ReportWhereInput =
+		scope === "own" ? { organizationId, ownerId: userId } : { organizationId };
 
 	if (!filters) {
-		return scope;
+		return base;
 	}
 
 	return {
-		AND: [scope, compileFilterGroup(filters)],
+		AND: [base, compileFilterGroup(filters)],
 	};
 }
 
