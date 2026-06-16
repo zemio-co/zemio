@@ -1,178 +1,24 @@
-import { TRPCError } from "@trpc/server";
-import { ExpenseType, ReportStatus } from "@zemio/db";
 import { z } from "zod";
-import { logger } from "@/lib/logger";
 import {
 	createTRPCRouter,
 	orgAdminProcedure,
 	orgProcedure,
-	protectedProcedure,
 } from "@/server/api/trpc";
-import { auth } from "@/server/better-auth";
-import { db } from "@/server/db";
 import {
-	deleteFilesFromStorage,
-	getFileExtension,
-	getPresignedDownloadUrl,
-	getPresignedUploadUrl,
-} from "@/server/storage";
+	attachmentProcedure,
+	attachmentService,
+	toAttachmentServiceContext,
+} from "@/server/modules/attachment/";
+import { expenseProcedure } from "@/server/modules/expense";
 
 export const attachmentRouter = createTRPCRouter({
-	listForReport: protectedProcedure
-		.input(
-			z.object({
-				id: z.string(),
-			}),
-		)
-		.query(async ({ ctx, input }) => {
-			const report = await ctx.db.report.findUnique({
-				where: {
-					id: input.id,
-				},
-				select: {
-					organizationId: true,
-					ownerId: true,
-				},
-			});
+	list: expenseProcedure("read").query(({ ctx }) =>
+		attachmentService.list(toAttachmentServiceContext(ctx), ctx.expense),
+	),
 
-			if (!report) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
-			}
-
-			const hasPermission = await auth.api.hasPermission({
-				headers: ctx.headers,
-				body: {
-					organizationId: report.organizationId,
-					permissions: {
-						report: ["readAll"],
-					},
-				},
-			});
-
-			if (!hasPermission.success && report.ownerId !== ctx.session.user.id) {
-				throw new TRPCError({
-					code: "UNAUTHORIZED",
-				});
-			}
-
-			return await db.attachment.findMany({
-				where: {
-					expense: {
-						reportId: input.id,
-					},
-				},
-			});
-		}),
-
-	listForExpense: protectedProcedure
-		.input(
-			z.object({
-				expenseId: z.string(),
-			}),
-		)
-		.query(async ({ ctx, input }) => {
-			const expense = await ctx.db.expense.findUnique({
-				where: {
-					id: input.expenseId,
-				},
-				select: {
-					report: {
-						select: {
-							organizationId: true,
-							ownerId: true,
-						},
-					},
-				},
-			});
-
-			if (!expense) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-				});
-			}
-
-			const hasPermission = await auth.api.hasPermission({
-				headers: ctx.headers,
-				body: {
-					organizationId: expense.report.organizationId,
-					permissions: {
-						report: ["readAll"],
-					},
-				},
-			});
-
-			if (
-				!hasPermission.success &&
-				expense.report.ownerId !== ctx.session.user.id
-			) {
-				throw new TRPCError({
-					code: "UNAUTHORIZED",
-				});
-			}
-
-			return await db.attachment.findMany({
-				where: {
-					expense: {
-						id: input.expenseId,
-					},
-				},
-			});
-		}),
-
-	getDownloadUrl: protectedProcedure
-		.input(
-			z.object({
-				id: z.string(),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			const attachment = await ctx.db.attachment.findUnique({
-				where: { id: input.id },
-				select: {
-					key: true,
-					originalName: true,
-					expense: {
-						select: {
-							report: {
-								select: {
-									ownerId: true,
-									organizationId: true,
-								},
-							},
-						},
-					},
-				},
-			});
-
-			if (!attachment) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			const hasPermission = await auth.api.hasPermission({
-				headers: ctx.headers,
-				body: {
-					organizationId: attachment.expense.report.organizationId,
-					permissions: {
-						report: ["readAll"],
-					},
-				},
-			});
-
-			const isOwner = attachment.expense.report.ownerId === ctx.session.user.id;
-
-			if (!hasPermission.success && !isOwner) {
-				throw new TRPCError({ code: "UNAUTHORIZED" });
-			}
-
-			const url = await getPresignedDownloadUrl(
-				attachment.key,
-				attachment.originalName,
-			);
-
-			return { url };
-		}),
+	getDownloadUrl: attachmentProcedure("read").mutation(({ ctx }) =>
+		attachmentService.getDownloadUrl(ctx.attachment),
+	),
 
 	getBatchDownloadUrls: orgAdminProcedure
 		.input(
@@ -186,62 +32,12 @@ export const attachmentRouter = createTRPCRouter({
 					}),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const attachments = await ctx.db.attachment.findMany({
-				where: {
-					id: {
-						in: input.ids,
-					},
-					expense: {
-						report: {
-							organizationId: ctx.organizationId,
-						},
-					},
-				},
-				select: {
-					id: true,
-					key: true,
-					originalName: true,
-				},
-			});
-
-			if (attachments.length !== input.ids.length) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "One or more attachments were not found",
-				});
-			}
-
-			const attachmentsById = new Map(
-				attachments.map((attachment) => [attachment.id, attachment]),
-			);
-
-			const files = await Promise.all(
-				input.ids.map(async (id) => {
-					const attachment = attachmentsById.get(id);
-
-					if (!attachment) {
-						throw new TRPCError({
-							code: "NOT_FOUND",
-							message: "One or more attachments were not found",
-						});
-					}
-
-					const url = await getPresignedDownloadUrl(
-						attachment.key,
-						attachment.originalName,
-					);
-
-					return {
-						id: attachment.id,
-						filename: attachment.originalName,
-						url,
-					};
-				}),
-			);
-
-			return { files };
-		}),
+		.mutation(({ ctx, input }) =>
+			attachmentService.getBatchDownloadUrls(
+				toAttachmentServiceContext(ctx),
+				input,
+			),
+		),
 
 	getUploadUrls: orgProcedure
 		.input(
@@ -262,86 +58,13 @@ export const attachmentRouter = createTRPCRouter({
 					.max(5),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const presignedUrls = await Promise.all(
-				input.files.map(async (file) => {
-					const extension = getFileExtension(file.name);
-					const uniqueFilename = extension
-						? `${crypto.randomUUID()}.${extension}`
-						: crypto.randomUUID();
-					const key = `attachment/${ctx.organizationId}/${uniqueFilename}`;
-					const url = await getPresignedUploadUrl(key, file.contentType, file.size);
-					return { url, key };
-				}),
-			);
+		.mutation(({ ctx, input }) =>
+			attachmentService.getUploadUrls(toAttachmentServiceContext(ctx), input),
+		),
 
-			logger.info("attachment.upload_initiated", {
-				organizationId: ctx.organizationId,
-				actorId: ctx.session.user.id,
-				count: input.files.length,
-			});
-
-			return { presignedUrls };
-		}),
-
-	delete: orgProcedure
-		.input(z.object({ id: z.string() }))
-		.mutation(async ({ ctx, input }) => {
-			const attachment = await ctx.db.attachment.findUnique({
-				where: { id: input.id },
-				select: {
-					key: true,
-					expense: {
-						select: {
-							report: {
-								select: {
-									ownerId: true,
-									organizationId: true,
-									status: true,
-								},
-							},
-						},
-					},
-				},
-			});
-
-			if (!attachment) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			const { report } = attachment.expense;
-
-			if (report.organizationId !== ctx.organizationId) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			if (report.ownerId !== ctx.session.user.id) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "You don't have permission to delete this attachment",
-				});
-			}
-
-			if (
-				report.status !== ReportStatus.DRAFT &&
-				report.status !== ReportStatus.NEEDS_REVISION
-			) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message:
-						"Attachments can only be deleted from draft or needs revision reports",
-				});
-			}
-
-			await deleteFilesFromStorage([attachment.key]);
-
-			return ctx.db.attachment.delete({ where: { id: input.id } });
-		}),
-
-	addToExpense: orgProcedure
+	addToExpense: expenseProcedure("addAttachment")
 		.input(
 			z.object({
-				expenseId: z.string(),
 				attachments: z
 					.array(
 						z.object({
@@ -360,83 +83,17 @@ export const attachmentRouter = createTRPCRouter({
 					.max(5),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const expense = await ctx.db.expense.findUnique({
-				where: { id: input.expenseId },
-				select: {
-					type: true,
-					report: {
-						select: {
-							ownerId: true,
-							organizationId: true,
-							status: true,
-						},
-					},
-					_count: { select: { attachments: true } },
-				},
-			});
+		.mutation(({ ctx, input }) =>
+			attachmentService.addToExpense(
+				toAttachmentServiceContext(ctx),
+				ctx.expense,
+				input,
+			),
+		),
 
-			if (!expense) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			if (expense.report.organizationId !== ctx.organizationId) {
-				throw new TRPCError({ code: "NOT_FOUND" });
-			}
-
-			if (expense.report.ownerId !== ctx.session.user.id) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "You don't have permission to add attachments to this expense",
-				});
-			}
-
-			if (
-				expense.report.status !== ReportStatus.DRAFT &&
-				expense.report.status !== ReportStatus.NEEDS_REVISION
-			) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message:
-						"Attachments can only be added to draft or needs revision reports",
-				});
-			}
-
-			if (expense.type !== ExpenseType.RECEIPT) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "Attachments can only be added to receipt expenses",
-				});
-			}
-
-			const newTotal = expense._count.attachments + input.attachments.length;
-			if (newTotal > 5) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: `Adding these attachments would exceed the 5-attachment limit (currently ${expense._count.attachments})`,
-				});
-			}
-
-			const expectedKeyPrefix = `attachment/${ctx.organizationId}/`;
-			const hasInvalidKey = input.attachments.some(
-				(a) => !a.key.startsWith(expectedKeyPrefix),
-			);
-			if (hasInvalidKey) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "One or more attachment keys do not belong to this organization",
-				});
-			}
-
-			return ctx.db.attachment.createMany({
-				data: input.attachments.map((a) => ({
-					expenseId: input.expenseId,
-					key: a.key,
-					size: a.size,
-					originalName: a.originalName,
-				})),
-			});
-		}),
+	delete: attachmentProcedure("delete").mutation(({ ctx }) =>
+		attachmentService.delete(toAttachmentServiceContext(ctx), ctx.attachment),
+	),
 
 	deletePendingUploads: orgProcedure
 		.input(
@@ -450,28 +107,10 @@ export const attachmentRouter = createTRPCRouter({
 					.max(5),
 			}),
 		)
-		.mutation(async ({ ctx, input }) => {
-			const organizationKeyPrefix = `attachment/${ctx.organizationId}/`;
-			const hasInvalidKey = input.keys.some(
-				(key) => !key.startsWith(organizationKeyPrefix),
-			);
-
-			if (hasInvalidKey) {
-				throw new TRPCError({
-					code: "BAD_REQUEST",
-					message: "One or more attachment keys do not belong to this organization",
-				});
-			}
-
-			try {
-				await deleteFilesFromStorage(input.keys);
-			} catch {
-				throw new TRPCError({
-					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to clean up uploaded attachments",
-				});
-			}
-
-			return { deletedKeys: input.keys };
-		}),
+		.mutation(({ ctx, input }) =>
+			attachmentService.deletePendingUploads(
+				toAttachmentServiceContext(ctx),
+				input,
+			),
+		),
 });

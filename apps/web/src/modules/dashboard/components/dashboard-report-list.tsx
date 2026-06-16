@@ -19,7 +19,7 @@ function DashboardReportList({
 	className,
 	...props
 }: React.ComponentProps<"section">) {
-	const { data, isPending, error } = api.report.listOwn.useQuery({
+	const { data, isPending, error } = api.report.list.useQuery({
 		page: 1,
 		pageSize: 10,
 	});

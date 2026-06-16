@@ -67,6 +67,18 @@ const costUnitArrayFilterSchema = z.object({
 	value: nonEmptyStringArraySchema,
 });
 
+const ownerSingleFilterSchema = z.object({
+	field: z.literal("ownerId"),
+	op: z.enum(["is", "isNot"]),
+	value: nonEmptyStringSchema,
+});
+
+const ownerArrayFilterSchema = z.object({
+	field: z.literal("ownerId"),
+	op: z.enum(["in", "notIn"]),
+	value: nonEmptyStringArraySchema,
+});
+
 const tagSingleFilterSchema = z.object({
 	field: z.literal("tag"),
 	op: z.enum(["eq", "gt", "lt"]),
@@ -104,6 +116,8 @@ const reportListFilterRuleSchema = z.union([
 	titleArrayFilterSchema,
 	costUnitSingleFilterSchema,
 	costUnitArrayFilterSchema,
+	ownerSingleFilterSchema,
+	ownerArrayFilterSchema,
 	tagSingleFilterSchema,
 	tagArrayFilterSchema,
 	tagRangeFilterSchema,
@@ -124,7 +138,7 @@ const reportListSortingSchema = z
 export const reportListInputSchema = z
 	.object({
 		filters: z.lazy(() => reportListFilterGroupSchema).optional(),
-		limit: z.number().int().min(1).max(101).optional(),
+		scope: z.enum(["own", "all"]).default("own"),
 		page: z.number().int().min(1),
 		pageSize: z.number().int().min(1).max(100),
 		sorting: reportListSortingSchema,
@@ -151,6 +165,8 @@ export const reportListInputSchema = z
 		}
 	});
 
+export type ReportListInput = z.infer<typeof reportListInputSchema>;
+
 type ReportListFilterRule = z.infer<typeof reportListFilterRuleSchema>;
 
 type ReportListFilterGroup = {
@@ -162,7 +178,15 @@ type ReportListFilterNode = ReportListFilterGroup | ReportListFilterRule;
 
 type ReportListSorting = z.infer<typeof reportListSortingSchema>;
 
+/**
+ * Whose reports the list should return:
+ * - `own`: the requesting user's reports (owner views)
+ * - `all`: every report in the org (admin views; the policy must permit it)
+ */
+export type ReportListScope = "own" | "all";
+
 type ReportListWhereInput = {
+	scope: ReportListScope;
 	filters?: ReportListFilterGroup;
 	organizationId: string;
 	userId: string;
@@ -206,21 +230,20 @@ function getFilterDepth(group: ReportListFilterGroup): number {
 }
 
 export function buildReportListWhere({
+	scope,
 	filters,
 	organizationId,
 	userId,
 }: ReportListWhereInput): Prisma.ReportWhereInput {
-	const scope: Prisma.ReportWhereInput = {
-		organizationId,
-		ownerId: userId,
-	};
+	const base: Prisma.ReportWhereInput =
+		scope === "own" ? { organizationId, ownerId: userId } : { organizationId };
 
 	if (!filters) {
-		return scope;
+		return base;
 	}
 
 	return {
-		AND: [scope, compileFilterGroup(filters)],
+		AND: [base, compileFilterGroup(filters)],
 	};
 }
 
@@ -262,6 +285,8 @@ function compileFilterRule(
 	switch (rule.field) {
 		case "costUnitId":
 			return compileStringFilter("costUnitId", rule);
+		case "ownerId":
+			return compileStringFilter("ownerId", rule);
 		case "createdAt":
 			return compileDateFilter("createdAt", rule);
 		case "lastUpdatedAt":
@@ -291,8 +316,11 @@ function compileStatusFilter(
 }
 
 function compileStringFilter(
-	field: "costUnitId" | "title",
-	rule: Extract<ReportListFilterRule, { field: "costUnitId" | "title" }>,
+	field: "costUnitId" | "title" | "ownerId",
+	rule: Extract<
+		ReportListFilterRule,
+		{ field: "costUnitId" | "title" | "ownerId" }
+	>,
 ): Prisma.ReportWhereInput {
 	switch (rule.op) {
 		case "in":

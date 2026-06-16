@@ -30,7 +30,7 @@ export function ReportExpensesList({
 		reportStatus === ReportStatus.DRAFT ||
 		reportStatus === ReportStatus.NEEDS_REVISION;
 
-	const [expenses] = api.expense.listForReport.useSuspenseQuery({
+	const [expenses] = api.expense.list.useSuspenseQuery({
 		reportId: reportId,
 	});
 

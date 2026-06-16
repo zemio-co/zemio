@@ -1,6 +1,6 @@
 import type { RouterOutputs } from "@/trpc/react";
 
-type ReviewReadModel = RouterOutputs["admin"]["getReview"];
+type ReviewReadModel = RouterOutputs["report"]["review"];
 type ReviewReport = ReviewReadModel["report"];
 type ReviewExpense = ReviewReadModel["expenses"][number];
 type ReviewAttachment = ReviewReadModel["attachments"][number];

@@ -39,7 +39,7 @@ function ExpensesHeader({
 		data: review,
 		error,
 		isPending,
-	} = api.admin.getReview.useQuery({
+	} = api.report.review.useQuery({
 		id: reportId,
 	});
 
@@ -158,13 +158,13 @@ function ReportActions({
 }) {
 	const utils = api.useUtils();
 
-	const { mutate: setStatus } = api.report.updateStatus.useMutation({
+	const { mutate: setStatus } = api.report.transition.useMutation({
 		onMutate: () => {
 			toast.info("Status wird aktualisiert");
 		},
 		onSuccess: () => {
 			toast.success("Status erfolgreich aktualisiert");
-			void utils.admin.getReview.invalidate({ id: report.id });
+			void utils.report.review.invalidate({ id: report.id });
 		},
 		onError: () => {
 			toast.error("Fehler beim Aktualisieren des Reports");

@@ -78,7 +78,7 @@ function ReceiptEditForm({
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
-			utils.expense.listForReport.invalidate({ reportId: expense.reportId });
+			utils.expense.list.invalidate({ reportId: expense.reportId });
 			toast.success("Ausgabe erfolgreich aktualisiert");
 			onSuccess();
 		},
@@ -231,7 +231,7 @@ function TravelEditForm({
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
-			utils.expense.listForReport.invalidate({ reportId: expense.reportId });
+			utils.expense.list.invalidate({ reportId: expense.reportId });
 			toast.success("Ausgabe erfolgreich aktualisiert");
 			onSuccess();
 		},
@@ -482,7 +482,7 @@ function FoodEditForm({
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
-			utils.expense.listForReport.invalidate({ reportId: expense.reportId });
+			utils.expense.list.invalidate({ reportId: expense.reportId });
 			toast.success("Ausgabe erfolgreich aktualisiert");
 			onSuccess();
 		},

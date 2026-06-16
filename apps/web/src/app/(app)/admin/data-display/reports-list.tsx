@@ -3,59 +3,123 @@
 import type {
 	ColumnFiltersState,
 	ExpandedState,
+	RowSelectionState,
+	SortingState,
+	Updater,
 	VisibilityState,
 } from "@tanstack/react-table";
 import {
 	flexRender,
 	getCoreRowModel,
 	getExpandedRowModel,
-	getFilteredRowModel,
 	getGroupedRowModel,
-	getSortedRowModel,
-	type RowSelectionState,
-	type SortingState,
 	useReactTable,
 } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { ListFilterIcon, Loader2Icon, Settings2Icon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReportStatus } from "@zemio/db";
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	ListFilterIcon,
+	Settings2Icon,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { DataListGroupHeader } from "@/components/data/data-list";
 import { DisplayOptions } from "@/components/data/display-options";
 import { FilterList } from "@/components/data/filter-list";
 import { FilterMenu } from "@/components/data/filter-menu";
+import {
+	isDateRangeFilter,
+	isMultiSelectFilter,
+	isSelectFilter,
+} from "@/components/data/filter-types";
 import { List, ListItem } from "@/components/list";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { createColumns, type ExtendedReport } from "./columns";
 
 const PAGE_SIZE = 50;
-const ROW_HEIGHT = 40; // Default row height in pixels
-const OVERSCAN = 5; // Number of items to render outside visible area
+
+const SERVER_SORT_FIELDS = [
+	"createdAt",
+	"lastUpdatedAt",
+	"status",
+	"tag",
+	"title",
+] as const;
+
+type ServerSortField = (typeof SERVER_SORT_FIELDS)[number];
+
+function isServerSortField(id: string): id is ServerSortField {
+	return (SERVER_SORT_FIELDS as readonly string[]).includes(id);
+}
+
+function buildReportListSorting(
+	sortingState: SortingState,
+): Array<{ id: ServerSortField; desc: boolean }> | undefined {
+	const sort = sortingState[0];
+	if (!sort || !isServerSortField(sort.id)) return undefined;
+	return [{ id: sort.id, desc: sort.desc }];
+}
+
+type AdminFilterRule =
+	| { field: "status"; op: "is" | "isNot"; value: ReportStatus }
+	| { field: "ownerId"; op: "is" | "isNot"; value: string }
+	| { field: "costUnitId"; op: "in" | "notIn"; value: string[] }
+	| { field: "createdAt"; op: "between"; value: { start: Date; end: Date } };
+
+type AdminFilters = { logic: "and"; rules: AdminFilterRule[] };
+
+function buildReportListFilters(
+	columnFilters: ColumnFiltersState,
+): AdminFilters | undefined {
+	const rules: AdminFilterRule[] = [];
+
+	for (const filter of columnFilters) {
+		if (filter.id === "status" && isSelectFilter(filter.value)) {
+			rules.push({
+				field: "status",
+				op: filter.value.operator === "is" ? "is" : "isNot",
+				value: filter.value.value as ReportStatus,
+			});
+		}
+
+		if (filter.id === "owner" && isSelectFilter(filter.value)) {
+			rules.push({
+				field: "ownerId",
+				op: filter.value.operator === "is" ? "is" : "isNot",
+				value: filter.value.value,
+			});
+		}
+
+		if (
+			filter.id === "costUnit" &&
+			isMultiSelectFilter(filter.value) &&
+			filter.value.value.length > 0
+		) {
+			rules.push({
+				field: "costUnitId",
+				op: filter.value.operator === "in" ? "in" : "notIn",
+				value: filter.value.value,
+			});
+		}
+
+		if (filter.id === "createdAt" && isDateRangeFilter(filter.value)) {
+			rules.push({
+				field: "createdAt",
+				op: "between",
+				value: { end: filter.value.end, start: filter.value.start },
+			});
+		}
+	}
+
+	if (rules.length === 0) return undefined;
+
+	return { logic: "and", rules };
+}
 
 export function ReportsList() {
-	// Fetch filter options from server (separate query, cached independently)
-	const [filterOptions] = api.admin.getFilterOptions.useSuspenseQuery();
-
-	// Infinite query for paginated reports
-	const {
-		data: reportsData,
-		fetchNextPage,
-		hasNextPage,
-		isFetchingNextPage,
-	} = api.admin.listAllPaginated.useInfiniteQuery(
-		{ limit: PAGE_SIZE },
-		{
-			getNextPageParam: (lastPage) => lastPage.nextCursor,
-		},
-	);
-
-	// Flatten all pages into a single array
-	const data = useMemo(() => {
-		return reportsData?.pages.flatMap((page) => page.items) ?? [];
-	}, [reportsData]);
-
-	const totalCount = reportsData?.pages[0]?.totalCount ?? 0;
-
+	const [page, setPage] = useState<number>(1);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [grouping, setGrouping] = useState<string[]>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
@@ -63,7 +127,25 @@ export function ReportsList() {
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 	const [expanded, setExpanded] = useState<ExpandedState>(true);
 
-	// Create columns with server-provided filter options
+	const [filterOptions] = api.reportFilters.options.useSuspenseQuery();
+
+	const queryFilters = useMemo(
+		() => buildReportListFilters(columnFilters),
+		[columnFilters],
+	);
+	const querySorting = useMemo(() => buildReportListSorting(sorting), [sorting]);
+
+	const reportsQuery = api.report.list.useQuery(
+		{
+			scope: "all",
+			filters: queryFilters,
+			page,
+			pageSize: PAGE_SIZE,
+			sorting: querySorting,
+		},
+		{ placeholderData: (previousData) => previousData },
+	);
+
 	const columns = useMemo(
 		() =>
 			createColumns({
@@ -75,9 +157,12 @@ export function ReportsList() {
 
 	const table = useReactTable<ExtendedReport>({
 		autoResetExpanded: false,
-		autoResetPageIndex: false, // Prevent state update during render/hydration
+		autoResetPageIndex: false,
 		enableExpanding: true,
-		data,
+		manualFiltering: true,
+		manualSorting: true,
+		groupedColumnMode: false,
+		data: reportsQuery.data?.reports ?? [],
 		columns,
 		state: {
 			columnFilters,
@@ -87,55 +172,28 @@ export function ReportsList() {
 			rowSelection,
 			columnVisibility,
 		},
-		onColumnFiltersChange: setColumnFilters,
+		onColumnFiltersChange: (updater: Updater<ColumnFiltersState>) => {
+			const next =
+				typeof updater === "function" ? updater(columnFilters) : updater;
+			setColumnFilters(next);
+			setPage(1);
+		},
 		onExpandedChange: setExpanded,
 		onRowSelectionChange: setRowSelection,
 		onGroupingChange: setGrouping,
-		onSortingChange: setSorting,
+		onSortingChange: (updater: Updater<SortingState>) => {
+			const next = typeof updater === "function" ? updater(sorting) : updater;
+			setSorting(next);
+			setPage(1);
+		},
 		onColumnVisibilityChange: setColumnVisibility,
-		groupedColumnMode: false,
 		getGroupedRowModel: getGroupedRowModel(),
 		getCoreRowModel: getCoreRowModel(),
 		getExpandedRowModel: getExpandedRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
 	});
 
-	const { rows } = table.getRowModel();
-
-	// Container ref for virtualization
-	const parentRef = useRef<HTMLDivElement>(null);
-
-	// Set up virtualizer
-	const virtualizer = useVirtualizer({
-		count: rows.length,
-		getScrollElement: () => parentRef.current,
-		estimateSize: () => ROW_HEIGHT,
-		overscan: OVERSCAN,
-	});
-
-	const virtualItems = virtualizer.getVirtualItems();
-
-	// Load more when scrolling near the bottom
-	const handleScroll = useCallback(() => {
-		if (!parentRef.current) return;
-
-		const { scrollHeight, scrollTop, clientHeight } = parentRef.current;
-		const scrollBottom = scrollHeight - scrollTop - clientHeight;
-
-		// Load more when within 200px of the bottom
-		if (scrollBottom < 200 && hasNextPage && !isFetchingNextPage) {
-			void fetchNextPage();
-		}
-	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-	useEffect(() => {
-		const element = parentRef.current;
-		if (!element) return;
-
-		element.addEventListener("scroll", handleScroll);
-		return () => element.removeEventListener("scroll", handleScroll);
-	}, [handleScroll]);
+	const rows = table.getRowModel().rows;
+	const pageCount = reportsQuery.data?.pagination.pageCount ?? 0;
 
 	return (
 		<div className="flex flex-col">
@@ -153,31 +211,22 @@ export function ReportsList() {
 						</span>
 					</FilterMenu>
 				</FilterList>
-				<div className="flex items-center gap-2">
-					<span className="text-muted-foreground text-sm">
-						{rows.length} / {totalCount}
-					</span>
-					<DisplayOptions
-						className={"shrink-0"}
-						display={table}
-						size={"sm"}
-						variant={"outline"}
-					>
-						<Settings2Icon /> Display
-					</DisplayOptions>
-				</div>
-			</div>
-			<div className="max-h-[calc(100vh-200px)] overflow-auto" ref={parentRef}>
-				<List
-					style={{
-						height: `${virtualizer.getTotalSize()}px`,
-						position: "relative",
-					}}
+				<DisplayOptions
+					className={"shrink-0"}
+					display={table}
+					size={"sm"}
+					variant={"outline"}
 				>
-					{virtualItems.map((virtualRow) => {
-						const row = rows[virtualRow.index];
-						if (!row) return null;
+					<Settings2Icon /> Display
+				</DisplayOptions>
+			</div>
 
+			<div
+				className="transition-opacity data-[fetching=true]:opacity-50"
+				data-fetching={reportsQuery.isFetching}
+			>
+				<List>
+					{rows.map((row) => {
 						if (row.getIsGrouped()) {
 							return (
 								<DataListGroupHeader
@@ -185,14 +234,6 @@ export function ReportsList() {
 									display={table}
 									key={row.id}
 									row={row}
-									style={{
-										position: "absolute",
-										top: 0,
-										left: 0,
-										width: "100%",
-										height: `${virtualRow.size}px`,
-										transform: `translateY(${virtualRow.start}px)`,
-									}}
 								/>
 							);
 						}
@@ -201,14 +242,6 @@ export function ReportsList() {
 								key={row.id}
 								{...(row.getIsSelected() ? { "data-selected": true } : {})}
 								className="relative pr-8"
-								style={{
-									position: "absolute",
-									top: 0,
-									left: 0,
-									width: "100%",
-									height: `${virtualRow.size}px`,
-									transform: `translateY(${virtualRow.start}px)`,
-								}}
 							>
 								{row.getVisibleCells().map((cell) => (
 									<div
@@ -227,12 +260,31 @@ export function ReportsList() {
 						);
 					})}
 				</List>
-				{isFetchingNextPage && (
-					<div className="flex items-center justify-center py-4">
-						<Loader2Icon className="size-6 animate-spin text-muted-foreground" />
-					</div>
-				)}
 			</div>
+
+			{pageCount > 1 && (
+				<div className="container flex max-w-none items-center justify-end gap-2 py-4">
+					<span className="text-xs text-zinc-500">
+						Seite {page} von {pageCount}
+					</span>
+					<Button
+						disabled={page <= 1}
+						onClick={() => setPage((p) => p - 1)}
+						size="icon-sm"
+						variant="outline"
+					>
+						<ChevronLeftIcon />
+					</Button>
+					<Button
+						disabled={page >= pageCount}
+						onClick={() => setPage((p) => p + 1)}
+						size="icon-sm"
+						variant="outline"
+					>
+						<ChevronRightIcon />
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

@@ -110,7 +110,7 @@ function UpdateExpenseForm({
 	expenseType: ExpenseType;
 	canModify: boolean;
 }) {
-	const { data, isPending, error } = api.expense.getById.useQuery(
+	const { data, isPending, error } = api.expense.byId.useQuery(
 		{ id: expenseId },
 		{ placeholderData: keepPreviousData },
 	);
@@ -155,8 +155,8 @@ function ReceiptUpdateForm({
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
-			utils.expense.listForReport.invalidate({ reportId: expense.reportId });
-			utils.expense.getById.invalidate({
+			utils.expense.list.invalidate({ reportId: expense.reportId });
+			utils.expense.byId.invalidate({
 				id: expense.id,
 			});
 			toast.success("Ausgabe erfolgreich aktualisiert");
@@ -311,8 +311,8 @@ function UpdateExpenseAttachments({
 	expenseId: string;
 	canModify: boolean;
 }) {
-	const { isPending, data, error } = api.attachment.listForExpense.useQuery({
-		expenseId,
+	const { isPending, data, error } = api.attachment.list.useQuery({
+		id: expenseId,
 	});
 
 	if (isPending) {
@@ -395,7 +395,7 @@ function AttachmentUploadSection({
 	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const addToExpense = api.attachment.addToExpense.useMutation({
 		onSuccess: () => {
-			utils.attachment.listForExpense.invalidate({ expenseId });
+			utils.attachment.list.invalidate({ id: expenseId });
 			toast.success("Anhänge erfolgreich hinzugefügt");
 		},
 		onError: (error) => {
@@ -439,7 +439,7 @@ function AttachmentUploadSection({
 			};
 		});
 
-		addToExpense.mutate({ expenseId, attachments });
+		addToExpense.mutate({ id: expenseId, attachments });
 	}
 
 	return (
@@ -480,7 +480,7 @@ function ReportExpenseAttachmentRow({
 	const downloadMutation = api.attachment.getDownloadUrl.useMutation();
 	const deleteMutation = api.attachment.delete.useMutation({
 		onSuccess: () => {
-			utils.attachment.listForExpense.invalidate({ expenseId });
+			utils.attachment.list.invalidate({ id: expenseId });
 			toast.success("Anhang erfolgreich gelöscht");
 		},
 		onError: (error) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import type { JsonValue } from "@prisma/client/runtime/client";
-import type { Attachment, ExpenseType } from "@zemio/db";
+import type { ExpenseType } from "@zemio/db";
 import { ReportStatus } from "@zemio/db/enums";
 import { formatDate } from "date-fns";
 import {
@@ -53,6 +53,7 @@ import {
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
 import { ReportUpdateExpense } from "@/modules/report";
+import type { AttachmentListItemDTO } from "@/server/modules/expense/expense.dto";
 import { api } from "@/trpc/react";
 
 export function ReportExpenseCard({
@@ -61,7 +62,7 @@ export function ReportExpenseCard({
 	reportStatus,
 	...props
 }: React.ComponentProps<typeof Card> & {
-	expense: ClientExpense & { attachments: Attachment[] };
+	expense: ClientExpense & { attachments: AttachmentListItemDTO[] };
 	reportStatus?: ReportStatus;
 }) {
 	const [detailsOpen, setDetailsOpen] = React.useState(false);
@@ -71,7 +72,7 @@ export function ReportExpenseCard({
 	const utils = api.useUtils();
 	const deleteExpense = api.expense.delete.useMutation({
 		onSuccess: () => {
-			utils.expense.listForReport.invalidate({ reportId: expense.reportId });
+			utils.expense.list.invalidate({ reportId: expense.reportId });
 			toast.success("Ausgabe erfolgreich gelöscht");
 			setDeleteOpen(false);
 		},

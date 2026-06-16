@@ -15,11 +15,11 @@ export default async function ServerPage({
 }: PageProps<"/reports/[id]">) {
 	const { id: reportId } = await params;
 
-	const report = await api.report.getById({ id: reportId });
+	const report = await api.report.byId({ id: reportId });
 
 	// Prefetch additional data for client components
-	void api.report.getDetails.prefetch({ id: reportId });
-	void api.expense.listForReport.prefetch({ reportId });
+	void api.report.financialSummary.prefetch({ id: reportId });
+	void api.expense.list.prefetch({ reportId });
 
 	const canAddExpense =
 		report.status === ReportStatus.DRAFT ||
