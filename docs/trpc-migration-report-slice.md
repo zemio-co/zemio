@@ -24,21 +24,17 @@ reads (`review`, `financialSummary`); writes are `create`/`update`/`delete` + do
 - **`filterOptions` moved out.** It returns cost-units + owners (not reports), so it no longer
   belongs on `reportRouter`. It now lives at `reportFilters.options`
   (`modules/report-filters/`, `routers/report-filters.ts`).
-- **`list` / `reviewList` — server converged, client deferred.** The doc's destination is a
-  single scope-widened `list`. Both endpoints now share one scope-aware query core
-  (`buildReportListWhere({ scope: "own" | "all" })`): `list` uses `own`, `reviewList` uses
-  `all`. `reviewList` remains as a `@deprecated` transitional adapter **only** because the admin
-  table uses cursor/infinite-scroll + client-side filtering, while `list` is offset +
-  server-side filtering — collapsing them into one endpoint requires reworking that table.
-  **Remaining step (client-coupled):** migrate the admin report table onto `list` (add a
-  public `scope` input, adopt one pagination contract — the doc defaults to cursor), then delete
-  `reviewList`.
+- **`list` / `reviewList` — converged to one canonical `list`.** `list` now takes a public
+  `scope: "own" | "all"` input (`all` enforced by the policy), offset pagination, and
+  server-side filters (`status`, `costUnitId`, `ownerId`, `createdAt`) via the shared query
+  core. The admin report table was reworked to use it with page buttons (infinite-scroll +
+  client-side filtering removed), and `reviewList` (router + service + repository) was deleted.
+  Both the owner and admin tables now share the offset pagination contract.
 
-## Follow-up flagged for the user
+## Resolved follow-ups
 
-- **Dead duplicate components.** `app/(app)/admin/review/[id]/_components/*` are not imported
-  anywhere — that page renders `@/modules/review`. They were endpoint-renamed only to keep the
-  build green; the whole folder is a deletion candidate (pending explicit approval).
+- **Dead duplicate components removed.** `app/(app)/admin/review/[id]/_components/*` (unused —
+  the page renders `@/modules/review`) were deleted.
 
 ## Deliberate deviations from the target architecture
 
@@ -91,17 +87,23 @@ Resolving `activeMember` lazily is a cross-cutting context change ([§ Lean cont
 
 ## Endpoint contract changes (this slice)
 
-| New (`report.*`) | Replaced |
+| New | Replaced |
 |---|---|
-| `list` | `report.listOwn` |
-| `reviewList` | `admin.listAllPaginated` |
-| `filterOptions` | `admin.getFilterOptions` |
-| `byId` | `report.getById`, `admin.getReportById` (unused) |
-| `financialSummary` | `report.getDetails` |
-| `review` | `admin.getReview` |
-| `create` / `delete` / `submit` / `exportToPdf` | same names |
-| `update` | `report.update` (now: no `status`; only `title`/`description`) |
-| `transition` | `report.updateStatus`, `admin.updateReportStatus` (unused) |
+| `report.list` (scope `own`/`all`) | `report.listOwn` **and** `admin.listAllPaginated` |
+| `reportFilters.options` | `admin.getFilterOptions` |
+| `report.byId` | `report.getById`, `admin.getReportById` (unused) |
+| `report.financialSummary` | `report.getDetails` |
+| `report.review` | `admin.getReview` |
+| `report.create` / `delete` / `submit` / `exportToPdf` | same names |
+| `report.update` | `report.update` (now: no `status`; only `title`/`description`) |
+| `report.transition` | `report.updateStatus`, `admin.updateReportStatus` (unused) |
+
+`report.list` is the single canonical list: `scope: "own"` (owner views, default) or
+`scope: "all"` (admin, enforced by policy), offset-paginated with server-side filters
+(`status`, `costUnitId`, `ownerId`, `createdAt`). The owner and admin tables both use page
+buttons. `reviewList` (the transitional cursor adapter) and `filterOptions` on `reportRouter`
+have been **removed**; `reportFilters.options` returns cost-unit/owner **ids** so its values map
+straight onto the list filter DSL.
 
 **Deleted (provably zero consumers):** `admin.listAll`, `admin.stats`, `admin.listOpen`,
 `admin.listRelevant`, `admin.getAllReports`, `admin.getReportById`, `admin.updateReportStatus`.
