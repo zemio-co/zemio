@@ -48,8 +48,12 @@ function Button({
 	className,
 	variant = "default",
 	size = "default",
+	disableAnimation,
 	...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props &
+	VariantProps<typeof buttonVariants> & {
+		disableAnimation?: boolean;
+	}) {
 	return (
 		<ButtonPrimitive
 			className={cn(buttonVariants({ variant, size, className }))}
@@ -57,7 +61,13 @@ function Button({
 			render={
 				<motion.button
 					transition={{ duration: 0.1, ease: "easeOut" }}
-					whileTap={{ scale: 0.97 }}
+					whileTap={{
+						...(disableAnimation
+							? { scale: 1 }
+							: {
+									scale: 0.97,
+								}),
+					}}
 				/>
 			}
 			{...props}
