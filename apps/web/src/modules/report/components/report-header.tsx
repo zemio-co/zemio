@@ -61,7 +61,7 @@ function ReportHeader({
 	const reportQuery = api.report.byId.useQuery({ id: reportId });
 
 	if (reportQuery.isPending) {
-		return <ReportHeaderLoading />;
+		return <ReportHeaderLoading className={className} {...props} />;
 	}
 
 	if (reportQuery.error) {
