@@ -28,6 +28,7 @@ const reportDetailSelect = {
 			preferences: { select: { notifications: true } },
 		},
 	},
+	costUnit: { select: { tag: true, title: true } },
 } satisfies Prisma.ReportSelect;
 
 const reportListRowSelect = {

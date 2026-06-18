@@ -11,6 +11,7 @@ import {
 	CopyIcon,
 	EuroIcon,
 	LandmarkIcon,
+	TagIcon,
 	UserIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -100,6 +101,13 @@ function ReportDetails({
 					)}
 					title="Antragssteller"
 					value={report.owner.name}
+				/>
+
+				<ReportDetail
+					icon={<TagIcon />}
+					render={(v) => `${v} · ${report.costUnit.title}`}
+					title="Kostenstelle"
+					value={report.costUnit.tag}
 				/>
 
 				<ReportDetail
