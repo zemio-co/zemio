@@ -3,7 +3,7 @@
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { keepPreviousData } from "@tanstack/react-query";
-import type { Attachment, ExpenseType } from "@zemio/db";
+import type { Attachment } from "@zemio/db";
 import { formatDate, isValid, parse } from "date-fns";
 import { DownloadIcon, ImageIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -20,8 +20,10 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
+import { Separator } from "@/components/ui/separator";
 import {
 	Sheet,
+	SheetBody,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
@@ -32,54 +34,73 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { cn, formatBytes, renameFileWithHash } from "@/lib/utils";
+import type { ExpenseByIdDTO } from "@/server/modules/expense";
 import { api } from "@/trpc/react";
 
 const MAX_ATTACHMENTS = 5;
 
 function ReportUpdateExpense({
 	expenseId,
-	expenseType,
-	canModify,
 	children,
 	...props
 }: Omit<React.ComponentProps<typeof Sheet>, "children"> & {
 	expenseId: string;
-	expenseType: ExpenseType;
-	canModify: boolean;
 	children?: React.ReactNode;
 }) {
 	return (
 		<Sheet {...props}>
 			{children}
 			<SheetContent className={"data-[side=right]:sm:max-w-2xl"}>
-				<UpdateExpenseContent
-					canModify={canModify}
-					expenseId={expenseId}
-					expenseType={expenseType}
-				/>
+				<UpdateExpenseContent expenseId={expenseId} />
 			</SheetContent>
 		</Sheet>
 	);
 }
 
 function ReportUpdateExpenseTrigger({
-	className,
 	...props
-}: React.ComponentProps<typeof SheetTrigger>) {
-	return <SheetTrigger className={cn("", className)} {...props} />;
+}: React.ComponentProps<typeof Button>) {
+	return <SheetTrigger render={<Button {...props} />} />;
 }
 
 function UpdateExpenseContent({
 	className,
 	expenseId,
-	expenseType,
-	canModify,
 	...props
 }: React.ComponentProps<"div"> & {
 	expenseId: string;
-	expenseType: ExpenseType;
-	canModify: boolean;
 }) {
+	const expenseQuery = api.expense.byId.useQuery(
+		{ id: expenseId },
+		{
+			placeholderData: keepPreviousData,
+		},
+	);
+
+	if (expenseQuery.isPending) {
+		return (
+			<div>
+				<SheetHeader>Ausgabe</SheetHeader>
+				<SheetBody>
+					<Skeleton className="h-24" />
+				</SheetBody>
+			</div>
+		);
+	}
+
+	if (expenseQuery.error) {
+		return (
+			<div>
+				<SheetHeader>Ausgabe</SheetHeader>
+				<SheetBody>
+					<p>Fehler beim Laden der Ausgabe.</p>
+				</SheetBody>
+			</div>
+		);
+	}
+
+	const { data: expense } = expenseQuery;
+
 	return (
 		<div
 			className={cn("", className)}
@@ -89,69 +110,20 @@ function UpdateExpenseContent({
 			<SheetHeader>
 				<SheetTitle>Ausgabe</SheetTitle>
 			</SheetHeader>
-			<UpdateExpenseForm
-				canModify={canModify}
-				expenseId={expenseId}
-				expenseType={expenseType}
-			/>
-			{expenseType === "RECEIPT" && (
-				<UpdateExpenseAttachments canModify={canModify} expenseId={expenseId} />
-			)}
+			<SheetBody className="min-h-0">
+				{expense.type === "RECEIPT" && (
+					<>
+						<ReceiptUpdateForm expense={expense} />
+						<Separator className={"my-8"} />
+						<UpdateExpenseAttachments expenseId={expenseId} />
+					</>
+				)}
+			</SheetBody>
 		</div>
 	);
 }
 
-function UpdateExpenseForm({
-	expenseId,
-	expenseType,
-	canModify,
-}: {
-	expenseId: string;
-	expenseType: ExpenseType;
-	canModify: boolean;
-}) {
-	const { data, isPending, error } = api.expense.byId.useQuery(
-		{ id: expenseId },
-		{ placeholderData: keepPreviousData },
-	);
-
-	if (expenseType !== "RECEIPT" || !canModify) {
-		return null;
-	}
-
-	if (isPending) {
-		return (
-			<div className="space-y-4 p-4">
-				<Skeleton className="h-20 w-full" />
-				<Skeleton className="h-10 w-full" />
-				<Skeleton className="h-10 w-full" />
-			</div>
-		);
-	}
-
-	if (error || !data) {
-		return (
-			<p className="p-4 text-destructive text-sm">
-				{error?.message ?? "Ausgabe konnte nicht geladen werden"}
-			</p>
-		);
-	}
-
-	return <ReceiptUpdateForm expense={data} />;
-}
-
-function ReceiptUpdateForm({
-	expense,
-}: {
-	expense: {
-		id: string;
-		reportId: string;
-		description: string | null;
-		amount: unknown;
-		startDate: Date;
-		endDate: Date;
-	};
-}) {
+function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
@@ -191,7 +163,7 @@ function ReceiptUpdateForm({
 
 	return (
 		<form
-			className="border-b p-4"
+			className=""
 			onSubmit={(e) => {
 				e.preventDefault();
 				form.handleSubmit();
@@ -305,11 +277,9 @@ function ReceiptUpdateForm({
 function UpdateExpenseAttachments({
 	className,
 	expenseId,
-	canModify,
 	...props
 }: React.ComponentProps<"div"> & {
 	expenseId: string;
-	canModify: boolean;
 }) {
 	const { isPending, data, error } = api.attachment.list.useQuery({
 		id: expenseId,
@@ -351,7 +321,7 @@ function UpdateExpenseAttachments({
 
 	return (
 		<div
-			className={cn("p-4", className)}
+			className={cn("", className)}
 			data-slot="update-expense-attachments"
 			{...props}
 		>
@@ -373,7 +343,7 @@ function UpdateExpenseAttachments({
 				</p>
 			)}
 
-			{canModify && remainingSlots > 0 && (
+			{remainingSlots > 0 && (
 				<AttachmentUploadSection
 					expenseId={expenseId}
 					remainingSlots={remainingSlots}
@@ -419,7 +389,15 @@ function AttachmentUploadSection({
 		if (failedFiles.length > 0) {
 			const keys = uploadedFiles.map((f) => f.objectInfo.key);
 			if (keys.length > 0) {
-				await deletePendingUploads.mutateAsync({ keys }).catch(() => {});
+				try {
+					await deletePendingUploads.mutateAsync({ keys });
+				} catch {
+					toast.error("Upload fehlgeschlagen", {
+						description:
+							"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					});
+					return;
+				}
 			}
 			toast.error("Upload fehlgeschlagen", {
 				description: "Nicht alle Dateien konnten hochgeladen werden",

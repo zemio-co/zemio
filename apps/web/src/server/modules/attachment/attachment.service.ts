@@ -54,6 +54,10 @@ export function createAttachmentService(deps: { repo: AttachmentRepository }) {
 			return repo.listForExpense(ctx.db, expense.id);
 		},
 
+		listForReport(ctx: AttachmentServiceContext, reportId: string) {
+			return repo.listForReport(ctx.db, reportId);
+		},
+
 		async getDownloadUrl(
 			attachment: Pick<AttachmentDetail, "key" | "originalName">,
 		): Promise<{ url: string }> {

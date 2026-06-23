@@ -27,7 +27,9 @@ export function translateReportStatus(status: ReportStatus) {
 	}
 }
 
-export function formatBytes(bytes: number, decimals = 2): string {
+export function formatBytes(input: number | bigint, decimals = 2): string {
+	const bytes = Number(input);
+
 	if (bytes === 0) return "0 Bytes";
 	const k = 1024;
 	const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB"];

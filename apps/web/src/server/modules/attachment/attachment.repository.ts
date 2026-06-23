@@ -39,6 +39,10 @@ export const attachmentRepository = {
 		return db.attachment.findMany({ where: { expenseId } });
 	},
 
+	listForReport(db: Db, reportId: string) {
+		return db.attachment.findMany({ where: { expense: { reportId } } });
+	},
+
 	findManyByIds(db: Db, args: { ids: string[]; organizationId: string }) {
 		return db.attachment.findMany({
 			where: {
