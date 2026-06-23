@@ -117,7 +117,7 @@ function SheetHeader({
 function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
-			className={cn("grow overflow-y-auto px-6 py-8", className)}
+			className={cn("min-h-0 grow overflow-y-auto px-6 py-8", className)}
 			data-slot="sheet-body"
 			{...props}
 		/>
