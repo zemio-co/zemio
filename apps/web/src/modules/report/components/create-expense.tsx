@@ -113,7 +113,9 @@ function ReceiptExpense({
 		onSuccess: () => {
 			utils.expense.list.invalidate({ reportId });
 			utils.report.financialSummary.invalidate({ id: reportId });
+			utils.attachment.listForReport.invalidate({ id: reportId });
 			toast.success("Ausgabe erfolgreich erstellt");
+
 			props.handle?.close();
 		},
 		onError: (error) => {

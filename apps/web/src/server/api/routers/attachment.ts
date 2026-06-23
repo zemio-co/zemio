@@ -10,10 +10,18 @@ import {
 	toAttachmentServiceContext,
 } from "@/server/modules/attachment/";
 import { expenseProcedure } from "@/server/modules/expense";
+import { reportProcedure } from "@/server/modules/report";
 
 export const attachmentRouter = createTRPCRouter({
 	list: expenseProcedure("read").query(({ ctx }) =>
 		attachmentService.list(toAttachmentServiceContext(ctx), ctx.expense),
+	),
+
+	listForReport: reportProcedure("read").query(({ ctx }) =>
+		attachmentService.listForReport(
+			toAttachmentServiceContext(ctx),
+			ctx.report.id,
+		),
 	),
 
 	getDownloadUrl: attachmentProcedure("read").mutation(({ ctx }) =>
