@@ -1,0 +1,41 @@
+{
+	"name": "@zemio/db",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./enums": {
+			"types": "./dist/generated/prisma/enums.d.ts",
+			"default": "./dist/generated/prisma/enums.js"
+		}
+	},
+	"scripts": {
+		"build": "prisma generate && tsc --build",
+		"clean": "rm -rf dist tsconfig.tsbuildinfo",
+		"generate": "prisma generate",
+		"db:migrate": "prisma migrate deploy",
+		"db:push": "prisma db push",
+		"db:studio": "prisma studio",
+		"postinstall": "prisma generate",
+		"typecheck": "tsc --noEmit",
+		"check": "biome check ."
+	},
+	"dependencies": {
+		"@prisma/client": "^7.2.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@types/node": "^26.0.0",
+		"@zemio/typescript-config": "workspace:*",
+		"dotenv": "^17.2.3",
+		"prisma": "^7.2.0",
+		"typescript": "^5.8.2"
+	}
+}

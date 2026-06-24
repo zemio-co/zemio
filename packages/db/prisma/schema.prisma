@@ -1,0 +1,349 @@
+// Prisma schema for Better Auth
+// learn more: https://better-auth.com/docs/concepts/database
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// NOTE: When using mysql or sqlserver, uncomment the //@db.Text annotations in model Account below
+// Further reading:
+// https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  tag         Int          @unique @default(autoincrement())
+  title       String
+  description String?
+  status      ReportStatus @default(DRAFT)
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  costUnitId String
+  costUnit   CostUnit @relation(fields: [costUnitId], references: [id], onDelete: Cascade)
+
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String
+
+  bankingDetailsId String
+  bankingDetails   BankingDetails @relation(fields: [bankingDetailsId], references: [id], onDelete: Restrict)
+
+  createdAt     DateTime @default(now())
+  lastUpdatedAt DateTime @updatedAt
+
+  expenses Expense[]
+
+  @@index([ownerId])
+  @@index([organizationId])
+  @@index([ownerId, organizationId])
+  @@index([status])
+  @@index([costUnitId])
+  @@index([bankingDetailsId])
+  @@index([createdAt])
+  @@index([lastUpdatedAt])
+  @@map("report")
+}
+
+enum ReportStatus {
+  DRAFT
+  PENDING_APPROVAL
+  NEEDS_REVISION
+  ACCEPTED
+  REJECTED
+}
+
+model Expense {
+  id          String      @id @default(cuid())
+  description String?
+  amount      Decimal
+  startDate   DateTime
+  endDate     DateTime
+  type        ExpenseType
+  meta        Json
+
+  reportId    String
+  report      Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+
+  @@index([reportId])
+  @@map("expense")
+}
+
+enum ExpenseType {
+  RECEIPT
+  TRAVEL
+  FOOD
+}
+
+model Attachment {
+  id           String   @id @default(cuid())
+  key          String
+  size         BigInt
+  originalName String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  expenseId    String
+  expense      Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+
+  @@index([key])
+  @@index([expenseId])
+  @@map("attachment")
+}
+
+model User {
+  id            String    @id
+  name          String //@db.Text - Required by better-auth, we provide fallback in mapProfileToUser
+  email         String
+  emailVerified Boolean   @default(false) // Required by better-auth as boolean, not DateTime
+  image         String? //@db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  invitationsSent Invitation[]
+  members         Member[]
+
+  ownReports Report[]
+
+  // Role required by better-auth admin plugin
+  role String @default("user")
+
+  // Microsoft Entra ID tenant ID captured from the OAuth id_token on first login
+  microsoftTenantId String?
+
+  // Banning fields required by better-auth admin plugin
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  preferences Preferences?
+
+  bankingDetails BankingDetails[]
+  legalAcceptances LegalAcceptance[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String? //@db.Text
+  userAgent String? //@db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
+  activeOrganizationId String?
+  legalAcceptedAt DateTime?
+  legalAcceptedReleaseVersion String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String //@db.Text
+  providerId            String //@db.Text
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String? //@db.Text
+  refreshToken          String? //@db.Text
+  idToken               String? //@db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String? //@db.Text
+  password              String? //@db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String //@db.Text
+  value      String //@db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Organization {
+  id                String   @id
+  name              String
+  slug              String   @unique
+  logo              String?
+  metadata          String?
+  createdAt         DateTime
+  microsoftTenantId String?
+
+  members     Member[]
+  invitations Invitation[]
+
+  reports        Report[]
+  costUnits      CostUnit[]
+  costUnitGroups CostUnitGroup[]
+  settings       Settings?
+
+  @@map("organization")
+}
+
+model Member {
+  id             String   @id
+  userId         String
+  organizationId String
+  role           String
+  createdAt      DateTime
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@map("member")
+}
+
+model Invitation {
+  id             String   @id
+  email          String
+  inviterId      String
+  organizationId String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  createdAt      DateTime
+
+  inviter      User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([organizationId])
+  @@map("invitation")
+}
+
+model Preferences {
+  id            String                 @id @default(cuid())
+  userId        String                 @unique
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notifications NotificationPreference @default(ALL)
+
+  @@map("preferences")
+}
+
+enum NotificationPreference {
+  ALL
+  STATUS_CHANGES
+  NONE
+}
+
+model LegalAcceptance {
+  id               String              @id @default(cuid())
+  userId           String
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  releaseVersion   String
+  acceptanceType   LegalAcceptanceType
+  acceptedAt       DateTime            @default(now())
+  documentVersions Json
+
+  // One acceptance row per user/release is intentional. Repeated submissions for
+  // the same release are treated as idempotent confirmations, not append-only events.
+  @@unique([userId, releaseVersion])
+  @@index([userId])
+  @@index([releaseVersion])
+  @@map("legal_acceptance")
+}
+
+enum LegalAcceptanceType {
+  CHECKBOX_AND_BUTTON
+  IMPLICIT_ON_SIGNUP
+}
+
+model Settings {
+  id              String   @id @default(cuid())
+  organizationId  String   @unique
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  kilometerRate   Decimal  @default(0.30) // Rate per kilometer in EUR
+  reviewerEmail   String? // Email of the global reviewer
+  costUnitInfoUrl String?  @map("accountingUnitPdfUrl") // PDF URL for cost unit information
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  dailyFoodAllowance Decimal @default(0.00)
+  breakfastDeduction Decimal @default(0.00)
+  lunchDeduction     Decimal @default(0.00)
+  dinnerDeduction    Decimal @default(0.00)
+
+  @@map("settings")
+}
+
+model CostUnitGroup {
+  id        String     @id @default(cuid())
+  title     String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  costUnits CostUnit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([organizationId, title])
+  @@index([organizationId])
+  @@map("cost_unit_group")
+}
+
+model CostUnit {
+  id       String   @id @default(cuid())
+  tag      String
+  title    String
+  examples String[]
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  costUnitGroupId String?
+  costUnitGroup   CostUnitGroup? @relation(fields: [costUnitGroupId], references: [id], onDelete: Cascade)
+
+  reports Report[]
+
+  @@unique([organizationId, tag])
+  @@index([organizationId])
+  @@index([tag])
+  @@map("cost_unit")
+}
+
+model BankingDetails {
+  id    String @id @default(cuid())
+  // Used for displaying the banking details in the UI without exposing the iban
+  title String
+
+  iban     String
+  fullName String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reports Report[]
+
+  @@index([userId])
+  @@map("banking_details")
+}

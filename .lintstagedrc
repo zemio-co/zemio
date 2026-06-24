@@ -1,4 +1,4 @@
 {
   "**/*.{js,jsx,ts,tsx,mjs,cjs}": ["biome check --files-ignore-unknown=true"],
-  "ignore": ["node_modules", "src/generated/**"]
+  "ignore": ["node_modules", "apps/web/src/generated/**", "packages/db/src/generated/**", "packages/db/dist/**"]
 }

@@ -1,0 +1,27 @@
+{
+	"name": "@zemio/encryption",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "rm -rf dist tsconfig.tsbuildinfo",
+		"typecheck": "tsc --noEmit",
+		"check": "biome check ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@types/node": "^22",
+		"@zemio/typescript-config": "workspace:*",
+		"typescript": "^5.8.2"
+	}
+}
