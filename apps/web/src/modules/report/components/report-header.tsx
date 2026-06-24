@@ -534,6 +534,11 @@ function ReportHeaderSubmitAction({
 			utils.report.byId.invalidate({ id: report.id });
 			handle.close();
 		},
+		onError(error) {
+			toast.error("Antrag konnte nicht eingereicht werden", {
+				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			});
+		},
 	});
 
 	const handleSubmit = async () => {
