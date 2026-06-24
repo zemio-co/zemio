@@ -53,20 +53,6 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: false,
 	},
-	session: {
-		additionalFields: {
-			legalAcceptedAt: {
-				type: "date",
-				required: false,
-				input: false,
-			},
-			legalAcceptedReleaseVersion: {
-				type: "string",
-				required: false,
-				input: false,
-			},
-		},
-	},
 	socialProviders: {
 		microsoft: {
 			clientId: microsoftClientId,
@@ -80,12 +66,23 @@ export const auth = betterAuth({
 		user: {
 			create: {
 				after: async (user) => {
-					await db.preferences.create({
-						data: {
-							userId: user.id,
-							notifications: "ALL",
-						},
-					});
+					await Promise.all([
+						db.preferences.create({
+							data: {
+								userId: user.id,
+								notifications: "ALL",
+							},
+						}),
+						db.legalAcceptance.create({
+							data: {
+								userId: user.id,
+								releaseVersion: CURRENT_LEGAL_RELEASE.version,
+								acceptanceType: "IMPLICIT_ON_SIGNUP",
+								documentVersions: CURRENT_LEGAL_RELEASE.version,
+								acceptedAt: new Date(),
+							},
+						}),
+					]);
 				},
 			},
 		},
@@ -170,28 +167,10 @@ export const auth = betterAuth({
 						orderBy: { createdAt: "asc" },
 					});
 
-					// This extra lookup keeps newly created sessions in sync with the
-					// immutable LegalAcceptance source of truth, including sessions
-					// created after the acceptance mutation updated existing sessions.
-					const legalAcceptance = await db.legalAcceptance.findUnique({
-						where: {
-							userId_releaseVersion: {
-								userId: session.userId,
-								releaseVersion: CURRENT_LEGAL_RELEASE.version,
-							},
-						},
-						select: {
-							acceptedAt: true,
-							releaseVersion: true,
-						},
-					});
-
 					return {
 						data: {
 							...session,
 							activeOrganizationId: firstMember?.organizationId ?? null,
-							legalAcceptedAt: legalAcceptance?.acceptedAt ?? null,
-							legalAcceptedReleaseVersion: legalAcceptance?.releaseVersion ?? null,
 						},
 					};
 				},

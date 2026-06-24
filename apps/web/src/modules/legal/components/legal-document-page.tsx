@@ -3,10 +3,14 @@ import Link from "next/link";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { LegalDocumentDefinition } from "@/server/legal";
 
 interface LegalDocumentPageProps {
-	document: LegalDocumentDefinition;
+	document: {
+		title: string;
+		version: string;
+		summary: string;
+		content: string;
+	};
 }
 
 function LegalDocumentPage({ document }: LegalDocumentPageProps) {

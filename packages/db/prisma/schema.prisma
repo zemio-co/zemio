@@ -270,6 +270,7 @@ model LegalAcceptance {
 
 enum LegalAcceptanceType {
   CHECKBOX_AND_BUTTON
+  IMPLICIT_ON_SIGNUP
 }
 
 model Settings {

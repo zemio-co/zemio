@@ -1,7 +1,6 @@
 import { costUnitRouter } from "@/server/api/routers/cost-unit";
 import { dashboardRouter } from "@/server/api/routers/dashboard";
 import { expenseRouter } from "@/server/api/routers/expense";
-import { legalRouter } from "@/server/api/routers/legal";
 import { platformAdminRouter } from "@/server/api/routers/platform-admin";
 import { reportRouter } from "@/server/api/routers/report";
 import { reportFiltersRouter } from "@/server/api/routers/report-filters";
@@ -22,7 +21,6 @@ export const appRouter = createTRPCRouter({
 	report: reportRouter,
 	reportFilters: reportFiltersRouter,
 	expense: expenseRouter,
-	legal: legalRouter,
 	settings: settingsRouter,
 	preferences: preferencesRouter,
 	user: userRouter,

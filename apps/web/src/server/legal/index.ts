@@ -3,13 +3,6 @@ export {
 	getCurrentLegalDocumentVersionSnapshots,
 	getCurrentLegalRelease,
 } from "./load-current-release";
-export {
-	buildLegalOnboardingRedirectPath,
-	getPostAcceptancePath,
-	getRequestReturnToPath,
-	getSafeReturnToPath,
-	hasAcceptedCurrentLegalRelease,
-} from "./session";
 export type {
 	LegalDocumentDefinition,
 	LegalDocumentVersionSnapshot,

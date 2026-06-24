@@ -3,10 +3,6 @@ import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/consts";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
-import {
-	buildLegalOnboardingRedirectPath,
-	hasAcceptedCurrentLegalRelease,
-} from "@/server/legal";
 import { NoOrgPageContent } from "./_components/no-org-page";
 
 export default async function NoOrgPage() {
@@ -16,10 +12,6 @@ export default async function NoOrgPage() {
 
 	if (!session) {
 		redirect(ROUTES.AUTH);
-	}
-
-	if (!hasAcceptedCurrentLegalRelease(session)) {
-		redirect(buildLegalOnboardingRedirectPath(ROUTES.NO_ORG));
 	}
 
 	// If the user has since been added to an org (e.g. admin created one),
