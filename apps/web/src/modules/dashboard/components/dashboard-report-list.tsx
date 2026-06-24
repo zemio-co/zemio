@@ -27,7 +27,7 @@ function DashboardReportList({
 	if (isPending) {
 		return (
 			<section
-				className={cn("space-y-4", className)}
+				className={cn("max-w-full space-y-4 overflow-x-auto", className)}
 				data-slot="dashboard-report-list"
 				{...props}
 			>
@@ -120,7 +120,7 @@ function ReportList({
 }: React.ComponentProps<"div"> & { reports: Report[] }) {
 	return (
 		<div
-			className={cn("w-full overflow-hidden bg-white", className)}
+			className={cn("w-full overflow-x-auto bg-white", className)}
 			data-slot="report-list"
 			{...props}
 		>

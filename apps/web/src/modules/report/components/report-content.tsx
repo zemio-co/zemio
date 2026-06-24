@@ -14,8 +14,8 @@ function ReportContent({
 	return (
 		<div className={cn("py-12", className)} data-slot="report-content" {...props}>
 			<ReportHeader reportId={reportId} />
-			<div className="container mt-20 grid grid-cols-4 gap-12">
-				<div className="col-span-3 space-y-24">
+			<div className="container mt-20 grid gap-24 lg:grid-cols-4 lg:gap-12">
+				<div className="space-y-24 lg:col-span-3">
 					<ReportExpenses reportId={reportId} />
 					<ReportAttachments reportId={reportId} />
 				</div>

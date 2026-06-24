@@ -45,7 +45,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<div className="flex-1">
+			<div className="min-w-0 flex-1">
 				<AppNavbar className="sticky top-0" />
 				{children}
 			</div>

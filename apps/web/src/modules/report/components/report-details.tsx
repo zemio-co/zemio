@@ -232,7 +232,7 @@ function ReportDetail<T extends string | number | Date>({
 			<p className="font-medium text-slate-800 text-sm">{title}</p>
 			<div>
 				{disableCopy ? (
-					<span className="flex -translate-x-1.5 items-start justify-start gap-2 rounded-sm px-1.5 py-1 text-slate-700 text-sm [&_svg:not([class*='mt-'])]:mt-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-slate-500">
+					<span className="flex -translate-x-1.5 items-start justify-start gap-2 rounded-sm px-1.5 py-1 text-slate-700 text-sm *:text-start [&_svg:not([class*='mt-'])]:mt-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-slate-500 [&_svg]:shrink-0">
 						{icon}
 						{render?.(value) || formatValue(value)}
 					</span>
@@ -242,7 +242,7 @@ function ReportDetail<T extends string | number | Date>({
 						onClick={handleCopy}
 						type="button"
 					>
-						<span className="flex items-start justify-start gap-2 rounded-sm px-1.5 py-1 text-start text-slate-700 text-sm transition-colors group-hover/button:bg-slate-100 [&_svg:not([class*='mt-'])]:mt-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-slate-500">
+						<span className="flex items-start justify-start gap-2 rounded-sm px-1.5 py-1 text-start text-slate-700 text-sm transition-colors group-hover/button:bg-slate-100 [&_svg:not([class*='mt-'])]:mt-0.5 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-slate-500 [&_svg]:shrink-0">
 							{icon}
 							{render?.(value) || formatValue(value)}
 						</span>

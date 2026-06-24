@@ -26,11 +26,11 @@ import { api } from "@/trpc/react";
 function DashboardStats({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
-			className={cn("grid grid-cols-3 gap-8", className)}
+			className={cn("grid gap-8 lg:grid-cols-3", className)}
 			data-slot="dashboard-stats"
 			{...props}
 		>
-			<DashboardChart className="col-span-2" />
+			<DashboardChart className="lg:col-span-2" />
 			<div className="pt-2">
 				<DashboardCreatedReports />
 				<Separator className={"my-8"} />
