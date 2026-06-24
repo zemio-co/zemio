@@ -528,7 +528,7 @@ function ReportHeaderSubmitAction({
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
 	}, [report.status]);
 
-	const transitionMutation = api.report.transition.useMutation({
+	const submitMutation = api.report.submit.useMutation({
 		onSuccess() {
 			toast.success("Antrag wurde erfolgreich eingereicht");
 			utils.report.byId.invalidate({ id: report.id });
@@ -542,10 +542,8 @@ function ReportHeaderSubmitAction({
 	});
 
 	const handleSubmit = async () => {
-		transitionMutation.mutate({
+		submitMutation.mutate({
 			id: report.id,
-			status: "PENDING_APPROVAL",
-			notify: true,
 		});
 	};
 
@@ -565,11 +563,11 @@ function ReportHeaderSubmitAction({
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel disabled={transitionMutation.isPending}>
+					<AlertDialogCancel disabled={submitMutation.isPending}>
 						Abbrechen
 					</AlertDialogCancel>
 					<AlertDialogAction
-						disabled={transitionMutation.isPending}
+						disabled={submitMutation.isPending}
 						onClick={handleSubmit}
 					>
 						Einreichen
