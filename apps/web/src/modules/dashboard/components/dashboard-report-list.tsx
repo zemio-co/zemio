@@ -103,11 +103,11 @@ function ReportListHeader({
 			<Link
 				className={cn(
 					buttonVariants({ variant: "ghost", size: "sm" }),
-					"translate-x-2.5 text-blue-500",
+					"translate-x-2.5 text-violet-600 hover:text-violet-600",
 				)}
 				href={ROUTES.USER_REPORTS_LIST()}
 			>
-				Alle Anträge <ArrowRightIcon />
+				Alle Anträge <ArrowRightIcon className="text-violet-600" />
 			</Link>
 		</div>
 	);
@@ -120,17 +120,14 @@ function ReportList({
 }: React.ComponentProps<"div"> & { reports: Report[] }) {
 	return (
 		<div
-			className={cn(
-				"w-full overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-zinc-700/15",
-				className,
-			)}
+			className={cn("w-full overflow-hidden bg-white", className)}
 			data-slot="report-list"
 			{...props}
 		>
 			<table className="w-full">
 				<thead>
 					<tr className="bg-zinc-100">
-						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
+						<th className="rounded-l-md px-3 py-2 text-left font-medium text-muted-foreground text-xs">
 							Antrag
 						</th>
 						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
@@ -139,7 +136,7 @@ function ReportList({
 						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
 							Ausgaben
 						</th>
-						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
+						<th className="rounded-r-md px-3 py-2 text-left font-medium text-muted-foreground text-xs">
 							Status
 						</th>
 					</tr>
@@ -174,7 +171,7 @@ function ReportList({
 										)}
 									>
 										<Icon className="size-3.5 shrink-0" />
-										<span className="block shrink-0">
+										<span className="block shrink-0 text-slate-600">
 											{translateReportStatus(report.status)}
 										</span>
 									</span>

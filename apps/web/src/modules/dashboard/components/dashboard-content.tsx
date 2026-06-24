@@ -20,7 +20,7 @@ function DashboardContent({
 				<section className="container mt-8">
 					<DashboardStats />
 				</section>
-				<section className="container mt-12">
+				<section className="container mt-20">
 					<DashboardReportList />
 				</section>
 			</main>
