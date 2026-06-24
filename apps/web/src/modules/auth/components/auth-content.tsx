@@ -7,7 +7,7 @@ function AuthContent() {
 	return (
 		<main className="flex bg-slate-100">
 			<div className="w-full max-w-2xl shrink-0 bg-white">
-				<div className="container flex min-h-svh max-w-xl flex-col items-start justify-between py-20">
+				<div className="container flex min-h-svh max-w-xl flex-col items-start justify-between gap-20 py-20">
 					<Image alt="Zemio logo" className="h-5 w-auto" src={ZemioLogo} />
 					<div className="">
 						<h1 className="font-semibold text-2xl text-slate-800">
