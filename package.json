@@ -24,5 +24,8 @@
 		"lint-staged": "^16.2.7",
 		"turbo": "^2.5.4"
 	},
-	"packageManager": "bun@1.3.14"
+	"packageManager": "bun@1.3.14",
+	"dependencies": {
+		"recharts": "^3.8.1"
+	}
 }

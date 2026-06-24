@@ -1,8 +1,8 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
-import { PageTitle } from "@/components/page-title";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CreateReport } from "@/modules/report";
@@ -34,20 +34,23 @@ function DashboarHeader({
 }: React.ComponentProps<"section">) {
 	return (
 		<section
-			className={cn("container flex flex-wrap justify-between gap-4", className)}
+			className={cn("container", className)}
 			data-slot="dashboard-header"
 			{...props}
 		>
-			<PageTitle>Dashboard</PageTitle>
-			<CreateReport>
-				<SheetTrigger
-					render={
-						<Button size={"sm"}>
-							<PlusIcon /> Neuer Antrag
-						</Button>
-					}
-				/>
-			</CreateReport>
+			<div className="flex flex-wrap justify-between gap-4">
+				<h1 className="font-semibold text-2xl text-slate-800">Dashboard</h1>
+				<CreateReport>
+					<SheetTrigger
+						render={
+							<Button size={"sm"}>
+								<PlusIcon /> Neuer Antrag
+							</Button>
+						}
+					/>
+				</CreateReport>
+			</div>
+			<Separator className={"mt-4"} />
 		</section>
 	);
 }

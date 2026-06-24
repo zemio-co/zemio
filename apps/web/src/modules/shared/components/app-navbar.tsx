@@ -13,7 +13,7 @@ import { AppCommandProvider, AppCommandTrigger } from "./app-command";
 function AppNavbar({ className, ...props }: React.ComponentProps<"nav">) {
 	return (
 		<nav
-			className={cn("bg-background", className)}
+			className={cn("z-50 bg-background", className)}
 			data-slot="app-navbar"
 			{...props}
 		>
