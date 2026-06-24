@@ -14,9 +14,11 @@ import {
 	CreditCardIcon,
 	FingerprintIcon,
 	TextIcon,
+	TrashIcon,
 	UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -378,6 +380,7 @@ function ReportHeaderEditAction({
 	report: Report;
 }) {
 	const editTitleHandle = AlertDialogPrimitive.createHandle();
+	const deleteHandle = AlertDialogPrimitive.createHandle();
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
@@ -400,6 +403,15 @@ function ReportHeaderEditAction({
 						<DropdownMenuItem onClick={() => editTitleHandle.open(null)}>
 							<TextIcon /> Titel bearbeiten
 						</DropdownMenuItem>
+						<DropdownMenuItem
+							disabled={
+								!(report.status === "DRAFT" || report.status === "NEEDS_REVISION")
+							}
+							onClick={() => deleteHandle.open(null)}
+							variant="destructive"
+						>
+							<TrashIcon /> Löschen
+						</DropdownMenuItem>
 					</DropdownMenuGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -408,6 +420,7 @@ function ReportHeaderEditAction({
 				reportId={report.id}
 				reportTitle={report.title}
 			/>
+			<ReportHeaderDelete handle={deleteHandle} reportId={report.id} />
 		</>
 	);
 }
@@ -507,6 +520,61 @@ function ReportHeaderEditTitle({
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</form>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+}
+
+function ReportHeaderDelete({
+	reportId,
+	...props
+}: React.ComponentProps<typeof AlertDialog> & {
+	reportId: string;
+}) {
+	const utils = api.useUtils();
+	const router = useRouter();
+
+	const deleteMutation = api.report.delete.useMutation({
+		onSuccess() {
+			toast.success("Antrag wurde erfolgreich gelöscht");
+			utils.report.list.invalidate();
+			router.push(ROUTES.USER_DASHBOARD());
+		},
+		onError(error) {
+			toast.error("Antrag konnte nicht gelöscht werden", {
+				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			});
+		},
+	});
+
+	const handleDelete = async () => {
+		deleteMutation.mutate({
+			id: reportId,
+		});
+	};
+
+	return (
+		<AlertDialog data-slot="report-header-delete-action" {...props}>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>
+						Willst du deinen Antrag wirklich löschen?
+					</AlertDialogTitle>
+					<AlertDialogDescription>
+						Diese Aktion kann nicht rückgängig gemacht werden.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel disabled={deleteMutation.isPending}>
+						Abbrechen
+					</AlertDialogCancel>
+					<AlertDialogAction
+						disabled={deleteMutation.isPending}
+						onClick={handleDelete}
+					>
+						Löschen
+					</AlertDialogAction>
+				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
 	);
