@@ -16,7 +16,6 @@ import { logger } from "@/lib/logger";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
-import { hasAcceptedCurrentLegalRelease } from "@/server/legal";
 
 /**
  * 1. CONTEXT
@@ -176,7 +175,7 @@ export const publicProcedure = t.procedure
  *
  * @see https://trpc.io/docs/procedures
  */
-export const authenticatedProcedure = t.procedure
+export const protectedProcedure = t.procedure
 	.use(timingMiddleware)
 	.use(({ ctx, next }) => {
 		if (!ctx.session?.user) {
@@ -189,19 +188,6 @@ export const authenticatedProcedure = t.procedure
 			},
 		});
 	});
-
-export const protectedProcedure = authenticatedProcedure.use(
-	({ ctx, next }) => {
-		if (!hasAcceptedCurrentLegalRelease(ctx.session)) {
-			throw new TRPCError({
-				code: "FORBIDDEN",
-				message: "The current legal documents must be accepted first.",
-			});
-		}
-
-		return next({ ctx });
-	},
-);
 
 export const orgProcedure = protectedProcedure.use(({ ctx, next }) => {
 	if (!ctx.activeMember) {

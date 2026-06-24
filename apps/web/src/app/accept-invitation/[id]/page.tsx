@@ -2,10 +2,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/consts";
 import { auth } from "@/server/better-auth";
-import {
-	buildLegalOnboardingRedirectPath,
-	hasAcceptedCurrentLegalRelease,
-} from "@/server/legal";
 import { AcceptInvitationPageContent } from "./_components/accept-invitation-page";
 
 export default async function AcceptInvitationPage({
@@ -22,10 +18,6 @@ export default async function AcceptInvitationPage({
 	}
 
 	const { id } = await params;
-
-	if (!hasAcceptedCurrentLegalRelease(session)) {
-		redirect(buildLegalOnboardingRedirectPath(ROUTES.ACCEPT_INVITATION(id)));
-	}
 
 	return <AcceptInvitationPageContent invitationId={id} />;
 }

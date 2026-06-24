@@ -20,4 +20,8 @@ export const ROUTES = {
 	USER_DASHBOARD: () => "/",
 
 	AUTH: () => "/auth",
+
+	LEGAL_TERMS_AND_CONDITIONS: () => "/legal/terms-and-conditions",
+	LEGAL_PRIVACY_POLICY: () => "/legal/privacy-policy",
+	LEGAL_PLATFORM_POLICIES: () => "/legal/platform-policies",
 } as const;

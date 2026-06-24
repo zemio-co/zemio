@@ -1,7 +1,6 @@
 export const ROUTES = {
 	USER_DASHBOARD: "/",
 	AUTH: "/auth",
-	ONBOARDING: "/onboarding",
 	NO_ORG: "/no-org",
 	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
 	REPORT_DETAIL: (id: string) => `/reports/${id}`,

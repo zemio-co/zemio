@@ -1,12 +1,8 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { ROUTES } from "@/lib/consts";
+import { ROUTES } from "@/lib/routes";
 import { auth } from "@/server/better-auth";
-import {
-	buildLegalOnboardingRedirectPath,
-	hasAcceptedCurrentLegalRelease,
-} from "@/server/legal";
 
 export default async function AuthLayout({
 	children,
@@ -19,11 +15,7 @@ export default async function AuthLayout({
 
 	// When the user is already logged in, redirect to the dashboard
 	if (session) {
-		redirect(
-			hasAcceptedCurrentLegalRelease(session)
-				? ROUTES.USER_DASHBOARD
-				: buildLegalOnboardingRedirectPath(ROUTES.USER_DASHBOARD),
-		);
+		redirect(ROUTES.USER_DASHBOARD());
 	}
 
 	return <>{children}</>;
