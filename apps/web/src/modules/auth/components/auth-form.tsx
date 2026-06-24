@@ -1,11 +1,13 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import Image from "next/image";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/consts";
 import { authClient } from "@/server/better-auth/client";
+import MicrosoftLogo from "../../../../public/assets/microsoft-logo.svg";
 
 const formSchema = z.object({});
 
@@ -52,6 +54,7 @@ export function AuthForm({ ...props }: React.ComponentProps<"form">) {
 				type="submit"
 				variant={"outline"}
 			>
+				<Image alt="Microsoft Logo" className="mr-1 size-3.5" src={MicrosoftLogo} />
 				Mit Microsoft fortfahren
 			</Button>
 		</form>
