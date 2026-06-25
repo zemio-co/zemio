@@ -13,6 +13,7 @@ import {
 	ReceiptIcon,
 	TrashIcon,
 } from "lucide-react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import {
 	AlertDialog,
@@ -246,8 +247,19 @@ function ExpenseActionMenu({
 	expenseId: string;
 	reportId: string;
 }) {
-	const deleteHandle = AlertDialogPrimitive.createHandle();
-	const editHandle = DialogPrimitive.createHandle();
+	const deleteHandleRef = useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
+
+	const editHandleRef = useRef<ReturnType<
+		typeof DialogPrimitive.createHandle
+	> | null>(null);
+	if (!editHandleRef.current)
+		editHandleRef.current = DialogPrimitive.createHandle();
+	const editHandle = editHandleRef.current;
 
 	return (
 		<>
