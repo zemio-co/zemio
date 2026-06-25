@@ -48,7 +48,12 @@ function CreateExpense({
 }: React.ComponentProps<typeof Button> & {
 	reportId: string;
 }) {
-	const receiptHandle = useRef(Dialog.createHandle()).current;
+	const receiptHandleRef = useRef<ReturnType<typeof Dialog.createHandle> | null>(
+		null,
+	);
+	if (!receiptHandleRef.current)
+		receiptHandleRef.current = Dialog.createHandle();
+	const receiptHandle = receiptHandleRef.current;
 
 	return (
 		<>

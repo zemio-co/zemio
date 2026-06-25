@@ -247,8 +247,19 @@ function ExpenseActionMenu({
 	expenseId: string;
 	reportId: string;
 }) {
-	const deleteHandle = useRef(AlertDialogPrimitive.createHandle()).current;
-	const editHandle = useRef(DialogPrimitive.createHandle()).current;
+	const deleteHandleRef = useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
+
+	const editHandleRef = useRef<ReturnType<
+		typeof DialogPrimitive.createHandle
+	> | null>(null);
+	if (!editHandleRef.current)
+		editHandleRef.current = DialogPrimitive.createHandle();
+	const editHandle = editHandleRef.current;
 
 	return (
 		<>

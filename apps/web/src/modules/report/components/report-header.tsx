@@ -379,10 +379,19 @@ function ReportHeaderEditAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
-	const editTitleHandle = React.useRef(
-		AlertDialogPrimitive.createHandle(),
-	).current;
-	const deleteHandle = React.useRef(AlertDialogPrimitive.createHandle()).current;
+	const editTitleHandleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!editTitleHandleRef.current)
+		editTitleHandleRef.current = AlertDialogPrimitive.createHandle();
+	const editTitleHandle = editTitleHandleRef.current;
+
+	const deleteHandleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
@@ -590,7 +599,12 @@ function ReportHeaderSubmitAction({
 	report: Report;
 }) {
 	const utils = api.useUtils();
-	const handle = React.useRef(AlertDialogPrimitive.createHandle()).current;
+	const handleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!handleRef.current)
+		handleRef.current = AlertDialogPrimitive.createHandle();
+	const handle = handleRef.current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
