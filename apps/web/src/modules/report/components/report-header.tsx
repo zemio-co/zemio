@@ -379,8 +379,10 @@ function ReportHeaderEditAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
-	const editTitleHandle = AlertDialogPrimitive.createHandle();
-	const deleteHandle = AlertDialogPrimitive.createHandle();
+	const editTitleHandle = React.useRef(
+		AlertDialogPrimitive.createHandle(),
+	).current;
+	const deleteHandle = React.useRef(AlertDialogPrimitive.createHandle()).current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
@@ -588,9 +590,7 @@ function ReportHeaderSubmitAction({
 	report: Report;
 }) {
 	const utils = api.useUtils();
-	const handle = React.useMemo(() => {
-		return AlertDialogPrimitive.createHandle();
-	}, []);
+	const handle = React.useRef(AlertDialogPrimitive.createHandle()).current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");

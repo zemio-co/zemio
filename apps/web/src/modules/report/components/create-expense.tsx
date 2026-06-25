@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { formatDate, isValid, parse } from "date-fns";
 import { CarIcon, ReceiptIcon, UtensilsIcon, XIcon } from "lucide-react";
 import type React from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { DatePicker } from "@/components/date-picker";
@@ -47,7 +48,7 @@ function CreateExpense({
 }: React.ComponentProps<typeof Button> & {
 	reportId: string;
 }) {
-	const receiptHandle = Dialog.createHandle();
+	const receiptHandle = useRef(Dialog.createHandle()).current;
 
 	return (
 		<>
