@@ -1,7 +1,7 @@
 "use client";
 
 import type { Attachment } from "@zemio/db";
-import { FileIcon, TrashIcon } from "lucide-react";
+import { DownloadIcon, FileIcon, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -148,6 +148,7 @@ function AttachmentRow({
 	reportId: string;
 }) {
 	const utils = api.useUtils();
+	const downloadMutation = api.attachment.getDownloadUrl.useMutation();
 	const deleteMutation = api.attachment.delete.useMutation({
 		onSuccess: () => {
 			toast.success("Anhang erfolgreich gelöscht.");
@@ -165,6 +166,24 @@ function AttachmentRow({
 			id: attachment.id,
 		});
 	};
+
+	function handleDownload() {
+		toast.promise(
+			downloadMutation.mutateAsync({ id: attachment.id }).then((result) => {
+				window.location.href = result.url;
+			}),
+			{
+				loading: "Download wird vorbereitet…",
+				success: "Download gestartet",
+				error: (error) => {
+					return {
+						message: "Fehler beim Herunterladen des Anhangs",
+						description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+					};
+				},
+			},
+		);
+	}
 
 	return (
 		<li
@@ -185,7 +204,18 @@ function AttachmentRow({
 				</p>
 				<p className="text-slate-500 text-xs">{formatBytes(attachment.size)}</p>
 			</div>
-			<div className="ml-8">
+			<div className="ml-8 flex items-center justify-center gap-2">
+				<Button
+					className={
+						"opacity-0 transition-opacity group-hover/row:opacity-100 group-data-[pending=true]/row:opacity-100"
+					}
+					disabled={deleteMutation.isPending}
+					onClick={handleDownload}
+					size={"icon-sm"}
+					variant={"ghost"}
+				>
+					<DownloadIcon />
+				</Button>
 				<Button
 					className={
 						"opacity-0 transition-opacity group-hover/row:opacity-100 group-data-[pending=true]/row:opacity-100"
@@ -195,7 +225,7 @@ function AttachmentRow({
 					size={"icon-sm"}
 					variant={"ghost"}
 				>
-					<TrashIcon />
+					<TrashIcon className="text-destructive" />
 				</Button>
 			</div>
 		</li>
