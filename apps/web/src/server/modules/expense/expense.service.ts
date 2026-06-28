@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
-import type { PrismaClient } from "@zemio/db";
-import { ExpenseType, ReportStatus } from "@zemio/db";
+import {
+	ExpenseType,
+	type Prisma,
+	type PrismaClient,
+	ReportStatus,
+} from "@zemio/db";
 import type { z } from "zod";
 import type {
 	createFoodExpenseSchema,
@@ -11,6 +15,7 @@ import {
 	foodExpenseMetaSchema,
 	travelExpenseMetaSchema,
 } from "@/lib/validators";
+import { type AuditRepository, auditRepository } from "@/server/modules/audit";
 import { mapPrismaError } from "@/server/shared/errors";
 import { deleteFilesFromStorage } from "@/server/storage";
 import {
@@ -29,6 +34,17 @@ import {
 async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
 	try {
 		return await operation();
+	} catch (error) {
+		throw mapPrismaError(error);
+	}
+}
+
+async function transact<T>(
+	db: PrismaClient,
+	fn: (db: PrismaClient) => Promise<T>,
+): Promise<T> {
+	try {
+		return await db.$transaction((tx) => fn(tx as unknown as PrismaClient));
 	} catch (error) {
 		throw mapPrismaError(error);
 	}
@@ -59,8 +75,11 @@ type UpdateExpenseInput = {
 	dinnerDeduction?: number;
 };
 
-export function createExpenseService(deps: { repo: ExpenseRepository }) {
-	const { repo } = deps;
+export function createExpenseService(deps: {
+	repo: ExpenseRepository;
+	audit: AuditRepository;
+}) {
+	const { repo, audit } = deps;
 
 	function toPolicyContext(ctx: ExpenseServiceContext): ExpensePolicyContext {
 		return { userId: ctx.userId, isOrgAdmin: ctx.isOrgAdmin };
@@ -135,8 +154,8 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 				});
 			}
 
-			return runWrite(() =>
-				repo.create(ctx.db, {
+			return transact(ctx.db, async (db) => {
+				const result = await repo.create(db, {
 					report: { connect: { id: input.reportId } },
 					type: ExpenseType.RECEIPT,
 					amount: input.amount,
@@ -153,8 +172,18 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 							})),
 						},
 					},
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "expense",
+					entityId: result.id,
+					action: "expense.added",
+					diff: null,
+					payload: { type: "RECEIPT", reportId: input.reportId },
+				});
+				return result;
+			});
 		},
 
 		async createTravel(
@@ -173,8 +202,8 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 				});
 			}
 
-			return runWrite(() =>
-				repo.create(ctx.db, {
+			return transact(ctx.db, async (db) => {
+				const result = await repo.create(db, {
 					report: { connect: { id: input.reportId } },
 					type: ExpenseType.TRAVEL,
 					amount: Number(input.distance) * Number(settings.kilometerRate),
@@ -182,8 +211,18 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 					endDate: input.endDate,
 					description: input.description,
 					meta: { from: input.from, to: input.to, distance: input.distance },
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "expense",
+					entityId: result.id,
+					action: "expense.added",
+					diff: null,
+					payload: { type: "TRAVEL", reportId: input.reportId },
+				});
+				return result;
+			});
 		},
 
 		async createFood(
@@ -194,8 +233,8 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 			assertOwner(ctx, report);
 			assertEditable(report);
 
-			return runWrite(() =>
-				repo.create(ctx.db, {
+			return transact(ctx.db, async (db) => {
+				const result = await repo.create(db, {
 					report: { connect: { id: input.reportId } },
 					type: ExpenseType.FOOD,
 					amount: input.amount,
@@ -208,8 +247,18 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 						lunchDeduction: input.lunchDeduction,
 						dinnerDeduction: input.dinnerDeduction,
 					},
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "expense",
+					entityId: result.id,
+					action: "expense.added",
+					diff: null,
+					payload: { type: "FOOD", reportId: input.reportId },
+				});
+				return result;
+			});
 		},
 
 		async update(
@@ -279,9 +328,48 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 				}
 			}
 
-			return runWrite(() =>
-				repo.update(ctx.db, { id: expense.id, data: updateData }),
-			);
+			const before: Record<string, Prisma.InputJsonValue | null> = {};
+			const after: Record<string, Prisma.InputJsonValue | null> = {};
+
+			if (
+				"description" in updateData &&
+				updateData.description !== expense.description
+			) {
+				before.description = expense.description;
+				after.description = updateData.description as string;
+			}
+			if ("amount" in updateData) {
+				const prevAmount = Number(expense.amount);
+				const nextAmount = Number(updateData.amount);
+				if (prevAmount !== nextAmount) {
+					before.amount = prevAmount;
+					after.amount = nextAmount;
+				}
+			}
+			if ("meta" in updateData) {
+				before.meta = expense.meta as Prisma.InputJsonValue;
+				after.meta = updateData.meta as Prisma.InputJsonValue;
+			}
+
+			if (Object.keys(before).length === 0) {
+				return runWrite(() =>
+					repo.update(ctx.db, { id: expense.id, data: updateData }),
+				);
+			}
+
+			return transact(ctx.db, async (db) => {
+				const result = await repo.update(db, { id: expense.id, data: updateData });
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "expense",
+					entityId: expense.id,
+					action: "expense.updated",
+					diff: { before, after },
+					payload: null,
+				});
+				return result;
+			});
 		},
 
 		async remove(
@@ -292,11 +380,33 @@ export function createExpenseService(deps: { repo: ExpenseRepository }) {
 			if (keys.length > 0) {
 				await deleteFilesFromStorage(keys);
 			}
-			return runWrite(() => repo.remove(ctx.db, expense.id));
+			return transact(ctx.db, async (db) => {
+				const result = await repo.remove(db, expense.id);
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "expense",
+					entityId: expense.id,
+					action: "expense.deleted",
+					diff: {
+						before: {
+							type: expense.type,
+							amount: Number(expense.amount),
+							description: expense.description ?? null,
+						},
+						after: null,
+					},
+					payload: null,
+				});
+				return result;
+			});
 		},
 	};
 }
 
 export type ExpenseService = ReturnType<typeof createExpenseService>;
 
-export const expenseService = createExpenseService({ repo: expenseRepository });
+export const expenseService = createExpenseService({
+	repo: expenseRepository,
+	audit: auditRepository,
+});
