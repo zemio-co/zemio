@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ReportActivity } from "./report-activity";
 import { ReportAttachments } from "./report-attachments";
 import { ReportDetails } from "./report-details";
 import { ReportExpenses } from "./report-expenses";
@@ -18,6 +19,7 @@ function ReportContent({
 				<div className="space-y-24 lg:col-span-3">
 					<ReportExpenses reportId={reportId} />
 					<ReportAttachments reportId={reportId} />
+					<ReportActivity reportId={reportId} />
 				</div>
 				<ReportDetails reportId={reportId} />
 			</div>

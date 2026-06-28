@@ -211,7 +211,11 @@ export function createReportService(deps: {
 					entityId: result.id,
 					action: "report.created",
 					diff: null,
-					payload: { title: input.title, costUnitId: input.costUnitId },
+					payload: {
+						title: input.title,
+						costUnitId: input.costUnitId,
+						bankingDetailsId: input.bankingDetailsId,
+					},
 				});
 				return result;
 			});

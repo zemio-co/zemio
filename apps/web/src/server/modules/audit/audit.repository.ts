@@ -1,4 +1,5 @@
 import { Prisma, type PrismaClient } from "@zemio/db";
+import type { NewAuditAction } from "./audit.validators";
 
 type Db = PrismaClient;
 
@@ -22,12 +23,8 @@ export type AuditEventRow = Prisma.AuditEventGetPayload<{
 export type NewAuditEntry = {
 	organizationId: string;
 	actorId: string;
-	entityType: string;
 	entityId: string;
-	action: string;
-	diff: Prisma.InputJsonValue | null;
-	payload: Prisma.InputJsonValue | null;
-};
+} & NewAuditAction;
 
 type ListPageArgs = {
 	where: Prisma.AuditEventWhereInput;
@@ -41,12 +38,22 @@ type ListPageResult = {
 };
 
 export const auditRepository = {
-	append(db: Db, entry: NewAuditEntry): Promise<{ id: string }> {
-		return db.auditEvent.create({
+	async append(db: Db, entry: NewAuditEntry): Promise<void> {
+		await db.auditEvent.create({
 			data: {
-				...entry,
-				diff: entry.diff !== null ? entry.diff : Prisma.DbNull,
-				payload: entry.payload !== null ? entry.payload : Prisma.DbNull,
+				organizationId: entry.organizationId,
+				actorId: entry.actorId,
+				entityType: entry.entityType,
+				entityId: entry.entityId,
+				action: entry.action,
+				diff:
+					entry.diff !== null
+						? (entry.diff as unknown as Prisma.InputJsonValue)
+						: Prisma.DbNull,
+				payload:
+					entry.payload !== null
+						? (entry.payload as unknown as Prisma.InputJsonValue)
+						: Prisma.DbNull,
 			},
 			select: { id: true },
 		});

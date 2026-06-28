@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { ReportActivity } from "@/modules/report/components/report-activity";
 import { api } from "@/trpc/react";
 import { ReviewAttachments } from "./review-attachments";
 import { ReviewDetails } from "./review-details";
@@ -58,6 +59,7 @@ function ReviewContent({
 					errorMessage={errorMessage}
 					loading={isPending}
 				/>
+				<ReportActivity className="mt-20" reportId={reportId} />
 			</div>
 		</main>
 	);

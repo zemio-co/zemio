@@ -62,7 +62,7 @@ function AttachmentsHeader({
 			data-slot="report-expenses-header"
 			{...props}
 		>
-			<h3 className="font-semibold text-lg text-slate-800">Ausgaben</h3>
+			<h3 className="font-semibold text-lg text-slate-800">Anhänge</h3>
 		</div>
 	);
 }

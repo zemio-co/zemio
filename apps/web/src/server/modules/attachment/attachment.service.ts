@@ -166,7 +166,7 @@ export function createAttachmentService(deps: {
 			}
 
 			return transact(ctx.db, async (db) => {
-				const result = await repo.createMany(
+				const created = await repo.createMany(
 					db,
 					input.attachments.map((a) => ({
 						expenseId: expense.id,
@@ -175,16 +175,22 @@ export function createAttachmentService(deps: {
 						originalName: a.originalName,
 					})),
 				);
-				await audit.append(db, {
-					organizationId: ctx.organizationId,
-					actorId: ctx.userId,
-					entityType: "expense",
-					entityId: expense.id,
-					action: "attachment.added",
-					diff: null,
-					payload: { count: input.attachments.length },
-				});
-				return result;
+				for (const attachment of created) {
+					await audit.append(db, {
+						organizationId: ctx.organizationId,
+						actorId: ctx.userId,
+						entityType: "attachment",
+						entityId: attachment.id,
+						action: "attachment.added",
+						diff: null,
+						payload: {
+							attachmentId: attachment.id,
+							fileName: attachment.originalName,
+							expenseId: attachment.expenseId,
+						},
+					});
+				}
+				return { count: created.length };
 			});
 		},
 
