@@ -62,7 +62,7 @@ export const auditRepository = {
 	async listPage(db: Db, args: ListPageArgs): Promise<ListPageResult> {
 		const rows = await db.auditEvent.findMany({
 			where: args.where,
-			orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+			orderBy: [{ createdAt: "asc" }, { id: "asc" }],
 			take: args.take + 1,
 			cursor: args.cursor ? { id: args.cursor } : undefined,
 			skip: args.cursor ? 1 : 0,

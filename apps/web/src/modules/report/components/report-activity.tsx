@@ -103,12 +103,23 @@ function ReportUpdatedEvent({
 	);
 }
 
-function ReportDeletedEvent({ actor, createdAt }: BaseEventProps) {
+function ReportDeletedEvent({
+	event,
+	...props
+}: React.ComponentProps<"div"> & { event: BaseEventProps }) {
 	return (
-		<div>
-			<EventMeta actor={actor} createdAt={createdAt} />
-			<p className="text-slate-700 text-sm">hat den Bericht gelöscht.</p>
-		</div>
+		<EventItem data-slot="report-deleted-event" {...props}>
+			<EventIconColumn>
+				<FileXIcon className="text-red-500" />
+			</EventIconColumn>
+			<EventContent>
+				<p>
+					<InlineActor actor={event.actor} /> hat diesen Bericht gelöscht
+				</p>
+				<span className="block text-slate-500">•</span>
+				<EventDate date={event.createdAt} />
+			</EventContent>
+		</EventItem>
 	);
 }
 
@@ -294,10 +305,9 @@ function ExpenseAddedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} />
-					hat eine Ausgabe hinzugefügt vom Typ{" "}
+					<InlineActor actor={event.actor} /> hat eine Ausgabe vom Typ{" "}
 					<span className="font-semibold text-slate-800">
-						{translateExpenseType(event.type)})
+						{translateExpenseType(event.type)}
 					</span>{" "}
 					hinzugefügt
 				</p>
@@ -340,14 +350,13 @@ function ExpenseDeletedEvent({
 	};
 }) {
 	return (
-		<EventItem data-slot="report-rejected-event" {...props}>
+		<EventItem data-slot="expense-deleted-event" {...props}>
 			<EventIconColumn>
 				<FileXIcon className="text-red-500" />
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} />
-					hat eine Ausgabe entfernt
+					<InlineActor actor={event.actor} /> hat eine Ausgabe entfernt
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -508,6 +517,7 @@ function ActivityCommentField({
 			});
 		},
 		onSuccess() {
+			setValue("");
 			utils.audit.history.invalidate({ id: reportId });
 		},
 	});
@@ -519,7 +529,6 @@ function ActivityCommentField({
 			id: reportId,
 			text: value,
 		});
-		setValue("");
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -576,7 +585,7 @@ function AuditEventItem({ event }: { event: AuditEventDTO }) {
 				/>
 			);
 		case "report.deleted":
-			return <ReportDeletedEvent {...base} />;
+			return <ReportDeletedEvent event={base} />;
 		case "report.status_changed":
 			return (
 				<ReportStatusChangedEvent
@@ -646,7 +655,7 @@ function EventHistory({
 			data-slot="event-history"
 			{...props}
 		>
-			{[...items].reverse().map((event) => (
+			{items.map((event) => (
 				<AuditEventItem event={event} key={event.id} />
 			))}
 		</div>
