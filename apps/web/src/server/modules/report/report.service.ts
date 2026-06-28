@@ -5,6 +5,7 @@ import type { z } from "zod";
 import { env } from "@/env";
 import { isOrganizationAdminRole } from "@/lib/organization";
 import type { createReportSchema } from "@/lib/validators";
+import { type AuditRepository, auditRepository } from "@/server/modules/audit";
 import { mapPrismaError } from "@/server/shared/errors";
 import { nullableDecimalToNumber } from "@/server/shared/money";
 import { offsetPageArgs, pageCount } from "@/server/shared/pagination";
@@ -39,6 +40,25 @@ async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
+/**
+ * Runs an interactive transaction, passing a typed DB client to the callback.
+ * Maps Prisma errors to typed TRPCErrors on failure.
+ * The `tx as unknown as PrismaClient` cast is justified: Prisma's transaction
+ * client exposes the same model operations as PrismaClient — only lifecycle
+ * methods ($connect, $transaction, etc.) are omitted, none of which are used
+ * inside repository methods.
+ */
+async function transact<T>(
+	db: PrismaClient,
+	fn: (db: PrismaClient) => Promise<T>,
+): Promise<T> {
+	try {
+		return await db.$transaction((tx) => fn(tx as unknown as PrismaClient));
+	} catch (error) {
+		throw mapPrismaError(error);
+	}
+}
+
 /** Request-scoped facts the service needs. Authorization is enforced upstream. */
 export type ReportServiceContext = {
 	db: PrismaClient;
@@ -56,8 +76,9 @@ type PdfExportResult = { url: string; filename: string };
 export function createReportService(deps: {
 	repo: ReportRepository;
 	events: ReportEventEmitter;
+	audit: AuditRepository;
 }) {
-	const { repo, events } = deps;
+	const { repo, events, audit } = deps;
 
 	return {
 		async list(
@@ -176,14 +197,28 @@ export function createReportService(deps: {
 				});
 			}
 
-			return runWrite(() =>
-				repo.create(ctx.db, {
+			return transact(ctx.db, async (db) => {
+				const result = await repo.create(db, {
 					...input,
 					ownerId: ctx.userId,
 					organizationId: ctx.organizationId,
 					status: ReportStatus.DRAFT,
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "report",
+					entityId: result.id,
+					action: "report.created",
+					diff: null,
+					payload: {
+						title: input.title,
+						costUnitId: input.costUnitId,
+						bankingDetailsId: input.bankingDetailsId,
+					},
+				});
+				return result;
+			});
 		},
 
 		update(
@@ -191,14 +226,60 @@ export function createReportService(deps: {
 			report: ReportDetail,
 			input: UpdateReportInput,
 		): Promise<{ id: string }> {
-			return runWrite(() => repo.update(ctx.db, { id: report.id, data: input }));
+			const before: Record<string, string | null> = {};
+			const after: Record<string, string | null> = {};
+
+			if (input.title !== undefined && input.title !== report.title) {
+				before.title = report.title;
+				after.title = input.title;
+			}
+			if (
+				input.description !== undefined &&
+				input.description !== report.description
+			) {
+				before.description = report.description ?? null;
+				after.description = input.description;
+			}
+
+			if (Object.keys(before).length === 0) {
+				return runWrite(() => repo.update(ctx.db, { id: report.id, data: input }));
+			}
+
+			return transact(ctx.db, async (db) => {
+				const result = await repo.update(db, { id: report.id, data: input });
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "report",
+					entityId: report.id,
+					action: "report.updated",
+					diff: { before, after },
+					payload: null,
+				});
+				return result;
+			});
 		},
 
 		remove(
 			ctx: ReportServiceContext,
 			report: ReportDetail,
 		): Promise<{ id: string }> {
-			return runWrite(() => repo.remove(ctx.db, report.id));
+			return transact(ctx.db, async (db) => {
+				const result = await repo.remove(db, report.id);
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "report",
+					entityId: report.id,
+					action: "report.deleted",
+					diff: {
+						before: { title: report.title, status: report.status },
+						after: null,
+					},
+					payload: null,
+				});
+				return result;
+			});
 		},
 
 		async submit(
@@ -206,12 +287,25 @@ export function createReportService(deps: {
 			report: ReportDetail,
 		): Promise<{ id: string }> {
 			assertSubmittable(report.status);
-			await runWrite(() =>
-				repo.setStatus(ctx.db, {
+
+			await transact(ctx.db, async (db) => {
+				await repo.setStatus(db, {
 					id: report.id,
 					status: ReportStatus.PENDING_APPROVAL,
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "report",
+					entityId: report.id,
+					action: "report.status_changed",
+					diff: {
+						before: { status: report.status },
+						after: { status: ReportStatus.PENDING_APPROVAL },
+					},
+					payload: null,
+				});
+			});
 
 			const settings = await repo.findReviewerEmail(ctx.db, ctx.organizationId);
 
@@ -233,12 +327,26 @@ export function createReportService(deps: {
 			input: TransitionInput,
 		): Promise<{ id: string; status: ReportStatus }> {
 			assertAdminTransition(report.status, input.status);
-			const updated = await runWrite(() =>
-				repo.setStatus(ctx.db, {
+
+			const updated = await transact(ctx.db, async (db) => {
+				const result = await repo.setStatus(db, {
 					id: report.id,
 					status: input.status,
-				}),
-			);
+				});
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "report",
+					entityId: report.id,
+					action: "report.status_changed",
+					diff: {
+						before: { status: report.status },
+						after: { status: input.status },
+					},
+					payload: { notify: input.notify ?? false },
+				});
+				return result;
+			});
 
 			events.emit("report.status_changed", {
 				reportId: report.id,
@@ -291,8 +399,9 @@ export function createReportService(deps: {
 
 export type ReportService = ReturnType<typeof createReportService>;
 
-/** Default service instance wired with the real repository and event bus. */
+/** Default service instance wired with the real repository, event bus, and audit repository. */
 export const reportService = createReportService({
 	repo: reportRepository,
 	events: reportEventBus,
+	audit: auditRepository,
 });

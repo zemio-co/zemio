@@ -65,8 +65,15 @@ export const attachmentRepository = {
 			size: bigint | number;
 			originalName: string;
 		}>,
-	) {
-		return db.attachment.createMany({ data });
+	): Promise<Array<{ id: string; originalName: string; expenseId: string }>> {
+		return Promise.all(
+			data.map((item) =>
+				db.attachment.create({
+					data: item,
+					select: { id: true, originalName: true, expenseId: true },
+				}),
+			),
+		);
 	},
 
 	remove(db: Db, id: string) {
