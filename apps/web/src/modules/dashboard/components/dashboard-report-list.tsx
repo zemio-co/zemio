@@ -27,7 +27,7 @@ function DashboardReportList({
 	if (isPending) {
 		return (
 			<section
-				className={cn("max-w-full space-y-4 overflow-x-auto", className)}
+				className={cn("max-w-full space-y-4", className)}
 				data-slot="dashboard-report-list"
 				{...props}
 			>
