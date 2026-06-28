@@ -104,13 +104,13 @@ function ReportExpenses({
 					<tbody>
 						{expenses.map((expense) => (
 							<tr className="border-slate-200 border-b" key={expense.id}>
-								<td className="px-2 py-2.5 pl-0 text-left font-medium text-slate-800">
+								<td className="px-3 py-2.5 pl-0 text-left font-medium text-slate-800">
 									{translateExpenseType(expense.type)}
 								</td>
-								<td className="px-2 py-2.5 text-left text-slate-700 text-sm">
+								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{expense.description}
 								</td>
-								<td className="px-2 py-2.5 text-left text-slate-700 text-sm">
+								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{isSameDay(expense.startDate, expense.endDate) ? (
 										formatDate(expense.startDate, "dd.MM.yyyy")
 									) : (
@@ -120,7 +120,7 @@ function ReportExpenses({
 										</>
 									)}
 								</td>
-								<td className="px-2 py-2.5 text-right font-semibold text-slate-700 text-sm">
+								<td className="whitespace-nowrap px-3 py-2.5 text-right font-semibold text-slate-700 text-sm">
 									{expense.amount.toFixed(2)} <span className="ml-1">€</span>
 								</td>
 								<td className="pl-2">
