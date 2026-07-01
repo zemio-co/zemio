@@ -206,10 +206,11 @@ function AttachmentRow({
 			</div>
 			<div className="ml-8 flex items-center justify-center gap-2">
 				<Button
+					aria-label="Anhang herunterladen"
 					className={
 						"opacity-0 transition-opacity group-hover/row:opacity-100 group-data-[pending=true]/row:opacity-100"
 					}
-					disabled={deleteMutation.isPending}
+					disabled={deleteMutation.isPending || downloadMutation.isPending}
 					onClick={handleDownload}
 					size={"icon-sm"}
 					variant={"ghost"}

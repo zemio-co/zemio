@@ -230,7 +230,8 @@ function ReportAcceptedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					Antrag wurde von <InlineActor actor={event.actor} /> als akzeptiert makiert
+					Antrag wurde von <InlineActor actor={event.actor} /> als akzeptiert
+					markiert
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
