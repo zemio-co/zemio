@@ -1,3 +1,4 @@
+import { auditRouter } from "@/server/api/routers/audit";
 import { costUnitRouter } from "@/server/api/routers/cost-unit";
 import { dashboardRouter } from "@/server/api/routers/dashboard";
 import { expenseRouter } from "@/server/api/routers/expense";
@@ -17,6 +18,7 @@ import { preferencesRouter } from "./routers/preferences";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+	audit: auditRouter,
 	dashboard: dashboardRouter,
 	report: reportRouter,
 	reportFilters: reportFiltersRouter,

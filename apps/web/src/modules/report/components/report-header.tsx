@@ -379,8 +379,19 @@ function ReportHeaderEditAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
-	const editTitleHandle = AlertDialogPrimitive.createHandle();
-	const deleteHandle = AlertDialogPrimitive.createHandle();
+	const editTitleHandleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!editTitleHandleRef.current)
+		editTitleHandleRef.current = AlertDialogPrimitive.createHandle();
+	const editTitleHandle = editTitleHandleRef.current;
+
+	const deleteHandleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");
@@ -588,9 +599,12 @@ function ReportHeaderSubmitAction({
 	report: Report;
 }) {
 	const utils = api.useUtils();
-	const handle = React.useMemo(() => {
-		return AlertDialogPrimitive.createHandle();
-	}, []);
+	const handleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!handleRef.current)
+		handleRef.current = AlertDialogPrimitive.createHandle();
+	const handle = handleRef.current;
 
 	const disabledByStatus = React.useMemo(() => {
 		return !(report.status === "DRAFT" || report.status === "NEEDS_REVISION");

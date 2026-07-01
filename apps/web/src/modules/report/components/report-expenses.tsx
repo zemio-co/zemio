@@ -13,6 +13,7 @@ import {
 	ReceiptIcon,
 	TrashIcon,
 } from "lucide-react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import {
 	AlertDialog,
@@ -103,13 +104,13 @@ function ReportExpenses({
 					<tbody>
 						{expenses.map((expense) => (
 							<tr className="border-slate-200 border-b" key={expense.id}>
-								<td className="px-2 py-2.5 pl-0 text-left font-medium text-slate-800">
+								<td className="px-3 py-2.5 pl-0 text-left font-medium text-slate-800">
 									{translateExpenseType(expense.type)}
 								</td>
-								<td className="px-2 py-2.5 text-left text-slate-700 text-sm">
+								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{expense.description}
 								</td>
-								<td className="px-2 py-2.5 text-left text-slate-700 text-sm">
+								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{isSameDay(expense.startDate, expense.endDate) ? (
 										formatDate(expense.startDate, "dd.MM.yyyy")
 									) : (
@@ -119,7 +120,7 @@ function ReportExpenses({
 										</>
 									)}
 								</td>
-								<td className="px-2 py-2.5 text-right font-semibold text-slate-700 text-sm">
+								<td className="whitespace-nowrap px-3 py-2.5 text-right font-semibold text-slate-700 text-sm">
 									{expense.amount.toFixed(2)} <span className="ml-1">€</span>
 								</td>
 								<td className="pl-2">
@@ -246,8 +247,19 @@ function ExpenseActionMenu({
 	expenseId: string;
 	reportId: string;
 }) {
-	const deleteHandle = AlertDialogPrimitive.createHandle();
-	const editHandle = DialogPrimitive.createHandle();
+	const deleteHandleRef = useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
+
+	const editHandleRef = useRef<ReturnType<
+		typeof DialogPrimitive.createHandle
+	> | null>(null);
+	if (!editHandleRef.current)
+		editHandleRef.current = DialogPrimitive.createHandle();
+	const editHandle = editHandleRef.current;
 
 	return (
 		<>

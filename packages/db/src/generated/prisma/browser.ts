@@ -93,6 +93,11 @@ export type CostUnitGroup = Prisma.CostUnitGroupModel
  */
 export type CostUnit = Prisma.CostUnitModel
 /**
+ * Model AuditEvent
+ * 
+ */
+export type AuditEvent = Prisma.AuditEventModel
+/**
  * Model BankingDetails
  * 
  */

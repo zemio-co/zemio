@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
 import { ExpenseType } from "@zemio/db";
+import { type AuditRepository, auditRepository } from "@/server/modules/audit";
 import type { ExpenseDetail } from "@/server/modules/expense/expense.repository";
 import { mapPrismaError } from "@/server/shared/errors";
 import {
@@ -15,9 +16,12 @@ import type {
 } from "./attachment.repository";
 import { attachmentRepository } from "./attachment.repository";
 
-async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
+async function transact<T>(
+	db: PrismaClient,
+	fn: (db: PrismaClient) => Promise<T>,
+): Promise<T> {
 	try {
-		return await operation();
+		return await db.$transaction((tx) => fn(tx as unknown as PrismaClient));
 	} catch (error) {
 		throw mapPrismaError(error);
 	}
@@ -46,8 +50,11 @@ type GetUploadUrlsInput = {
 	}>;
 };
 
-export function createAttachmentService(deps: { repo: AttachmentRepository }) {
-	const { repo } = deps;
+export function createAttachmentService(deps: {
+	repo: AttachmentRepository;
+	audit: AuditRepository;
+}) {
+	const { repo, audit } = deps;
 
 	return {
 		list(ctx: AttachmentServiceContext, expense: ExpenseDetail) {
@@ -158,17 +165,33 @@ export function createAttachmentService(deps: { repo: AttachmentRepository }) {
 				});
 			}
 
-			return runWrite(() =>
-				repo.createMany(
-					ctx.db,
+			return transact(ctx.db, async (db) => {
+				const created = await repo.createMany(
+					db,
 					input.attachments.map((a) => ({
 						expenseId: expense.id,
 						key: a.key,
 						size: a.size,
 						originalName: a.originalName,
 					})),
-				),
-			);
+				);
+				for (const attachment of created) {
+					await audit.append(db, {
+						organizationId: ctx.organizationId,
+						actorId: ctx.userId,
+						entityType: "attachment",
+						entityId: attachment.id,
+						action: "attachment.added",
+						diff: null,
+						payload: {
+							attachmentId: attachment.id,
+							fileName: attachment.originalName,
+							expenseId: attachment.expenseId,
+						},
+					});
+				}
+				return { count: created.length };
+			});
 		},
 
 		async delete(
@@ -176,7 +199,25 @@ export function createAttachmentService(deps: { repo: AttachmentRepository }) {
 			attachment: AttachmentDetail,
 		): Promise<{ id: string }> {
 			await deleteFilesFromStorage([attachment.key]);
-			return runWrite(() => repo.remove(ctx.db, attachment.id));
+			return transact(ctx.db, async (db) => {
+				const result = await repo.remove(db, attachment.id);
+				await audit.append(db, {
+					organizationId: ctx.organizationId,
+					actorId: ctx.userId,
+					entityType: "attachment",
+					entityId: attachment.id,
+					action: "attachment.deleted",
+					diff: {
+						before: {
+							originalName: attachment.originalName,
+							size: Number(attachment.size),
+						},
+						after: null,
+					},
+					payload: null,
+				});
+				return result;
+			});
 		},
 
 		async deletePendingUploads(
@@ -212,4 +253,5 @@ export type AttachmentService = ReturnType<typeof createAttachmentService>;
 
 export const attachmentService = createAttachmentService({
 	repo: attachmentRepository,
+	audit: auditRepository,
 });

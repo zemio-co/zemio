@@ -399,6 +399,7 @@ export const ModelName = {
   Settings: 'Settings',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
+  AuditEvent: 'AuditEvent',
   BankingDetails: 'BankingDetails'
 } as const
 
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "report" | "expense" | "attachment" | "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "preferences" | "legalAcceptance" | "settings" | "costUnitGroup" | "costUnit" | "bankingDetails"
+    modelProps: "report" | "expense" | "attachment" | "user" | "session" | "account" | "verification" | "organization" | "member" | "invitation" | "preferences" | "legalAcceptance" | "settings" | "costUnitGroup" | "costUnit" | "auditEvent" | "bankingDetails"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1529,6 +1530,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AuditEvent: {
+      payload: Prisma.$AuditEventPayload<ExtArgs>
+      fields: Prisma.AuditEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AuditEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AuditEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        findFirst: {
+          args: Prisma.AuditEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AuditEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        findMany: {
+          args: Prisma.AuditEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+        }
+        create: {
+          args: Prisma.AuditEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        createMany: {
+          args: Prisma.AuditEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AuditEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+        }
+        delete: {
+          args: Prisma.AuditEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        update: {
+          args: Prisma.AuditEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.AuditEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AuditEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AuditEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.AuditEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuditEventPayload>
+        }
+        aggregate: {
+          args: Prisma.AuditEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAuditEvent>
+        }
+        groupBy: {
+          args: Prisma.AuditEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AuditEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AuditEventCountAggregateOutputType> | number
+        }
+      }
+    }
     BankingDetails: {
       payload: Prisma.$BankingDetailsPayload<ExtArgs>
       fields: Prisma.BankingDetailsFieldRefs
@@ -1854,6 +1929,21 @@ export const CostUnitScalarFieldEnum = {
 export type CostUnitScalarFieldEnum = (typeof CostUnitScalarFieldEnum)[keyof typeof CostUnitScalarFieldEnum]
 
 
+export const AuditEventScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  actorId: 'actorId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  action: 'action',
+  diff: 'diff',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditEventScalarFieldEnum = (typeof AuditEventScalarFieldEnum)[keyof typeof AuditEventScalarFieldEnum]
+
+
 export const BankingDetailsScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -1880,6 +1970,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2198,6 +2296,7 @@ export type GlobalOmitConfig = {
   settings?: Prisma.SettingsOmit
   costUnitGroup?: Prisma.CostUnitGroupOmit
   costUnit?: Prisma.CostUnitOmit
+  auditEvent?: Prisma.AuditEventOmit
   bankingDetails?: Prisma.BankingDetailsOmit
 }
 
