@@ -38,10 +38,10 @@ const sidebarItems = [
 	},
 	{
 		label: "Einstellungen",
-		href: ROUTES.SETTINGS_USER_GENERAL(),
+		href: ROUTES.SETTINGS(),
 		icon: SettingsIcon,
 		active: (pathname: string) => {
-			return pathname.startsWith("/settings/user");
+			return pathname.startsWith(ROUTES.SETTINGS());
 		},
 	},
 ];

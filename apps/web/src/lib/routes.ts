@@ -1,4 +1,6 @@
 export const ROUTES = {
+	SETTINGS: () => "/settings",
+
 	// ======= USER SETTINGS ==========================================
 	SETTINGS_USER_GENERAL: () => "/settings/user/general",
 	SETTINGS_USER_NOTIFICATIONS: () => "/settings/user/notifications",
