@@ -5,7 +5,7 @@ export * from "./org-settings-cost-units";
 export * from "./org-settings-general";
 export * from "./org-settings-members";
 export * from "./settings-content";
-export * from "./settings-layout";
+export * from "./settings-routes-layout";
 export * from "./user-settings-bank-details";
 export * from "./user-settings-general";
 export * from "./user-settings-notifications";

@@ -1,2 +1,2 @@
 export * from "./components";
-export { SettingsContent } from "./components";
+export { SettingsContent, SettingsRoutesLayout } from "./components";
