@@ -23,10 +23,10 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { WithHandle } from "@/lib/types";
 import { createCostUnitGroupSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
+import { SheetFormError, SheetFormSkeleton } from "./sheet-form-state";
 
 type CreateCostUnitGroupFormValues = z.infer<typeof createCostUnitGroupSchema>;
 type CreateCostUnitGroupHandle = ReturnType<
@@ -34,8 +34,9 @@ type CreateCostUnitGroupHandle = ReturnType<
 >;
 
 const FORM_ID = "create-cost-unit-group";
+const COST_UNIT_GROUP_FORM_FIELD_COUNT = 1;
 
-function createCreateCostUnitGroupHandle(): CreateCostUnitGroupHandle {
+function createCostUnitGroupCreateHandle(): CreateCostUnitGroupHandle {
 	return DialogPrimitive.createHandle();
 }
 
@@ -68,9 +69,11 @@ function CreateCostUnitGroupSheet({
 				</SheetHeader>
 
 				<AsyncBoundary
-					pending={<CreateCostUnitGroupFormSkeleton />}
+					pending={
+						<SheetFormSkeleton fieldCount={COST_UNIT_GROUP_FORM_FIELD_COUNT} />
+					}
 					rejected={({ error, retry }) => (
-						<CreateCostUnitGroupFormError error={error} retry={retry} />
+						<SheetFormError error={error} retry={retry} />
 					)}
 				>
 					<CreateCostUnitGroupFormConnected
@@ -209,53 +212,9 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 	);
 }
 
-function CreateCostUnitGroupFormSkeleton() {
-	return (
-		<>
-			<SheetBody>
-				<div className="space-y-5">
-					{["Title", "Price", "Category"].map((label) => (
-						<div className="space-y-2" key={label}>
-							<Skeleton className="h-4 w-20" />
-							<Skeleton className="h-10 w-full" />
-						</div>
-					))}
-				</div>
-			</SheetBody>
-			<SheetFooter>
-				<Skeleton className="h-10 w-32" />
-			</SheetFooter>
-		</>
-	);
-}
-
-export function CreateCostUnitGroupFormError({
-	error,
-	retry,
-}: {
-	error: Error;
-	retry: () => void;
-}) {
-	return (
-		<>
-			<SheetBody>
-				<div className="space-y-3">
-					<p className="font-medium text-sm">Couldn&apos;t load the form</p>
-					<p className="text-muted-foreground text-sm">{error.message}</p>
-				</div>
-			</SheetBody>
-			<SheetFooter>
-				<Button onClick={retry} variant="outline">
-					Try again
-				</Button>
-			</SheetFooter>
-		</>
-	);
-}
-
 export {
 	type CreateCostUnitGroupHandle,
 	CreateCostUnitGroupSheet,
 	CreateCostUnitGroupSheetTrigger,
-	createCreateCostUnitGroupHandle,
+	createCostUnitGroupCreateHandle,
 };

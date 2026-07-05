@@ -1,7 +1,6 @@
 export * from "./admin-settings-org-details";
 export * from "./admin-settings-orgs";
 export { OrgSettingsCostUnits } from "./org-settings";
-export * from "./org-settings/org-settings-cost-units";
 export * from "./org-settings-allowances";
 export * from "./org-settings-general";
 export * from "./org-settings-members";

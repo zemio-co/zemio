@@ -1,28 +1,14 @@
 "use client";
 
-import {
-	AlertDialog as AlertDialogPrimitive,
-	Dialog as DialogPrimitive,
-} from "@base-ui/react";
+import { Dialog as DialogPrimitive } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup } from "@zemio/db";
-import { InfoIcon, TrashIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -32,7 +18,6 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	NativeSelect,
 	NativeSelectOptGroup,
@@ -47,158 +32,127 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { updateCostUnitSchema } from "@/lib/validators";
+import { NO_COST_UNIT_GROUP } from "@/lib/consts";
+import type { WithHandle } from "@/lib/types";
+import { createCostUnitSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
-import { ExamplesInput } from "./org-settings-cost-units";
+import {
+	type CreateCostUnitGroupHandle,
+	CreateCostUnitGroupSheet,
+	createCostUnitGroupCreateHandle,
+} from "./create-cost-unit-group";
+import { ExamplesInput } from "./examples-input";
+import { SheetFormError, SheetFormSkeleton } from "./sheet-form-state";
 
-type UpdateCostUnitPayload = { id: string } | undefined;
-type UpdateCostUnitHandle = ReturnType<
-	typeof DialogPrimitive.createHandle<UpdateCostUnitPayload>
->;
-type UpdateCostUnitFormValues = z.infer<typeof updateCostUnitSchema>;
+type CreateCostUnitFormValues = z.infer<typeof createCostUnitSchema>;
+type CreateCostUnitHandle = ReturnType<typeof DialogPrimitive.createHandle>;
 
-const FORM_ID = "update-cost-unit";
-const NO_COST_UNIT_GROUP = "NO_GROUP" as const;
+const FORM_ID = "create-cost-unit";
+const COST_UNIT_FORM_FIELD_COUNT = 4;
 
-function createUpdateCostUnitHandle() {
-	return DialogPrimitive.createHandle<UpdateCostUnitPayload>();
+function createCostUnitCreateHandle(): CreateCostUnitHandle {
+	return DialogPrimitive.createHandle();
 }
 
-function UpdateCostUnitSheet({
+function CreateCostUnitSheetTrigger({
 	handle,
 	...props
-}: Omit<React.ComponentProps<typeof Sheet>, "handle"> & {
-	handle: UpdateCostUnitHandle;
-}) {
+}: React.ComponentProps<typeof Button> & WithHandle) {
 	return (
-		<DialogPrimitive.Root {...props} handle={handle}>
-			{({ payload }) => (
-				<SheetContent className={"data-nested-dialog-open:blur-xs"}>
-					<SheetHeader>
-						<SheetTitle>Edit cost unit</SheetTitle>
-					</SheetHeader>
-
-					{payload ? (
-						<AsyncBoundary
-							// SECTION 3 — keying on the entity id remounts queries + form
-							// when a different row opens the sheet. Fresh seed every time;
-							// you never manually reset form state.
-							key={payload.id}
-							pending={<UpdateCostUnitFormSkeleton />}
-							rejected={({ error, retry }) => (
-								<UpdateCostUnitFormError error={error} retry={retry} />
-							)}
-						>
-							<UpdateCostUnitFormConnected costUnitId={payload.id} handle={handle} />
-						</AsyncBoundary>
-					) : null}
-				</SheetContent>
-			)}
-		</DialogPrimitive.Root>
-	);
-}
-
-type UpdateCostUnitFormProps = {
-	defaultValues: UpdateCostUnitFormValues;
-	submitLabel: string;
-	groups: CostUnitGroup[];
-	canDelete?: boolean;
-
-	onSubmit: (values: UpdateCostUnitFormValues) => Promise<void> | void;
-	onDelete: () => Promise<void> | void;
-};
-
-function UpdateCostUnitFormConnected({
-	costUnitId,
-	handle,
-}: {
-	costUnitId: string;
-	handle: UpdateCostUnitHandle;
-}) {
-	const utils = api.useUtils();
-
-	const [{ data: groups }, { data: costUnit }] = useSuspenseQueries({
-		queries: [
-			utils.costUnit.listGroups.queryOptions(),
-			utils.costUnit.getById.queryOptions({ id: costUnitId }),
-		],
-	});
-
-	const update = api.costUnit.update.useMutation({
-		onSuccess: (value) => {
-			toast.success("Kostenstelle wurde erfolgreich aktualisiert", {
-				description: `${value.tag} • ${value.title}`,
-			});
-			handle.close();
-		},
-		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Kostenstelle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
-			});
-		},
-	});
-
-	const deleteCostUnit = api.costUnit.delete.useMutation({
-		onSuccess: (value) => {
-			toast.success("Kostenstelle wurde erfolgreich gelöscht", {
-				description: `${value.tag} • ${value.title}`,
-			});
-			handle.close();
-		},
-		onError: (error) => {
-			toast.error("Fehler beim Löschen der Kostenstelle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
-			});
-		},
-	});
-
-	return (
-		<UpdateCostUnitForm
-			canDelete={costUnit._count.reports === 0}
-			defaultValues={{
-				...costUnit,
-				costUnitGroupId: costUnit.costUnitGroupId ?? NO_COST_UNIT_GROUP,
-			}}
-			groups={groups}
-			onDelete={async () => {
-				await deleteCostUnit.mutateAsync({
-					id: costUnitId,
-				});
-			}}
-			onSubmit={async (values) => {
-				await update.mutateAsync(values);
-			}}
-			submitLabel="Update"
+		<DialogPrimitive.Trigger
+			data-slot="create-cost-unit-sheet-trigger"
+			handle={handle}
+			render={<Button {...props} />}
 		/>
 	);
 }
 
-function UpdateCostUnitForm({
-	defaultValues,
-	submitLabel,
-	canDelete,
-	groups,
+function CreateCostUnitSheet({
+	handle,
+	...props
+}: Omit<React.ComponentProps<typeof Sheet>, "handle"> & WithHandle) {
+	return (
+		<DialogPrimitive.Root handle={handle} {...props}>
+			<SheetContent
+				className={
+					"data-nested-dialog-open:-translate-x-6 data-nested-dialog-open:scale-98"
+				}
+			>
+				<SheetHeader>
+					<SheetTitle>Neue Kostenstelle</SheetTitle>
+				</SheetHeader>
 
-	onSubmit,
-	onDelete,
-}: UpdateCostUnitFormProps) {
-	const deleteHandleRef = React.useRef<ReturnType<
-		typeof AlertDialogPrimitive.createHandle
-	> | null>(null);
-	if (!deleteHandleRef.current)
-		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
-	const deleteHandle = deleteHandleRef.current;
+				<AsyncBoundary
+					pending={<SheetFormSkeleton fieldCount={COST_UNIT_FORM_FIELD_COUNT} />}
+					rejected={({ error, retry }) => (
+						<SheetFormError error={error} retry={retry} />
+					)}
+				>
+					<CreateCostUnitFormConnected handle={handle} />
+				</AsyncBoundary>
+			</SheetContent>
+		</DialogPrimitive.Root>
+	);
+}
+
+function CreateCostUnitFormConnected({ handle }: WithHandle) {
+	const utils = api.useUtils();
+
+	const [{ data: groups }] = useSuspenseQueries({
+		queries: [utils.costUnit.listGroups.queryOptions()],
+	});
+
+	const create = api.costUnit.create.useMutation({
+		onSuccess: (value) => {
+			toast.success("Kostenstelle wurde erfolgreich erstellt", {
+				description: `${value.tag} • ${value.title}`,
+			});
+			handle.close();
+		},
+		onError: (error) => {
+			toast.error("Fehler beim Erstellen der Kostenstelle", {
+				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			});
+		},
+	});
+
+	return (
+		<CreateCostUnitForm
+			groups={groups}
+			onSubmit={async (values) => {
+				await create.mutateAsync(values);
+			}}
+		/>
+	);
+}
+
+type CreateCostUnitFormProps = {
+	onSubmit: (values: CreateCostUnitFormValues) => Promise<void>;
+	groups: CostUnitGroup[];
+};
+
+function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
+	const createGroupHandleRef = React.useRef<CreateCostUnitGroupHandle | null>(
+		null,
+	);
+	if (!createGroupHandleRef.current)
+		createGroupHandleRef.current = createCostUnitGroupCreateHandle();
+	const createGroupHandle = createGroupHandleRef.current;
 
 	const form = useForm({
-		defaultValues,
+		defaultValues: {
+			tag: "",
+			title: "",
+			examples: [],
+			costUnitGroupId: NO_COST_UNIT_GROUP,
+		} as CreateCostUnitFormValues,
 		validators: {
-			onSubmit: updateCostUnitSchema,
+			onSubmit: createCostUnitSchema,
 		},
 		onSubmit: async ({ value }) => {
 			await onSubmit(value);
@@ -314,6 +268,16 @@ function UpdateCostUnitForm({
 											Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden,
 											indem du sie in Gruppen sortierst.
 										</FieldDescription>
+										<div>
+											<DialogPrimitive.Trigger
+												handle={createGroupHandle}
+												render={
+													<Button className={"w-fit -translate-x-2.5"} variant={"link"}>
+														Neue Gruppe erstellen
+													</Button>
+												}
+											/>
+										</div>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -347,33 +311,7 @@ function UpdateCostUnitForm({
 						</form.Field>
 					</FieldGroup>
 				</form>
-				<div className="mt-12 flex flex-nowrap items-start justify-between gap-8">
-					<div>
-						<Label
-							className="mb-1 font-semibold text-base text-red-600"
-							htmlFor={"delete-cost-unit"}
-						>
-							Kostenstelle löschen
-						</Label>
-						<FieldDescription>
-							{canDelete
-								? "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet."
-								: "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden."}
-						</FieldDescription>
-					</div>
-					<AlertDialogTrigger
-						disabled={!canDelete}
-						handle={deleteHandle}
-						id={"delete-cost-unit"}
-						render={
-							<Button type="button" variant={"destructive"}>
-								<TrashIcon /> Löschen
-							</Button>
-						}
-					/>
-				</div>
 			</SheetBody>
-
 			<SheetFooter className="flex flex-row items-center justify-end gap-4">
 				<SheetClose
 					render={
@@ -395,79 +333,19 @@ function UpdateCostUnitForm({
 							form={FORM_ID}
 							type="submit"
 						>
-							{isSubmitting ? "Saving…" : submitLabel}
+							{isSubmitting ? "Saving…" : "Erstellen"}
 						</Button>
 					)}
 				</form.Subscribe>
 			</SheetFooter>
-			<AlertDialog handle={deleteHandle}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>Kostenstelle löschen</AlertDialogTitle>
-						<AlertDialogDescription>
-							Bist du dir sicher, dass du diese Kostenstelle löschen möchtest? Diese
-							Aktion kann nicht rückängig gemacht werden.
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>Abbrechen</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={onDelete}
-							render={<Button variant={"destructive"}>Löschen</Button>}
-						/>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</>
-	);
-}
-
-function UpdateCostUnitFormSkeleton() {
-	return (
-		<>
-			<SheetBody>
-				<div className="space-y-5">
-					{["Title", "Price", "Category"].map((label) => (
-						<div className="space-y-2" key={label}>
-							<Skeleton className="h-4 w-20" />
-							<Skeleton className="h-10 w-full" />
-						</div>
-					))}
-				</div>
-			</SheetBody>
-			<SheetFooter>
-				<Skeleton className="h-10 w-32" />
-			</SheetFooter>
-		</>
-	);
-}
-
-export function UpdateCostUnitFormError({
-	error,
-	retry,
-}: {
-	error: Error;
-	retry: () => void;
-}) {
-	return (
-		<>
-			<SheetBody>
-				<div className="space-y-3">
-					<p className="font-medium text-sm">Couldn&apos;t load the form</p>
-					<p className="text-muted-foreground text-sm">{error.message}</p>
-				</div>
-			</SheetBody>
-			<SheetFooter>
-				<Button onClick={retry} variant="outline">
-					Try again
-				</Button>
-			</SheetFooter>
+			<CreateCostUnitGroupSheet closeOnSuccess handle={createGroupHandle} />
 		</>
 	);
 }
 
 export {
-	createUpdateCostUnitHandle,
-	type UpdateCostUnitHandle,
-	UpdateCostUnitSheet,
+	type CreateCostUnitHandle,
+	CreateCostUnitSheet,
+	CreateCostUnitSheetTrigger,
+	createCostUnitCreateHandle,
 };

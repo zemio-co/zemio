@@ -1,1 +1,1 @@
-export { OrgSettingsCostUnits } from "./org-settings-cost-units";
+export { OrgSettingsCostUnits } from "./cost-units";
