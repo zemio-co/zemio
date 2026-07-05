@@ -136,6 +136,7 @@ function UpdateCostUnitFormConnected({
 			toast.success("Kostenstelle wurde erfolgreich aktualisiert", {
 				description: `${value.tag} • ${value.title}`,
 			});
+			utils.costUnit.listCostUnits.invalidate({});
 			handle.close();
 		},
 		onError: (error) => {

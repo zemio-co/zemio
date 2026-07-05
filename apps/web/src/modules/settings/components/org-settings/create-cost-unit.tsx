@@ -112,6 +112,7 @@ function CreateCostUnitFormConnected({ handle }: WithHandle) {
 			toast.success("Kostenstelle wurde erfolgreich erstellt", {
 				description: `${value.tag} • ${value.title}`,
 			});
+			utils.costUnit.listCostUnits.invalidate({});
 			handle.close();
 		},
 		onError: (error) => {

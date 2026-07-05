@@ -1,15 +1,16 @@
 "use client";
 
 import { Dialog as DialogPrimitive } from "@base-ui/react";
-import { useQueries } from "@tanstack/react-query";
+import { keepPreviousData } from "@tanstack/react-query";
 import {
 	type ColumnDef,
 	flexRender,
 	getCoreRowModel,
+	type PaginationState,
 	useReactTable,
 } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { EllipsisIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -159,88 +160,135 @@ const costUnitColumns: ColumnDef<FetchedCostUnit>[] = [
 ];
 
 function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
+	const PAGE_SIZE = 20;
+
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: PAGE_SIZE,
+	});
+
+	const dataQuery = api.costUnit.listCostUnits.useQuery(
+		{
+			page: pagination.pageIndex + 1,
+			pageSize: pagination.pageSize,
+			search: undefined,
+		},
+		{
+			placeholderData: keepPreviousData,
+		},
+	);
+
+	const table = useReactTable({
+		data: dataQuery.data?.items ?? [],
+		rowCount: dataQuery.data?.totalCount,
+		columns: costUnitColumns,
+		state: {
+			pagination,
+		},
+		getCoreRowModel: getCoreRowModel(),
+		onPaginationChange: setPagination,
+		manualPagination: true,
+	});
+
 	const updateHandleRef = React.useRef<UpdateCostUnitHandle | null>(null);
 	if (!updateHandleRef.current)
 		updateHandleRef.current = createCostUnitUpdateHandle();
 	const updateHandle = updateHandleRef.current;
 
-	const utils = api.useUtils();
-
-	const [dataQuery] = useQueries({
-		queries: [
-			utils.costUnit.listCostUnits.queryOptions({
-				page: 1,
-				pageSize: 20,
-				search: undefined,
-			}),
-		],
-	});
-
-	const table = useReactTable({
-		data: dataQuery.data?.items ?? [],
-		columns: costUnitColumns,
-		getCoreRowModel: getCoreRowModel(),
-	});
+	if (dataQuery.isPending) {
+		return null;
+	}
 
 	if (dataQuery.error) {
 		return <p>{JSON.stringify(dataQuery.error)}</p>;
 	}
 
+	const { data } = dataQuery;
+
 	return (
 		<div className={cn("", className)} data-slot="cost-units-table" {...props}>
-			<table className="w-full">
-				<thead>
-					{table.getHeaderGroups().map((headerGroup) => (
-						<tr className="border-b" key={headerGroup.id}>
-							{headerGroup.headers.map((header) => {
-								return (
-									<th
-										className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-800 text-xs"
-										key={header.id}
-									>
-										{header.isPlaceholder
-											? null
-											: flexRender(header.column.columnDef.header, header.getContext())}
-									</th>
-								);
-							})}
-						</tr>
-					))}
-				</thead>
-				<tbody>
-					{table.getRowModel().rows?.length ? (
-						table.getRowModel().rows.map((row) => (
-							<DialogPrimitive.Trigger
-								handle={updateHandle}
-								key={row.id}
-								nativeButton={false}
-								payload={{ id: row.original.id }}
-								render={
-									<tr className="group/row" key={row.id}>
-										{row.getVisibleCells().map((cell) => (
-											<td
-												className="cursor-pointer whitespace-nowrap px-3 py-2 text-slate-700 text-sm"
-												key={cell.id}
-											>
-												{flexRender(cell.column.columnDef.cell, cell.getContext())}
-											</td>
-										))}
-									</tr>
-								}
-							/>
-						))
-					) : (
-						<tr>
-							<td
-								className="h-24 text-center"
-								colSpan={table.getVisibleFlatColumns().length}
-							>
-								No results.
-							</td>
-						</tr>
-					)}
-				</tbody>
-			</table>
+			<div
+				className="transition-opacity data-[fetching=true]:opacity-50"
+				data-fetching={dataQuery.isFetching}
+			>
+				<table className="w-full">
+					<thead>
+						{table.getHeaderGroups().map((headerGroup) => (
+							<tr className="border-b" key={headerGroup.id}>
+								{headerGroup.headers.map((header) => {
+									return (
+										<th
+											className="whitespace-nowrap px-3 py-2 text-left font-semibold text-slate-800 text-xs"
+											key={header.id}
+										>
+											{header.isPlaceholder
+												? null
+												: flexRender(header.column.columnDef.header, header.getContext())}
+										</th>
+									);
+								})}
+							</tr>
+						))}
+					</thead>
+					<tbody>
+						{table.getRowModel().rows?.length ? (
+							table.getRowModel().rows.map((row) => (
+								<DialogPrimitive.Trigger
+									handle={updateHandle}
+									key={row.id}
+									nativeButton={false}
+									payload={{ id: row.original.id }}
+									render={
+										<tr className="group/row" key={row.id}>
+											{row.getVisibleCells().map((cell) => (
+												<td
+													className="cursor-pointer whitespace-nowrap px-3 py-2 text-slate-700 text-sm"
+													key={cell.id}
+												>
+													{flexRender(cell.column.columnDef.cell, cell.getContext())}
+												</td>
+											))}
+										</tr>
+									}
+								/>
+							))
+						) : (
+							<tr>
+								<td
+									className="h-24 text-center"
+									colSpan={table.getVisibleFlatColumns().length}
+								>
+									No results.
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+			</div>
+			<div className="mt-8 flex flex-wrap justify-between gap-4 border-slate-200 border-t pt-4">
+				<span className="text-slate-500 text-sm">{data.totalCount} Units</span>
+				<div className="flex items-center justify-center gap-2">
+					<span className="me-2 text-slate-500 text-sm">
+						Page {pagination.pageIndex + 1} / {Math.ceil(data.totalCount / PAGE_SIZE)}
+					</span>
+					<Button
+						disabled={!table.getCanPreviousPage()}
+						onClick={() => table.previousPage()}
+						size={"icon-xs"}
+						variant={"outline"}
+					>
+						<ChevronLeftIcon />
+					</Button>
+					<Button
+						disabled={!table.getCanNextPage()}
+						onClick={() => table.nextPage()}
+						size={"icon-xs"}
+						variant={"outline"}
+					>
+						<ChevronRightIcon />
+					</Button>
+				</div>
+			</div>
 			<UpdateCostUnitSheet handle={updateHandle} />
 		</div>
 	);
