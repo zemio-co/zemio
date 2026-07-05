@@ -26,16 +26,29 @@ function isPrismaUniqueConstraintError(
 }
 
 export const costUnitRouter = createTRPCRouter({
+	getById: orgProcedure
+		.input(z.object({ id: z.string() }))
+		.query(async ({ ctx, input }) => {
+			return ctx.db.costUnit.findUniqueOrThrow({
+				where: {
+					id: input.id,
+				},
+				include: {
+					costUnitGroup: true,
+					_count: true,
+				},
+			});
+		}),
 	listCostUnits: orgProcedure
 		.input(
 			z.object({
-				cursor: z.string().optional(),
+				page: z.number().min(1).default(1),
 				pageSize: z.number().min(1).max(200).default(20),
 				search: z.string().optional(),
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			const { cursor, pageSize, search } = input;
+			const { page, pageSize, search } = input;
 
 			const where = {
 				organizationId: ctx.organizationId,
@@ -49,27 +62,30 @@ export const costUnitRouter = createTRPCRouter({
 					: {}),
 			};
 
-			const items = await ctx.db.costUnit.findMany({
-				where,
-				take: pageSize + 1,
-				cursor: cursor ? { id: cursor } : undefined,
-				orderBy: { tag: "asc" },
-				select: {
-					id: true,
-					tag: true,
-					title: true,
-					examples: true,
-					costUnitGroupId: true,
-				},
-			});
+			const [items, totalCount] = await ctx.db.$transaction([
+				ctx.db.costUnit.findMany({
+					where,
+					skip: (page - 1) * pageSize,
+					take: pageSize,
+					orderBy: { tag: "asc" },
+					select: {
+						id: true,
+						tag: true,
+						title: true,
+						examples: true,
+						costUnitGroupId: true,
+						createdAt: true,
+						costUnitGroup: {
+							select: {
+								title: true,
+							},
+						},
+					},
+				}),
+				ctx.db.costUnit.count({ where }),
+			]);
 
-			let nextCursor: string | undefined;
-			if (items.length > pageSize) {
-				const nextItem = items.pop();
-				nextCursor = nextItem?.id;
-			}
-
-			return { items, nextCursor };
+			return { items, totalCount, page, pageSize };
 		}),
 
 	listGroupsWithUnits: orgProcedure.query(async ({ ctx }) => {

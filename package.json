@@ -26,6 +26,8 @@
 	},
 	"packageManager": "bun@1.3.14",
 	"dependencies": {
-		"recharts": "^3.8.1"
+		"react-error-boundary": "^6.1.2",
+		"recharts": "^3.8.1",
+		"use-debounce": "^10.1.1"
 	}
 }

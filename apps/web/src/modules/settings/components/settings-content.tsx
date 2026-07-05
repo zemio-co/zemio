@@ -59,7 +59,7 @@ function SettingsGroup({
 		>
 			<h1 className="font-semibold text-slate-800 text-xl">{group.label}</h1>
 
-			<div className="mt-6 grid gap-12 sm:grid-cols-2 md:grid-cols-3">
+			<div className="mt-6 grid gap-12 sm:grid-cols-2 xl:grid-cols-3">
 				{group.items.map(({ icon: Icon, ...item }) => (
 					<div
 						className={cn(
