@@ -1,3 +1,4 @@
+import type { Prisma } from "@zemio/db";
 import { z } from "zod";
 import {
 	updateMealAllowancesSchema,
@@ -135,8 +136,10 @@ export const settingsRouter = createTRPCRouter({
 					}
 				: { organizationId: ctx.organizationId };
 
-			const select = {
+			const select: Prisma.MemberSelect = {
 				id: true,
+				createdAt: true,
+				role: true,
 				user: {
 					select: {
 						id: true,
@@ -172,7 +175,7 @@ export const settingsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { id: membershipId } = input;
 
-			return await ctx.db.member.findUnique({
+			return await ctx.db.member.findUniqueOrThrow({
 				where: {
 					id: membershipId,
 				},

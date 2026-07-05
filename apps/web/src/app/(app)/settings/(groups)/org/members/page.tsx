@@ -1,5 +1,5 @@
 import { createLoader, parseAsInteger, parseAsString } from "nuqs/server";
-import { OrgSettingsMembers } from "@/modules/settings";
+import { OrgSettingsMembers } from "@/modules/settings/components/";
 import { api, HydrateClient } from "@/trpc/server";
 
 const loadSearchParams = createLoader({
