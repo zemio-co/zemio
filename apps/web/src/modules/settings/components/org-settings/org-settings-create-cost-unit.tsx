@@ -82,7 +82,6 @@ function CreateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
 }
 
 type CreateCostUnitFormProps = {
-	defaultValues: CreateCostUnitFormValues;
 	onSubmit: (values: CreateCostUnitFormValues) => Promise<void>;
 	groups: CostUnitGroup[];
 };
@@ -110,12 +109,6 @@ function CreateCostUnitFormConnected() {
 
 	return (
 		<CreateCostUnitForm
-			defaultValues={{
-				title: "",
-				examples: [],
-				tag: "",
-				costUnitGroupId: NO_COST_UNIT_GROUP,
-			}}
 			groups={groups}
 			onSubmit={async (values) => {
 				await create.mutateAsync(values);
@@ -124,13 +117,14 @@ function CreateCostUnitFormConnected() {
 	);
 }
 
-function CreateCostUnitForm({
-	defaultValues,
-	onSubmit,
-	groups,
-}: CreateCostUnitFormProps) {
+function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 	const form = useForm({
-		defaultValues,
+		defaultValues: {
+			tag: "",
+			title: "",
+			examples: [],
+			costUnitGroupId: NO_COST_UNIT_GROUP,
+		} as CreateCostUnitFormValues,
 		validators: {
 			onSubmit: createCostUnitSchema,
 		},
