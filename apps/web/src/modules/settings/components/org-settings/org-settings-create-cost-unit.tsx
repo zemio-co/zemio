@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup } from "@zemio/db";
 import { InfoIcon } from "lucide-react";
+import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
@@ -37,33 +38,49 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type { WithHandle } from "@/lib/types";
 import { createCostUnitSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import { ExamplesInput } from "./org-settings-cost-units";
+import {
+	type CreateCostUnitGroupHandle,
+	CreateCostUnitGroupSheet,
+} from "./org-settings-create-cost-unit-group";
 
 type CreateCostUnitFormValues = z.infer<typeof createCostUnitSchema>;
+type CreateCostUnitHandle = ReturnType<typeof DialogPrimitive.createHandle>;
 
 const FORM_ID = "create-cost-unit";
 const NO_COST_UNIT_GROUP = "NO_GROUP" as const;
 
-const createCostUnitHandle = DialogPrimitive.createHandle();
+function createCreateCostUnitHandle(): CreateCostUnitHandle {
+	return DialogPrimitive.createHandle();
+}
 
 function CreateCostUnitSheetTrigger({
+	handle,
 	...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & WithHandle) {
 	return (
 		<DialogPrimitive.Trigger
 			data-slot="create-cost-unit-sheet-trigger"
-			handle={createCostUnitHandle}
+			handle={handle}
 			render={<Button {...props} />}
 		/>
 	);
 }
 
-function CreateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
+function CreateCostUnitSheet({
+	handle,
+	...props
+}: Omit<React.ComponentProps<typeof Sheet>, "handle"> & WithHandle) {
 	return (
-		<DialogPrimitive.Root handle={createCostUnitHandle} {...props}>
-			<SheetContent>
+		<DialogPrimitive.Root handle={handle} {...props}>
+			<SheetContent
+				className={
+					"data-nested-dialog-open:-translate-x-6 data-nested-dialog-open:scale-98"
+				}
+			>
 				<SheetHeader>
 					<SheetTitle>Neue Kostenstelle</SheetTitle>
 				</SheetHeader>
@@ -74,19 +91,14 @@ function CreateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
 						<CreateCostUnitFormError error={error} retry={retry} />
 					)}
 				>
-					<CreateCostUnitFormConnected />
+					<CreateCostUnitFormConnected handle={handle} />
 				</AsyncBoundary>
 			</SheetContent>
 		</DialogPrimitive.Root>
 	);
 }
 
-type CreateCostUnitFormProps = {
-	onSubmit: (values: CreateCostUnitFormValues) => Promise<void>;
-	groups: CostUnitGroup[];
-};
-
-function CreateCostUnitFormConnected() {
+function CreateCostUnitFormConnected({ handle }: WithHandle) {
 	const utils = api.useUtils();
 
 	const [{ data: groups }] = useSuspenseQueries({
@@ -98,7 +110,7 @@ function CreateCostUnitFormConnected() {
 			toast.success("Kostenstelle wurde erfolgreich erstellt", {
 				description: `${value.tag} • ${value.title}`,
 			});
-			createCostUnitHandle.close();
+			handle.close();
 		},
 		onError: (error) => {
 			toast.error("Fehler beim Erstellen der Kostenstelle", {
@@ -117,7 +129,19 @@ function CreateCostUnitFormConnected() {
 	);
 }
 
+type CreateCostUnitFormProps = {
+	onSubmit: (values: CreateCostUnitFormValues) => Promise<void>;
+	groups: CostUnitGroup[];
+};
+
 function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
+	const createGroupHandleRef = React.useRef<CreateCostUnitGroupHandle | null>(
+		null,
+	);
+	if (!createGroupHandleRef.current)
+		createGroupHandleRef.current = createCreateCostUnitHandle();
+	const createGroupHandle = createGroupHandleRef.current;
+
 	const form = useForm({
 		defaultValues: {
 			tag: "",
@@ -242,6 +266,16 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 											Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden,
 											indem du sie in Gruppen sortierst.
 										</FieldDescription>
+										<div>
+											<DialogPrimitive.Trigger
+												handle={createGroupHandle}
+												render={
+													<Button className={"w-fit -translate-x-2.5"} variant={"link"}>
+														Neue Gruppe erstellen
+													</Button>
+												}
+											/>
+										</div>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -276,7 +310,6 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 					</FieldGroup>
 				</form>
 			</SheetBody>
-
 			<SheetFooter className="flex flex-row items-center justify-end gap-4">
 				<SheetClose
 					render={
@@ -303,6 +336,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 					)}
 				</form.Subscribe>
 			</SheetFooter>
+			<CreateCostUnitGroupSheet closeOnSuccess handle={createGroupHandle} />
 		</>
 	);
 }
@@ -352,7 +386,8 @@ export function CreateCostUnitFormError({
 }
 
 export {
+	type CreateCostUnitHandle,
 	CreateCostUnitSheet,
 	CreateCostUnitSheetTrigger,
-	createCostUnitHandle,
+	createCreateCostUnitHandle,
 };

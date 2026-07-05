@@ -1,13 +1,28 @@
 "use client";
 
-import { Dialog as DialogPrimitive } from "@base-ui/react";
+import {
+	AlertDialog as AlertDialogPrimitive,
+	Dialog as DialogPrimitive,
+} from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup } from "@zemio/db";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, TrashIcon } from "lucide-react";
+import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -17,6 +32,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	NativeSelect,
 	NativeSelectOptGroup,
@@ -42,19 +58,28 @@ import { api } from "@/trpc/react";
 import { ExamplesInput } from "./org-settings-cost-units";
 
 type UpdateCostUnitPayload = { id: string } | undefined;
+type UpdateCostUnitHandle = ReturnType<
+	typeof DialogPrimitive.createHandle<UpdateCostUnitPayload>
+>;
 type UpdateCostUnitFormValues = z.infer<typeof updateCostUnitSchema>;
 
 const FORM_ID = "update-cost-unit";
 const NO_COST_UNIT_GROUP = "NO_GROUP" as const;
 
-const updateCostUnitHandle =
-	DialogPrimitive.createHandle<UpdateCostUnitPayload>();
+function createUpdateCostUnitHandle() {
+	return DialogPrimitive.createHandle<UpdateCostUnitPayload>();
+}
 
-function UpdateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
+function UpdateCostUnitSheet({
+	handle,
+	...props
+}: Omit<React.ComponentProps<typeof Sheet>, "handle"> & {
+	handle: UpdateCostUnitHandle;
+}) {
 	return (
-		<DialogPrimitive.Root {...props} handle={updateCostUnitHandle}>
+		<DialogPrimitive.Root {...props} handle={handle}>
 			{({ payload }) => (
-				<SheetContent>
+				<SheetContent className={"data-nested-dialog-open:blur-xs"}>
 					<SheetHeader>
 						<SheetTitle>Edit cost unit</SheetTitle>
 					</SheetHeader>
@@ -70,7 +95,7 @@ function UpdateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
 								<UpdateCostUnitFormError error={error} retry={retry} />
 							)}
 						>
-							<UpdateCostUnitFormConnected costUnitId={payload.id} />
+							<UpdateCostUnitFormConnected costUnitId={payload.id} handle={handle} />
 						</AsyncBoundary>
 					) : null}
 				</SheetContent>
@@ -82,11 +107,20 @@ function UpdateCostUnitSheet({ ...props }: React.ComponentProps<typeof Sheet>) {
 type UpdateCostUnitFormProps = {
 	defaultValues: UpdateCostUnitFormValues;
 	submitLabel: string;
-	onSubmit: (values: UpdateCostUnitFormValues) => Promise<void>;
 	groups: CostUnitGroup[];
+	canDelete?: boolean;
+
+	onSubmit: (values: UpdateCostUnitFormValues) => Promise<void> | void;
+	onDelete: () => Promise<void> | void;
 };
 
-function UpdateCostUnitFormConnected({ costUnitId }: { costUnitId: string }) {
+function UpdateCostUnitFormConnected({
+	costUnitId,
+	handle,
+}: {
+	costUnitId: string;
+	handle: UpdateCostUnitHandle;
+}) {
 	const utils = api.useUtils();
 
 	const [{ data: groups }, { data: costUnit }] = useSuspenseQueries({
@@ -101,7 +135,7 @@ function UpdateCostUnitFormConnected({ costUnitId }: { costUnitId: string }) {
 			toast.success("Kostenstelle wurde erfolgreich aktualisiert", {
 				description: `${value.tag} • ${value.title}`,
 			});
-			updateCostUnitHandle.close();
+			handle.close();
 		},
 		onError: (error) => {
 			toast.error("Fehler beim Aktualisieren der Kostenstelle", {
@@ -110,13 +144,33 @@ function UpdateCostUnitFormConnected({ costUnitId }: { costUnitId: string }) {
 		},
 	});
 
+	const deleteCostUnit = api.costUnit.delete.useMutation({
+		onSuccess: (value) => {
+			toast.success("Kostenstelle wurde erfolgreich gelöscht", {
+				description: `${value.tag} • ${value.title}`,
+			});
+			handle.close();
+		},
+		onError: (error) => {
+			toast.error("Fehler beim Löschen der Kostenstelle", {
+				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			});
+		},
+	});
+
 	return (
 		<UpdateCostUnitForm
+			canDelete={costUnit._count.reports === 0}
 			defaultValues={{
 				...costUnit,
 				costUnitGroupId: costUnit.costUnitGroupId ?? NO_COST_UNIT_GROUP,
 			}}
 			groups={groups}
+			onDelete={async () => {
+				await deleteCostUnit.mutateAsync({
+					id: costUnitId,
+				});
+			}}
 			onSubmit={async (values) => {
 				await update.mutateAsync(values);
 			}}
@@ -128,9 +182,19 @@ function UpdateCostUnitFormConnected({ costUnitId }: { costUnitId: string }) {
 function UpdateCostUnitForm({
 	defaultValues,
 	submitLabel,
-	onSubmit,
+	canDelete,
 	groups,
+
+	onSubmit,
+	onDelete,
 }: UpdateCostUnitFormProps) {
+	const deleteHandleRef = React.useRef<ReturnType<
+		typeof AlertDialogPrimitive.createHandle
+	> | null>(null);
+	if (!deleteHandleRef.current)
+		deleteHandleRef.current = AlertDialogPrimitive.createHandle();
+	const deleteHandle = deleteHandleRef.current;
+
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -283,6 +347,31 @@ function UpdateCostUnitForm({
 						</form.Field>
 					</FieldGroup>
 				</form>
+				<div className="mt-12 flex flex-nowrap items-start justify-between gap-8">
+					<div>
+						<Label
+							className="mb-1 font-semibold text-base text-red-600"
+							htmlFor={"delete-cost-unit"}
+						>
+							Kostenstelle löschen
+						</Label>
+						<FieldDescription>
+							{canDelete
+								? "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet."
+								: "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden."}
+						</FieldDescription>
+					</div>
+					<AlertDialogTrigger
+						disabled={!canDelete}
+						handle={deleteHandle}
+						id={"delete-cost-unit"}
+						render={
+							<Button type="button" variant={"destructive"}>
+								<TrashIcon /> Löschen
+							</Button>
+						}
+					/>
+				</div>
 			</SheetBody>
 
 			<SheetFooter className="flex flex-row items-center justify-end gap-4">
@@ -311,6 +400,24 @@ function UpdateCostUnitForm({
 					)}
 				</form.Subscribe>
 			</SheetFooter>
+			<AlertDialog handle={deleteHandle}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>Kostenstelle löschen</AlertDialogTitle>
+						<AlertDialogDescription>
+							Bist du dir sicher, dass du diese Kostenstelle löschen möchtest? Diese
+							Aktion kann nicht rückängig gemacht werden.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={onDelete}
+							render={<Button variant={"destructive"}>Löschen</Button>}
+						/>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</>
 	);
 }
@@ -359,4 +466,8 @@ export function UpdateCostUnitFormError({
 	);
 }
 
-export { UpdateCostUnitSheet, updateCostUnitHandle };
+export {
+	createUpdateCostUnitHandle,
+	type UpdateCostUnitHandle,
+	UpdateCostUnitSheet,
+};

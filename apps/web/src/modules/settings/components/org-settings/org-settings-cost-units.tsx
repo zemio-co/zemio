@@ -1,7 +1,6 @@
 "use client";
 
 import { Dialog as DialogPrimitive } from "@base-ui/react";
-import { useForm } from "@tanstack/react-form";
 import { useQueries } from "@tanstack/react-query";
 import {
 	type ColumnDef,
@@ -11,39 +10,39 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { EllipsisIcon } from "lucide-react";
-import type React from "react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { toast } from "sonner";
+import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { createCostUnitGroupSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import {
+	type CreateCostUnitHandle,
 	CreateCostUnitSheet,
 	CreateCostUnitSheetTrigger,
+	createCreateCostUnitHandle,
 } from "./org-settings-create-cost-unit";
 import {
+	CreateCostUnitGroupSheet,
+	CreateCostUnitGroupSheetTrigger,
+} from "./org-settings-create-cost-unit-group";
+import {
+	createUpdateCostUnitHandle,
+	type UpdateCostUnitHandle,
 	UpdateCostUnitSheet,
-	updateCostUnitHandle,
 } from "./org-settings-update-cost-unit";
 
 function OrgSettingsCostUnits() {
+	const createHandleRef = React.useRef<CreateCostUnitHandle | null>(null);
+	if (!createHandleRef.current)
+		createHandleRef.current = createCreateCostUnitHandle();
+	const createHandle = createHandleRef.current;
+
+	const createGroupHandleRef = React.useRef<CreateCostUnitHandle | null>(null);
+	if (!createGroupHandleRef.current)
+		createGroupHandleRef.current = createCreateCostUnitHandle();
+	const createGroupHandle = createGroupHandleRef.current;
+
 	return (
 		<section className="container">
 			<header className="flex flex-wrap items-start justify-between gap-8">
@@ -54,14 +53,22 @@ function OrgSettingsCostUnits() {
 					</p>
 				</div>
 				<div className="flex flex-nowrap items-center justify-center gap-4">
-					<CreateCostUnitGroup variant={"outline"}>Neue Gruppe</CreateCostUnitGroup>
-					<CreateCostUnitSheetTrigger>Neue Kostenstelle</CreateCostUnitSheetTrigger>
+					<CreateCostUnitGroupSheetTrigger
+						handle={createGroupHandle}
+						variant={"outline"}
+					>
+						Neue Gruppe
+					</CreateCostUnitGroupSheetTrigger>
+					<CreateCostUnitSheetTrigger handle={createHandle}>
+						Neue Kostenstelle
+					</CreateCostUnitSheetTrigger>
 				</div>
 			</header>
 
 			<CostUnitsTable className="mt-12" />
 
-			<CreateCostUnitSheet />
+			<CreateCostUnitSheet handle={createHandle} />
+			<CreateCostUnitGroupSheet closeOnSuccess handle={createGroupHandle} />
 		</section>
 	);
 }
@@ -158,6 +165,11 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 	const pageSize = 20;
 	const search = undefined;
 
+	const updateHandleRef = React.useRef<UpdateCostUnitHandle | null>(null);
+	if (!updateHandleRef.current)
+		updateHandleRef.current = createUpdateCostUnitHandle();
+	const updateHandle = updateHandleRef.current;
+
 	const utils = api.useUtils();
 
 	const [dataQuery] = useQueries({
@@ -205,7 +217,7 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 					{table.getRowModel().rows?.length ? (
 						table.getRowModel().rows.map((row) => (
 							<DialogPrimitive.Trigger
-								handle={updateCostUnitHandle}
+								handle={updateHandle}
 								key={row.id}
 								nativeButton={false}
 								payload={{ id: row.original.id }}
@@ -235,97 +247,8 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 					)}
 				</tbody>
 			</table>
-			<UpdateCostUnitSheet />
+			<UpdateCostUnitSheet handle={updateHandle} />
 		</div>
-	);
-}
-
-// ========= CREATE COST UNIT GROUP ======================================
-
-function CreateCostUnitGroup({
-	...props
-}: React.ComponentProps<typeof Button>) {
-	const utils = api.useUtils();
-	const [open, setOpen] = useState(false);
-
-	const createGroup = api.costUnit.createGroup.useMutation({
-		onSuccess: () => {
-			utils.costUnit.listGroups.invalidate();
-			setOpen(false);
-			form.reset();
-			toast.success("Kostenstellengruppe erfolgreich erstellt");
-		},
-		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Kostenstellengruppe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
-			});
-		},
-	});
-
-	const form = useForm({
-		defaultValues: {
-			title: "",
-		},
-		validators: {
-			onSubmit: createCostUnitGroupSchema,
-		},
-		onSubmit: (value) => {
-			createGroup.mutate(value.value);
-		},
-	});
-
-	return (
-		<Dialog onOpenChange={setOpen} open={open}>
-			<DialogTrigger render={<Button {...props} />} />
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Neue Kostenstellengruppe</DialogTitle>
-					<DialogDescription>
-						Erstelle eine neue Kostenstellengruppe
-					</DialogDescription>
-				</DialogHeader>
-				<div>
-					<form
-						id="form-create-cost-unit-group"
-						onSubmit={(e) => {
-							e.preventDefault();
-							form.handleSubmit();
-						}}
-					>
-						<FieldGroup>
-							<form.Field name="title">
-								{(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
-									return (
-										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Gruppentitel</FieldLabel>
-											<Input
-												aria-invalid={isInvalid}
-												id={field.name}
-												name={field.name}
-												onBlur={field.handleBlur}
-												onChange={(e) => field.handleChange(e.target.value)}
-												value={field.state.value}
-											/>
-											{isInvalid && <FieldError errors={field.state.meta.errors} />}
-										</Field>
-									);
-								}}
-							</form.Field>
-							<Button
-								className="w-full"
-								disabled={createGroup.isPending}
-								form="form-create-cost-unit-group"
-								type="submit"
-							>
-								Erstellen
-							</Button>
-						</FieldGroup>
-					</form>
-				</div>
-			</DialogContent>
-		</Dialog>
 	);
 }
 

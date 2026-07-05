@@ -21,7 +21,7 @@ const buttonVariants = cva(
 					"border-0 hover:bg-muted hover:text-foreground hover:ring-1 hover:ring-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 [&_svg:not([class*='text-'])]:text-slate-500",
 				destructive:
 					"border-0 bg-white text-red-600 shadow-sm ring-1 ring-slate-700/15 hover:bg-red-50 hover:ring-red-700/25 focus-visible:ring-red-200 [&_svg:not([class*='text-'])]:text-red-600",
-				link: "text-primary underline-offset-4 hover:underline",
+				link: "text-violet-600 hover:text-violet-500",
 			},
 			size: {
 				default:
