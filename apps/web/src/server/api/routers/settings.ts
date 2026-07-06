@@ -28,6 +28,29 @@ export const settingsRouter = createTRPCRouter({
 			});
 		}),
 
+	updateOrgGeneral: orgAdminProcedure
+		.input(
+			z.object({
+				name: z.string().min(1).max(100),
+				logo: z.preprocess(
+					(val) => (val === "" ? null : val),
+					z
+						.url({
+							normalize: true,
+						})
+						.nullable()
+						.optional(),
+				),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			return await ctx.db.organization.update({
+				where: { id: ctx.organizationId },
+				data: { name: input.name, logo: input.logo },
+				select: { id: true, name: true },
+			});
+		}),
+
 	get: orgProcedure.query(async ({ ctx }) => {
 		const settings = await ctx.db.settings.upsert({
 			where: { organizationId: ctx.organizationId },
@@ -75,7 +98,15 @@ export const settingsRouter = createTRPCRouter({
 		.input(
 			z.object({
 				kilometerRate: z.number().positive().optional(),
-				reviewerEmail: z.email().optional().nullable(),
+				reviewerEmail: z
+					.string()
+					.refine(
+						(val) => val === "" || z.email().safeParse(val).success,
+						"Must be a valid E-Mail",
+					)
+					.transform((val) => (val === "" ? null : val))
+					.nullable()
+					.optional(),
 				costUnitInfoUrl: z.string().optional().nullable(),
 			}),
 		)
