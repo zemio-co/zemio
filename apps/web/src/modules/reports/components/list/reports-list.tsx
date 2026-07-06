@@ -142,6 +142,13 @@ function ReportsList({ className, ...props }: React.ComponentProps<"div">) {
 			(costUnitsQuery.data?.items ?? []).map((cu) => ({
 				label: cu.tag,
 				value: cu.id,
+				data: cu,
+				render: (costUnit: Pick<typeof cu, "id" | "tag" | "title">) => (
+					<span className="flex items-center gap-1.5">
+						<span>{costUnit.tag}</span>
+						<span className="text-muted-foreground">{costUnit.title}</span>
+					</span>
+				),
 			})),
 		[costUnitsQuery.data],
 	);

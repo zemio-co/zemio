@@ -33,6 +33,7 @@ import {
 	isSelectFilter,
 } from "@/components/data/filter-types";
 import { List, ListItem } from "@/components/list";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -149,8 +150,28 @@ export function ReportsList() {
 	const columns = useMemo(
 		() =>
 			createColumns({
-				costUnits: filterOptions.costUnits,
-				owners: filterOptions.owners,
+				costUnits: filterOptions.costUnits.map((option) => ({
+					...option,
+					render: (costUnit) => (
+						<span className="flex items-center gap-1.5 truncate whitespace-nowrap">
+							<span className="text-muted-foreground">{costUnit.tag}</span>
+							<span className="font-medium">{costUnit.title}</span>
+						</span>
+					),
+					searchValue: option.data.title,
+				})),
+				owners: filterOptions.owners.map((option) => ({
+					...option,
+					render: (owner) => (
+						<span className="flex items-center gap-2">
+							<Avatar className="size-5">
+								<AvatarImage src={owner.image ?? undefined} />
+								<AvatarFallback>{owner.name.charAt(0)}</AvatarFallback>
+							</Avatar>
+							<span>{owner.name}</span>
+						</span>
+					),
+				})),
 			}),
 		[filterOptions],
 	);

@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
-import type { ReportStatus } from "@zemio/db";
+import type { CostUnit, ReportStatus, User } from "@zemio/db";
 import { format } from "date-fns";
 import {
 	ALargeSmallIcon,
@@ -10,6 +10,7 @@ import {
 	UserCircleIcon,
 } from "lucide-react";
 import Link from "next/link";
+import type { FilterOption } from "@/components/data/filter-types";
 import { ListActionSlot } from "@/components/list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,16 +25,13 @@ import { ROUTES } from "@/lib/routes";
 import { cn, formatTimeElapsed, translateReportStatus } from "@/lib/utils";
 import type { ListReport } from "./types";
 
-export type CostUnitOption = {
-	label: string;
-	value: string;
-};
+export type CostUnitOption = FilterOption<
+	Pick<CostUnit, "id" | "tag" | "title">
+>;
 
-export type OwnerOption = {
-	label: string;
-	value: string;
-	image?: string | null;
-};
+export type OwnerOption = FilterOption<
+	Pick<User, "id" | "name" | "email" | "image">
+>;
 
 const actionsColumn: ColumnDef<ListReport> = {
 	id: "actions",

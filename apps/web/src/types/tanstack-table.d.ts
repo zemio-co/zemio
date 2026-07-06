@@ -42,5 +42,11 @@ declare module "@tanstack/react-table" {
 		 * When true, cell cannot be displayed on mobile devices.
 		 */
 		hideOnMobile?: boolean;
+
+		/**
+		 * When true, renders a search input at the top of the filter menu's
+		 * select/multiselect submenu to filter the available options.
+		 */
+		searchable?: boolean;
 	}
 }

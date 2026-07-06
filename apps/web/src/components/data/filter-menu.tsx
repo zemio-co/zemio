@@ -1,8 +1,9 @@
 "use client";
 
+import type { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import type { Column, Table } from "@tanstack/react-table";
 import type React from "react";
-import { memo } from "react";
+import { memo, useRef } from "react";
 import { Button } from "../ui/button";
 import {
 	DropdownMenu,
@@ -30,6 +31,7 @@ type FilterMenuItemProps<TData> = {
 	column: Column<TData, unknown>;
 	table: Table<TData>;
 	filterValue?: unknown;
+	closeMenu: () => void;
 };
 
 // ============================================================================
@@ -43,12 +45,13 @@ type FilterMenuItemProps<TData> = {
 const FilterMenuItem = memo(function FilterMenuItem<TData>({
 	column,
 	table,
+	closeMenu,
 }: // filterValue is intentionally unused — it exists solely to break memo
 // when the column's filter value changes, ensuring the submenu re-renders
 // with fresh state (fixes stale checked indicators and stale closure in handleToggle)
 FilterMenuItemProps<TData>) {
 	const meta = column.columnDef.meta;
-	const menuContent = renderFilterMenuContent(column, table);
+	const menuContent = renderFilterMenuContent(column, table, closeMenu);
 
 	if (!menuContent) return null;
 
@@ -87,6 +90,7 @@ export function FilterMenu<TData>({
 	...buttonProps
 }: FilterMenuProps<TData>) {
 	const filterableColumns = useFilterableColumns(table);
+	const menuActionsRef = useRef<MenuPrimitive.Root.Actions>(null);
 
 	const hasActiveFilters = table.getState().columnFilters.length >= 1;
 
@@ -95,7 +99,7 @@ export function FilterMenu<TData>({
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu actionsRef={menuActionsRef}>
 			<DropdownMenuTrigger
 				data-filtered={hasActiveFilters}
 				render={<Button {...buttonProps}>{children}</Button>}
@@ -107,6 +111,7 @@ export function FilterMenu<TData>({
 				<DropdownMenuGroup>
 					{filterableColumns.map((column) => (
 						<FilterMenuItem
+							closeMenu={() => menuActionsRef.current?.close()}
 							column={column}
 							filterValue={
 								table.getState().columnFilters.find((f) => f.id === column.id)?.value

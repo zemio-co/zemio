@@ -1,5 +1,6 @@
 "use client";
 
+import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import type { Column, Table } from "@tanstack/react-table";
 import { differenceInDays } from "date-fns";
 import { XIcon } from "lucide-react";
@@ -12,6 +13,10 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuSubContent,
+	DropdownMenuSubSearchEmpty,
+	DropdownMenuSubSearchInput,
+	DropdownMenuSubSearchItem,
+	DropdownMenuSubSearchList,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import {
@@ -22,12 +27,46 @@ import {
 	type DateRangePreset,
 	type FilterChipProps,
 	type FilterMenuContentProps,
+	type FilterOption,
 	isDateRangeFilter,
 	isMultiSelectFilter,
 	isSelectFilter,
 	type MultiSelectFilterValue,
 	type SelectFilterValue,
 } from "./filter-types";
+
+// ============================================================================
+// Shared Option Rendering
+// ============================================================================
+
+/**
+ * Renders a single filter option's content for a dropdown row.
+ * Uses the option's custom `render` when both `render` and `data` are set,
+ * otherwise falls back to the default icon+label row.
+ */
+function renderOptionContent(option: FilterOption): ReactNode {
+	if (option.render && option.data !== undefined) {
+		return option.render(option.data);
+	}
+
+	return (
+		<>
+			{option.icon && <option.icon className={option.iconClassName} />}
+			{option.label}
+		</>
+	);
+}
+
+/**
+ * Matches a filter option against a search query, considering both its
+ * `label` and its optional `searchValue`.
+ */
+function useOptionFilter() {
+	const filter = ComboboxPrimitive.useFilter();
+
+	return (option: FilterOption, query: string) =>
+		filter.contains(option, query, (o) => `${o.label} ${o.searchValue ?? ""}`);
+}
 
 // ============================================================================
 // Filter Registry Definition
@@ -166,9 +205,11 @@ function DateRangeChipContent<TData, TValue>({
 
 function SelectMenuContent<TData, TValue>({
 	column,
+	closeMenu,
 }: FilterMenuContentProps<TData, TValue>) {
 	const meta = column.columnDef.meta;
 	const options = meta?.options ?? [];
+	const filterOption = useOptionFilter();
 
 	const handleSelect = (optionValue: string, operator: "is" | "is-not") => {
 		const value: SelectFilterValue = {
@@ -179,6 +220,31 @@ function SelectMenuContent<TData, TValue>({
 		column.setFilterValue(value);
 	};
 
+	if (meta?.searchable) {
+		return (
+			<DropdownMenuSubContent className="flex max-h-72 w-64 flex-col overflow-hidden">
+				<ComboboxPrimitive.Root filter={filterOption} inline items={options} open>
+					<DropdownMenuSubSearchInput placeholder="Suchen…" />
+					<DropdownMenuSubSearchEmpty>Keine Treffer</DropdownMenuSubSearchEmpty>
+					<DropdownMenuSubSearchList>
+						{(option: FilterOption) => (
+							<DropdownMenuSubSearchItem
+								key={option.value}
+								onClick={() => {
+									handleSelect(option.value, "is");
+									closeMenu?.();
+								}}
+								value={option}
+							>
+								{renderOptionContent(option)}
+							</DropdownMenuSubSearchItem>
+						)}
+					</DropdownMenuSubSearchList>
+				</ComboboxPrimitive.Root>
+			</DropdownMenuSubContent>
+		);
+	}
+
 	return (
 		<DropdownMenuSubContent className="min-w-48">
 			{options.map((option) => (
@@ -186,8 +252,7 @@ function SelectMenuContent<TData, TValue>({
 					key={option.value}
 					onClick={() => handleSelect(option.value, "is")}
 				>
-					{option.icon && <option.icon className={option.iconClassName} />}
-					{option.label}
+					{renderOptionContent(option)}
 				</DropdownMenuItem>
 			))}
 		</DropdownMenuSubContent>
@@ -273,8 +338,7 @@ function SelectChipContent<TData, TValue>({
 							key={option.value}
 							onClick={() => handleValueChange(option.value)}
 						>
-							{option.icon && <option.icon className={option.iconClassName} />}
-							{option.label}
+							{renderOptionContent(option)}
 						</DropdownMenuItem>
 					))}
 				</DropdownMenuContent>
@@ -296,6 +360,7 @@ function MultiSelectMenuContent<TData, TValue>({
 }: FilterMenuContentProps<TData, TValue>) {
 	const meta = column.columnDef.meta;
 	const options = meta?.options ?? [];
+	const filterOption = useOptionFilter();
 	const filterValue = column.getFilterValue();
 	const selectedValues: string[] = isMultiSelectFilter(filterValue)
 		? filterValue.value
@@ -328,6 +393,29 @@ function MultiSelectMenuContent<TData, TValue>({
 		column.setFilterValue(value);
 	};
 
+	if (meta?.searchable) {
+		return (
+			<DropdownMenuSubContent className="flex max-h-72 w-64 flex-col overflow-hidden">
+				<ComboboxPrimitive.Root filter={filterOption} inline items={options} open>
+					<DropdownMenuSubSearchInput placeholder="Suchen…" />
+					<DropdownMenuSubSearchEmpty>Keine Treffer</DropdownMenuSubSearchEmpty>
+					<DropdownMenuSubSearchList>
+						{(option: FilterOption) => (
+							<DropdownMenuSubSearchItem
+								checked={selectedValues.includes(option.value)}
+								key={option.value}
+								onClick={() => handleToggle(option.value)}
+								value={option}
+							>
+								{renderOptionContent(option)}
+							</DropdownMenuSubSearchItem>
+						)}
+					</DropdownMenuSubSearchList>
+				</ComboboxPrimitive.Root>
+			</DropdownMenuSubContent>
+		);
+	}
+
 	return (
 		<DropdownMenuSubContent className="min-w-48">
 			{options.map((option) => (
@@ -336,8 +424,7 @@ function MultiSelectMenuContent<TData, TValue>({
 					key={option.value}
 					onCheckedChange={() => handleToggle(option.value)}
 				>
-					{option.icon && <option.icon className={option.iconClassName} />}
-					{option.label}
+					{renderOptionContent(option)}
 				</DropdownMenuCheckboxItem>
 			))}
 		</DropdownMenuSubContent>
@@ -452,8 +539,7 @@ function MultiSelectChipContent<TData, TValue>({
 							key={option.value}
 							onCheckedChange={() => handleValueToggle(option.value)}
 						>
-							{option.icon && <option.icon className={option.iconClassName} />}
-							{option.label}
+							{renderOptionContent(option)}
 						</DropdownMenuCheckboxItem>
 					))}
 				</DropdownMenuContent>
@@ -550,6 +636,7 @@ export function getFilterEntry<TData, TValue>(
 export function renderFilterMenuContent<TData, TValue>(
 	column: Column<TData, TValue>,
 	table: Table<TData>,
+	closeMenu?: () => void,
 ): ReactNode {
 	const meta = column.columnDef.meta;
 	const entry = getFilterEntry<TData, TValue>(
@@ -559,7 +646,9 @@ export function renderFilterMenuContent<TData, TValue>(
 
 	if (!entry) return null;
 
-	return <entry.MenuContent column={column} table={table} />;
+	return (
+		<entry.MenuContent closeMenu={closeMenu} column={column} table={table} />
+	);
 }
 
 /**
