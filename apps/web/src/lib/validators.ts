@@ -1,7 +1,11 @@
-import { ExpenseType, NotificationPreference } from "@zemio/db/enums";
+import {
+	CostUnitStatus,
+	ExpenseType,
+	NotificationPreference,
+} from "@zemio/db/enums";
+
 import { isValid, parse } from "date-fns";
 import z from "zod";
-
 export const createReportSchema = z.object({
 	title: z.string().min(1, "Bitte gib einen Titel ein."),
 	description: z.string(),
@@ -151,6 +155,7 @@ export const updateCostUnitSchema = z.object({
 	title: z.string().min(1),
 	examples: z.string().array(),
 	costUnitGroupId: z.string(),
+	status: z.enum(CostUnitStatus),
 });
 
 export const deleteCostUnitSchema = z.object({

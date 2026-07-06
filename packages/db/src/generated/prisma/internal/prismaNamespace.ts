@@ -1921,6 +1921,7 @@ export const CostUnitScalarFieldEnum = {
   title: 'title',
   examples: 'examples',
   organizationId: 'organizationId',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   costUnitGroupId: 'costUnitGroupId'
@@ -2155,6 +2156,20 @@ export type EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel> = FieldRefInputTy
  * Reference to a field of type 'LegalAcceptanceType[]'
  */
 export type ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LegalAcceptanceType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CostUnitStatus'
+ */
+export type EnumCostUnitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CostUnitStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CostUnitStatus[]'
+ */
+export type ListEnumCostUnitStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CostUnitStatus[]'>
     
 
 

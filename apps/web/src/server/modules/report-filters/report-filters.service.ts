@@ -13,10 +13,20 @@ export type ReportFiltersContext = {
  * Filter dropdown options for the admin report list. Not a projection of Report
  * itself. Values are ids (cost-unit id / user id) so they map directly onto the
  * report list filter DSL (`costUnitId` / `ownerId`); labels are display text.
+ * `data` carries the full source entity so the frontend can render custom
+ * option content (e.g. cost unit title, owner avatar) beyond label/value.
  */
 export type ReportFilterOptionsDTO = {
-	costUnits: Array<{ label: string; value: string }>;
-	owners: Array<{ label: string; value: string; image: string | null }>;
+	costUnits: Array<{
+		label: string;
+		value: string;
+		data: { id: string; tag: string; title: string };
+	}>;
+	owners: Array<{
+		label: string;
+		value: string;
+		data: { id: string; name: string; email: string; image: string | null };
+	}>;
 };
 
 export function createReportFiltersService(deps: {
@@ -35,11 +45,12 @@ export function createReportFiltersService(deps: {
 				costUnits: costUnits.map((costUnit) => ({
 					label: costUnit.tag,
 					value: costUnit.id,
+					data: costUnit,
 				})),
 				owners: owners.map((owner) => ({
 					label: owner.name,
 					value: owner.id,
-					image: owner.image,
+					data: owner,
 				})),
 			};
 		},

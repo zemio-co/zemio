@@ -1,3 +1,4 @@
+import type { Prisma } from "@zemio/db";
 import { z } from "zod";
 import {
 	updateMealAllowancesSchema,
@@ -23,6 +24,29 @@ export const settingsRouter = createTRPCRouter({
 			return await ctx.db.organization.update({
 				where: { id: ctx.organizationId },
 				data: { name: input.name },
+				select: { id: true, name: true },
+			});
+		}),
+
+	updateOrgGeneral: orgAdminProcedure
+		.input(
+			z.object({
+				name: z.string().min(1).max(100),
+				logo: z.preprocess(
+					(val) => (val === "" ? null : val),
+					z
+						.url({
+							normalize: true,
+						})
+						.nullable()
+						.optional(),
+				),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			return await ctx.db.organization.update({
+				where: { id: ctx.organizationId },
+				data: { name: input.name, logo: input.logo },
 				select: { id: true, name: true },
 			});
 		}),
@@ -74,7 +98,15 @@ export const settingsRouter = createTRPCRouter({
 		.input(
 			z.object({
 				kilometerRate: z.number().positive().optional(),
-				reviewerEmail: z.email().optional().nullable(),
+				reviewerEmail: z
+					.string()
+					.refine(
+						(val) => val === "" || z.email().safeParse(val).success,
+						"Must be a valid E-Mail",
+					)
+					.transform((val) => (val === "" ? null : val))
+					.nullable()
+					.optional(),
 				costUnitInfoUrl: z.string().optional().nullable(),
 			}),
 		)
@@ -135,8 +167,10 @@ export const settingsRouter = createTRPCRouter({
 					}
 				: { organizationId: ctx.organizationId };
 
-			const select = {
+			const select: Prisma.MemberSelect = {
 				id: true,
+				createdAt: true,
+				role: true,
 				user: {
 					select: {
 						id: true,
@@ -172,7 +206,7 @@ export const settingsRouter = createTRPCRouter({
 		.query(async ({ ctx, input }) => {
 			const { id: membershipId } = input;
 
-			return await ctx.db.member.findUnique({
+			return await ctx.db.member.findUniqueOrThrow({
 				where: {
 					id: membershipId,
 				},
