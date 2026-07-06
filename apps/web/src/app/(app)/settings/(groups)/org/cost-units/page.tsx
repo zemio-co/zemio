@@ -12,7 +12,8 @@ export default async function ServerPage(
 	const searchParams = await props.searchParams;
 	const params = loadSearchParams(searchParams);
 
-	await api.costUnit.listCostUnits.prefetchInfinite({
+	await api.costUnit.listCostUnits.prefetch({
+		page: 1,
 		pageSize: 20,
 		search: params.search ?? undefined,
 	});

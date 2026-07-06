@@ -1,4 +1,4 @@
-import { OrgSettingsGeneral } from "@/modules/settings";
+import { OrgSettingsGeneral } from "@/modules/settings/components";
 import { api, HydrateClient } from "@/trpc/server";
 
 export default async function ServerPage(

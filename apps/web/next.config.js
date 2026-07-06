@@ -14,6 +14,14 @@ const config = {
 	// Required for standalone output to correctly trace workspace package files
 	// (packages/db, packages/encryption) in the monorepo.
 	outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "*", // Allow images from all domains
+			},
+		],
+	},
 };
 
 const sourceMapUploadConfig =

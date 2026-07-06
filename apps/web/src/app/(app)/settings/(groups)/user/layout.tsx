@@ -18,5 +18,5 @@ export default async function ServerLayout({
 		redirect(ROUTES.AUTH());
 	}
 
-	return children;
+	return <div className="container">{children}</div>;
 }

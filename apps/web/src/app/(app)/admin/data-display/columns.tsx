@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import type {
 	DateRangeFilterValue,
+	FilterOption,
 	MultiSelectFilterValue,
 	SelectFilterValue,
 } from "@/components/data/filter-types";
@@ -33,16 +34,13 @@ export type ExtendedReport = Report & {
 	costUnit: Pick<CostUnit, "tag">;
 };
 
-export type CostUnitOption = {
-	label: string;
-	value: string;
-};
+export type CostUnitOption = FilterOption<
+	Pick<CostUnit, "id" | "tag" | "title">
+>;
 
-export type OwnerOption = {
-	label: string;
-	value: string;
-	image?: string | null;
-};
+export type OwnerOption = FilterOption<
+	Pick<User, "id" | "name" | "email" | "image">
+>;
 
 const actionsColumn: ColumnDef<ExtendedReport> = {
 	id: "actions",
@@ -235,6 +233,7 @@ const createOwnerColumn = (
 		options,
 		placeholder: "Ersteller",
 		filterType: "select",
+		searchable: true,
 	},
 });
 
@@ -299,6 +298,7 @@ const createCostUnitColumn = (
 		placeholder: "Kostenstelle",
 		filterType: "multiselect",
 		hideOnMobile: true,
+		searchable: true,
 	},
 });
 

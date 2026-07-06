@@ -1,5 +1,6 @@
 "use client";
 
+import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import { Menu as MenuPrimitive } from "@base-ui/react/menu";
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
 import type * as React from "react";
@@ -139,7 +140,7 @@ function DropdownMenuSubContent({
 			align={align}
 			alignOffset={alignOffset}
 			className={cn(
-				"data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-auto min-w-[96px] rounded-md bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in",
+				"data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 max-h-(--available-height) w-auto min-w-[96px] overflow-y-auto rounded-md bg-popover p-1 text-popover-foreground shadow-lg ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in",
 				className,
 			)}
 			data-slot="dropdown-menu-sub-content"
@@ -147,6 +148,98 @@ function DropdownMenuSubContent({
 			sideOffset={sideOffset}
 			{...props}
 		/>
+	);
+}
+
+function DropdownMenuSubSearchInput({
+	className,
+	onKeyDown,
+	...props
+}: ComboboxPrimitive.Input.Props) {
+	return (
+		<ComboboxPrimitive.Input
+			autoFocus
+			className={cn(
+				"mb-1 w-full shrink-0 rounded-md border border-input bg-transparent px-1.5 py-1 text-sm outline-hidden placeholder:text-muted-foreground focus:ring-[3px] focus:ring-ring/50",
+				className,
+			)}
+			data-slot="dropdown-menu-sub-search-input"
+			onKeyDown={(event) => {
+				// The parent Menu listens for keydown on the popup to drive its own
+				// typeahead/roving-focus navigation, which would otherwise prevent
+				// default on printable-character keys before they reach this input.
+				event.stopPropagation();
+				onKeyDown?.(event);
+			}}
+			{...props}
+		/>
+	);
+}
+
+function DropdownMenuSubSearchEmpty({
+	className,
+	...props
+}: ComboboxPrimitive.Empty.Props) {
+	return (
+		<ComboboxPrimitive.Empty
+			className={cn(
+				"px-1.5 py-2 text-center text-muted-foreground text-sm",
+				className,
+			)}
+			data-slot="dropdown-menu-sub-search-empty"
+			{...props}
+		/>
+	);
+}
+
+function DropdownMenuSubSearchList({
+	className,
+	...props
+}: ComboboxPrimitive.List.Props) {
+	return (
+		<ComboboxPrimitive.List
+			className={cn(
+				"min-h-0 flex-1 overflow-y-auto overscroll-contain",
+				className,
+			)}
+			data-slot="dropdown-menu-sub-search-list"
+			{...props}
+		/>
+	);
+}
+
+function DropdownMenuSubSearchItem({
+	className,
+	children,
+	checked,
+	...props
+}: ComboboxPrimitive.Item.Props & {
+	/**
+	 * Whether to render a checkmark indicator (for multiselect search lists).
+	 * Omit for single-select search lists.
+	 */
+	checked?: boolean;
+}) {
+	return (
+		<ComboboxPrimitive.Item
+			className={cn(
+				"relative flex cursor-default select-none items-center gap-1.5 rounded-md py-1 pl-1.5 text-sm outline-hidden data-disabled:pointer-events-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:opacity-50 data-highlighted:**:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				checked !== undefined && "pr-8",
+				className,
+			)}
+			data-slot="dropdown-menu-sub-search-item"
+			{...props}
+		>
+			{children}
+			{checked && (
+				<span
+					className="pointer-events-none absolute right-2 flex items-center justify-center"
+					data-slot="dropdown-menu-sub-search-item-indicator"
+				>
+					<CheckIcon className="size-4" />
+				</span>
+			)}
+		</ComboboxPrimitive.Item>
 	);
 }
 
@@ -255,6 +348,10 @@ export {
 	DropdownMenuShortcut,
 	DropdownMenuSub,
 	DropdownMenuSubContent,
+	DropdownMenuSubSearchEmpty,
+	DropdownMenuSubSearchInput,
+	DropdownMenuSubSearchItem,
+	DropdownMenuSubSearchList,
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 };

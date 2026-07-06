@@ -361,6 +361,23 @@ export type EnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
 }
 
+export type EnumCostUnitStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CostUnitStatus | Prisma.EnumCostUnitStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel> | $Enums.CostUnitStatus
+}
+
+export type EnumCostUnitStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CostUnitStatus | Prisma.EnumCostUnitStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCostUnitStatusWithAggregatesFilter<$PrismaModel> | $Enums.CostUnitStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel>
+}
+
 export type JsonNullableFilter<$PrismaModel = never> =
 | Prisma.PatchUndefined<
     Prisma.Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -743,6 +760,23 @@ export type NestedEnumLegalAcceptanceTypeWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumLegalAcceptanceTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumCostUnitStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CostUnitStatus | Prisma.EnumCostUnitStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel> | $Enums.CostUnitStatus
+}
+
+export type NestedEnumCostUnitStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CostUnitStatus | Prisma.EnumCostUnitStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CostUnitStatus[] | Prisma.ListEnumCostUnitStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCostUnitStatusWithAggregatesFilter<$PrismaModel> | $Enums.CostUnitStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCostUnitStatusFilter<$PrismaModel>
 }
 
 export type NestedJsonNullableFilter<$PrismaModel = never> =

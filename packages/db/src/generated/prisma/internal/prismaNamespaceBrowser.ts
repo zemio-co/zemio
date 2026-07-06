@@ -290,6 +290,7 @@ export const CostUnitScalarFieldEnum = {
   title: 'title',
   examples: 'examples',
   organizationId: 'organizationId',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   costUnitGroupId: 'costUnitGroupId'
