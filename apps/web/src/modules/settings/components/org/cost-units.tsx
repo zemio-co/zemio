@@ -9,8 +9,14 @@ import {
 	type PaginationState,
 	useReactTable,
 } from "@tanstack/react-table";
+import type { CostUnitStatus } from "@zemio/db";
 import { format } from "date-fns";
-import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react";
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	CircleIcon,
+	EllipsisIcon,
+} from "lucide-react";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -85,79 +91,108 @@ type FetchedCostUnit = {
 		title: string;
 	} | null;
 	createdAt: Date;
+	status: CostUnitStatus;
 };
 
-const costUnitColumns: ColumnDef<FetchedCostUnit>[] = [
-	{
-		id: "tag",
-		accessorKey: "tag",
-		header: "Tag",
-	},
-	{
-		id: "title",
-		accessorKey: "title",
-		header: "Titel",
-		cell: ({ row }) => {
-			return (
-				<span className="font-semibold text-slate-800">{row.original.title}</span>
-			);
+function createMembersTableColumns(
+	handle: UpdateCostUnitHandle,
+): ColumnDef<FetchedCostUnit>[] {
+	return [
+		{
+			id: "tag",
+			accessorKey: "tag",
+			header: "Tag",
 		},
-	},
-	{
-		id: "examples",
-		accessorFn: (original) => {
-			return original.examples.length;
+		{
+			id: "title",
+			accessorKey: "title",
+			header: "Titel",
+			cell: ({ row }) => {
+				return (
+					<span className="font-semibold text-slate-800">{row.original.title}</span>
+				);
+			},
 		},
-		cell: ({ row }) => {
-			return <span>{row.original.examples.length} Beispiele</span>;
+		{
+			id: "examples",
+			accessorFn: (original) => {
+				return original.examples.length;
+			},
+			cell: ({ row }) => {
+				return <span>{row.original.examples.length} Beispiele</span>;
+			},
+			header: undefined,
 		},
-		header: undefined,
-	},
-	{
-		id: "createdAt",
-		accessorKey: "",
-		header: "Erstellt",
-		cell: ({ row }) => {
-			return format(row.original.createdAt, "dd.MM.yyyy, HH:mm");
+		{
+			id: "createdAt",
+			accessorKey: "",
+			header: "Erstellt",
+			cell: ({ row }) => {
+				return format(row.original.createdAt, "dd.MM.yyyy, HH:mm");
+			},
 		},
-	},
-	{
-		id: "group",
-		accessorFn: (original) => {
-			return original.costUnitGroup?.title ?? "Keine Gruppe";
+		{
+			id: "group",
+			accessorFn: (original) => {
+				return original.costUnitGroup?.title ?? "Keine Gruppe";
+			},
+			header: "Gruppe",
+			cell: ({ row }) => {
+				return (
+					<Badge variant={"outline"}>
+						{row.original.costUnitGroup?.title ?? "Keine Gruppe"}
+					</Badge>
+				);
+			},
 		},
-		header: "Gruppe",
-		cell: ({ row }) => {
-			return (
-				<Badge variant={"outline"}>
-					{row.original.costUnitGroup?.title ?? "Keine Gruppe"}
-				</Badge>
-			);
+		{
+			id: "status",
+			accessorFn: (original) => {
+				return original.status;
+			},
+			header: "Status",
+			cell: ({ row }) => {
+				if (row.original.status === "ARCHIVED") {
+					return (
+						<Badge className="pl-1.25" variant={"outline"}>
+							<CircleIcon className="text-white **:fill-orange-500" />
+							Archiviert
+						</Badge>
+					);
+				}
+
+				return (
+					<Badge className="pl-1.25" variant={"outline"}>
+						<CircleIcon className="text-white **:fill-green-500" />
+						Aktiv
+					</Badge>
+				);
+			},
 		},
-	},
-	{
-		id: "actions",
-		cell: () => {
-			return (
-				<Button
-					className={
-						"shadow-none ring-0 group-hover/row:shadow-sm group-hover/row:ring-1"
+		{
+			id: "action",
+			cell: ({ row }) => (
+				<DialogPrimitive.Trigger
+					handle={handle}
+					payload={{
+						id: row.original.id,
+					}}
+					render={
+						<Button
+							className={
+								"shadow-none ring-0 group-hover/row:shadow-sm group-hover/row:ring-1"
+							}
+							size={"icon-sm"}
+							variant={"outline"}
+						>
+							<EllipsisIcon />
+						</Button>
 					}
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
-					onPointerDown={(e) => {
-						e.stopPropagation();
-					}}
-					size={"icon-sm"}
-					variant={"outline"}
-				>
-					<EllipsisIcon />
-				</Button>
-			);
+				/>
+			),
 		},
-	},
-];
+	];
+}
 
 function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 	const PAGE_SIZE = 20;
@@ -166,6 +201,15 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 		pageIndex: 0,
 		pageSize: PAGE_SIZE,
 	});
+
+	const updateHandleRef = React.useRef<UpdateCostUnitHandle | null>(null);
+	if (!updateHandleRef.current)
+		updateHandleRef.current = createCostUnitUpdateHandle();
+	const updateHandle = updateHandleRef.current;
+
+	const columns = React.useMemo(() => {
+		return createMembersTableColumns(updateHandle);
+	}, [updateHandle]);
 
 	const dataQuery = api.costUnit.listCostUnits.useQuery(
 		{
@@ -181,7 +225,7 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 	const table = useReactTable({
 		data: dataQuery.data?.items ?? [],
 		rowCount: dataQuery.data?.totalCount,
-		columns: costUnitColumns,
+		columns,
 		state: {
 			pagination,
 		},
@@ -189,11 +233,6 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 		onPaginationChange: setPagination,
 		manualPagination: true,
 	});
-
-	const updateHandleRef = React.useRef<UpdateCostUnitHandle | null>(null);
-	if (!updateHandleRef.current)
-		updateHandleRef.current = createCostUnitUpdateHandle();
-	const updateHandle = updateHandleRef.current;
 
 	if (dataQuery.isPending) {
 		return null;
@@ -233,24 +272,16 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 					<tbody>
 						{table.getRowModel().rows?.length ? (
 							table.getRowModel().rows.map((row) => (
-								<DialogPrimitive.Trigger
-									handle={updateHandle}
-									key={row.id}
-									nativeButton={false}
-									payload={{ id: row.original.id }}
-									render={
-										<tr className="group/row" key={row.id}>
-											{row.getVisibleCells().map((cell) => (
-												<td
-													className="cursor-pointer whitespace-nowrap px-3 py-2 text-slate-700 text-sm"
-													key={cell.id}
-												>
-													{flexRender(cell.column.columnDef.cell, cell.getContext())}
-												</td>
-											))}
-										</tr>
-									}
-								/>
+								<tr className="group/row" key={row.id}>
+									{row.getVisibleCells().map((cell) => (
+										<td
+											className="whitespace-nowrap px-3 py-2 text-slate-700 text-sm"
+											key={cell.id}
+										>
+											{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										</td>
+									))}
+								</tr>
 							))
 						) : (
 							<tr>

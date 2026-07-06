@@ -468,7 +468,7 @@ function OrgReviewerEdit({
 	const updateMutation = api.settings.update.useMutation({
 		onSuccess: () => {
 			toast.success("Reviewer wurde erfolgreich gespeichert");
-			utils.settings.getOrg.invalidate();
+			utils.settings.get.invalidate();
 			handleOpenChange(false);
 		},
 		onError: (error) => {

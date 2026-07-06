@@ -75,6 +75,7 @@ export const costUnitRouter = createTRPCRouter({
 						examples: true,
 						costUnitGroupId: true,
 						createdAt: true,
+						status: true,
 						costUnitGroup: {
 							select: {
 								title: true,
@@ -287,6 +288,7 @@ export const costUnitRouter = createTRPCRouter({
 						title: input.title,
 						examples: input.examples,
 						costUnitGroupId: shouldConnectGroup ? input.costUnitGroupId : null,
+						status: input.status,
 					},
 				});
 			} catch (error) {

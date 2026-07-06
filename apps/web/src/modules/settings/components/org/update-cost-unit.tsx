@@ -7,7 +7,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup } from "@zemio/db";
-import { InfoIcon, TrashIcon } from "lucide-react";
+import { CircleIcon, InfoIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
@@ -39,6 +39,14 @@ import {
 	NativeSelectOption,
 } from "@/components/ui/native-select";
 import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import {
 	type Sheet,
 	SheetBody,
 	SheetClose,
@@ -53,6 +61,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NO_COST_UNIT_GROUP } from "@/lib/consts";
+import { cn } from "@/lib/utils";
 import { updateCostUnitSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import { ExamplesInput } from "./examples-input";
@@ -285,6 +294,57 @@ function UpdateCostUnitForm({
 								Wird zur eindeutigen Identifikation der Kostenstelle verwendet.
 							</FieldDescription>
 						</div>
+						<form.Field name="status">
+							{({ state, ...field }) => {
+								const isInvalid = state.meta.isTouched && !state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<FieldLabel
+											className="mb-1 font-semibold text-base text-slate-800"
+											htmlFor={field.name}
+										>
+											Status
+										</FieldLabel>
+										<Select
+											items={{
+												ACTIVE: "Aktiv",
+												ARCHIVED: "Archiviert",
+											}}
+											onValueChange={(value) => field.handleChange(value ?? "ACTIVE")}
+											value={state.value}
+										>
+											<SelectTrigger>
+												<SelectValue placeholder="Wähle eine Rolle" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectGroup>
+													<SelectItem
+														className={cn(
+															"focus:bg-slate-100 focus:text-slate-800 not-data-[variant=destructive]:focus:**:text-slate-800",
+															"**:data-[slot='item-text']:items-center",
+														)}
+														value={"ACTIVE"}
+													>
+														<CircleIcon className="size-2.5 text-white **:fill-green-500 group-focus/item:**:text-slate-100!" />
+														Aktiv
+													</SelectItem>
+													<SelectItem
+														className={cn(
+															"focus:bg-slate-100 focus:text-slate-800 not-data-[variant=destructive]:focus:**:text-slate-800",
+															"**:data-[slot='item-text']:items-center",
+														)}
+														value={"ARCHIVED"}
+													>
+														<CircleIcon className="size-2.5 text-white **:fill-orange-500 group-focus/item:**:text-slate-100!" />
+														Archiviert
+													</SelectItem>
+												</SelectGroup>
+											</SelectContent>
+										</Select>
+									</Field>
+								);
+							}}
+						</form.Field>
 						<form.Field name="costUnitGroupId">
 							{(field) => {
 								const isInvalid =
@@ -360,7 +420,7 @@ function UpdateCostUnitForm({
 						<FieldDescription>
 							{canDelete
 								? "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet."
-								: "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden."}
+								: "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden. Archiviere die Kostenstelle stattdessen."}
 						</FieldDescription>
 					</div>
 					<AlertDialogTrigger
@@ -389,11 +449,12 @@ function UpdateCostUnitForm({
 					selector={(s) => ({
 						canSubmit: s.canSubmit,
 						isSubmitting: s.isSubmitting,
+						isDefaultValue: s.isDefaultValue,
 					})}
 				>
-					{({ canSubmit, isSubmitting }) => (
+					{({ canSubmit, isSubmitting, isDefaultValue }) => (
 						<Button
-							disabled={!canSubmit || isSubmitting}
+							disabled={!canSubmit || isSubmitting || isDefaultValue}
 							form={FORM_ID}
 							type="submit"
 						>
