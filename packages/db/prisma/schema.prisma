@@ -96,15 +96,15 @@ model Attachment {
 }
 
 model User {
-  id            String    @id
-  name          String //@db.Text - Required by better-auth, we provide fallback in mapProfileToUser
-  email         String
-  emailVerified Boolean   @default(false) // Required by better-auth as boolean, not DateTime
-  image         String? //@db.Text
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now()) @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id              String       @id
+  name            String //@db.Text - Required by better-auth, we provide fallback in mapProfileToUser
+  email           String
+  emailVerified   Boolean      @default(false) // Required by better-auth as boolean, not DateTime
+  image           String? //@db.Text
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
+  sessions        Session[]
+  accounts        Account[]
   invitationsSent Invitation[]
   members         Member[]
 
@@ -123,9 +123,9 @@ model User {
 
   preferences Preferences?
 
-  bankingDetails BankingDetails[]
+  bankingDetails   BankingDetails[]
   legalAcceptances LegalAcceptance[]
-  auditEvents    AuditEvent[]
+  auditEvents      AuditEvent[]
 
   @@unique([email])
   @@map("user")
@@ -142,9 +142,9 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  impersonatedBy String?
-  activeOrganizationId String?
-  legalAcceptedAt DateTime?
+  impersonatedBy              String?
+  activeOrganizationId        String?
+  legalAcceptedAt             DateTime?
   legalAcceptedReleaseVersion String?
 
   @@unique([token])
@@ -276,14 +276,14 @@ enum LegalAcceptanceType {
 }
 
 model Settings {
-  id              String   @id @default(cuid())
-  organizationId  String   @unique
+  id              String       @id @default(cuid())
+  organizationId  String       @unique
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  kilometerRate   Decimal  @default(0.30) // Rate per kilometer in EUR
+  kilometerRate   Decimal      @default(0.30) // Rate per kilometer in EUR
   reviewerEmail   String? // Email of the global reviewer
-  costUnitInfoUrl String?  @map("accountingUnitPdfUrl") // PDF URL for cost unit information
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  costUnitInfoUrl String?      @map("accountingUnitPdfUrl") // PDF URL for cost unit information
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   dailyFoodAllowance Decimal @default(0.00)
   breakfastDeduction Decimal @default(0.00)
@@ -294,11 +294,11 @@ model Settings {
 }
 
 model CostUnitGroup {
-  id        String     @id @default(cuid())
-  title     String
+  id             String       @id @default(cuid())
+  title          String
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  costUnits CostUnit[]
+  costUnits      CostUnit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -308,13 +308,20 @@ model CostUnitGroup {
   @@map("cost_unit_group")
 }
 
+enum CostUnitStatus {
+  ACTIVE
+  ARCHIVED
+}
+
 model CostUnit {
-  id       String   @id @default(cuid())
-  tag      String
-  title    String
-  examples String[]
+  id             String       @id @default(cuid())
+  tag            String
+  title          String
+  examples       String[]
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  status CostUnitStatus @default(ACTIVE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

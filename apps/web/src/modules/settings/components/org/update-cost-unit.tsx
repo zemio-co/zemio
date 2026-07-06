@@ -6,7 +6,7 @@ import {
 } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
-import type { CostUnitGroup } from "@zemio/db";
+import type { CostUnitGroup, CostUnitStatus } from "@zemio/db";
 import { CircleIcon, InfoIcon, TrashIcon } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
@@ -146,6 +146,7 @@ function UpdateCostUnitFormConnected({
 				description: `${value.tag} • ${value.title}`,
 			});
 			utils.costUnit.listCostUnits.invalidate({});
+			utils.costUnit.getById.invalidate({ id: value.id });
 			handle.close();
 		},
 		onError: (error) => {
@@ -314,7 +315,23 @@ function UpdateCostUnitForm({
 											value={state.value}
 										>
 											<SelectTrigger>
-												<SelectValue placeholder="Wähle eine Rolle" />
+												<SelectValue placeholder="Wähle eine Rolle">
+													{(status: CostUnitStatus) => (
+														<span
+															className={cn(
+																"flex flex-1 shrink-0 items-center gap-2 whitespace-nowrap",
+															)}
+														>
+															<CircleIcon
+																className={cn(
+																	"size-2.5 text-white **:fill-green-500",
+																	status === "ARCHIVED" && "**:fill-orange-500",
+																)}
+															/>
+															{status === "ARCHIVED" ? "Archiviert" : "Aktiv"}
+														</span>
+													)}
+												</SelectValue>
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
@@ -341,6 +358,10 @@ function UpdateCostUnitForm({
 												</SelectGroup>
 											</SelectContent>
 										</Select>
+										<FieldDescription>
+											Wenn eine Kostenstelle als archiviert markiert ist, kann sie von
+											Benutzern nicht für neue Anträge verwendet werden.
+										</FieldDescription>
 									</Field>
 								);
 							}}

@@ -94,6 +94,13 @@ export const costUnitRouter = createTRPCRouter({
 			ctx.db.costUnitGroup.findMany({
 				where: {
 					organizationId: ctx.organizationId,
+					costUnits: {
+						every: {
+							status: {
+								not: "ARCHIVED",
+							},
+						},
+					},
 				},
 				select: {
 					id: true,
@@ -114,7 +121,11 @@ export const costUnitRouter = createTRPCRouter({
 				where: {
 					organizationId: ctx.organizationId,
 					costUnitGroupId: null,
+					status: {
+						not: "ARCHIVED",
+					},
 				},
+
 				select: {
 					id: true,
 					title: true,

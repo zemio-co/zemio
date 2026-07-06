@@ -44,3 +44,11 @@ export const LegalAcceptanceType = {
 } as const
 
 export type LegalAcceptanceType = (typeof LegalAcceptanceType)[keyof typeof LegalAcceptanceType]
+
+
+export const CostUnitStatus = {
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type CostUnitStatus = (typeof CostUnitStatus)[keyof typeof CostUnitStatus]
