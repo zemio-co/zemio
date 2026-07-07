@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { cn } from "@/lib/utils";
+import { ReportingBanner } from "./reporting-banner";
 import { ReportingByCostUnitCard } from "./reporting-by-cost-unit";
 import { ReportingByMembersCard } from "./reporting-by-member";
 import { ReportingHeader } from "./reporting-header";
@@ -15,6 +16,9 @@ function ReportingContent({
 	return (
 		<div className={cn("", className)} data-slot="reporting-content" {...props}>
 			<main className="py-12">
+				<div className="container mb-12">
+					<ReportingBanner />
+				</div>
 				<ReportingHeader />
 				<section className="container mt-12">
 					<div className="grid gap-2 rounded-xl bg-slate-100 p-2 lg:grid-cols-2 xl:grid-cols-3">

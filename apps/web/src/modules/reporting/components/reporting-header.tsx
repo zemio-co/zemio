@@ -29,7 +29,7 @@ function ReportingHeader({
 				<h1 className="font-semibold text-2xl text-slate-800">Reporting</h1>
 				<div className="flex items-center justify-center gap-4">
 					<DatePickerWithRange />
-					<Button>Exportieren</Button>
+					<Button disabled>Exportieren</Button>
 				</div>
 			</div>
 
