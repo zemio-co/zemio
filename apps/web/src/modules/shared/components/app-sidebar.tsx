@@ -1,6 +1,12 @@
 "use client";
 
-import { FileIcon, HomeIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
+import {
+	ChartPieIcon,
+	FileIcon,
+	HomeIcon,
+	ListIcon,
+	SettingsIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
@@ -80,9 +86,17 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 const sidebarAdminItems = [
 	{
-		label: "Admin Dashboard",
+		label: "Reporting",
+		href: ROUTES.ADMIN_REPORTING(),
+		icon: ChartPieIcon,
+		active: (pathname: string) => {
+			return pathname.startsWith(ROUTES.ADMIN_REPORTING());
+		},
+	},
+	{
+		label: "Anträge",
 		href: ROUTES.ADMIN_REVIEW_OVERVIEW(),
-		icon: ShieldUserIcon,
+		icon: ListIcon,
 		active: (pathname: string) => {
 			return pathname.startsWith(ROUTES.ADMIN_REVIEW_OVERVIEW());
 		},
