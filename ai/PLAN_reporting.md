@@ -402,3 +402,44 @@ or accept the full recursive filter tree here.
 
 Frontend dashboard cards, the CSV serializer, and the export-trigger UI are deliberately excluded
 here — plan those once this backend contract is implemented and reviewed.
+
+---
+
+## Implementation notes (as-built deltas from this plan)
+
+All phases are implemented and committed. Three review passes (one per phase group) surfaced
+refinements applied during implementation — recorded here so this document matches what actually
+shipped, not just what was originally sketched:
+
+- **`exportToPdf`'s filter-flattening lives in `reporting.service.ts`, not the router.** Phase 3's
+  pseudocode described the flattening as a router-level step; the actual router procedure is a pure
+  one-line delegation (`reportingService.exportToPdf(ctx, input)`), consistent with Phase 0's own
+  "router = parse input → call service" principle.
+- **Breakdown grouping is two strategies, not one generic helper.** Phase 2 sketched a single
+  `groupedTotals(db, where, groupField)` repository function for all four breakdowns. In practice,
+  `costUnitId`/`ownerId`/`status` live on `Report` while `Expense.amount` lives on `Expense`, and
+  Prisma cannot `groupBy` a relation field in one call — so `byStatus`/`byCostUnit`/`byMember` go
+  through a shared `reportsWithSums` + `bucketReportsBy` (fetch matching reports, fetch per-report
+  expense sums, bucket in JS), while `byExpenseType` uses a direct one-step `Expense.groupBy` since
+  type is expense-native. `overview` and `byStatus` share one internal `statusBuckets` computation
+  rather than each re-fetching independently.
+- **Renamed `totalSpent` → `totalSubmitted`** in `ReportingOverviewDTO` — it sums across every
+  report status including DRAFT/REJECTED, so "spent" was misleading; matches the per-user
+  dashboard's existing "submitted" terminology for the same semantics.
+- **Added validation Phase 0 didn't call out:** `reportingFilterInputSchema` reuses the report
+  list's rule-count/nesting-depth limits (`checkFilterGroupLimits`, exported from `report.query.ts`
+  for this reuse); `reportingTimeSeriesInputSchema` and the PDF's `dateRange` both got the same
+  `start <= end` / max-range guards the sibling schemas already enforce.
+- **Deduplicated `expenseSumsByReport`** (web) to call the existing `reportRepository.sumByReportIds`
+  instead of re-declaring the same `groupBy` query.
+- **`apps/api` hardening found during review:** `POST /pdf/reporting`'s body parse is now wrapped in
+  try/catch (malformed JSON previously produced an unhandled 500 instead of a clean 400); a missing
+  organization now throws a controlled 404 instead of leaking a raw Prisma error message; empty
+  filter arrays (`costUnitIds: []`) are now treated as "no filter" rather than "match nothing".
+
+**Not independently exercised in this session:** Final Phase items 4 and 5 (live-calling each
+procedure as an admin/non-admin, and curling `POST /pdf/reporting`) require a running dev server
+with real auth/org data. Verification here was structural instead: every `reporting.*` procedure is
+confirmed `orgAdminProcedure`-gated (grep), and the request/response/error-mapping code paths were
+traced line-by-line by the review passes rather than exercised at runtime. Recommend an actual
+manual smoke test before this ships.
