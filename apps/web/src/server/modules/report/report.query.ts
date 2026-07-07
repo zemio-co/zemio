@@ -143,33 +143,43 @@ export const reportListInputSchema = z
 		pageSize: z.number().int().min(1).max(100),
 		sorting: reportListSortingSchema,
 	})
-	.superRefine((input, ctx) => {
-		if (!input.filters) return;
+	.superRefine((input, ctx) => checkFilterGroupLimits(input.filters, ctx));
 
-		const ruleCount = countFilterRules(input.filters);
-		if (ruleCount > MAX_FILTER_RULES) {
-			ctx.addIssue({
-				code: "custom",
-				message: `Filter tree may contain at most ${MAX_FILTER_RULES} rules`,
-				path: ["filters", "rules"],
-			});
-		}
+/**
+ * Enforces the same rule-count/nesting-depth limits on any schema embedding
+ * `reportListFilterGroupSchema` — shared so callers other than the report list
+ * (e.g. reporting) don't accept unbounded filter trees.
+ */
+export function checkFilterGroupLimits(
+	filters: ReportListFilterGroup | undefined,
+	ctx: z.RefinementCtx,
+): void {
+	if (!filters) return;
 
-		const depth = getFilterDepth(input.filters);
-		if (depth > MAX_FILTER_DEPTH) {
-			ctx.addIssue({
-				code: "custom",
-				message: `Filter tree may be nested at most ${MAX_FILTER_DEPTH} levels`,
-				path: ["filters", "rules"],
-			});
-		}
-	});
+	const ruleCount = countFilterRules(filters);
+	if (ruleCount > MAX_FILTER_RULES) {
+		ctx.addIssue({
+			code: "custom",
+			message: `Filter tree may contain at most ${MAX_FILTER_RULES} rules`,
+			path: ["filters", "rules"],
+		});
+	}
+
+	const depth = getFilterDepth(filters);
+	if (depth > MAX_FILTER_DEPTH) {
+		ctx.addIssue({
+			code: "custom",
+			message: `Filter tree may be nested at most ${MAX_FILTER_DEPTH} levels`,
+			path: ["filters", "rules"],
+		});
+	}
+}
 
 export type ReportListInput = z.infer<typeof reportListInputSchema>;
 
 type ReportListFilterRule = z.infer<typeof reportListFilterRuleSchema>;
 
-type ReportListFilterGroup = {
+export type ReportListFilterGroup = {
 	logic: "and" | "or";
 	rules: ReportListFilterNode[];
 };
@@ -192,10 +202,11 @@ type ReportListWhereInput = {
 	userId: string;
 };
 
-const reportListFilterGroupSchema: z.ZodType<ReportListFilterGroup> = z.object({
-	logic: z.enum(["and", "or"]),
-	rules: z.array(z.lazy(() => reportListFilterNodeSchema)).min(1),
-});
+export const reportListFilterGroupSchema: z.ZodType<ReportListFilterGroup> =
+	z.object({
+		logic: z.enum(["and", "or"]),
+		rules: z.array(z.lazy(() => reportListFilterNodeSchema)).min(1),
+	});
 
 const reportListFilterNodeSchema: z.ZodType<ReportListFilterNode> = z.lazy(() =>
 	z.union([reportListFilterRuleSchema, reportListFilterGroupSchema]),
