@@ -5,6 +5,12 @@ import { PDFDocument as PDFLibDocument } from "pdf-lib";
 import PDFDocument from "pdfkit";
 import sharp from "sharp";
 import { logger } from "../../lib/logger";
+import {
+	formatEuroAmount,
+	toSnakeCaseFilenameSegment,
+	translateExpenseType,
+	translateReportStatus,
+} from "./format";
 
 const MUTED_COLOR = "#6b7280";
 const COLUMN_WIDTHS = {
@@ -23,32 +29,6 @@ export interface PdfInput {
 	};
 	images: { key: string; buffer: Buffer }[];
 	pdfs: { key: string; buffer: Buffer }[];
-}
-
-function translateReportStatus(status: Report["status"]): string {
-	switch (status) {
-		case "DRAFT":
-			return "Entwurf";
-		case "PENDING_APPROVAL":
-			return "In Bearbeitung";
-		case "NEEDS_REVISION":
-			return "Benötigt Überarbeitung";
-		case "ACCEPTED":
-			return "Akzeptiert";
-		case "REJECTED":
-			return "Abgelehnt";
-	}
-}
-
-function translateExpenseType(type: Expense["type"]): string {
-	switch (type) {
-		case "RECEIPT":
-			return "Beleg";
-		case "TRAVEL":
-			return "Reise";
-		case "FOOD":
-			return "Verpflegung";
-	}
 }
 
 const travelMetaSchema = {
@@ -88,20 +68,6 @@ function formatExpenseMeta(expense: Expense): string {
 		return "Ungültige Verpflegungsdaten";
 	}
 	return "";
-}
-
-function formatEuroAmount(amount: number): string {
-	return `${amount.toFixed(2)}€`;
-}
-
-function toSnakeCaseFilenameSegment(value: string): string {
-	const normalized = value.normalize("NFKD").replace(/[̀-ͯ]/g, "").toLowerCase();
-	return (
-		normalized
-			.replace(/[^a-z0-9]+/g, "_")
-			.replace(/^_+|_+$/g, "")
-			.replace(/_+/g, "_") || "report"
-	);
 }
 
 export function buildReportPdfFilename(
