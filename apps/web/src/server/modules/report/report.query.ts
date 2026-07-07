@@ -178,13 +178,24 @@ export function checkFilterGroupLimits(
 export type ReportListInput = z.infer<typeof reportListInputSchema>;
 
 type ReportListFilterRule = z.infer<typeof reportListFilterRuleSchema>;
+/** True pre-coercion input type — differs from the output above wherever a
+ * rule value goes through `z.coerce.date()` (`dateRangeSchema`). */
+type ReportListFilterRuleInput = z.input<typeof reportListFilterRuleSchema>;
 
 export type ReportListFilterGroup = {
 	logic: "and" | "or";
 	rules: ReportListFilterNode[];
 };
 
+export type ReportListFilterGroupInput = {
+	logic: "and" | "or";
+	rules: ReportListFilterNodeInput[];
+};
+
 type ReportListFilterNode = ReportListFilterGroup | ReportListFilterRule;
+type ReportListFilterNodeInput =
+	| ReportListFilterGroupInput
+	| ReportListFilterRuleInput;
 
 type ReportListSorting = z.infer<typeof reportListSortingSchema>;
 
@@ -202,13 +213,23 @@ type ReportListWhereInput = {
 	userId: string;
 };
 
-export const reportListFilterGroupSchema: z.ZodType<ReportListFilterGroup> =
-	z.object({
-		logic: z.enum(["and", "or"]),
-		rules: z.array(z.lazy(() => reportListFilterNodeSchema)).min(1),
-	});
+// Zod v4's `ZodType<Output, Input, Internals>` no longer defaults `Input` to
+// `Output` (unlike v3) — both type args must be supplied explicitly, or the
+// schema's inferred input type (what tRPC uses for the client-side argument
+// type) silently collapses to `unknown`. The two types genuinely differ here
+// because of `dateRangeSchema`'s `z.coerce.date()`.
+export const reportListFilterGroupSchema: z.ZodType<
+	ReportListFilterGroup,
+	ReportListFilterGroupInput
+> = z.object({
+	logic: z.enum(["and", "or"]),
+	rules: z.array(z.lazy(() => reportListFilterNodeSchema)).min(1),
+});
 
-const reportListFilterNodeSchema: z.ZodType<ReportListFilterNode> = z.lazy(() =>
+const reportListFilterNodeSchema: z.ZodType<
+	ReportListFilterNode,
+	ReportListFilterNodeInput
+> = z.lazy(() =>
 	z.union([reportListFilterRuleSchema, reportListFilterGroupSchema]),
 );
 
