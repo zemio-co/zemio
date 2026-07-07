@@ -67,7 +67,8 @@
 		"sonner": "^2.0.7",
 		"superjson": "^2.2.1",
 		"tailwind-merge": "^3.4.0",
-		"zod": "^4.3.5"
+		"zod": "^4.3.5",
+		"zustand": "^5.0.14"
 	},
 	"devDependencies": {
 		"@zemio/typescript-config": "workspace:*",
