@@ -44,6 +44,12 @@ export const reportingRouter = createTRPCRouter({
 			reportingService.byExpenseType(toReportingServiceContext(ctx), input),
 		),
 
+	export: orgAdminProcedure
+		.input(reportingFilterInputSchema)
+		.query(({ ctx, input }) =>
+			reportingService.export(toReportingServiceContext(ctx), input),
+		),
+
 	exportToPdf: orgAdminProcedure
 		.input(reportingPdfFilterInputSchema)
 		.mutation(({ ctx, input }) =>
