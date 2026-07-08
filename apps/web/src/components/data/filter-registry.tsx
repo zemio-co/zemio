@@ -174,7 +174,7 @@ function DateRangeChipContent<TData, TValue>({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button size="xs" variant="outline">
+						<Button disableAnimation size="xs" variant="outline">
 							{daysLabel}
 						</Button>
 					}
@@ -191,7 +191,7 @@ function DateRangeChipContent<TData, TValue>({
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			<Button onClick={onRemove} size="icon-xs" variant="outline">
+			<Button disableAnimation onClick={onRemove} size="icon-xs" variant="outline">
 				<XIcon />
 				<span className="sr-only">Filter entfernen</span>
 			</Button>
@@ -305,7 +305,7 @@ function SelectChipContent<TData, TValue>({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button size="xs" variant="outline">
+						<Button disableAnimation size="xs" variant="outline">
 							{value.operator === "is" ? "ist" : "ist nicht"}
 						</Button>
 					}
@@ -324,7 +324,7 @@ function SelectChipContent<TData, TValue>({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button size="xs" variant="outline">
+						<Button disableAnimation size="xs" variant="outline">
 							{selectedOption?.icon && (
 								<selectedOption.icon className={selectedOption.iconClassName} />
 							)}
@@ -505,7 +505,7 @@ function MultiSelectChipContent<TData, TValue>({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button size="xs" variant="outline">
+						<Button disableAnimation size="xs" variant="outline">
 							{value.operator === "in" ? "enthält" : "enthält nicht"}
 						</Button>
 					}
@@ -524,7 +524,7 @@ function MultiSelectChipContent<TData, TValue>({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<Button size="xs" variant="outline">
+						<Button disableAnimation size="xs" variant="outline">
 							{selectedOptions.length === 1 && FirstOptionIcon && (
 								<FirstOptionIcon className={firstSelectedOption?.iconClassName} />
 							)}
