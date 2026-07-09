@@ -222,6 +222,7 @@ export function ReportsList() {
 				<FilterList className="grow" table={table}>
 					<FilterMenu
 						className={"group/filter-menu data-[filtered=true]:size-6"}
+						disableAnimation
 						size={"xs"}
 						table={table}
 						variant={"outline"}
@@ -234,6 +235,7 @@ export function ReportsList() {
 				</FilterList>
 				<DisplayOptions
 					className={"shrink-0"}
+					disableAnimation
 					display={table}
 					size={"sm"}
 					variant={"outline"}
