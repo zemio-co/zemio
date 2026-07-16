@@ -5,6 +5,7 @@ import { expenseRouter } from "@/server/api/routers/expense";
 import { platformAdminRouter } from "@/server/api/routers/platform-admin";
 import { reportRouter } from "@/server/api/routers/report";
 import { reportFiltersRouter } from "@/server/api/routers/report-filters";
+import { reportingRouter } from "@/server/api/routers/reporting";
 import { settingsRouter } from "@/server/api/routers/settings";
 import { userRouter } from "@/server/api/routers/user";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
 	dashboard: dashboardRouter,
 	report: reportRouter,
 	reportFilters: reportFiltersRouter,
+	reporting: reportingRouter,
 	expense: expenseRouter,
 	settings: settingsRouter,
 	preferences: preferencesRouter,

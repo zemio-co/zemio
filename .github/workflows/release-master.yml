@@ -1,0 +1,90 @@
+name: Release (master)
+
+# Fires when canary is promoted to master. This is a two-phase promotion, but
+# unlike version-canary.yml it can't use changesets/action's built-in
+# version-vs-publish detection: that heuristic looks at whether any pending
+# changeset files exist, and by the time canary reaches master every changeset
+# has already been consumed by the alpha prerelease cycle. The real signal for
+# "which phase are we in" here is whether .changeset/pre.json (written by
+# `changeset pre enter`) is still present:
+#
+# 1. First push (the canary merge itself): pre.json is present. Exit
+#    prerelease mode and bump to the final stable version (e.g.
+#    0.4.0-alpha.3 -> 0.4.0), then open a "Release" PR with that bump and the
+#    consolidated changelog.
+# 2. Once a maintainer merges that PR: pre.json is gone (removed by the exit
+#    in phase 1). Tag `vX.Y.Z` and cut a GitHub release via
+#    scripts/release-tag.mjs. That tag triggers build-images.yml to publish
+#    version-tagged production images.
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: release-master
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install dependencies
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5432/db
+          DIRECT_URL: postgresql://user:password@localhost:5432/db
+          SKIP_ENV_VALIDATION: true
+          HUSKY: 0
+        run: bun install --frozen-lockfile
+
+      - name: Determine release phase
+        id: phase
+        run: |
+          if [ -f .changeset/pre.json ]; then
+            echo "name=exit-prerelease" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=publish" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Exit prerelease mode and bump to stable version
+        if: steps.phase.outputs.name == 'exit-prerelease'
+        run: |
+          bunx changeset pre exit
+          bun run ci:version
+        env:
+          # @changesets/changelog-github resolves PR and author links through
+          # the GitHub API while writing CHANGELOG.md.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Open release PR
+        if: steps.phase.outputs.name == 'exit-prerelease'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: release"
+          title: "chore: release"
+          body: Finalizes the stable version and changelog for this release. Merge to publish.
+          branch: changeset-release/master
+          base: master
+          labels: release
+
+      - name: Tag and publish release
+        if: steps.phase.outputs.name == 'publish'
+        run: bun run ci:release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
