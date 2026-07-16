@@ -66,6 +66,10 @@ jobs:
         run: |
           bunx changeset pre exit
           bun run ci:version
+        env:
+          # @changesets/changelog-github resolves PR and author links through
+          # the GitHub API while writing CHANGELOG.md.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Open release PR
         if: steps.phase.outputs.name == 'exit-prerelease'
