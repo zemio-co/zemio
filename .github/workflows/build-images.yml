@@ -118,8 +118,8 @@ jobs:
     strategy:
       matrix:
         service_id:
-          - 7f4af184-7675-483a-85a3-e034746d661e # frontend (zemio-web image)
-          - e533fc67-9c2d-4064-b918-52f16d105e59 # api (zemio-api image)
+          - 7f4af184-7675-483a-85a3-e034746d661e # frontend-staging (zemio-web image)
+          - e533fc67-9c2d-4064-b918-52f16d105e59 # api-staging (zemio-api image)
     steps:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
@@ -132,16 +132,16 @@ jobs:
   deploy-production:
     needs: build
     # Only the app whose tag was pushed redeploys, e.g. api-v2.0.0 redeploys
-    # zemio-api but leaves zemio-web untouched.
+    # api-prod but leaves frontend-prod untouched.
     if: github.ref_type == 'tag' && startsWith(github.ref_name, format('{0}-v', matrix.app))
     runs-on: ubuntu-latest
     strategy:
       matrix:
         include:
           - app: web
-            service_id: a982daf5-2f7d-49fe-880d-9972b9c85c4a # zemio-web
+            service_id: a982daf5-2f7d-49fe-880d-9972b9c85c4a # frontend-prod
           - app: api
-            service_id: f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c # zemio-api
+            service_id: f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c # api-prod
     steps:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
