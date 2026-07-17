@@ -5,13 +5,24 @@ name: Build and Push Images
 # from the Dockerfile, which lets us use BuildKit secrets for the Sentry
 # source-map upload token (Railway's builder does not support secret mounts).
 #
-# Runs only on push to master (production) / canary (staging) / version tags —
-# i.e. when a feature branch is merged into canary, or on release — never on
-# feature-branch commits themselves. Each branch publishes a moving tag named
-# after it (e.g. `canary`) plus the immutable per-commit SHA tag; `master`
-# additionally publishes `latest`.
+# Pull requests into master/canary build both images without pushing, to catch
+# Docker/build breakage before merge. Pushes to master (production) / canary
+# (staging) / version tags publish the built images. Each branch publishes a
+# moving tag named after it (e.g. `canary`) plus the immutable per-commit SHA
+# tag; `master` additionally publishes `latest`.
+#
+# A canary push also redeploys the staging Railway services, and a version
+# tag push redeploys the production ones — see the deploy-staging/
+# deploy-production jobs below. Railway can't watch GHCR itself (its
+# auto-deploy needs a linked GitHub repo, which conflicts with building images
+# in CI instead of on Railway), so this is the only thing that actually
+# ships a newly built image.
 
 on:
+  pull_request:
+    branches:
+      - master
+      - canary
   push:
     branches:
       - master
@@ -69,7 +80,7 @@ jobs:
         with:
           context: .
           file: apps/${{ matrix.app }}/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.app }}
@@ -84,3 +95,45 @@ jobs:
           # image's build step, never written to an image layer).
           secrets: |
             sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  # Neither Railway service has a linked GitHub repo (deliberately — see the
+  # "Why CI builds the images" note in docs/deployment.md), so Railway's
+  # auto-deploy-on-new-image can't fire on its own: nothing ever tells it a
+  # new `canary`/`master`/`vX.Y.Z` image landed in GHCR. These jobs are that
+  # missing trigger, using a Railway project token (scoped to exactly one
+  # environment) per environment.
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/canary'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service_id:
+          - 7f4af184-7675-483a-85a3-e034746d661e # frontend (zemio-web image)
+          - e533fc67-9c2d-4064-b918-52f16d105e59 # api (zemio-api image)
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Redeploy staging service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+        run: railway redeploy --service ${{ matrix.service_id }} --yes
+
+  deploy-production:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service_id:
+          - a982daf5-2f7d-49fe-880d-9972b9c85c4a # zemio-web
+          - f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c # zemio-api
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Redeploy production service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+        run: railway redeploy --service ${{ matrix.service_id }} --yes

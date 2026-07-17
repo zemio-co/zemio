@@ -49,28 +49,38 @@ Used by the web image to upload source maps during the build:
 If `SENTRY_AUTH_TOKEN` is absent the build still succeeds; source maps are simply
 not uploaded.
 
-## Railway configuration (one-time cutover)
+## Railway configuration
 
-Each service must be switched from "build from Dockerfile" to "deploy a registry
-image":
+Each service's source is set to a registry image (`ghcr.io/<owner>/zemio-web` or
+`zemio-api`), not a build from `apps/*/Dockerfile` — the `apps/*/railway.toml`
+build section is unused; only its runtime settings (healthcheck, restart
+policy) apply. Staging services track the `canary` tag; production services
+track `master`.
 
-1. In the service settings, set the **source** to the image
-   `ghcr.io/<owner>/zemio-web` (or `zemio-api`), pinned to a tag:
-   - **Production** service: the `sha-…` tag for reproducible, promotable
-     deploys (recommended), or `latest`/`master` to auto-track the prod branch.
-   - **Staging** service: the `canary` tag to auto-track the staging branch, or
-     a `sha-…` tag to pin.
-2. Add **registry credentials** so Railway can pull the private image: a GitHub
-   personal access token (or fine-grained token) with `read:packages`.
-3. Leave the existing **runtime variables** in place (see below). They are
-   injected at container start and are not needed at build time.
-4. The `apps/*/railway.toml` build section becomes unused once the service
-   deploys an image; runtime settings there (healthcheck, restart policy) still
-   apply.
+Neither service has a linked GitHub repo. This is deliberate — a linked repo
+would let Railway build from the Dockerfile itself, which contains a
+`--mount=type=secret` step Railway's builder cannot parse — but it also means
+Railway's auto-deploy-on-new-image can't fire: that feature requires a linked
+repo. **Nothing about pushing a new image to GHCR causes Railway to run it.**
 
-> Until a service is switched to image deploys, do not let Railway build the web
-> Dockerfile — it contains a `--mount=type=secret` step that Railway's builder
-> cannot parse.
+### Deploying a newly built image
+
+`build-images.yml`'s `deploy-staging`/`deploy-production` jobs are what
+actually ships a build: after a canary push (or a `vX.Y.Z` tag push for
+production) builds and pushes the image, these jobs call
+`railway redeploy --service <id> --yes` for each affected service, which pulls
+the tag's current image and restarts the service. Without this step a pushed
+image just sits in GHCR until someone manually redeploys it in the dashboard.
+
+This needs a Railway **project token** per environment (project tokens are
+scoped to exactly one environment) stored as GitHub secrets:
+
+| Secret | Scope |
+| --- | --- |
+| `RAILWAY_TOKEN_STAGING` | Staging environment project token |
+| `RAILWAY_TOKEN_PRODUCTION` | Production environment project token |
+
+Service IDs are hardcoded in the workflow rather than looked up by name.
 
 ## Runtime configuration
 
@@ -86,8 +96,8 @@ into the image):
   - `BETTER_STACK_SOURCE_TOKEN`
   - `BETTER_STACK_INGESTING_URL`
 
-  > These were previously named `NEXT_PUBLIC_BETTER_STACK_*`. Rename them in
-  > Railway when cutting over — the `NEXT_PUBLIC_` prefix is no longer used.
+  > These were previously named `NEXT_PUBLIC_BETTER_STACK_*` — the
+  > `NEXT_PUBLIC_` prefix is no longer used.
 
 ## Database migrations
 
