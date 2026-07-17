@@ -1,11 +1,12 @@
 name: Version (canary)
 
-# Keeps apps/web and apps/api versioned in lockstep as an alpha prerelease
-# while development happens on canary. Every push to canary either opens/
-# updates a "Version Packages (alpha)" PR (when changesets are pending) or,
-# once that PR is merged, is a no-op here (nothing to publish to a registry —
-# release-master.yml handles the real, stable release when canary is promoted
-# to master).
+# web and api version independently from their own changesets (no "fixed"
+# group, no alpha-prerelease cycle — see .changeset/config.json). Every push
+# to canary either opens/updates a "Version Packages" PR with real, final
+# version bumps (when changesets are pending) or, once that PR is merged, is a
+# no-op here (nothing to publish to a registry — release-master.yml tags and
+# releases whichever app(s) changed version once canary is promoted to
+# master).
 
 on:
   push:
@@ -42,11 +43,11 @@ jobs:
           HUSKY: 0
         run: bun install --frozen-lockfile
 
-      - name: Version packages (alpha)
+      - name: Version packages
         uses: changesets/action@v1
         with:
           version: bun run ci:version
-          title: "chore: version packages (alpha)"
-          commit: "chore: version packages (alpha)"
+          title: "chore: version packages"
+          commit: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

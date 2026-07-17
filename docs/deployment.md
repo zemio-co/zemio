@@ -21,15 +21,18 @@ environment-agnostic.
 
 - **Pull requests** (into `master` or `canary`) build both images **without**
   pushing — this catches Docker/build breakage before merge.
-- **Pushes to `master`** (production), **`canary`** (staging), and **version
-  tags (`v*`)** build and push to:
+- **Pushes to `master`** (production) and **`canary`** (staging) build and push
+  both images to:
   - `ghcr.io/<owner>/zemio-web`
   - `ghcr.io/<owner>/zemio-api`
+- **Version tags** (`web-vX.Y.Z`, `api-vX.Y.Z`) build and push only the
+  matching app's image — web and api version and release independently (see
+  `.changeset/config.json`), so a release of one doesn't touch the other.
 - Image tags published per build:
   - `sha-<40hex>` — immutable, every build (use for reproducible pins/rollback).
   - the **branch name** — a moving tag per branch (`master`, `canary`), always
     pointing at that branch's latest build.
-  - the git tag — for `v*` pushes.
+  - the version, e.g. `1.2.0` — extracted from a `web-v*`/`api-v*` tag push.
   - `latest` — on the default branch (`master`) only.
 
   So production tracks `latest` (or `master`) and staging tracks `canary`, while
@@ -66,10 +69,10 @@ repo. **Nothing about pushing a new image to GHCR causes Railway to run it.**
 ### Deploying a newly built image
 
 `build-images.yml`'s `deploy-staging`/`deploy-production` jobs are what
-actually ships a build: after a canary push (or a `vX.Y.Z` tag push for
-production) builds and pushes the image, these jobs call
-`railway redeploy --service <id> --yes` for each affected service, which pulls
-the tag's current image and restarts the service. Without this step a pushed
+actually ships a build: after a canary push (or a `web-vX.Y.Z`/`api-vX.Y.Z` tag
+push for production) builds and pushes the image, these jobs call
+`railway redeploy --service <id> --yes` for the affected service(s), which
+pulls the tag's current image and restarts the service. Without this step a pushed
 image just sits in GHCR until someone manually redeploys it in the dashboard.
 
 This needs a Railway **project token** per environment (project tokens are
