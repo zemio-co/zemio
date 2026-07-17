@@ -1,5 +1,10 @@
 # @zemio/web
 
+## 1.0.0
+
+Exits the prerelease cycle entered for the 1.0.0 major bump below; no
+functional change from 1.0.0-alpha.0.
+
 ## 1.0.0-alpha.0
 
 ### Major Changes
