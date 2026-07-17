@@ -1,19 +1,19 @@
 #!/usr/bin/env node
-// Runs as the "publish" step of release-master.yml: no npm packages are
+// Runs as the release step of release-master.yml: no npm packages are
 // published (every workspace package is private), so this replaces `changeset
-// publish` with a git tag + GitHub release for the version that `changeset
-// version` wrote to apps/web and apps/api (kept in sync by the "fixed" group in
-// .changeset/config.json).
+// publish` with a git tag + GitHub release per app, using the version that
+// `changeset version` wrote to apps/<app>/package.json. web and api version
+// independently (no "fixed" group in .changeset/config.json), so each app is
+// tagged and released on its own — a change to one doesn't tag the other.
 //
-// The release body is taken from the generated CHANGELOG.md files rather than
-// from `gh release create --generate-notes`, so the GitHub release and the
-// changelog are the same text derived from the same changesets, instead of two
-// competing descriptions of one release.
+// The release body is taken from the generated CHANGELOG.md rather than from
+// `gh release create --generate-notes`, so the GitHub release and the
+// changelog are the same text derived from the same changesets, instead of
+// two competing descriptions of one release.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
-// Apps sharing the single repo-wide version. Order determines the order of the
-// sections in the release body.
+// Apps released independently. Each gets its own tag: `<app>-v<version>`.
 const RELEASED_APPS = ["web", "api"];
 
 function git(args) {
@@ -26,9 +26,7 @@ function git(args) {
  *
  * A section runs from its `## <version>` heading to the next `## ` heading
  * (`### Minor Changes` and friends are nested inside it and do not terminate
- * it). Returns null when the version has no section or an empty one — the
- * normal case for an app that had no changesets of its own and was only bumped
- * to keep the fixed group aligned.
+ * it). Returns null when the version has no section or an empty one.
  *
  * @param {string} changelog Raw CHANGELOG.md contents.
  * @param {string} version Version to extract, without a leading "v".
@@ -64,48 +62,30 @@ function readAppSection(app, version) {
 }
 
 /**
- * Builds the GitHub release body from every app's changelog section.
+ * Tags and releases a single app if its current version isn't already
+ * tagged. Skips (without error) when there's nothing new to release — the
+ * normal case for the app that didn't change in this release cycle.
  *
- * @param {string} version Version being released.
- * @returns {string}
- * @throws When no app has a changelog entry for the version.
+ * @param {string} app Directory name under apps/.
  */
-function buildReleaseNotes(version) {
-	const sections = [];
-
-	for (const app of RELEASED_APPS) {
-		const section = readAppSection(app, version);
-		if (section === null) {
-			console.log(
-				`No changelog entry for @zemio/${app} in ${version}; omitting it from the release notes.`,
-			);
-			continue;
-		}
-		sections.push(`## @zemio/${app}\n\n${section}`);
-	}
-
-	if (sections.length === 0) {
-		throw new Error(
-			`No changelog entry for ${version} in any of: ${RELEASED_APPS.join(", ")}. ` +
-				"Refusing to publish a release with an empty body.",
-		);
-	}
-
-	return sections.join("\n\n");
-}
-
-function main() {
-	const { version } = JSON.parse(readFileSync("apps/web/package.json", "utf8"));
-	const tag = `v${version}`;
+function releaseApp(app) {
+	const { version } = JSON.parse(
+		readFileSync(`apps/${app}/package.json`, "utf8"),
+	);
+	const tag = `${app}-v${version}`;
 
 	if (git(["tag", "-l", tag]) === tag) {
-		console.log(`Tag ${tag} already exists; skipping release.`);
+		console.log(`Tag ${tag} already exists; skipping @zemio/${app}.`);
 		return;
 	}
 
-	// Built before tagging: a missing or empty changelog must fail the run
-	// before it pushes a tag that would then need to be deleted by hand.
-	const notes = buildReleaseNotes(version);
+	const notes = readAppSection(app, version);
+	if (notes === null) {
+		console.log(
+			`No changelog entry for @zemio/${app} in ${version}; skipping release.`,
+		);
+		return;
+	}
 
 	execFileSync("git", ["tag", tag], { stdio: "inherit" });
 	execFileSync("git", ["push", "origin", tag], { stdio: "inherit" });
@@ -118,6 +98,12 @@ function main() {
 	);
 
 	console.log(`Released ${tag}.`);
+}
+
+function main() {
+	for (const app of RELEASED_APPS) {
+		releaseApp(app);
+	}
 }
 
 // Guarded so the pure helpers above can be imported by a test without the

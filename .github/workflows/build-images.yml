@@ -5,19 +5,36 @@ name: Build and Push Images
 # from the Dockerfile, which lets us use BuildKit secrets for the Sentry
 # source-map upload token (Railway's builder does not support secret mounts).
 #
-# Runs only on push to master (production) / canary (staging) / version tags —
-# i.e. when a feature branch is merged into canary, or on release — never on
-# feature-branch commits themselves. Each branch publishes a moving tag named
+# Pull requests into master/canary build both images without pushing, to catch
+# Docker/build breakage before merge. Pushes to master (production) / canary
+# (staging) publish the built images. Each branch publishes a moving tag named
 # after it (e.g. `canary`) plus the immutable per-commit SHA tag; `master`
 # additionally publishes `latest`.
+#
+# web and api version and tag independently (see .changeset/config.json — no
+# "fixed" group), so a release tag is app-scoped: `web-vX.Y.Z` or
+# `api-vX.Y.Z`. Pushing one only builds/publishes/deploys that app's image,
+# not both.
+#
+# A canary push also redeploys the staging Railway services, and an app's
+# version tag redeploys that app's production service — see the
+# deploy-staging/deploy-production jobs below. Railway can't watch GHCR itself
+# (its auto-deploy needs a linked GitHub repo, which conflicts with building
+# images in CI instead of on Railway), so this is the only thing that actually
+# ships a newly built image.
 
 on:
+  pull_request:
+    branches:
+      - master
+      - canary
   push:
     branches:
       - master
       - canary
     tags:
-      - "v*"
+      - "web-v*"
+      - "api-v*"
   workflow_dispatch:
 
 concurrency:
@@ -30,6 +47,9 @@ permissions:
 
 jobs:
   build:
+    # On a tag push, only build/publish the app the tag belongs to
+    # (web-vX.Y.Z or api-vX.Y.Z); branch pushes and PRs always build both.
+    if: github.ref_type != 'tag' || startsWith(github.ref_name, format('{0}-v', matrix.app))
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -61,7 +81,7 @@ jobs:
           tags: |
             type=sha,format=long
             type=ref,event=branch
-            type=ref,event=tag
+            type=match,pattern=\w+-v(.*),group=1
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
@@ -69,7 +89,7 @@ jobs:
         with:
           context: .
           file: apps/${{ matrix.app }}/Dockerfile
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=${{ matrix.app }}
@@ -84,3 +104,49 @@ jobs:
           # image's build step, never written to an image layer).
           secrets: |
             sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  # Neither Railway service has a linked GitHub repo (deliberately — see the
+  # "Why CI builds the images" note in docs/deployment.md), so Railway's
+  # auto-deploy-on-new-image can't fire on its own: nothing ever tells it a
+  # new `canary`/`master`/`vX.Y.Z` image landed in GHCR. These jobs are that
+  # missing trigger, using a Railway project token (scoped to exactly one
+  # environment) per environment.
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/canary'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service_id:
+          - 7f4af184-7675-483a-85a3-e034746d661e # frontend-staging (zemio-web image)
+          - e533fc67-9c2d-4064-b918-52f16d105e59 # api-staging (zemio-api image)
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Redeploy staging service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
+        run: railway redeploy --service ${{ matrix.service_id }} --yes
+
+  deploy-production:
+    needs: build
+    # Only the app whose tag was pushed redeploys, e.g. api-v2.0.0 redeploys
+    # api-prod but leaves frontend-prod untouched.
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, format('{0}-v', matrix.app))
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - app: web
+            service_id: a982daf5-2f7d-49fe-880d-9972b9c85c4a # frontend-prod
+          - app: api
+            service_id: f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c # api-prod
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Redeploy production service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+        run: railway redeploy --service ${{ matrix.service_id }} --yes
