@@ -16,12 +16,17 @@ name: Build and Push Images
 # `api-vX.Y.Z`. Pushing one only builds/publishes/deploys that app's image,
 # not both.
 #
+# build-web/build-api and deploy-production-web/deploy-production-api are
+# split per app (not a matrix) because a job-level `if` can't read the matrix
+# context — only step-level `if` can — so filtering "does this tag belong to
+# this app" needed literal per-job conditions instead.
+#
 # A canary push also redeploys the staging Railway services, and an app's
 # version tag redeploys that app's production service — see the
-# deploy-staging/deploy-production jobs below. Railway can't watch GHCR itself
-# (its auto-deploy needs a linked GitHub repo, which conflicts with building
-# images in CI instead of on Railway), so this is the only thing that actually
-# ships a newly built image.
+# deploy-staging/deploy-production-* jobs below. Railway can't watch GHCR
+# itself (its auto-deploy needs a linked GitHub repo, which conflicts with
+# building images in CI instead of on Railway), so this is the only thing
+# that actually ships a newly built image.
 
 on:
   pull_request:
@@ -46,19 +51,11 @@ permissions:
   packages: write
 
 jobs:
-  build:
-    # On a tag push, only build/publish the app the tag belongs to
-    # (web-vX.Y.Z or api-vX.Y.Z); branch pushes and PRs always build both.
-    if: github.ref_type != 'tag' || startsWith(github.ref_name, format('{0}-v', matrix.app))
+  build-web:
+    # On a tag push, only build/publish if the tag belongs to this app;
+    # branch pushes and PRs always build.
+    if: github.ref_type != 'tag' || startsWith(github.ref_name, 'web-v')
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - app: web
-            image: zemio-web
-          - app: api
-            image: zemio-api
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -77,7 +74,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          images: ghcr.io/${{ github.repository_owner }}/zemio-web
           tags: |
             type=sha,format=long
             type=ref,event=branch
@@ -88,22 +85,60 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: apps/${{ matrix.app }}/Dockerfile
+          file: apps/web/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.app }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.app }}
-          # Non-sensitive Sentry coordinates (consumed by the web image only;
-          # ignored by the api image).
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+          # Non-sensitive Sentry coordinates.
           build-args: |
             SENTRY_ORG=${{ secrets.SENTRY_ORG }}
             SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
             SENTRY_URL=${{ secrets.SENTRY_URL }}
-          # Sensitive token passed as a BuildKit secret (mounted only by the web
-          # image's build step, never written to an image layer).
+          # Sensitive token passed as a BuildKit secret (never written to an
+          # image layer).
           secrets: |
             sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  build-api:
+    if: github.ref_type != 'tag' || startsWith(github.ref_name, 'api-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/zemio-api
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=match,pattern=\w+-v(.*),group=1
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
 
   # Neither Railway service has a linked GitHub repo (deliberately — see the
   # "Why CI builds the images" note in docs/deployment.md), so Railway's
@@ -112,7 +147,7 @@ jobs:
   # missing trigger, using a Railway project token (scoped to exactly one
   # environment) per environment.
   deploy-staging:
-    needs: build
+    needs: [build-web, build-api]
     if: github.ref == 'refs/heads/canary'
     runs-on: ubuntu-latest
     strategy:
@@ -129,24 +164,28 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_STAGING }}
         run: railway redeploy --service ${{ matrix.service_id }} --yes
 
-  deploy-production:
-    needs: build
-    # Only the app whose tag was pushed redeploys, e.g. api-v2.0.0 redeploys
-    # api-prod but leaves frontend-prod untouched.
-    if: github.ref_type == 'tag' && startsWith(github.ref_name, format('{0}-v', matrix.app))
+  deploy-production-web:
+    needs: build-web
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'web-v')
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - app: web
-            service_id: a982daf5-2f7d-49fe-880d-9972b9c85c4a # frontend-prod
-          - app: api
-            service_id: f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c # api-prod
     steps:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Redeploy production service
+      - name: Redeploy frontend-prod
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
-        run: railway redeploy --service ${{ matrix.service_id }} --yes
+        run: railway redeploy --service a982daf5-2f7d-49fe-880d-9972b9c85c4a --yes
+
+  deploy-production-api:
+    needs: build-api
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'api-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Redeploy api-prod
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN_PRODUCTION }}
+        run: railway redeploy --service f0d532fa-eb69-4c5c-950f-d3d1fb5b3c1c --yes
