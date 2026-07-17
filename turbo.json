@@ -22,7 +22,8 @@
 		},
 		"typecheck": {
 			"dependsOn": ["^build"],
-			"outputs": ["tsconfig.tsbuildinfo"]
+			"outputs": ["tsconfig.tsbuildinfo"],
+			"passThroughEnv": ["SKIP_ENV_VALIDATION"]
 		},
 		"check": {
 			"outputs": []
