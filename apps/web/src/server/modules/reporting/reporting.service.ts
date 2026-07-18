@@ -74,14 +74,18 @@ function bucketReportsBy<K extends string>(args: {
 /**
  * Ranks bucketed breakdown entries by amount descending and caps them at
  * `MAX_BREAKDOWN_ROWS` — the buckets are built from an unordered `Map`
- * (insertion order), so callers must not rely on iteration order.
+ * (insertion order), so callers must not rely on iteration order. Ties break
+ * on `key` so the ranking is deterministic across requests regardless of the
+ * unordered fetch that populated the buckets.
  */
-function rankBuckets<K, V extends Bucket>(
+function rankBuckets<K extends string, V extends Bucket>(
 	buckets: Map<K, V>,
 	limit = MAX_BREAKDOWN_ROWS,
 ): [K, V][] {
 	return [...buckets.entries()]
-		.sort(([, a], [, b]) => b.amount - a.amount)
+		.sort(
+			([keyA, a], [keyB, b]) => b.amount - a.amount || keyA.localeCompare(keyB),
+		)
 		.slice(0, limit);
 }
 
