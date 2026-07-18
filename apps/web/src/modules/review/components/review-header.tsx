@@ -84,7 +84,10 @@ function ExpensesHeader({
 				<FileIcon className="size-4 text-white md:size-5" />
 			</div>
 			<div className="mr-auto">
-				<h1 className="font-semibold text-2xl text-zinc-800">{report.title}</h1>
+				<h1 className="font-semibold text-2xl text-zinc-800">
+					<span className="me-2 text-zinc-500">#{report.tag}</span>
+					{report.title}
+				</h1>
 				<div className="mt-2 flex flex-col flex-wrap items-start justify-start gap-2 sm:flex-row sm:items-center sm:gap-3">
 					<Tooltip>
 						<TooltipTrigger>
