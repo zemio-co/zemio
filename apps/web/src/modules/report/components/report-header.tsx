@@ -197,6 +197,7 @@ const statusBadgeVariants = cva(
 				NEEDS_REVISION: "border-orange-300 bg-orange-50 text-orange-700",
 				REJECTED: "border-red-300 bg-red-50 text-red-700",
 				ACCEPTED: "border-green-300 bg-green-50 text-green-700",
+				PAID: "border-green-300 bg-green-50 text-green-700",
 			},
 		},
 	},

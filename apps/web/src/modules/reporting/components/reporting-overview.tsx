@@ -112,6 +112,26 @@ function ReportingOverviewCard({
 						{data.reportCounts.needsRevision}
 					</ReportingCardTitle>
 				</div>
+				<div className="space-y-2">
+					<p className="flex items-center justify-start gap-2 text-green-500 text-sm">
+						<StatusIcons.DRAFT className="size-3.5 text-green-500" />
+						Entwürfe
+					</p>
+					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
+						<span className={cn("block size-2.5 rounded-sm bg-slate-500")} />
+						{data.reportCounts.draft}
+					</ReportingCardTitle>
+				</div>
+				<div className="space-y-2">
+					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
+						<StatusIcons.PAID className="size-3.5 text-slate-500" />
+						Ausgezahlt
+					</p>
+					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
+						<span className={cn("block size-2.5 rounded-sm bg-green-500")} />
+						{data.reportCounts.paid}
+					</ReportingCardTitle>
+				</div>
 			</ReportingCardBody>
 		</ReportingCard>
 	);

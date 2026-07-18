@@ -55,6 +55,7 @@ enum ReportStatus {
   NEEDS_REVISION
   ACCEPTED
   REJECTED
+  PAID
 }
 
 model Expense {

@@ -43,6 +43,7 @@ const ADMIN_TRANSITIONS: Record<ReportStatus, readonly ReportStatus[]> = {
 		ReportStatus.NEEDS_REVISION,
 		ReportStatus.ACCEPTED,
 	],
+	[ReportStatus.PAID]: [],
 };
 
 export function canSubmit(from: ReportStatus): boolean {

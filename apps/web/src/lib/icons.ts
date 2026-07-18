@@ -1,5 +1,6 @@
 import type { ReportStatus } from "@zemio/db";
 import {
+	BanknoteArrowDownIcon,
 	CircleCheckIcon,
 	CircleDotDashedIcon,
 	CircleGaugeIcon,
@@ -16,4 +17,5 @@ export const StatusIcons: Record<
 	NEEDS_REVISION: RefreshCwIcon,
 	ACCEPTED: CircleCheckIcon,
 	REJECTED: CircleXIcon,
+	PAID: BanknoteArrowDownIcon,
 };

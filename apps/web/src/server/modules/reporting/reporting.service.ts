@@ -170,6 +170,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 					needsRevision: byStatus.get(ReportStatus.NEEDS_REVISION)?.count ?? 0,
 					accepted: byStatus.get(ReportStatus.ACCEPTED)?.count ?? 0,
 					rejected: byStatus.get(ReportStatus.REJECTED)?.count ?? 0,
+					paid: byStatus.get(ReportStatus.PAID)?.count ?? 0,
 				},
 			};
 		},

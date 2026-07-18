@@ -60,6 +60,7 @@ export const reportingOverviewDTOSchema = z.object({
 		needsRevision: z.number(),
 		accepted: z.number(),
 		rejected: z.number(),
+		paid: z.number(),
 	}),
 });
 export type ReportingOverviewDTO = z.infer<typeof reportingOverviewDTOSchema>;

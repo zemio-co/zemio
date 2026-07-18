@@ -78,7 +78,7 @@ export const dashboardRepository = {
 					report: {
 						ownerId: args.userId,
 						organizationId: args.organizationId,
-						status: ReportStatus.ACCEPTED,
+						status: ReportStatus.PAID,
 						lastUpdatedAt: { gte: args.from, lte: args.to },
 					},
 				},

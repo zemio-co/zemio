@@ -167,6 +167,7 @@ function ReportList({
 											report.status === "PENDING_APPROVAL" && "text-yellow-500",
 											report.status === "NEEDS_REVISION" && "text-orange-500",
 											report.status === "ACCEPTED" && "text-green-600",
+											report.status === "PAID" && "text-green-600",
 											report.status === "REJECTED" && "text-red-600",
 										)}
 									>

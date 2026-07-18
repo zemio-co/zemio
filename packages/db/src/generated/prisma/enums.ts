@@ -14,7 +14,8 @@ export const ReportStatus = {
   PENDING_APPROVAL: 'PENDING_APPROVAL',
   NEEDS_REVISION: 'NEEDS_REVISION',
   ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  PAID: 'PAID'
 } as const
 
 export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus]

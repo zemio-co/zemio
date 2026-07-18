@@ -105,6 +105,7 @@ function ExpensesHeader({
 						className={cn(
 							"flex items-center justify-center gap-1.5 font-medium text-sm text-zinc-600",
 							report.status === "ACCEPTED" && "text-green-600",
+							report.status === "PAID" && "text-green-600",
 							report.status === "REJECTED" && "text-red-600",
 							report.status === "NEEDS_REVISION" && "text-orange-600",
 							report.status === "PENDING_APPROVAL" && "text-yellow-600",
