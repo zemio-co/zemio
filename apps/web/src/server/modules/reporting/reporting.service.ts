@@ -9,14 +9,15 @@ import {
 	startOfPeriod,
 } from "@/server/modules/dashboard";
 import { decimalToNumber } from "@/server/shared/money";
-import type {
-	ReportingBreakdownDTO,
-	ReportingExportDTO,
-	ReportingOverviewDTO,
-	ReportingPdfExportResult,
-	ReportingPdfFilterInput,
-	ReportingTimeSeriesDTO,
-	ReportingTimeSeriesInput,
+import {
+	MAX_BREAKDOWN_ROWS,
+	type ReportingBreakdownDTO,
+	type ReportingExportDTO,
+	type ReportingOverviewDTO,
+	type ReportingPdfExportResult,
+	type ReportingPdfFilterInput,
+	type ReportingTimeSeriesDTO,
+	type ReportingTimeSeriesInput,
 } from "./reporting.dto";
 import { type ReportingFilterInput, reportingWhere } from "./reporting.query";
 import {
@@ -68,6 +69,20 @@ function bucketReportsBy<K extends string>(args: {
 	}
 
 	return buckets;
+}
+
+/**
+ * Ranks bucketed breakdown entries by amount descending and caps them at
+ * `MAX_BREAKDOWN_ROWS` — the buckets are built from an unordered `Map`
+ * (insertion order), so callers must not rely on iteration order.
+ */
+function rankBuckets<K, V extends Bucket>(
+	buckets: Map<K, V>,
+	limit = MAX_BREAKDOWN_ROWS,
+): [K, V][] {
+	return [...buckets.entries()]
+		.sort(([, a], [, b]) => b.amount - a.amount)
+		.slice(0, limit);
 }
 
 async function reportsWithSums(args: {
@@ -196,11 +211,11 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 		): Promise<ReportingBreakdownDTO> {
 			const buckets = await statusBuckets(repo, ctx, input);
 
-			return Object.values(ReportStatus).map((status) => ({
+			return rankBuckets(buckets).map(([status, bucket]) => ({
 				key: status,
 				label: translateReportStatus(status),
-				amount: buckets.get(status)?.amount ?? 0,
-				count: buckets.get(status)?.count ?? 0,
+				amount: bucket.amount,
+				count: bucket.count,
 			}));
 		},
 
@@ -221,7 +236,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 				labelOf: (report) => `${report.costUnit.tag} · ${report.costUnit.title}`,
 			});
 
-			return [...buckets.entries()].map(([key, bucket]) => ({
+			return rankBuckets(buckets).map(([key, bucket]) => ({
 				key,
 				label: bucket.label,
 				amount: bucket.amount,
@@ -246,7 +261,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 				labelOf: (report) => report.owner.name,
 			});
 
-			return [...buckets.entries()].map(([key, bucket]) => ({
+			return rankBuckets(buckets).map(([key, bucket]) => ({
 				key,
 				label: bucket.label,
 				amount: bucket.amount,

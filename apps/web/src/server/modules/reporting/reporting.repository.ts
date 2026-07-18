@@ -6,7 +6,7 @@ import {
 } from "@zemio/db";
 import { reportRepository } from "@/server/modules/report";
 import { nullableDecimalToNumber } from "@/server/shared/money";
-import type { Granularity } from "./reporting.dto";
+import { type Granularity, MAX_BREAKDOWN_ROWS } from "./reporting.dto";
 
 type Db = PrismaClient;
 
@@ -102,6 +102,8 @@ export const reportingRepository = {
 			where: { report: where },
 			_sum: { amount: true },
 			_count: true,
+			orderBy: { _sum: { amount: "desc" } },
+			take: MAX_BREAKDOWN_ROWS,
 		});
 
 		return rows.map((row) => ({
