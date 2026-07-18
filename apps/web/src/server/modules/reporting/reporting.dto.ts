@@ -64,6 +64,9 @@ export const reportingOverviewDTOSchema = z.object({
 });
 export type ReportingOverviewDTO = z.infer<typeof reportingOverviewDTOSchema>;
 
+/** Every "by…" breakdown returns at most this many rows, ranked by amount desc. */
+export const MAX_BREAKDOWN_ROWS = 5;
+
 /** One row of a grouped breakdown (by cost unit / member / expense type / status). */
 export const reportingBreakdownRowSchema = z.object({
 	key: z.string(),
