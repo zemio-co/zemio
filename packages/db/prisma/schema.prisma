@@ -47,6 +47,7 @@ model Report {
   @@index([bankingDetailsId])
   @@index([createdAt])
   @@index([lastUpdatedAt])
+  @@index([paidAt])
   @@map("report")
 }
 
