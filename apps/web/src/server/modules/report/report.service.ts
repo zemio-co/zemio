@@ -332,6 +332,7 @@ export function createReportService(deps: {
 				const result = await repo.setStatus(db, {
 					id: report.id,
 					status: input.status,
+					paidAt: input.status === ReportStatus.PAID ? new Date() : undefined,
 				});
 				await audit.append(db, {
 					organizationId: ctx.organizationId,

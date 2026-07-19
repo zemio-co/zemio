@@ -1,13 +1,31 @@
 "use client";
 
+import { useQueries, useSuspenseQuery } from "@tanstack/react-query";
 import type { ReportStatus } from "@zemio/db";
 import { format, formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
-import { ChevronDownIcon, FileIcon, SheetIcon, TrashIcon } from "lucide-react";
+import {
+	FileIcon,
+	SheetIcon,
+	TrashIcon,
+	TriangleAlertIcon,
+} from "lucide-react";
+import Image from "next/image";
+import type React from "react";
+import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -26,6 +44,7 @@ import {
 import { StatusIcons } from "@/lib/icons";
 import { cn, translateReportStatus } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import { generateEPCCode } from "../lib/epc-code";
 import type { ReviewReport } from "./review-types";
 
 function ExpensesHeader({
@@ -127,8 +146,24 @@ function ExpensesHeader({
 				</div>
 			</div>
 			<div className="mt-0.75 flex flex-nowrap gap-4">
-				<ReportActions report={report}>Bearbeiten</ReportActions>
-				<ExportReport reportId={report.id} />
+				<ButtonGroup>
+					<ReportActions
+						disableAnimation
+						disabled={report.status === "DRAFT" || report.status === "PAID"}
+						report={report}
+					>
+						Bearbeiten
+					</ReportActions>
+					<ExportReport disableAnimation reportId={report.id} variant={"outline"} />
+				</ButtonGroup>
+				<ReportPay
+					disabled={
+						report.status !== "ACCEPTED" && report.status !== "PENDING_APPROVAL"
+					}
+					reportId={report.id}
+				>
+					Ausgleichen
+				</ReportPay>
 			</div>
 		</header>
 	);
@@ -237,10 +272,9 @@ function ReportActions({
 }
 
 function ExportReport({
-	className,
 	reportId,
 	...props
-}: React.ComponentProps<typeof ButtonGroup> & { reportId: string }) {
+}: React.ComponentProps<typeof Button> & { reportId: string }) {
 	const createSummaryPdf = api.report.exportToPdf.useMutation({
 		onMutate: () => {
 			toast.info("PDF wird erstellt", {
@@ -261,32 +295,213 @@ function ExportReport({
 	});
 
 	return (
-		<ButtonGroup className={cn("", className)} data-slot="component" {...props}>
-			<Button onClick={() => createSummaryPdf.mutate({ id: reportId })}>
-				Exportieren
-			</Button>
-			<DropdownMenu>
-				<DropdownMenuTrigger
-					render={
-						<Button size={"icon"}>
-							<ChevronDownIcon />
-						</Button>
-					}
-				/>
-				<DropdownMenuContent align="end" className={"w-52"}>
-					<DropdownMenuGroup>
-						<DropdownMenuItem
-							onClick={() => createSummaryPdf.mutate({ id: reportId })}
+		<DropdownMenu>
+			<DropdownMenuTrigger render={<Button {...props}>Exportieren</Button>} />
+			<DropdownMenuContent align="end" className={"w-52"}>
+				<DropdownMenuGroup>
+					<DropdownMenuItem
+						onClick={() => createSummaryPdf.mutate({ id: reportId })}
+					>
+						<FileIcon /> PDF exportieren
+					</DropdownMenuItem>
+					<DropdownMenuItem disabled>
+						<SheetIcon /> CSV exportieren
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
+function ReportPay({
+	reportId,
+	...props
+}: React.ComponentProps<typeof Button> & {
+	reportId: string;
+}) {
+	const utils = api.useUtils();
+
+	const [financialQuery, reportQuery] = useQueries({
+		queries: [
+			utils.report.financialSummary.queryOptions({ id: reportId }),
+			utils.report.review.queryOptions({ id: reportId }),
+		],
+	});
+
+	const { mutate: setStatus, isPending: isUpdatingStatus } =
+		api.report.transition.useMutation({
+			onMutate: () => {
+				toast.info("Status wird aktualisiert");
+			},
+			onSuccess: () => {
+				toast.success("Status erfolgreich aktualisiert");
+				void utils.report.review.invalidate({ id: reportId });
+				void utils.report.financialSummary.invalidate({ id: reportId });
+			},
+			onError: () => {
+				toast.error("Fehler beim Aktualisieren des Reports");
+			},
+		});
+
+	if (financialQuery.isPending || reportQuery.isPending) {
+		return <Button disabled={true} {...props} />;
+	}
+
+	return (
+		<Dialog data-slot="report-pay">
+			<DialogTrigger render={<Button {...props} />} />
+			<DialogContent className={"sm:max-w-lg"}>
+				<DialogHeader>
+					<DialogTitle>Antrag ausgleichen</DialogTitle>
+					<DialogDescription>
+						Gleichen den eingereichten Betrag aus.
+					</DialogDescription>
+				</DialogHeader>
+				<div>
+					{financialQuery.error || reportQuery.error ? (
+						<ReportEPCCodeError />
+					) : (
+						<Suspense fallback={<ReportEPCCodeLoading />}>
+							<ErrorBoundary fallbackRender={(_error) => <ReportEPCCodeError />}>
+								<div>
+									<p className="mb-2 font-semibold text-slate-800">Giro Code</p>
+									<div className="w-full max-w-32">
+										<ReportEPCCode
+											config={{
+												amount: financialQuery.data.totalAmount,
+												iban: financialQuery.data.iban,
+												name: financialQuery.data.ownerName,
+												tag: reportQuery.data.report.tag,
+											}}
+										/>
+									</div>
+									<p className="mt-2 text-muted-foreground text-xs">
+										Scan this QR-Code with your banking app to get a prefilled
+										transaction.
+									</p>
+								</div>
+							</ErrorBoundary>
+						</Suspense>
+					)}
+				</div>
+				<div className="mt-6">
+					<div className="grid grid-cols-2 gap-2">
+						<Button
+							className={"w-full"}
+							disabled={
+								isUpdatingStatus ||
+								!reportQuery.data ||
+								reportQuery.data.report.status === "ACCEPTED"
+							}
+							onClick={() => {
+								setStatus({ id: reportId, status: "ACCEPTED", notify: true });
+							}}
+							variant={"outline"}
 						>
-							<FileIcon /> PDF exportieren
-						</DropdownMenuItem>
-						<DropdownMenuItem disabled>
-							<SheetIcon /> CSV exportieren
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</ButtonGroup>
+							Als akzeptiert markieren
+							<StatusIcons.ACCEPTED />
+						</Button>
+						<Button
+							className={"w-full"}
+							disabled={isUpdatingStatus || !reportQuery.data}
+							onClick={() => {
+								setStatus({ id: reportId, status: "PAID", notify: true });
+							}}
+						>
+							Als bezahlt markieren
+							<StatusIcons.PAID />
+						</Button>
+					</div>
+					<div className="mt-2">
+						<span className="block text-muted-foreground text-xs">
+							Wenn ein Antrag als bezahlt markiert wurde, kann dies nicht rückgängig
+							gemacht werden.
+						</span>
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+function ReportEPCCode({
+	config,
+	className,
+	...props
+}: React.ComponentProps<"div"> & {
+	config: {
+		iban: string;
+		amount: number;
+		name: string;
+		tag: number;
+	};
+}) {
+	const { data: epcCode } = useSuspenseQuery({
+		queryKey: [
+			"report-epc-code",
+			config.iban,
+			config.amount,
+			config.name,
+			config.tag,
+		],
+		queryFn: () =>
+			generateEPCCode({
+				...config,
+				tag: config.tag.toString(),
+			}),
+		staleTime: Number.POSITIVE_INFINITY,
+		retry: 1,
+	});
+
+	if (!epcCode || epcCode === "") {
+		throw new Error("Unable to generate EPC QRCode");
+	}
+
+	return (
+		<div className={cn("", className)} data-slot="report-epc-code" {...props}>
+			<Image alt="EPC QR Code" height={1024} src={epcCode} width={1024} />
+		</div>
+	);
+}
+
+function ReportEPCCodeLoading({
+	className,
+	...props
+}: React.ComponentProps<typeof Skeleton>) {
+	return (
+		<Skeleton
+			className={cn("aspect-square w-full", className)}
+			data-slot="epc-code-loading"
+			{...props}
+		/>
+	);
+}
+
+function ReportEPCCodeError({
+	className,
+	message,
+	...props
+}: React.ComponentProps<"div"> & {
+	message?: string;
+}) {
+	return (
+		<div
+			className={cn(
+				"flex flex-col items-center justify-center rounded-sm bg-zinc-50 px-4 py-6",
+				className,
+			)}
+			data-slot="epc-code-error"
+			{...props}
+		>
+			<TriangleAlertIcon className="mb-4 size-5 text-amber-500" />
+			<p className="text-center font-medium text-sm text-zinc-800">
+				Unable to generate a QR-Code
+			</p>
+			<p className="mt-0.5 text-center text-muted-foreground text-xs">
+				This likely means, that the provided IBAN was invalid or the validation
+				failed.
+			</p>
+		</div>
 	);
 }
 

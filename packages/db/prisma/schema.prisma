@@ -20,6 +20,7 @@ model Report {
   title       String
   description String?
   status      ReportStatus @default(DRAFT)
+  paidAt DateTime?
 
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)

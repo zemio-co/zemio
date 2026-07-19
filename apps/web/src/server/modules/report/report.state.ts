@@ -27,6 +27,7 @@ const ADMIN_TRANSITIONS: Record<ReportStatus, readonly ReportStatus[]> = {
 		ReportStatus.ACCEPTED,
 		ReportStatus.REJECTED,
 		ReportStatus.NEEDS_REVISION,
+		ReportStatus.PAID,
 	],
 	[ReportStatus.NEEDS_REVISION]: [
 		ReportStatus.PENDING_APPROVAL,
@@ -37,6 +38,7 @@ const ADMIN_TRANSITIONS: Record<ReportStatus, readonly ReportStatus[]> = {
 		ReportStatus.PENDING_APPROVAL,
 		ReportStatus.NEEDS_REVISION,
 		ReportStatus.REJECTED,
+		ReportStatus.PAID,
 	],
 	[ReportStatus.REJECTED]: [
 		ReportStatus.PENDING_APPROVAL,

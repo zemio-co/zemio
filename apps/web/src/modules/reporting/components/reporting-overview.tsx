@@ -113,8 +113,8 @@ function ReportingOverviewCard({
 					</ReportingCardTitle>
 				</div>
 				<div className="space-y-2">
-					<p className="flex items-center justify-start gap-2 text-green-500 text-sm">
-						<StatusIcons.DRAFT className="size-3.5 text-green-500" />
+					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
+						<StatusIcons.DRAFT className="size-3.5 text-slate-500" />
 						Entwürfe
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
