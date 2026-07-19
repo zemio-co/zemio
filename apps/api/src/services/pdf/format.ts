@@ -12,6 +12,8 @@ export function translateReportStatus(status: Report["status"]): string {
 			return "Akzeptiert";
 		case "REJECTED":
 			return "Abgelehnt";
+		case "PAID":
+			return "Ausgezahlt";
 	}
 }
 
