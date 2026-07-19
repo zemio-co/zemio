@@ -436,6 +436,8 @@ function ReportEPCCode({
 		tag: number;
 	};
 }) {
+	const utils = api.useUtils();
+
 	const { data: epcCode } = useSuspenseQuery({
 		queryKey: [
 			"report-epc-code",
@@ -448,6 +450,8 @@ function ReportEPCCode({
 			generateEPCCode({
 				...config,
 				tag: config.tag.toString(),
+				validateIban: (iban) =>
+					utils.client.bankingDetails.validateIban.query({ iban }),
 			}),
 		staleTime: Number.POSITIVE_INFINITY,
 		retry: 1,
