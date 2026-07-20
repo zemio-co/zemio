@@ -116,6 +116,7 @@ const statusColumn: ColumnDef<ListReport> = {
 				"NEEDS_REVISION",
 				"ACCEPTED",
 				"REJECTED",
+				"PAID",
 			] as const
 		).map((status) => ({
 			label: translateReportStatus(status),
