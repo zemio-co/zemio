@@ -48,7 +48,7 @@ function ReportingOverviewCard({
 				</p>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">
-					{[1, 2, 3, 4].map((row) => (
+					{[1, 2, 3, 4, 5, 6].map((row) => (
 						<Skeleton className="h-12 w-full" key={row} />
 					))}
 				</div>
@@ -110,6 +110,26 @@ function ReportingOverviewCard({
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-orange-500")} />
 						{data.reportCounts.needsRevision}
+					</ReportingCardTitle>
+				</div>
+				<div className="space-y-2">
+					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
+						<StatusIcons.DRAFT className="size-3.5 text-slate-500" />
+						Entwürfe
+					</p>
+					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
+						<span className={cn("block size-2.5 rounded-sm bg-slate-500")} />
+						{data.reportCounts.draft}
+					</ReportingCardTitle>
+				</div>
+				<div className="space-y-2">
+					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
+						<StatusIcons.PAID className="size-3.5 text-slate-500" />
+						Ausgezahlt
+					</p>
+					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
+						<span className={cn("block size-2.5 rounded-sm bg-green-500")} />
+						{data.reportCounts.paid}
 					</ReportingCardTitle>
 				</div>
 			</ReportingCardBody>

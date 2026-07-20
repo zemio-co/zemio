@@ -8,6 +8,7 @@ import { ReviewAttachments } from "./review-attachments";
 import { ReviewDetails } from "./review-details";
 import { ReviewExpenses } from "./review-expenses";
 import { ExpensesHeader } from "./review-header";
+import { ReviewPaidNotice } from "./review-paid-notice";
 import { ReviewReasoning } from "./review-reasoning";
 
 function ReviewContent({
@@ -28,6 +29,7 @@ function ReviewContent({
 		<main className={cn("pb-32", className)} {...props}>
 			<section className="mt-20">
 				<div className="mx-auto w-full max-w-5xl px-8">
+					<ReviewPaidNotice className="mb-8" reportId={reportId} />
 					<ExpensesHeader reportId={reportId} />
 
 					<ReviewDetails

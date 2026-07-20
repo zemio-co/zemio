@@ -79,6 +79,7 @@ export type ReviewDTO = {
 		description: string | null;
 		status: ReportStatus;
 		createdAt: Date;
+		paidAt: Date | null;
 		owner: ReviewDetail["owner"];
 	};
 	bankingSummary: { iban: string; ownerName: string };
@@ -114,6 +115,7 @@ export function toReviewDTO(detail: ReviewDetail): ReviewDTO {
 			description: detail.description,
 			status: detail.status,
 			createdAt: detail.createdAt,
+			paidAt: detail.paidAt,
 			owner: detail.owner,
 		},
 		bankingSummary: { iban: banking.iban, ownerName: banking.fullName },

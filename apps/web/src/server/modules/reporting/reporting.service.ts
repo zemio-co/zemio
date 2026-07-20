@@ -153,7 +153,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 			const byStatus = await statusBuckets(repo, ctx, input);
 
 			// "Submitted" = claimed across every status (draft included), not money
-			// that actually left the org — that's `totalReimbursed` (ACCEPTED only).
+			// that actually left the org — that's `totalReimbursed` (PAID only).
 			const totalSubmitted = [...byStatus.values()].reduce(
 				(sum, bucket) => sum + bucket.amount,
 				0,
@@ -161,7 +161,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 
 			return {
 				totalSubmitted,
-				totalReimbursed: byStatus.get(ReportStatus.ACCEPTED)?.amount ?? 0,
+				totalReimbursed: byStatus.get(ReportStatus.PAID)?.amount ?? 0,
 				totalPending: byStatus.get(ReportStatus.PENDING_APPROVAL)?.amount ?? 0,
 				totalRejected: byStatus.get(ReportStatus.REJECTED)?.amount ?? 0,
 				reportCounts: {
@@ -170,6 +170,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 					needsRevision: byStatus.get(ReportStatus.NEEDS_REVISION)?.count ?? 0,
 					accepted: byStatus.get(ReportStatus.ACCEPTED)?.count ?? 0,
 					rejected: byStatus.get(ReportStatus.REJECTED)?.count ?? 0,
+					paid: byStatus.get(ReportStatus.PAID)?.count ?? 0,
 				},
 			};
 		},

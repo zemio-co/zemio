@@ -42,15 +42,15 @@ export const dashboardRepository = {
 		const gran = granularityLiteral(args.granularity);
 		return db.$queryRaw<RawSeriesRow[]>`
 			SELECT
-				DATE_TRUNC(${gran}, r."lastUpdatedAt" AT TIME ZONE 'UTC') AS "periodStart",
+				DATE_TRUNC(${gran}, r."paidAt" AT TIME ZONE 'UTC') AS "periodStart",
 				SUM(e."amount")::float8 AS amount
 			FROM "expense" e
 			JOIN "report" r ON e."reportId" = r."id"
 			WHERE r."ownerId" = ${args.userId}
 				AND r."organizationId" = ${args.organizationId}
-				AND r."status" = 'ACCEPTED'::"ReportStatus"
-				AND r."lastUpdatedAt" >= ${args.from}
-				AND r."lastUpdatedAt" <= ${args.to}
+				AND r."status" = 'PAID'::"ReportStatus"
+				AND r."paidAt" >= ${args.from}
+				AND r."paidAt" <= ${args.to}
 			GROUP BY "periodStart"
 			ORDER BY "periodStart"
 		`;
@@ -78,8 +78,8 @@ export const dashboardRepository = {
 					report: {
 						ownerId: args.userId,
 						organizationId: args.organizationId,
-						status: ReportStatus.ACCEPTED,
-						lastUpdatedAt: { gte: args.from, lte: args.to },
+						status: ReportStatus.PAID,
+						paidAt: { gte: args.from, lte: args.to },
 					},
 				},
 				_sum: { amount: true },

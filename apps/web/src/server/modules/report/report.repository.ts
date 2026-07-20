@@ -9,6 +9,7 @@ const reportScalarSelect = {
 	title: true,
 	description: true,
 	status: true,
+	paidAt: true,
 	organizationId: true,
 	costUnitId: true,
 	ownerId: true,
@@ -43,6 +44,7 @@ const reviewDetailSelect = {
 	title: true,
 	description: true,
 	status: true,
+	paidAt: true,
 	createdAt: true,
 	owner: { select: { id: true, name: true, email: true, image: true } },
 	bankingDetails: { select: { iban: true, fullName: true } },
@@ -193,10 +195,10 @@ export const reportRepository = {
 		});
 	},
 
-	setStatus(db: Db, args: { id: string; status: ReportStatus }) {
+	setStatus(db: Db, args: { id: string; status: ReportStatus; paidAt?: Date }) {
 		return db.report.update({
 			where: { id: args.id },
-			data: { status: args.status },
+			data: { status: args.status, paidAt: args.paidAt },
 			select: { id: true, status: true },
 		});
 	},

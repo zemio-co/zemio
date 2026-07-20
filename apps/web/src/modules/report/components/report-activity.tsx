@@ -29,6 +29,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { StatusIcons } from "@/lib/icons";
 import { cn, formatTimeElapsed, translateExpenseType } from "@/lib/utils";
 import type { AuditEventDTO } from "@/server/modules/audit/audit.dto";
 import { api } from "@/trpc/react";
@@ -152,6 +153,10 @@ function ReportStatusChangedEvent({
 		return <ReportAcceptedEvent className={className} event={event} {...props} />;
 	}
 
+	if (event.diff.after.status === "PAID") {
+		return <ReportPaidEvent className={className} event={event} {...props} />;
+	}
+
 	if (event.diff.after.status === "REJECTED") {
 		return <ReportRejectedEvent className={className} event={event} {...props} />;
 	}
@@ -231,6 +236,31 @@ function ReportAcceptedEvent({
 			<EventContent>
 				<p>
 					Antrag wurde von <InlineActor actor={event.actor} /> als akzeptiert
+					markiert
+				</p>
+				<span className="block text-slate-500">•</span>
+				<EventDate date={event.createdAt} />
+			</EventContent>
+		</EventItem>
+	);
+}
+
+function ReportPaidEvent({
+	event,
+	...props
+}: React.ComponentProps<"div"> & {
+	event: BaseEventProps & {
+		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
+	};
+}) {
+	return (
+		<EventItem data-slot="report-paid-event" {...props}>
+			<EventIconColumn>
+				<StatusIcons.PAID className="text-green-500" />
+			</EventIconColumn>
+			<EventContent>
+				<p>
+					Antrag wurde von <InlineActor actor={event.actor} /> als ausgezahlt
 					markiert
 				</p>
 				<span className="block text-slate-500">•</span>

@@ -17,6 +17,7 @@ export function ReportStatusBadge({
 					status === "PENDING_APPROVAL" && "fill-yellow-500 text-yellow-500",
 					status === "NEEDS_REVISION" && "fill-orange-500 text-orange-500",
 					status === "ACCEPTED" && "fill-green-500 text-green-500",
+					status === "PAID" && "fill-green-500 text-green-500",
 					status === "REJECTED" && "fill-red-500 text-red-500",
 				)}
 			/>

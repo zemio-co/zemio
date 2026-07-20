@@ -71,6 +71,7 @@ const statusColumn: ColumnDef<ListReport> = {
 			"NEEDS_REVISION",
 			"ACCEPTED",
 			"REJECTED",
+			"PAID",
 		] satisfies ReportStatus[];
 
 		return (
@@ -93,6 +94,7 @@ const statusColumn: ColumnDef<ListReport> = {
 									row.original.status === "PENDING_APPROVAL" && "text-yellow-500",
 									row.original.status === "NEEDS_REVISION" && "text-orange-500",
 									row.original.status === "ACCEPTED" && "text-green-500",
+									row.original.status === "PAID" && "text-green-500",
 									row.original.status === "REJECTED" && "text-red-500",
 								)}
 							/>
@@ -114,6 +116,7 @@ const statusColumn: ColumnDef<ListReport> = {
 				"NEEDS_REVISION",
 				"ACCEPTED",
 				"REJECTED",
+				"PAID",
 			] as const
 		).map((status) => ({
 			label: translateReportStatus(status),
