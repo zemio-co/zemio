@@ -1,0 +1,32 @@
+{
+	"name": "@zemio/i18n",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"files": [
+		"dist",
+		"messages"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./messages/*.json": "./messages/*.json"
+	},
+	"scripts": {
+		"build": "tsc --build",
+		"clean": "rm -rf dist tsconfig.tsbuildinfo",
+		"typecheck": "tsc --noEmit",
+		"check": "biome check ."
+	},
+	"dependencies": {
+		"use-intl": "^4.13.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@types/node": "^22",
+		"@zemio/typescript-config": "workspace:*",
+		"typescript": "^5.8.2"
+	}
+}
