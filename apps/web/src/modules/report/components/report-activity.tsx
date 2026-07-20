@@ -254,7 +254,7 @@ function ReportPaidEvent({
 	};
 }) {
 	return (
-		<EventItem data-slot="report-pail-event" {...props}>
+		<EventItem data-slot="report-paid-event" {...props}>
 			<EventIconColumn>
 				<StatusIcons.PAID className="text-green-500" />
 			</EventIconColumn>
