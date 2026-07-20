@@ -48,7 +48,7 @@ function ReportingOverviewCard({
 				</p>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">
-					{[1, 2, 3, 4].map((row) => (
+					{[1, 2, 3, 4, 5, 6].map((row) => (
 						<Skeleton className="h-12 w-full" key={row} />
 					))}
 				</div>
