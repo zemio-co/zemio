@@ -10,6 +10,10 @@ type ValidateIban = (
  * run through the tRPC proxy (`bankingDetails.validateIban`) to reach the
  * internal banking API without exposing the service key to the client.
  */
+const MAX_NAME_LENGTH = 70;
+const MAX_REMITTANCE_INFO_LENGTH = 140;
+const MAX_PAYLOAD_BYTES = 331;
+
 async function generateEPCCode(config: {
 	iban: string;
 	name: string;
@@ -27,6 +31,19 @@ async function generateEPCCode(config: {
 		throw new Error("Unable to verify the provided IBAN");
 	}
 
+	if (name.length > MAX_NAME_LENGTH) {
+		throw new Error(
+			`Beneficiary name exceeds the EPC limit of ${MAX_NAME_LENGTH} characters`,
+		);
+	}
+
+	const remittanceInfo = `Ausgleich Spesenantrag #${tag}`;
+	if (remittanceInfo.length > MAX_REMITTANCE_INFO_LENGTH) {
+		throw new Error(
+			`Remittance information exceeds the EPC limit of ${MAX_REMITTANCE_INFO_LENGTH} characters`,
+		);
+	}
+
 	const payload = [
 		"BCD",
 		"002",
@@ -38,9 +55,14 @@ async function generateEPCCode(config: {
 		`EUR${amount.toFixed(2)}`,
 		"",
 		"",
-		`Augleich Spesenantrag #${tag}`,
-		"",
+		remittanceInfo,
 	].join("\n");
+
+	if (new TextEncoder().encode(payload).length > MAX_PAYLOAD_BYTES) {
+		throw new Error(
+			`EPC payload exceeds the maximum size of ${MAX_PAYLOAD_BYTES} bytes`,
+		);
+	}
 
 	const uri = await QRCode.toDataURL(payload, {
 		type: "image/png",
