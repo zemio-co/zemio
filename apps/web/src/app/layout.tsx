@@ -4,6 +4,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Agentation } from "agentation";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { PublicEnvScript } from "@/lib/runtime-env/public-env-script";
@@ -45,26 +47,30 @@ const inter = Inter({
 	variable: "--font-inter",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{ children: React.ReactNode }>) {
+	const locale = await getLocale();
+
 	return (
-		<html className={inter.variable} lang="en" suppressHydrationWarning>
+		<html className={inter.variable} lang={locale} suppressHydrationWarning>
 			<head>
 				{/* Injects runtime public env before deferred client bundles run. */}
 				<PublicEnvScript />
 			</head>
 			<body className="min-h-screen bg-background font-sans antialiased">
-				<Providers>
-					<TRPCReactProvider>
-						{children}
-						<ReactQueryDevtools />
-						{process.env.NODE_ENV === "development" && (
-							<Agentation endpoint="http://localhost:4747" />
-						)}
-					</TRPCReactProvider>
-					<Toaster />
-				</Providers>
+				<NextIntlClientProvider>
+					<Providers>
+						<TRPCReactProvider>
+							{children}
+							<ReactQueryDevtools />
+							{process.env.NODE_ENV === "development" && (
+								<Agentation endpoint="http://localhost:4747" />
+							)}
+						</TRPCReactProvider>
+						<Toaster />
+					</Providers>
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);
