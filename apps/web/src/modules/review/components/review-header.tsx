@@ -344,7 +344,7 @@ function ReportPay({
 		});
 
 	if (financialQuery.isPending || reportQuery.isPending) {
-		return <Button disabled={true} {...props} />;
+		return <Button {...props} disabled />;
 	}
 
 	return (
