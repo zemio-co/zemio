@@ -1,6 +1,7 @@
 "use client";
 
 import { CopyIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ function ReviewDetails({
 	bankingSummary?: ReviewDetailsSummary;
 	totalAmount?: number;
 } & ReviewLoadState) {
+	const t = useTranslations("modules.review.details");
+
 	if (loading) {
 		return (
 			<div
@@ -49,11 +52,9 @@ function ReviewDetails({
 				)}
 			>
 				<p className="text-center font-medium text-destructive text-sm">
-					Details konnten nicht geladen werden
+					{t("loadErrorTitle")}
 				</p>
-				<p className="text-center text-xs">
-					{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
-				</p>
+				<p className="text-center text-xs">{errorMessage ?? t("unknownError")}</p>
 			</div>
 		);
 	}
@@ -64,9 +65,12 @@ function ReviewDetails({
 			data-slot="review-details"
 			{...props}
 		>
-			<DetailCard title="Gesamtkosten" value={EUR_FORMATTER.format(totalAmount)} />
-			<DetailCard title="IBAN" value={bankingSummary.iban} />
-			<DetailCard title="Kontoname" value={bankingSummary.ownerName} />
+			<DetailCard
+				title={t("totalCostLabel")}
+				value={EUR_FORMATTER.format(totalAmount)}
+			/>
+			<DetailCard title={t("ibanLabel")} value={bankingSummary.iban} />
+			<DetailCard title={t("accountNameLabel")} value={bankingSummary.ownerName} />
 		</div>
 	);
 }
@@ -80,10 +84,11 @@ function DetailCard({
 	title: string;
 	value: string;
 }) {
+	const t = useTranslations("modules.review.details");
 	const handleCopy = React.useCallback(() => {
 		navigator.clipboard.writeText(value);
-		toast.info(`${title} zum Clipboard kopiert`);
-	}, [value, title]);
+		toast.info(t("copiedToClipboard", { title }));
+	}, [value, title, t]);
 
 	return (
 		<div

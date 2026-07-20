@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDate } from "date-fns";
+import { useTranslations } from "next-intl";
 import { PaidNotice } from "@/components/paid-notice";
 import { api } from "@/trpc/react";
 
@@ -9,6 +10,7 @@ function ReviewPaidNotice({
 	reportId,
 	...props
 }: React.ComponentProps<"div"> & { reportId: string }) {
+	const t = useTranslations("modules.review.paidNotice");
 	const {
 		data: review,
 		error,
@@ -28,20 +30,17 @@ function ReviewPaidNotice({
 	if (review.report.status !== "PAID") {
 		return null;
 	}
+
+	const date = review.report.paidAt
+		? ` am ${formatDate(review.report.paidAt, "dd.MM.yyyy 'um' HH:mm")}`
+		: "";
+
 	return (
 		<PaidNotice
 			className={className}
 			dataSlot="review-paid-notice"
-			description={
-				<>
-					Dieser Antrag wurde{" "}
-					{review.report.paidAt &&
-						`am ${formatDate(review.report.paidAt, "dd.MM.yyyy 'um' HH:mm")}`}{" "}
-					ausgeglichen und kann nicht mehr bearbeitet werden. Du kannst ihn noch
-					einsehen und exportieren.
-				</>
-			}
-			title="Antrag wurde ausgeglichen"
+			description={t("description", { date })}
+			title={t("title")}
 			{...props}
 		/>
 	);

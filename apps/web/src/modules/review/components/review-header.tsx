@@ -81,7 +81,7 @@ function ExpensesHeader({
 				{...props}
 			>
 				<p className="font-medium text-destructive text-sm">
-					Report konnte nicht geladen werden
+					{tHeader("loadErrorTitle")}
 				</p>
 				<p className="text-muted-foreground text-xs">{errorMessage}</p>
 			</header>
@@ -115,12 +115,15 @@ function ExpensesHeader({
 					<Tooltip>
 						<TooltipTrigger>
 							<p className="font-medium text-sm text-zinc-600">
-								vor {formatDistanceToNow(report.createdAt, { locale: de })} Uhr
+								{tHeader("createdAgo", {
+									distance: formatDistanceToNow(report.createdAt, { locale: de }),
+								})}
 							</p>
 						</TooltipTrigger>
 						<TooltipContent>
-							Erstellt am{" "}
-							{format(report.createdAt, "dd MMMM yyyy, HH:mm", { locale: de })} Uhr
+							{tHeader("createdAt", {
+								date: format(report.createdAt, "dd MMMM yyyy, HH:mm", { locale: de }),
+							})}
 						</TooltipContent>
 					</Tooltip>
 					<p className="hidden text-sm text-zinc-500 sm:block">•</p>
@@ -156,7 +159,7 @@ function ExpensesHeader({
 						disabled={report.status === "DRAFT" || report.status === "PAID"}
 						report={report}
 					>
-						Bearbeiten
+						{tHeader("editAction")}
 					</ReportActions>
 					<ExportReport disableAnimation reportId={report.id} variant={"outline"} />
 				</ButtonGroup>
@@ -199,18 +202,19 @@ function ReportActions({
 }: React.ComponentProps<typeof Button> & {
 	report: Pick<ReviewReport, "id" | "status">;
 }) {
+	const tHeader = useTranslations("modules.review.header");
 	const utils = api.useUtils();
 
 	const { mutate: setStatus } = api.report.transition.useMutation({
 		onMutate: () => {
-			toast.info("Status wird aktualisiert");
+			toast.info(tHeader("statusUpdating"));
 		},
 		onSuccess: () => {
-			toast.success("Status erfolgreich aktualisiert");
+			toast.success(tHeader("statusUpdated"));
 			void utils.report.review.invalidate({ id: report.id });
 		},
 		onError: () => {
-			toast.error("Fehler beim Aktualisieren des Reports");
+			toast.error(tHeader("statusUpdateError"));
 		},
 	});
 
@@ -230,14 +234,14 @@ function ReportActions({
 			<DropdownMenuTrigger render={<Button variant={"outline"} {...props} />} />
 			<DropdownMenuContent align="end" className={"w-64"}>
 				<DropdownMenuGroup>
-					<DropdownMenuLabel>Status ändern</DropdownMenuLabel>
+					<DropdownMenuLabel>{tHeader("changeStatusLabel")}</DropdownMenuLabel>
 					<DropdownMenuItem
 						disabled={report.status === "ACCEPTED"}
 						onClick={() => {
 							updateStatus("ACCEPTED");
 						}}
 					>
-						<StatusIcons.ACCEPTED /> Akzeptieren
+						<StatusIcons.ACCEPTED /> {tHeader("acceptAction")}
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={report.status === "REJECTED"}
@@ -245,7 +249,7 @@ function ReportActions({
 							updateStatus("REJECTED");
 						}}
 					>
-						<StatusIcons.REJECTED /> Ablehnen
+						<StatusIcons.REJECTED /> {tHeader("rejectAction")}
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={report.status === "NEEDS_REVISION"}
@@ -253,7 +257,7 @@ function ReportActions({
 							updateStatus("NEEDS_REVISION");
 						}}
 					>
-						<StatusIcons.NEEDS_REVISION /> Benötigt Revision
+						<StatusIcons.NEEDS_REVISION /> {tHeader("needsRevisionAction")}
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						disabled={report.status === "PENDING_APPROVAL"}
@@ -261,13 +265,13 @@ function ReportActions({
 							updateStatus("PENDING_APPROVAL");
 						}}
 					>
-						<StatusIcons.PENDING_APPROVAL /> In Bearbeitung
+						<StatusIcons.PENDING_APPROVAL /> {tHeader("pendingApprovalAction")}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuItem disabled variant="destructive">
-						<TrashIcon /> Antrag löschen
+						<TrashIcon /> {tHeader("deleteReportAction")}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
@@ -279,37 +283,40 @@ function ExportReport({
 	reportId,
 	...props
 }: React.ComponentProps<typeof Button> & { reportId: string }) {
+	const tHeader = useTranslations("modules.review.header");
 	const createSummaryPdf = api.report.exportToPdf.useMutation({
 		onMutate: () => {
-			toast.info("PDF wird erstellt", {
-				description: "Dies kann einige Sekunden dauern",
+			toast.info(tHeader("pdfGeneratingTitle"), {
+				description: tHeader("pdfGeneratingDescription"),
 			});
 		},
 		onSuccess: (data) => {
 			window.open(data.url, "_blank");
-			toast.success("PDF Zusammenfassung erstellt", {
-				description: "Datei wird heruntergeladen",
+			toast.success(tHeader("pdfGeneratedTitle"), {
+				description: tHeader("pdfGeneratedDescription"),
 			});
 		},
 		onError: ({ message }) => {
-			toast.error("Fehler beim Erstellen der PDF Zusammenfassung", {
-				description: message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(tHeader("pdfGenerationErrorTitle"), {
+				description: message ?? tHeader("unexpectedError"),
 			});
 		},
 	});
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger render={<Button {...props}>Exportieren</Button>} />
+			<DropdownMenuTrigger
+				render={<Button {...props}>{tHeader("exportAction")}</Button>}
+			/>
 			<DropdownMenuContent align="end" className={"w-52"}>
 				<DropdownMenuGroup>
 					<DropdownMenuItem
 						onClick={() => createSummaryPdf.mutate({ id: reportId })}
 					>
-						<FileIcon /> PDF exportieren
+						<FileIcon /> {tHeader("exportPdfAction")}
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled>
-						<SheetIcon /> CSV exportieren
+						<SheetIcon /> {tHeader("exportCsvAction")}
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
@@ -323,6 +330,7 @@ function ReportPay({
 }: React.ComponentProps<typeof Button> & {
 	reportId: string;
 }) {
+	const tHeader = useTranslations("modules.review.header");
 	const utils = api.useUtils();
 
 	const [financialQuery, reportQuery] = useQueries({
@@ -335,15 +343,15 @@ function ReportPay({
 	const { mutate: setStatus, isPending: isUpdatingStatus } =
 		api.report.transition.useMutation({
 			onMutate: () => {
-				toast.info("Status wird aktualisiert");
+				toast.info(tHeader("statusUpdating"));
 			},
 			onSuccess: () => {
-				toast.success("Status erfolgreich aktualisiert");
+				toast.success(tHeader("statusUpdated"));
 				void utils.report.review.invalidate({ id: reportId });
 				void utils.report.financialSummary.invalidate({ id: reportId });
 			},
 			onError: () => {
-				toast.error("Fehler beim Aktualisieren des Reports");
+				toast.error(tHeader("statusUpdateError"));
 			},
 		});
 
@@ -356,10 +364,8 @@ function ReportPay({
 			<DialogTrigger render={<Button {...props} />} />
 			<DialogContent className={"sm:max-w-lg"}>
 				<DialogHeader>
-					<DialogTitle>Antrag ausgleichen</DialogTitle>
-					<DialogDescription>
-						Gleichen den eingereichten Betrag aus.
-					</DialogDescription>
+					<DialogTitle>{tHeader("payDialogTitle")}</DialogTitle>
+					<DialogDescription>{tHeader("payDialogDescription")}</DialogDescription>
 				</DialogHeader>
 				<div>
 					{financialQuery.error || reportQuery.error ? (
@@ -368,7 +374,9 @@ function ReportPay({
 						<Suspense fallback={<ReportEPCCodeLoading />}>
 							<ErrorBoundary fallbackRender={(_error) => <ReportEPCCodeError />}>
 								<div>
-									<p className="mb-2 font-semibold text-slate-800">Giro Code</p>
+									<p className="mb-2 font-semibold text-slate-800">
+										{tHeader("giroCodeLabel")}
+									</p>
 									<div className="w-full max-w-32">
 										<ReportEPCCode
 											config={{
@@ -380,8 +388,7 @@ function ReportPay({
 										/>
 									</div>
 									<p className="mt-2 text-muted-foreground text-xs">
-										Scan this QR-Code with your banking app to get a prefilled
-										transaction.
+										{tHeader("giroCodeHint")}
 									</p>
 								</div>
 							</ErrorBoundary>
@@ -402,7 +409,7 @@ function ReportPay({
 							}}
 							variant={"outline"}
 						>
-							Als akzeptiert markieren
+							{tHeader("markAcceptedAction")}
 							<StatusIcons.ACCEPTED />
 						</Button>
 						<Button
@@ -412,14 +419,13 @@ function ReportPay({
 								setStatus({ id: reportId, status: "PAID", notify: true });
 							}}
 						>
-							Als bezahlt markieren
+							{tHeader("markPaidAction")}
 							<StatusIcons.PAID />
 						</Button>
 					</div>
 					<div className="mt-2">
 						<span className="block text-muted-foreground text-xs">
-							Wenn ein Antrag als bezahlt markiert wurde, kann dies nicht rückgängig
-							gemacht werden.
+							{tHeader("markPaidWarning")}
 						</span>
 					</div>
 				</div>
@@ -492,6 +498,8 @@ function ReportEPCCodeError({
 }: React.ComponentProps<"div"> & {
 	message?: string;
 }) {
+	const tHeader = useTranslations("modules.review.header");
+
 	return (
 		<div
 			className={cn(
@@ -503,11 +511,10 @@ function ReportEPCCodeError({
 		>
 			<TriangleAlertIcon className="mb-4 size-5 text-amber-500" />
 			<p className="text-center font-medium text-sm text-zinc-800">
-				Unable to generate a QR-Code
+				{tHeader("epcCodeErrorTitle")}
 			</p>
 			<p className="mt-0.5 text-center text-muted-foreground text-xs">
-				This likely means, that the provided IBAN was invalid or the validation
-				failed.
+				{tHeader("epcCodeErrorDescription")}
 			</p>
 		</div>
 	);
