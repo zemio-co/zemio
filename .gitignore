@@ -67,3 +67,5 @@ apps/web/public/uploads
 # AI agent tooling (personal developer config)
 .agents/
 .claude/
+
+graphify-out/
