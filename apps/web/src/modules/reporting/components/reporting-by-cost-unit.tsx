@@ -2,6 +2,7 @@
 
 import { keepPreviousData } from "@tanstack/react-query";
 import { TagIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -22,6 +23,9 @@ function ReportingByCostUnitCard({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.reporting.byCostUnit");
+	const tCommon = useTranslations("modules.reporting.common");
+
 	const updateTimer = useUpdateTimer();
 
 	const dates = useReportingStore((state) => state.dates);
@@ -65,7 +69,9 @@ function ReportingByCostUnitCard({
 				data-slot="reporting-cost-units"
 				{...props}
 			>
-				<p className="mb-3 font-semibold text-slate-700 text-xs">Top-Spender</p>
+				<p className="mb-3 font-semibold text-slate-700 text-xs">
+					{t("loadingTitle")}
+				</p>
 				<Skeleton className="h-8 w-16" />
 
 				<div className="mt-4 space-y-2">
@@ -78,7 +84,7 @@ function ReportingByCostUnitCard({
 	}
 
 	if (query.error) {
-		return <p>Error</p>;
+		return <p>{tCommon("loadError")}</p>;
 	}
 
 	const { data } = query;
@@ -91,14 +97,13 @@ function ReportingByCostUnitCard({
 			{...props}
 		>
 			<ReportingCardHeader>
-				<ReportingCardDescription>Nach Kostenstellen</ReportingCardDescription>
+				<ReportingCardDescription>{t("description")}</ReportingCardDescription>
 				<ReportingCardTitle
-					tooltip={
-						<span>
-							In den {data.length} beliebtesten Kostenstellen wurden{" "}
-							<span className="text-violet-600">€{sum.toFixed(2)}</span> ausgegeben.
-						</span>
-					}
+					tooltip={t.rich("tooltip", {
+						count: data.length,
+						amount: `€${sum.toFixed(2)}`,
+						highlight: (chunks) => <span className="text-violet-600">{chunks}</span>,
+					})}
 				>
 					€{sum.toFixed(2)}
 				</ReportingCardTitle>
@@ -124,7 +129,7 @@ function ReportingByCostUnitCard({
 				</ReportingCardBody>
 			)}
 			<ReportingCardFooter>
-				<span>Zuletzt aktualisiert {updateTimer.label}</span>
+				<span>{tCommon("lastUpdated", { time: updateTimer.label })}</span>
 			</ReportingCardFooter>
 		</ReportingCard>
 	);

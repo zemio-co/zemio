@@ -1,7 +1,12 @@
+"use client";
+
 import { TriangleAlertIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 function ReportingBanner({ className, ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.reporting.banner");
+
 	return (
 		<div
 			className={cn(
@@ -13,14 +18,8 @@ function ReportingBanner({ className, ...props }: React.ComponentProps<"div">) {
 		>
 			<TriangleAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600" />
 			<div>
-				<p className="font-semibold text-amber-800 text-sm">
-					Reporting ist ein experimentelles Feature
-				</p>
-				<p className="mt-1 max-w-4xl text-amber-700 text-sm">
-					Reporting ist ein Feature, welches sich aktiv in der Entwicklung befindet.
-					Du kannst bereits auf Reporting zugreifen und erste Funktionen austesten,
-					gehe jedoch davon aus, dass Fehler auftreten können.
-				</p>
+				<p className="font-semibold text-amber-800 text-sm">{t("title")}</p>
+				<p className="mt-1 max-w-4xl text-amber-700 text-sm">{t("description")}</p>
 			</div>
 		</div>
 	);

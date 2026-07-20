@@ -18,6 +18,60 @@
 		}
 	},
 	"modules": {
+		"admin": {
+			"sidebar": {
+				"back": "Zurück",
+				"organizations": "Organisationen"
+			},
+			"orgsContent": {
+				"title": "Organisationen",
+				"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"createCardTitle": "Neue Organisation",
+				"createCardDescription": "Erstelle eine neue Organisation um zu kollaborieren",
+				"listTitle": "Organisationen",
+				"createSuccess": "Organisation erfolgreich erstellt.",
+				"createButton": "Organisation erstellen",
+				"createDialogTitle": "Neue Organisation erstellen",
+				"nameLabel": "Name",
+				"namePlaceholder": "Meine Organisation",
+				"microsoftTenantIdLabel": "Microsoft Tenant ID",
+				"microsoftTenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+				"microsoftTenantIdDescription": "Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory). Alle Benutzer aus diesem Tenant werden dieser Organisation automatisch zugeordnet.",
+				"cancelButton": "Abbrechen",
+				"createSubmitPending": "Wird erstellt…",
+				"createSubmitAction": "Erstellen"
+			},
+			"orgDetails": {
+				"backAction": "Zurück",
+				"headerDescription": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"metrics": {
+					"members": "Mitglieder",
+					"reports": "Reports",
+					"admins": "Admins",
+					"invitations": "Einladungen"
+				},
+				"adminsHeading": "Admins",
+				"emptyAdminsTitle": "Keine Admins",
+				"emptyAdminsDescription": "In dieser Organisation wurden keine Administratoren gefunden",
+				"generalForm": {
+					"sectionTitle": "Allgemein",
+					"nameLabel": "Name",
+					"nameDescription": "Wird Nutzern in der App und E-Mails angezeigt",
+					"namePlaceholder": "Meine Organisation",
+					"slugLabel": "Slug",
+					"slugDescription": "Zur eindeutigen und nutzerfreundlichen Identifikation",
+					"slugPlaceholder": "my-org",
+					"microsoftTenantIdLabel": "Microsoft Tenant ID",
+					"microsoftTenantIdDescription": "Nutzer, deren Entra ID Tenant mit dieser UUID übereinstimmt, können dieser Organisation automatisch zugeordnet werden.",
+					"microsoftTenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+					"logoUrlLabel": "Logo URL",
+					"logoUrlDescription": "URL zum Logo der Organisation",
+					"logoUrlPlaceholder": "https://example.com/logo.png",
+					"saveButton": "Speichern",
+					"saveSuccess": "Organisationseinstellungen gespeichert."
+				}
+			}
+		},
 		"dashboard": {
 			"header": {
 				"title": "Dashboard",
@@ -477,6 +531,464 @@
 						"deleteErrorTitle": "Fehler beim Löschen des Anhangs",
 						"downloadFailed": "Download fehlgeschlagen"
 					}
+				}
+			}
+		},
+		"reporting": {
+			"banner": {
+				"title": "Reporting ist ein experimentelles Feature",
+				"description": "Reporting ist ein Feature, welches sich aktiv in der Entwicklung befindet. Du kannst bereits auf Reporting zugreifen und erste Funktionen austesten, gehe jedoch davon aus, dass Fehler auftreten können."
+			},
+			"header": {
+				"title": "Reporting",
+				"exportButton": "Exportieren",
+				"datePicker": {
+					"placeholder": "Datum auswählen"
+				}
+			},
+			"card": {
+				"emptyTitle": "Keine Daten",
+				"emptyDescription": "Für den angegebenen Zeitraum sind keine Daten verfügbar."
+			},
+			"common": {
+				"lastUpdated": "Zuletzt aktualisiert {time}",
+				"loadError": "Fehler beim Laden der Daten"
+			},
+			"overview": {
+				"title": "Antragsübersicht"
+			},
+			"byCostUnit": {
+				"loadingTitle": "Top-Spender",
+				"description": "Nach Kostenstellen",
+				"tooltip": "In den {count} beliebtesten Kostenstellen wurden <highlight>{amount}</highlight> ausgegeben."
+			},
+			"byMember": {
+				"loadingTitle": "Top-Spender",
+				"description": "Nach Mitgliedern",
+				"tooltip": "Im ausgewählten Zeitraum haben die <highlight>{count} Personen</highlight>, welche am meisten Geld ausgegeben haben, gemeinsam <highlight>{amount}</highlight> ausgegeben."
+			},
+			"timeline": {
+				"description": "Verlauf erstattet",
+				"chart": {
+					"amountLabel": "Summe"
+				},
+				"metrics": {
+					"reimbursed": "Erstattet",
+					"submitted": "Eingereicht"
+				}
+			}
+		},
+		"settings": {
+			"actions": {
+				"save": "Speichern",
+				"saving": "Wird gespeichert…",
+				"cancel": "Abbrechen",
+				"delete": "Löschen",
+				"create": "Erstellen",
+				"creating": "Wird erstellt…",
+				"update": "Aktualisieren",
+				"updating": "Wird aktualisiert…",
+				"back": "Zurück",
+				"edit": "Bearbeiten",
+				"tryAgain": "Erneut versuchen"
+			},
+			"nav": {
+				"groups": {
+					"personal": "Persönliche Einstellungen",
+					"organisation": "Organisation",
+					"platform": "Plattform"
+				},
+				"items": {
+					"general": {
+						"label": "Allgemeines",
+						"description": "Ändere deine persönlichen Einstellungen"
+					},
+					"notifications": {
+						"label": "Benachrichtigungen",
+						"description": "Passe die E-Mails, SMS und Push-Benachrichtigungen an, die du erhältst"
+					},
+					"bankDetails": {
+						"label": "Bankverbindungen",
+						"description": "Aktualisiere deine Bankverbindung, um Zahlungen zu erhalten"
+					},
+					"orgGeneral": {
+						"label": "Organisation",
+						"description": "Verwalte die Einstellungen zu deiner Organisation"
+					},
+					"orgMembers": {
+						"label": "Mitglieder",
+						"description": "Verwalte die Mitglieder deiner Organisation"
+					},
+					"orgAllowances": {
+						"label": "Zulagen",
+						"description": "Verwalte die Zulagen und Abzüge für Spesenanträge"
+					},
+					"orgCostUnits": {
+						"label": "Kostenstellen",
+						"description": "Kostenstellen werden verwendet, um Ausgaben einfacher zuordnen zu können"
+					},
+					"adminOrgs": {
+						"label": "Organisationen",
+						"description": "Verwalte alle Organisationen auf dieser Plattform"
+					}
+				},
+				"sidebarOrgHeading": "Organisation",
+				"sidebarAdminHeading": "Admin",
+				"noSession": "Keine aktive Sitzung gefunden"
+			},
+			"shared": {
+				"loadFormErrorTitle": "Das Formular konnte nicht geladen werden"
+			},
+			"general": {
+				"title": "Organisation",
+				"description": "Verwalte die Einstellungen zu deiner Organisation.",
+				"editButton": "Bearbeiten",
+				"rows": {
+					"logo": "Logo",
+					"name": "Name",
+					"id": "ID",
+					"tenantId": "Microsoft-Mandats-ID",
+					"slug": "Slug",
+					"createdAt": "Erstellt am",
+					"reviewer": "Reviewer",
+					"reviewerEmpty": "Nicht hinterlegt"
+				},
+				"sections": {
+					"general": "Allgemeines",
+					"reviewer": "Reviewer"
+				},
+				"updateDialog": {
+					"title": "Organisation aktualisieren",
+					"logoLabel": "Logo",
+					"logoDescription": "Gib eine URL zu einem Logo an.",
+					"logoPlaceholder": "https://example.com/logo.svg",
+					"nameLabel": "Name",
+					"nameDescription": "Dieser Name ist für alle Mitglieder deiner Organisation sichtbar.",
+					"namePlaceholder": "Deine Organisation"
+				},
+				"reviewerDialog": {
+					"title": "Reviewer aktualisieren",
+					"fieldLabel": "Reviewer",
+					"fieldDescription": "Benachrichtigungen über neue Anträge werden an diese E-Mail-Adresse versendet.",
+					"placeholder": "you@example.com"
+				},
+				"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+				"saveErrorTitle": "Einstellungen konnten nicht gespeichert werden",
+				"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+				"reviewerSavedToast": "Reviewer wurde erfolgreich gespeichert",
+				"reviewerSaveErrorTitle": "Reviewer konnte nicht gespeichert werden"
+			},
+			"generalLegacy": {
+				"title": "Organisation",
+				"description": "Verwalte die Einstellungen zu deiner Organisation",
+				"sections": {
+					"general": "Allgemeines",
+					"reviewer": "Reviewer"
+				},
+				"orgName": {
+					"label": "Organisationsname",
+					"ariaLabel": "Organisationsname",
+					"description": "Der Name deiner Organisation, wie er in der Anwendung angezeigt wird.",
+					"savedToast": "Organisationsname gespeichert"
+				},
+				"slug": {
+					"label": "Slug",
+					"description": "Zur eindeutigen und nutzerfreundlichen Identifikation"
+				},
+				"tenantId": {
+					"label": "Microsoft Tenant ID",
+					"description": "Nutzer, deren Entra-ID-Mandant dieser UUID entspricht, werden dieser Organisation automatisch zugeordnet."
+				},
+				"reviewerEmail": {
+					"label": "Reviewer E-Mail",
+					"ariaLabel": "Reviewer E-Mail",
+					"description": "Spesenanträge werden nach der Einreichung an diese E-Mail-Adresse weitergeleitet.",
+					"placeholder": "reviewer@example.com",
+					"savedToast": "Reviewer E-Mail gespeichert",
+					"invalid": "Ungültige E-Mail-Adresse"
+				},
+				"saveErrorTitle": "Fehler beim Speichern",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"allowances": {
+				"title": "Zulagen & Abzüge",
+				"description": "Verwalte die Zulagen und Abzüge für Spesenanträge.",
+				"kilometerRate": {
+					"label": "Kilometerpauschale",
+					"description": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet."
+				},
+				"dailyFoodAllowance": {
+					"label": "Tägliche Verpflegungszulage",
+					"description": "Dieser Betrag wird pro Tag für die Verpflegung erhoben."
+				},
+				"breakfastDeduction": {
+					"label": "Morgenstückabzug"
+				},
+				"lunchDeduction": {
+					"label": "Mittagessenabzug"
+				},
+				"dinnerDeduction": {
+					"label": "Abendessenabzug"
+				},
+				"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+				"saveErrorTitle": "Einstellungen konnten nicht gespeichert werden",
+				"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+			},
+			"allowancesLegacy": {
+				"title": "Zulagen & Abzüge",
+				"description": "Verwalte die Zulagen und Abzüge für Spesenanträge.",
+				"sections": {
+					"travel": "Reisepauschale",
+					"meal": "Verpflegungspauschale"
+				},
+				"mealToggle": {
+					"title": "Verpflegungspauschalen aktiviert",
+					"description": "Bestimmt ob Nutzer Verpflegungspauschalen einreichen können"
+				},
+				"mealSettings": {
+					"title": "Einstellungen",
+					"description": "Bestimme die Raten für die Verpflegungspauschale"
+				},
+				"kilometerRate": {
+					"label": "Kilometerpauschale",
+					"description": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet."
+				},
+				"dailyFoodAllowance": {
+					"label": "Tägliche Verpflegungszulage",
+					"description": "Dieser Betrag wird pro Tag für die Verpflegung erhoben."
+				},
+				"breakfastDeduction": {
+					"label": "Morgenstückabzug"
+				},
+				"lunchDeduction": {
+					"label": "Mittagessenabzug"
+				},
+				"dinnerDeduction": {
+					"label": "Abendessenabzug"
+				},
+				"savedToast": "Zulagen erfolgreich aktualisiert",
+				"saveErrorTitle": "Fehler beim Aktualisieren der Zulagen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"members": {
+				"title": "Mitglieder",
+				"description": "Die folgenden Benutzer sind Mitglieder deiner Organisation.",
+				"table": {
+					"name": "Name",
+					"email": "E-Mail",
+					"role": "Rolle",
+					"createdAt": "Beigetreten",
+					"noResults": "Keine Ergebnisse.",
+					"unitsCount": "{count} Einheiten",
+					"pageIndicator": "Seite {current} / {total}"
+				},
+				"roles": {
+					"owner": "Besitzer",
+					"admin": "Admin",
+					"member": "Mitglied"
+				},
+				"updateSheet": {
+					"title": "Mitglied bearbeiten",
+					"nameLabel": "Name",
+					"emailLabel": "E-Mail",
+					"createdAtLabel": "Beigetreten",
+					"roleLabel": "Rolle",
+					"rolePlaceholder": "Wähle eine Rolle",
+					"savedToast": "Rolle wurde erfolgreich aktualisiert",
+					"saveErrorTitle": "Fehler beim Aktualisieren der Rolle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+					"roleOptions": {
+						"member": "Mitglied",
+						"admin": "Administrator"
+					}
+				}
+			},
+			"costUnits": {
+				"title": "Kostenstellen",
+				"description": "Kostenstellen werden verwendet um Ausgaben einfacher zuordnen zu können",
+				"newGroupButton": "Neue Gruppe",
+				"newCostUnitButton": "Neue Kostenstelle",
+				"table": {
+					"tag": "Tag",
+					"title": "Titel",
+					"examplesCount": "{count} Beispiele",
+					"createdAt": "Erstellt",
+					"group": "Gruppe",
+					"noGroup": "Keine Gruppe",
+					"status": "Status",
+					"statusActive": "Aktiv",
+					"statusArchived": "Archiviert",
+					"noResults": "Keine Ergebnisse.",
+					"unitsCount": "{count} Einheiten",
+					"pageIndicator": "Seite {current} / {total}"
+				},
+				"createSheet": {
+					"title": "Neue Kostenstelle",
+					"tagLabel": "Tag",
+					"tagTooltip": "Jede Kostenstelle besteht aus einer Kombination eines einzigartigen Tags und einem Titel",
+					"tagPlaceholder": "KS123",
+					"titleLabel": "Titel",
+					"titlePlaceholder": "Sommerfest",
+					"tagTitleDescription": "Wird zur eindeutigen Identifikation der Kostenstelle verwendet.",
+					"groupLabel": "Gruppe",
+					"noGroupOption": "Keine Gruppe",
+					"groupOptGroupLabel": "Gruppen",
+					"groupDescription": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst.",
+					"createGroupButton": "Neue Gruppe erstellen",
+					"examplesLabel": "Beispiele",
+					"examplesPlaceholder": "z.B. Getränke ",
+					"examplesDescription": "Beispiele können Nutzern helfen, besser zu verstehen ob sie die richtige Kostenstelle für Ihren Antrag gewählt haben.",
+					"savedToast": "Kostenstelle wurde erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Kostenstelle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				},
+				"createGroupSheet": {
+					"title": "Neue Kostenstellengruppe",
+					"nameLabel": "Gruppenname",
+					"namePlaceholder": "Projekte, Werbung, Sonstiges...",
+					"description": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst. Titel ist öffentlich sichtbar.",
+					"savedToast": "Kostenstellengruppe wurde erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Kostenstellengruppe",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				},
+				"updateSheet": {
+					"title": "Kostenstelle bearbeiten",
+					"tagLabel": "Tag",
+					"tagTooltip": "Jede Kostenstelle besteht aus einer Kombination eines einzigartigen Tags und einem Titel",
+					"tagPlaceholder": "KS123",
+					"titleLabel": "Titel",
+					"titlePlaceholder": "Sommerfest",
+					"tagTitleDescription": "Wird zur eindeutigen Identifikation der Kostenstelle verwendet.",
+					"statusLabel": "Status",
+					"statusPlaceholder": "Wähle eine Rolle",
+					"statusActive": "Aktiv",
+					"statusArchived": "Archiviert",
+					"statusDescription": "Wenn eine Kostenstelle als archiviert markiert ist, kann sie von Benutzern nicht für neue Anträge verwendet werden.",
+					"groupLabel": "Gruppe",
+					"noGroupOption": "Keine Gruppe",
+					"groupOptGroupLabel": "Gruppen",
+					"groupDescription": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst.",
+					"examplesLabel": "Beispiele",
+					"examplesPlaceholder": "z.B. Getränke ",
+					"examplesDescription": "Beispiele können Nutzern helfen, besser zu verstehen ob sie die richtige Kostenstelle für Ihren Antrag gewählt haben.",
+					"deleteSectionLabel": "Kostenstelle löschen",
+					"deleteSectionDescriptionAllowed": "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet.",
+					"deleteSectionDescriptionBlocked": "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden. Archiviere die Kostenstelle stattdessen.",
+					"deleteDialogTitle": "Kostenstelle löschen",
+					"deleteDialogDescription": "Bist du dir sicher, dass du diese Kostenstelle löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+					"savedToast": "Kostenstelle wurde erfolgreich aktualisiert",
+					"saveErrorTitle": "Fehler beim Aktualisieren der Kostenstelle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+					"deletedToast": "Kostenstelle wurde erfolgreich gelöscht",
+					"deleteErrorTitle": "Fehler beim Löschen der Kostenstelle",
+					"deleteErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"banking": {
+				"title": "Bankverbindungen",
+				"description": "Um Zahlungen an dein Konto zu erhalten, musst du mindestens eine Bankverbindung anlegen.",
+				"listHeading": "Deine Bankdaten",
+				"createButton": "Erstellen",
+				"emptyTitle": "Noch keine Bankverbindung hinterlegt",
+				"emptyDescription": "Hinterlege eine Bankverbindung um Zahlungen zu erhalten",
+				"loadErrorFallback": "Keine Details gefunden - Fehler",
+				"createdOn": "Erstellt am {date} um {time}",
+				"createDialog": {
+					"title": "Neue Bankverbindung",
+					"description": "Lege eine neue Bankverbindung an um Zahlungen zu erhalten.",
+					"titleLabel": "Titel",
+					"titleDescription": "Nutze diesen Titel um die Bankverbindung später einfach wiederzufinden.",
+					"ibanLabel": "IBAN",
+					"nameLabel": "Name",
+					"nameDescription": "Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen übereinstimmt.",
+					"submitCreating": "Wird erstellt…",
+					"submitIdle": "Erstellen",
+					"savedToast": "Bankverbindung erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Bankverbindung",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				}
+			},
+			"preferences": {
+				"general": {
+					"title": "Allgemeines",
+					"description": "Verwalte deine persönlichen Informationen",
+					"sectionProfile": "Profil",
+					"nameLabel": "Name",
+					"nameAriaLabel": "Name",
+					"nameDescription": "Dein vollständiger Name, wie er in der Anwendung angezeigt wird.",
+					"emailLabel": "E-Mail",
+					"emailAriaLabel": "E-Mail",
+					"emailDescription": "Deine E-Mail-Adresse wird über Microsoft verwaltet und kann hier nicht geändert werden.",
+					"savedToast": "Name gespeichert",
+					"saveErrorTitle": "Fehler beim Speichern",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				},
+				"notifications": {
+					"title": "Benachrichtigungen",
+					"description": "Wähle welche Benachrichtigungen du erhalten möchtest",
+					"fieldLabel": "Benachrichtigungen",
+					"fieldDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
+					"allTitle": "Alle Benachrichtigungen",
+					"allDescription": "Du erhälst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+					"statusTitle": "Statusänderungen",
+					"statusDescription": "Du erhälst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+					"noneTitle": "Keine Benachrichtigungen",
+					"noneDescription": "Du erhältst keine Benachrichtigungen.",
+					"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+					"saveErrorTitle": "Fehler beim Speichern der Einstellungen",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				}
+			},
+			"adminOrgs": {
+				"title": "Organisationen",
+				"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"newOrgTitle": "Neue Organisation",
+				"newOrgDescription": "Erstelle eine neue Organisation um zu kollaborieren",
+				"listHeading": "Organisationen",
+				"emptyTitle": "Noch keine Organisationen hinterlegt",
+				"emptyDescription": "Hinterlege eine neue Organisation um Mitglieder zu verwalten",
+				"loadErrorFallback": "Fehler beim Laden der Organisationen",
+				"createDialog": {
+					"title": "Neue Organisation erstellen",
+					"nameLabel": "Name",
+					"namePlaceholder": "Meine Organisation",
+					"tenantIdLabel": "Microsoft Tenant ID",
+					"tenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+					"tenantIdDescription": "Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory). Alle Benutzer aus diesem Tenant werden dieser Organisation automatisch zugeordnet.",
+					"savedToast": "Organisation erfolgreich erstellt.",
+					"submitCreating": "Wird erstellt…",
+					"submitIdle": "Erstellen",
+					"triggerButton": "Organisation erstellen"
+				},
+				"details": {
+					"backLink": "Zurück",
+					"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+					"loadErrorFallback": "Ein Fehler ist aufgetreten",
+					"metrics": {
+						"members": "Mitglieder",
+						"reports": "Reports",
+						"admins": "Admins",
+						"invitations": "Einladungen"
+					},
+					"generalSectionTitle": "Allgemein",
+					"generalForm": {
+						"nameLabel": "Name",
+						"nameDescription": "Wird Nutzern in der App und E-Mails angezeigt",
+						"namePlaceholder": "Meine Organisation",
+						"slugLabel": "Slug",
+						"slugDescription": "Zur eindeutigen und nutzerfreundlichen Identifikation",
+						"slugPlaceholder": "my-org",
+						"tenantIdLabel": "Microsoft Tenant ID",
+						"tenantIdDescription": "Nutzer, deren Entra-ID-Mandant dieser UUID entspricht, werden dieser Organisation automatisch zugeordnet.",
+						"tenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+						"logoUrlLabel": "Logo URL",
+						"logoUrlDescription": "URL zum Logo der Organisation",
+						"logoUrlPlaceholder": "https://example.com/logo.png",
+						"savedToast": "Organisationseinstellungen gespeichert."
+					},
+					"adminsSectionTitle": "Admins",
+					"adminsEmptyTitle": "Keine Admins",
+					"adminsEmptyDescription": "In dieser Organisation wurden keine Administratoren gefunden"
 				}
 			}
 		}

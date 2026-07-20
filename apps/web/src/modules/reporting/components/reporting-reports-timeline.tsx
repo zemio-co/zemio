@@ -1,7 +1,9 @@
 "use client";
 
 import { keepPreviousData } from "@tanstack/react-query";
+import { createAppTranslator } from "@zemio/i18n";
 import { differenceInDays, format } from "date-fns";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
@@ -32,9 +34,13 @@ import {
 	ReportingCardTitle,
 } from "./reporting-card";
 
+const tModule = createAppTranslator({
+	namespace: "modules.reporting.timeline",
+});
+
 const timelineChartConfig = {
 	amount: {
-		label: "Summe",
+		label: tModule("chart.amountLabel"),
 		color: "var(--color-violet-600)",
 	},
 } satisfies ChartConfig;
@@ -62,6 +68,9 @@ function ReportingReportsTimeline({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.reporting.timeline");
+	const tCommon = useTranslations("modules.reporting.common");
+
 	const [metric, setMetric] = React.useState<TimelineMetric>("submitted");
 
 	const dates = useReportingStore((state) => state.dates);
@@ -100,7 +109,7 @@ function ReportingReportsTimeline({
 	}
 
 	if (query.error) {
-		return <p>Error</p>;
+		return <p>{tCommon("loadError")}</p>;
 	}
 
 	const chartData = query.data.series.map((point) => ({
@@ -117,7 +126,7 @@ function ReportingReportsTimeline({
 		>
 			<ReportingCardHeader className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<ReportingCardDescription>Verlauf erstattet</ReportingCardDescription>
+					<ReportingCardDescription>{t("description")}</ReportingCardDescription>
 					<ReportingCardTitle>€{query.data.total.toFixed(2)}</ReportingCardTitle>
 				</div>
 				<MetricSelector
@@ -152,7 +161,7 @@ function ReportingReportsTimeline({
 				</ChartContainer>
 			</ReportingCardBody>
 			<ReportingCardFooter>
-				<span>Zuletzt aktualisiert {updateTimer.label}</span>
+				<span>{tCommon("lastUpdated", { time: updateTimer.label })}</span>
 			</ReportingCardFooter>
 		</ReportingCard>
 	);
@@ -161,8 +170,8 @@ function ReportingReportsTimeline({
 type TimelineMetric = "reimbursed" | "submitted";
 
 const metricItems = {
-	reimbursed: "Erstattet",
-	submitted: "Eingereicht",
+	reimbursed: tModule("metrics.reimbursed"),
+	submitted: tModule("metrics.submitted"),
 };
 
 function MetricSelector({ ...props }: React.ComponentProps<typeof Select>) {
