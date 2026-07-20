@@ -2,6 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import z from "zod";
 import { api } from "@/trpc/react";
@@ -26,16 +27,18 @@ const formSchema = z.object({
 });
 
 export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
+	const t = useTranslations("modules.shared.adminSettingsForm");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [data] = api.settings.get.useSuspenseQuery();
 	const updateSettings = api.settings.update.useMutation({
 		onSuccess: () => {
-			toast.success("Einstellungen wurden erfolgreich gespeichert");
+			toast.success(t("saveSuccess"));
 			utils.settings.get.invalidate();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Speichern der Einstellungen", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("saveError"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -71,7 +74,7 @@ export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Kilometerpauschale</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("kilometerRateLabel")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										style: "decimal",
@@ -109,9 +112,7 @@ export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
 										</InputGroup>
 									</NumberField.Group>
 								</NumberField.Root>
-								<FieldDescription>
-									Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet.
-								</FieldDescription>
+								<FieldDescription>{t("kilometerRateDescription")}</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
@@ -122,7 +123,7 @@ export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Reviewer-E-Mail</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("reviewerEmailLabel")}</FieldLabel>
 								<Input
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -133,10 +134,7 @@ export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
 									placeholder="bearbeiter@move-ev.de"
 									value={field.state.value}
 								/>
-								<FieldDescription>
-									Diese E-Mail-Adresse erhält eine Benachrichtigung, wenn ein
-									Spesenantrag eingereicht wird.
-								</FieldDescription>
+								<FieldDescription>{t("reviewerEmailDescription")}</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
@@ -148,7 +146,7 @@ export function AdminSettingsForm({ ...props }: React.ComponentProps<"form">) {
 					form="form-admin-settings"
 					type="submit"
 				>
-					Speichern
+					{tActions("save")}
 				</Button>
 			</FieldGroup>
 		</form>

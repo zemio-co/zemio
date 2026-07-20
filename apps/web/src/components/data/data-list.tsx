@@ -1,6 +1,7 @@
 "use client";
 
 import type { Row, Table } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import {
 	ListActionSlot,
@@ -19,6 +20,7 @@ export function DataListGroupHeader<TData>({
 	row: Row<TData>;
 	countItems?: boolean;
 }) {
+	const t = useTranslations("modules.shared.dataList");
 	const groupedByColumnId = row.groupingColumnId;
 
 	if (!groupedByColumnId) {
@@ -47,7 +49,7 @@ export function DataListGroupHeader<TData>({
 			{option?.icon && (
 				<option.icon className={cn("size-4", option.iconClassName)} />
 			)}
-			{option?.label ?? "Unbekannt"}
+			{option?.label ?? t("unknown")}
 		</ListGroupHeader>
 	);
 }

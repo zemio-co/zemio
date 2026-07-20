@@ -3,6 +3,7 @@
 import type { BankingDetails } from "@zemio/db";
 import { format } from "date-fns";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
 	AlertDialog,
@@ -26,6 +27,7 @@ export function BankingDetailsList({
 	className,
 	...props
 }: React.ComponentProps<"ul"> & { className?: string }) {
+	const t = useTranslations("modules.preferences.bankingDetailsList");
 	const [items] = api.bankingDetails.list.useSuspenseQuery();
 
 	return (
@@ -40,7 +42,7 @@ export function BankingDetailsList({
 					className="min-h-16 w-full border-dashed"
 					variant={"outline"}
 				>
-					<PlusIcon /> <span>Neue Bankverbindung anlegen</span>
+					<PlusIcon /> <span>{t("addNew")}</span>
 				</CreateBankingDetailsForm>
 			</li>
 		</ul>
@@ -54,16 +56,18 @@ export function BankingDetailsListItem({
 }: React.ComponentProps<typeof Card> & {
 	details: Pick<BankingDetails, "id" | "title" | "createdAt">;
 }) {
+	const t = useTranslations("modules.preferences.bankingDetailsList");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 
 	const deleteBankingDetails = api.bankingDetails.delete.useMutation({
 		onSuccess: () => {
-			toast.success("Bankverbindung erfolgreich gelöscht");
+			toast.success(t("deleteSuccess"));
 			utils.bankingDetails.list.invalidate();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Löschen der Bankverbindung", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("deleteError"), {
+				description: error.message ?? t("unexpectedError"),
 			});
 		},
 	});
@@ -77,8 +81,10 @@ export function BankingDetailsListItem({
 				<div>
 					<p className="font-medium text-foreground">{details.title}</p>
 					<p className="mt-1 text-muted-foreground text-xs">
-						Erstellt am {format(details.createdAt, "dd.MM.yyyy")} um{" "}
-						{format(details.createdAt, "HH:mm")}
+						{t("createdAt", {
+							date: format(details.createdAt, "dd.MM.yyyy"),
+							time: format(details.createdAt, "HH:mm"),
+						})}
 					</p>
 				</div>
 				<div className="ml-auto flex flex-nowrap gap-2 transition-opacity md:opacity-0 md:group-hover/details-list-item:opacity-100">
@@ -107,21 +113,20 @@ export function BankingDetailsListItem({
 						/>
 						<AlertDialogContent className="w-full md:max-w-lg!">
 							<AlertDialogHeader>
-								<AlertDialogTitle>Bankverbindung löschen?</AlertDialogTitle>
+								<AlertDialogTitle>{t("deleteDialogTitle")}</AlertDialogTitle>
 								<AlertDialogDescription>
-									Die Bankverbindung "{details.title}" wird dauerhaft gelöscht. Diese
-									Aktion kann nicht rückgängig gemacht werden.
+									{t("deleteDialogDescription", { title: details.title })}
 								</AlertDialogDescription>
 							</AlertDialogHeader>
 							<AlertDialogFooter>
-								<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+								<AlertDialogCancel>{tActions("cancel")}</AlertDialogCancel>
 								<AlertDialogAction
 									disabled={deleteBankingDetails.isPending}
 									onClick={() => deleteBankingDetails.mutate({ id: details.id })}
 									variant={"destructive"}
 								>
 									<TrashIcon />
-									Löschen
+									{tActions("delete")}
 								</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>

@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import z from "zod";
 import { DatePicker } from "@/components/date-picker";
@@ -36,18 +37,20 @@ export function CreateReceiptExpenseForm({
 	reportId: string;
 	onSuccess?: () => void;
 }) {
+	const t = useTranslations("modules.shared.expenseForm");
+	const tActions = useTranslations("modules.settings.actions");
 	const router = useRouter();
 	const utils = api.useUtils();
 	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const createReceipt = api.expense.createReceipt.useMutation({
 		onSuccess: () => {
 			utils.expense.invalidate();
-			toast.success("Beleg-Ausgabe erfolgreich erstellt");
+			toast.success(t("receipt.createSuccess"));
 			onSuccess?.();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Beleg-Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("receipt.createError"), {
+				description: error.message ?? t("unexpectedError"),
 			});
 		},
 	});
@@ -86,16 +89,15 @@ export function CreateReceiptExpenseForm({
 							keys: uploadedKeys,
 						});
 					} catch {
-						toast.error("Upload fehlgeschlagen", {
-							description:
-								"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+						toast.error(t("receipt.uploadFailedTitle"), {
+							description: t("receipt.uploadFailedCleanupDescription"),
 						});
 						return;
 					}
 				}
 
-				toast.error("Upload fehlgeschlagen", {
-					description: "Nicht alle Dateien konnten hochgeladen werden",
+				toast.error(t("receipt.uploadFailedTitle"), {
+					description: t("receipt.uploadFailedDescription"),
 				});
 				return;
 			}
@@ -149,7 +151,7 @@ export function CreateReceiptExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Beschreibung</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("fields.description")}</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -157,12 +159,10 @@ export function CreateReceiptExpenseForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Verpflegung Weihnachtsfeier"
+									placeholder={t("fields.descriptionPlaceholder")}
 									value={field.state.value}
 								/>
-								<FieldDescription>
-									Beschreibung der Ausgabe oder Kommentar
-								</FieldDescription>
+								<FieldDescription>{t("fields.descriptionHint")}</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
@@ -175,14 +175,14 @@ export function CreateReceiptExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Startdatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("fields.startDate")}</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={t("datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -196,14 +196,14 @@ export function CreateReceiptExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Enddatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("fields.endDate")}</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={t("datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -217,7 +217,7 @@ export function CreateReceiptExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Betrag</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("fields.amount")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										style: "decimal",
@@ -267,7 +267,9 @@ export function CreateReceiptExpenseForm({
 
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Anhänge</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{t("receipt.attachmentsLabel")}
+								</FieldLabel>
 								<UploadDropzone
 									accept={{
 										"image/*": [],
@@ -329,7 +331,7 @@ export function CreateReceiptExpenseForm({
 					form="form-create-receipt-expense"
 					type="submit"
 				>
-					Erstellen
+					{tActions("create")}
 				</Button>
 			</FieldGroup>
 		</form>

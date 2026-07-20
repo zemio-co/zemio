@@ -2,6 +2,7 @@
 
 import type { Table } from "@tanstack/react-table";
 import { XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -36,6 +37,7 @@ export function FilterList<TData>({
 	children,
 	...props
 }: FilterListProps<TData>) {
+	const t = useTranslations("modules.shared.filterList");
 	const columnFilters = table.getState().columnFilters;
 	const hasActiveFilters = columnFilters.length >= 1;
 
@@ -56,7 +58,7 @@ export function FilterList<TData>({
 
 			{hasActiveFilters && (
 				<Button
-					aria-label="Alle Filter löschen"
+					aria-label={t("clearAll")}
 					onClick={handleClearAll}
 					size="icon-xs"
 					variant="outline"

@@ -4,6 +4,7 @@ import { Combobox as ComboboxPrimitive } from "@base-ui/react";
 import type { Column, Table } from "@tanstack/react-table";
 import { differenceInDays } from "date-fns";
 import { XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Button } from "../ui/button";
 import { ButtonGroup } from "../ui/button-group";
@@ -129,13 +130,14 @@ function DateRangeChipContent<TData, TValue>({
 	presets,
 	direction,
 }: DateRangeChipContentProps<TData, TValue>) {
+	const t = useTranslations("modules.shared.filterRegistry");
 	const meta = column.columnDef.meta;
 
 	if (!isDateRangeFilter(value)) return null;
 
 	const days = differenceInDays(value.end, value.start);
-	const daysLabel = days === 1 ? "1 Tag" : `${days} Tage`;
-	const directionLabel = direction === "past" ? "vor" : "in";
+	const daysLabel = t("days", { count: days });
+	const directionLabel = direction === "past" ? t("daysAgo") : t("daysIn");
 
 	const handlePresetChange = (preset: DateRangePreset) => {
 		const range = preset.getRange();
@@ -193,7 +195,7 @@ function DateRangeChipContent<TData, TValue>({
 
 			<Button disableAnimation onClick={onRemove} size="icon-xs" variant="outline">
 				<XIcon />
-				<span className="sr-only">Filter entfernen</span>
+				<span className="sr-only">{t("removeFilter")}</span>
 			</Button>
 		</ButtonGroup>
 	);
@@ -207,6 +209,7 @@ function SelectMenuContent<TData, TValue>({
 	column,
 	closeMenu,
 }: FilterMenuContentProps<TData, TValue>) {
+	const t = useTranslations("modules.shared.filterRegistry");
 	const meta = column.columnDef.meta;
 	const options = meta?.options ?? [];
 	const filterOption = useOptionFilter();
@@ -224,8 +227,8 @@ function SelectMenuContent<TData, TValue>({
 		return (
 			<DropdownMenuSubContent className="flex max-h-72 w-64 flex-col overflow-hidden">
 				<ComboboxPrimitive.Root filter={filterOption} inline items={options} open>
-					<DropdownMenuSubSearchInput placeholder="Suchen…" />
-					<DropdownMenuSubSearchEmpty>Keine Treffer</DropdownMenuSubSearchEmpty>
+					<DropdownMenuSubSearchInput placeholder={t("search")} />
+					<DropdownMenuSubSearchEmpty>{t("noResults")}</DropdownMenuSubSearchEmpty>
 					<DropdownMenuSubSearchList>
 						{(option: FilterOption) => (
 							<DropdownMenuSubSearchItem
@@ -264,6 +267,7 @@ function SelectChipContent<TData, TValue>({
 	value,
 	onRemove,
 }: FilterChipProps<TData, TValue>) {
+	const t = useTranslations("modules.shared.filterRegistry");
 	const meta = column.columnDef.meta;
 
 	if (!isSelectFilter(value)) return null;
@@ -306,16 +310,16 @@ function SelectChipContent<TData, TValue>({
 				<DropdownMenuTrigger
 					render={
 						<Button disableAnimation size="xs" variant="outline">
-							{value.operator === "is" ? "ist" : "ist nicht"}
+							{value.operator === "is" ? t("is") : t("isNot")}
 						</Button>
 					}
 				/>
 				<DropdownMenuContent>
 					<DropdownMenuItem onClick={() => handleOperatorChange("is")}>
-						ist
+						{t("is")}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => handleOperatorChange("is-not")}>
-						ist nicht
+						{t("isNot")}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -346,7 +350,7 @@ function SelectChipContent<TData, TValue>({
 
 			<Button onClick={onRemove} size="icon-xs" variant="outline">
 				<XIcon />
-				<span className="sr-only">Filter entfernen</span>
+				<span className="sr-only">{t("removeFilter")}</span>
 			</Button>
 		</ButtonGroup>
 	);
@@ -358,6 +362,7 @@ function SelectChipContent<TData, TValue>({
 function MultiSelectMenuContent<TData, TValue>({
 	column,
 }: FilterMenuContentProps<TData, TValue>) {
+	const t = useTranslations("modules.shared.filterRegistry");
 	const meta = column.columnDef.meta;
 	const options = meta?.options ?? [];
 	const filterOption = useOptionFilter();
@@ -397,8 +402,8 @@ function MultiSelectMenuContent<TData, TValue>({
 		return (
 			<DropdownMenuSubContent className="flex max-h-72 w-64 flex-col overflow-hidden">
 				<ComboboxPrimitive.Root filter={filterOption} inline items={options} open>
-					<DropdownMenuSubSearchInput placeholder="Suchen…" />
-					<DropdownMenuSubSearchEmpty>Keine Treffer</DropdownMenuSubSearchEmpty>
+					<DropdownMenuSubSearchInput placeholder={t("search")} />
+					<DropdownMenuSubSearchEmpty>{t("noResults")}</DropdownMenuSubSearchEmpty>
 					<DropdownMenuSubSearchList>
 						{(option: FilterOption) => (
 							<DropdownMenuSubSearchItem
@@ -436,6 +441,7 @@ function MultiSelectChipContent<TData, TValue>({
 	value,
 	onRemove,
 }: FilterChipProps<TData, TValue>) {
+	const t = useTranslations("modules.shared.filterRegistry");
 	const meta = column.columnDef.meta;
 
 	if (!isMultiSelectFilter(value)) return null;
@@ -484,7 +490,7 @@ function MultiSelectChipContent<TData, TValue>({
 	const displayLabel =
 		selectedOptions.length === 1 && firstSelectedOption
 			? firstSelectedOption.label
-			: `${selectedOptions.length} ausgewählt`;
+			: t("selectedCount", { count: selectedOptions.length });
 
 	// Get icon component for single selection
 	const FirstOptionIcon = firstSelectedOption?.icon;
@@ -506,16 +512,16 @@ function MultiSelectChipContent<TData, TValue>({
 				<DropdownMenuTrigger
 					render={
 						<Button disableAnimation size="xs" variant="outline">
-							{value.operator === "in" ? "enthält" : "enthält nicht"}
+							{value.operator === "in" ? t("contains") : t("containsNot")}
 						</Button>
 					}
 				/>
 				<DropdownMenuContent>
 					<DropdownMenuItem onClick={() => handleOperatorChange("in")}>
-						enthält
+						{t("contains")}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => handleOperatorChange("not-in")}>
-						enthält nicht
+						{t("containsNot")}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -547,7 +553,7 @@ function MultiSelectChipContent<TData, TValue>({
 
 			<Button onClick={onRemove} size="icon-xs" variant="outline">
 				<XIcon />
-				<span className="sr-only">Filter entfernen</span>
+				<span className="sr-only">{t("removeFilter")}</span>
 			</Button>
 		</ButtonGroup>
 	);

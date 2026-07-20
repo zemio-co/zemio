@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -35,19 +36,22 @@ const formSchema = z.object({
 export function CreateBankingDetailsForm({
 	...props
 }: React.ComponentProps<typeof Button>) {
+	const t = useTranslations("modules.preferences.createBankingDetails");
+	const tFields = useTranslations("modules.preferences.bankingDetailsForm");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [open, setOpen] = useState(false);
 
 	const createBankingDetails = api.bankingDetails.create.useMutation({
 		onSuccess: () => {
-			toast.success("Bankverbindung erfolgreich erstellt");
+			toast.success(t("createSuccess"));
 			utils.bankingDetails.list.invalidate();
 			setOpen(false);
 			form.reset();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Bankverbindung", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("createError"), {
+				description: error.message ?? t("unexpectedError"),
 			});
 		},
 	});
@@ -71,10 +75,8 @@ export function CreateBankingDetailsForm({
 			<DialogTrigger render={<Button {...props} />} />
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Neue Bankverbindung</DialogTitle>
-					<DialogDescription>
-						Lege eine neue Banverbindung an um Zahlungen zu erhalten.
-					</DialogDescription>
+					<DialogTitle>{t("dialogTitle")}</DialogTitle>
+					<DialogDescription>{t("dialogDescription")}</DialogDescription>
 				</DialogHeader>
 				<div>
 					<form
@@ -91,7 +93,7 @@ export function CreateBankingDetailsForm({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Titel</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{tFields("titleLabel")}</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -100,10 +102,7 @@ export function CreateBankingDetailsForm({
 												onChange={(e) => field.handleChange(e.target.value)}
 												value={field.state.value}
 											/>
-											<FieldDescription>
-												Nutze diesen Titel um die Bankverbindung später einfach
-												wiederzufinden.
-											</FieldDescription>
+											<FieldDescription>{tFields("titleHint")}</FieldDescription>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
 										</Field>
 									);
@@ -115,7 +114,7 @@ export function CreateBankingDetailsForm({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>IBAN</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{tFields("ibanLabel")}</FieldLabel>
 											<IbanInput
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -135,7 +134,7 @@ export function CreateBankingDetailsForm({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Name</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{tFields("nameLabel")}</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -144,10 +143,7 @@ export function CreateBankingDetailsForm({
 												onChange={(e) => field.handleChange(e.target.value)}
 												value={field.state.value}
 											/>
-											<FieldDescription>
-												Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen
-												übereinstimmt.
-											</FieldDescription>
+											<FieldDescription>{tFields("nameHint")}</FieldDescription>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
 										</Field>
 									);
@@ -158,7 +154,7 @@ export function CreateBankingDetailsForm({
 								form="form-create-banking-details"
 								type="submit"
 							>
-								{createBankingDetails.isPending ? "Erstellen..." : "Erstellen"}
+								{createBankingDetails.isPending ? t("creating") : tActions("create")}
 							</Button>
 						</FieldGroup>
 					</form>

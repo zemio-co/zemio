@@ -991,6 +991,222 @@
 					"adminsEmptyDescription": "In dieser Organisation wurden keine Administratoren gefunden"
 				}
 			}
+		},
+		"auth": {
+			"content": {
+				"title": "Willkommen zurück!",
+				"subtitle": "Melde dich mit deinem Microsoft-Konto an um fortzufahren.",
+				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
+			},
+			"form": {
+				"continueWithMicrosoft": "Mit Microsoft fortfahren",
+				"signInError": "Ein Fehler ist aufgetreten",
+				"signInSuccessTitle": "Anmeldung erfolgreich",
+				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet"
+			}
+		},
+		"legal": {
+			"document": {
+				"version": "Version {version}"
+			},
+			"footer": {
+				"privacyPolicy": "Datenschutzerklärung",
+				"termsAndConditions": "Nutzungsbedingungen"
+			}
+		},
+		"shared": {
+			"sidebarMenu": {
+				"triggerLoadError": "Organisation konnte nicht geladen werden.",
+				"settings": "Einstellungen",
+				"signOut": "Abmelden",
+				"signOutLoading": "Du wirst abgemeldet",
+				"signOutSuccess": "Du wurdest erfolgreich abgemeldet",
+				"signOutError": "Fehler beim Abmelden",
+				"orgsLoadError": "Organisationen konnten nicht geladen werden.",
+				"yourOrganizations": "Deine Organisationen",
+				"headerLoadError": "Aktive Organisation konnte nicht geladen werden."
+			},
+			"command": {
+				"searchPlaceholder": "Suchen..."
+			},
+			"sidebar": {
+				"nav": {
+					"dashboard": "Dashboard",
+					"myReports": "Meine Anträge",
+					"settings": "Einstellungen"
+				},
+				"admin": {
+					"label": "Administration",
+					"reporting": "Reporting",
+					"reports": "Anträge"
+				}
+			},
+			"datePicker": {
+				"openCalendar": "Kalender öffnen"
+			},
+			"adminSettingsSidebar": {
+				"nav": {
+					"general": "Allgemeines",
+					"users": "Benutzer",
+					"allowances": "Zulagen",
+					"costUnits": "Kostenstellen"
+				},
+				"settingsLabel": "Einstellungen"
+			},
+			"themeToggle": {
+				"tooltip": "Theme wechseln"
+			},
+			"preferencesForm": {
+				"notificationsLabel": "Benachrichtigungen",
+				"notificationsDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
+				"allLabel": "Alle Benachrichtigungen",
+				"allDescription": "Du erhälst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+				"statusLabel": "Statusänderungen",
+				"statusDescription": "Du erhälst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+				"noneLabel": "Keine Benachrichtigungen",
+				"noneDescription": "Du erhältst keine Benachrichtigungen.",
+				"saveSuccess": "Einstellungen wurden erfolgreich gespeichert",
+				"saveError": "Fehler beim Speichern der Einstellungen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"adminSettingsForm": {
+				"kilometerRateLabel": "Kilometerpauschale",
+				"kilometerRateDescription": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet.",
+				"reviewerEmailLabel": "Reviewer-E-Mail",
+				"reviewerEmailDescription": "Diese E-Mail-Adresse erhält eine Benachrichtigung, wenn ein Spesenantrag eingereicht wird.",
+				"saveSuccess": "Einstellungen wurden erfolgreich gespeichert",
+				"saveError": "Fehler beim Speichern der Einstellungen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"dataDisplay": {
+				"layout": "Layout",
+				"layoutCompact": "Kompakt",
+				"layoutDefault": "Standard",
+				"layoutLoose": "Locker",
+				"grouping": "Gruppierung",
+				"sorting": "Sortierung",
+				"columnVisibility": "Spaltensichtbarkeit",
+				"noGrouping": "Keine Gruppierung",
+				"noSorting": "Keine Sortierung"
+			},
+			"filterList": {
+				"clearAll": "Alle Filter löschen"
+			},
+			"filterMenu": {
+				"ariaLabel": "Filteroptionen"
+			},
+			"filterRegistry": {
+				"search": "Suchen…",
+				"noResults": "Keine Treffer",
+				"is": "ist",
+				"isNot": "ist nicht",
+				"contains": "enthält",
+				"containsNot": "enthält nicht",
+				"removeFilter": "Filter entfernen",
+				"selectedCount": "{count} ausgewählt",
+				"daysAgo": "vor",
+				"daysIn": "in",
+				"days": "{count, plural, one {1 Tag} other {# Tage}}"
+			},
+			"dataList": {
+				"unknown": "Unbekannt"
+			},
+			"expenseForm": {
+				"fields": {
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Verpflegung Weihnachtsfeier",
+					"descriptionHint": "Beschreibung der Ausgabe oder Kommentar",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"amount": "Betrag"
+				},
+				"datePlaceholder": "01.01.2026",
+				"createSuccess": "Ausgabe erfolgreich erstellt",
+				"createError": "Fehler beim Erstellen der Ausgabe",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"travel": {
+					"fromLabel": "Startpunkt",
+					"fromPlaceholder": "Münster",
+					"toLabel": "Endpunkt",
+					"toPlaceholder": "Berlin",
+					"distanceLabel": "Strecke",
+					"distanceHint": "Abgelegte Strecke in km",
+					"amountHint": "Automatisch berechnet: {rate} € pro Kilometer"
+				},
+				"food": {
+					"durationLabel": "Dauer",
+					"durationUnit": "Tage",
+					"breakfastLabel": "Frühstücksabzug",
+					"breakfastHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"lunchLabel": "Mittagessenabzug",
+					"lunchHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"dinnerLabel": "Abendessenabzug",
+					"dinnerHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"amountHint": "Automatisch berechnet: {amount} € pro Tag - Abzüge"
+				},
+				"receipt": {
+					"createSuccess": "Beleg-Ausgabe erfolgreich erstellt",
+					"createError": "Fehler beim Erstellen der Beleg-Ausgabe",
+					"attachmentsLabel": "Anhänge",
+					"uploadFailedTitle": "Upload fehlgeschlagen",
+					"uploadFailedCleanupDescription": "Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					"uploadFailedDescription": "Nicht alle Dateien konnten hochgeladen werden"
+				}
+			}
+		},
+		"preferences": {
+			"page": {
+				"title": "Einstellungen",
+				"description": "Verwalte deine persönlichen Einstellungen",
+				"bankingDetailsTitle": "Bankverbindungen",
+				"bankingDetailsDescription": "Um Zahlungen an dein Konto zu erhalten, musst du mindestens eine Bankverbindung anlegen."
+			},
+			"bankingDetailsList": {
+				"addNew": "Neue Bankverbindung anlegen",
+				"createdAt": "Erstellt am {date} um {time}",
+				"deleteSuccess": "Bankverbindung erfolgreich gelöscht",
+				"deleteError": "Fehler beim Löschen der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"deleteDialogTitle": "Bankverbindung löschen?",
+				"deleteDialogDescription": "Die Bankverbindung \"{title}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+			},
+			"bankingDetailsForm": {
+				"titleLabel": "Titel",
+				"titleHint": "Nutze diesen Titel um die Bankverbindung später einfach wiederzufinden.",
+				"ibanLabel": "IBAN",
+				"nameLabel": "Name",
+				"nameHint": "Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen übereinstimmt."
+			},
+			"editBankingDetails": {
+				"dialogTitle": "Bankverbindung bearbeiten",
+				"dialogDescription": "Bearbeite deine Bankverbindung um Zahlungen zu erhalten.",
+				"loadError": "Fehler beim Laden der Bankverbindung",
+				"updateSuccess": "Bankverbindung erfolgreich aktualisiert",
+				"updateError": "Fehler beim Aktualisieren der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"saving": "Speichern..."
+			},
+			"createBankingDetails": {
+				"dialogTitle": "Neue Bankverbindung",
+				"dialogDescription": "Lege eine neue Banverbindung an um Zahlungen zu erhalten.",
+				"createSuccess": "Bankverbindung erfolgreich erstellt",
+				"createError": "Fehler beim Erstellen der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"creating": "Erstellen..."
+			}
+		},
+		"adminReports": {
+			"page": {
+				"title": "Admin Dashboard",
+				"description": "Verwalte deine Spesenanträge"
+			}
+		},
+		"acceptInvitation": {
+			"title": "Einladung annehmen",
+			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
+			"acceptButton": "Einladung annehmen",
+			"acceptError": "Einladung konnte nicht angenommen werden",
+			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
 		}
 	}
 }

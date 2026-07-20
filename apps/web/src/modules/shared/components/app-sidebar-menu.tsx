@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -52,6 +53,7 @@ function SidebarMenuTrigger({
 }: React.ComponentProps<typeof DropdownMenuTrigger> & {
 	activeOrgQuery: ActiveOrgQuery;
 }) {
+	const t = useTranslations("modules.shared.sidebarMenu");
 	const { data, error, isPending } = activeOrgQuery;
 
 	if (isPending) {
@@ -60,9 +62,7 @@ function SidebarMenuTrigger({
 
 	if (!data || error) {
 		return (
-			<span className="text-destructive text-xs">
-				Unable to load organization.
-			</span>
+			<span className="text-destructive text-xs">{t("triggerLoadError")}</span>
 		);
 	}
 
@@ -103,6 +103,7 @@ function SidebarMenuContent({
 }: React.ComponentProps<typeof DropdownMenuContent> & {
 	activeOrgQuery: ActiveOrgQuery;
 }) {
+	const t = useTranslations("modules.shared.sidebarMenu");
 	const [pending, setPending] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -110,9 +111,9 @@ function SidebarMenuContent({
 		setPending(true);
 		const signOutPromise = authClient.signOut();
 		toast.promise(signOutPromise, {
-			loading: "Du wirst abgemeldet",
-			success: "Du wurdest erfolgreich abgemeldet",
-			error: "Fehler beim Abmelden",
+			loading: t("signOutLoading"),
+			success: t("signOutSuccess"),
+			error: t("signOutError"),
 		});
 		try {
 			await signOutPromise;
@@ -136,7 +137,7 @@ function SidebarMenuContent({
 					render={
 						<Link href={ROUTES.SETTINGS_USER_GENERAL()}>
 							<SettingsIcon className="size-4 shrink-0 text-slate-500!" />
-							<span className="truncate">Einstellungen</span>
+							<span className="truncate">{t("settings")}</span>
 						</Link>
 					}
 				/>
@@ -151,7 +152,7 @@ function SidebarMenuContent({
 					onClick={handleSignOut}
 				>
 					<LogOutIcon className="size-4 shrink-0 text-slate-500!" />
-					<span className="truncate">Abmelden</span>
+					<span className="truncate">{t("signOut")}</span>
 				</DropdownMenuItem>
 			</DropdownMenuGroup>
 		</DropdownMenuContent>
@@ -197,6 +198,7 @@ function SidebarMenuOrgsButton({
 	className,
 	...props
 }: React.ComponentProps<typeof DropdownMenuItem>) {
+	const t = useTranslations("modules.shared.sidebarMenu");
 	const organizations = authClient.useListOrganizations();
 
 	const handleOrgChange = async (organizationId: string) => {
@@ -233,9 +235,7 @@ function SidebarMenuOrgsButton({
 				{...props}
 			>
 				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
-				<span className="text-destructive text-xs">
-					Organisationen konnten nicht geladen werden.
-				</span>
+				<span className="text-destructive text-xs">{t("orgsLoadError")}</span>
 			</DropdownMenuItem>
 		);
 	}
@@ -249,7 +249,7 @@ function SidebarMenuOrgsButton({
 				)}
 			>
 				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
-				<span className="truncate">Deine Organisationen</span>
+				<span className="truncate">{t("yourOrganizations")}</span>
 			</DropdownMenuSubTrigger>
 			<DropdownMenuPortal>
 				<DropdownMenuSubContent className={"w-72"}>
@@ -281,6 +281,7 @@ function SidebarMenuContentHeader({
 }: React.ComponentProps<"div"> & {
 	activeOrgQuery: ActiveOrgQuery;
 }) {
+	const t = useTranslations("modules.shared.sidebarMenu");
 	const { data, error, isPending } = activeOrgQuery;
 
 	if (isPending) {
@@ -310,7 +311,7 @@ function SidebarMenuContentHeader({
 				{...props}
 			>
 				<span className="font-medium text-destructive text-xs">
-					Unable to load active organization.
+					{t("headerLoadError")}
 				</span>
 			</div>
 		);
