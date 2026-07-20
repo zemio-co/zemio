@@ -52,7 +52,432 @@
 		},
 		"review": {
 			"header": {
-				"payAction": "Auszahlen"
+				"payAction": "Auszahlen",
+				"loadErrorTitle": "Report konnte nicht geladen werden",
+				"createdAgo": "vor {distance} Uhr",
+				"createdAt": "Erstellt am {date} Uhr",
+				"editAction": "Bearbeiten",
+				"changeStatusLabel": "Status ändern",
+				"acceptAction": "Akzeptieren",
+				"rejectAction": "Ablehnen",
+				"needsRevisionAction": "Benötigt Revision",
+				"pendingApprovalAction": "In Bearbeitung",
+				"deleteReportAction": "Antrag löschen",
+				"exportAction": "Exportieren",
+				"exportPdfAction": "PDF exportieren",
+				"exportCsvAction": "CSV exportieren",
+				"statusUpdating": "Status wird aktualisiert",
+				"statusUpdated": "Status erfolgreich aktualisiert",
+				"statusUpdateError": "Fehler beim Aktualisieren des Reports",
+				"pdfGeneratingTitle": "PDF wird erstellt",
+				"pdfGeneratingDescription": "Dies kann einige Sekunden dauern",
+				"pdfGeneratedTitle": "PDF Zusammenfassung erstellt",
+				"pdfGeneratedDescription": "Datei wird heruntergeladen",
+				"pdfGenerationErrorTitle": "Fehler beim Erstellen der PDF Zusammenfassung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"payDialogTitle": "Antrag auszahlen",
+				"payDialogDescription": "Zahle den eingereichten Betrag aus.",
+				"giroCodeLabel": "Giro Code",
+				"giroCodeHint": "Scanne diesen QR-Code mit deiner Banking-App, um eine vorausgefüllte Überweisung zu erhalten.",
+				"markAcceptedAction": "Als akzeptiert markieren",
+				"markPaidAction": "Als ausgezahlt markieren",
+				"markPaidWarning": "Wenn ein Antrag als ausgezahlt markiert wurde, kann dies nicht rückgängig gemacht werden.",
+				"epcCodeErrorTitle": "QR-Code konnte nicht erstellt werden",
+				"epcCodeErrorDescription": "Das bedeutet meist, dass die angegebene IBAN ungültig ist oder die Validierung fehlgeschlagen ist."
+			},
+			"expenses": {
+				"title": "Kostenaufstellung",
+				"exportAction": "Exportieren",
+				"loadErrorTitle": "Fehler beim Laden der Ausgaben",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Ausgaben gefunden.",
+				"emptyDescription": "Für diesen Spesenbericht wurden noch keine Ausgaben eingetragen",
+				"table": {
+					"title": "Titel",
+					"date": "Datum",
+					"amount": "Betrag",
+					"actions": "Aktionen",
+					"total": "Summe"
+				},
+				"csv": {
+					"title": "Titel",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"amount": "Betrag",
+					"description": "Beschreibung",
+					"meta": "Metadaten"
+				}
+			},
+			"attachments": {
+				"title": "Anhänge",
+				"downloadAllAction": "Alle herunterladen",
+				"loadErrorTitle": "Fehler beim Laden der Anhänge",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Uploads gefunden",
+				"emptyDescription": "Der Nutzer hat keine Dokumente hochgeladen.",
+				"downloadAllLoading": "Downloads werden vorbereitet…",
+				"downloadAllSuccess": "Downloads gestartet",
+				"downloadAllError": "Downloads fehlgeschlagen",
+				"downloadAction": "Herunterladen",
+				"downloadLoading": "Download wird vorbereitet…",
+				"downloadSuccess": "Download gestartet",
+				"downloadError": "Download fehlgeschlagen"
+			},
+			"details": {
+				"loadErrorTitle": "Details konnten nicht geladen werden",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"totalCostLabel": "Gesamtkosten",
+				"ibanLabel": "IBAN",
+				"accountNameLabel": "Kontoname",
+				"copiedToClipboard": "{title} zum Clipboard kopiert"
+			},
+			"paidNotice": {
+				"title": "Antrag wurde ausgezahlt",
+				"description": "Dieser Antrag wurde{date} ausgezahlt und kann nicht mehr bearbeitet werden. Du kannst ihn noch einsehen und exportieren."
+			},
+			"reasoning": {
+				"title": "Begründung",
+				"loadErrorTitle": "Fehler beim Laden des Reports",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Begründung",
+				"emptyDescription": "Der Nutzer hat keine Begründung für diesen Antrag angegeben.",
+				"byLabel": "Von"
+			}
+		},
+		"reports": {
+			"columns": {
+				"actions": {
+					"label": "Aktionen",
+					"placeholder": "Aktion"
+				},
+				"status": {
+					"label": "Status",
+					"placeholder": "Status"
+				},
+				"reportId": {
+					"label": "Report ID",
+					"placeholder": "Report ID"
+				},
+				"title": {
+					"label": "Titel",
+					"placeholder": "Titel"
+				},
+				"owner": {
+					"label": "Ersteller",
+					"placeholder": "Ersteller"
+				},
+				"lastUpdatedAt": {
+					"label": "Zuletzt aktualisiert",
+					"placeholder": "Zuletzt aktualisiert"
+				},
+				"costUnit": {
+					"label": "Kostenstelle",
+					"placeholder": "Kostenstelle"
+				},
+				"createdAt": {
+					"label": "Erstellt am",
+					"placeholder": "Erstellt am",
+					"tooltip": "Erstellt am {date} um {time} Uhr"
+				}
+			},
+			"empty": {
+				"title": "Noch keine Anträge erstellt",
+				"description": "Du hast noch keinen Antrag erstellt. Erstelle einen neuen Antrag, um loszulegen.",
+				"createButton": "Neuer Antrag"
+			},
+			"noResults": {
+				"title": "Keine Anträge gefunden",
+				"description": "Es wurden keine Anträge mit den aktuellen Filtern gefunden. Versuche es mit anderen Filtern erneut.",
+				"clearFilters": "Filter zurücksetzen"
+			},
+			"quickActions": {
+				"all": "Alle",
+				"draft": "Entwurf",
+				"completed": "Abgeschlossen"
+			},
+			"pagination": {
+				"indicator": "Seite {page} von {pageCount}"
+			}
+		},
+		"report": {
+			"common": {
+				"fields": {
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Verpflegung Weihnachtsfeier",
+					"descriptionHelper": "Beschreibung der Ausgabe oder Kommentar",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"datePlaceholder": "01.01.2026",
+					"amount": "Betrag",
+					"attachments": "Anhänge"
+				},
+				"actions": {
+					"cancel": "Abbrechen",
+					"delete": "Löschen",
+					"save": "Speichern",
+					"create": "Erstellen"
+				},
+				"toasts": {
+					"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+					"uploadFailedTitle": "Upload fehlgeschlagen",
+					"uploadCleanupFailedDescription": "Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					"uploadPartialFailureDescription": "Nicht alle Dateien konnten hochgeladen werden",
+					"downloadPreparing": "Download wird vorbereitet…",
+					"downloadStarted": "Download gestartet"
+				}
+			},
+			"createExpense": {
+				"menu": {
+					"receipts": "Belege & Rechnungen",
+					"travelAllowance": "Reisepauschale",
+					"mealAllowance": "Verpflegungspauschale"
+				},
+				"receiptSheet": {
+					"title": "Belege und Rechnungen hinzufügen",
+					"submit": "Hinzufügen",
+					"toasts": {
+						"createSuccess": "Ausgabe erfolgreich erstellt",
+						"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+					},
+					"descriptionHelper": "Optional. Füge dieser Ausgabe eine Kurze Beschreibung hinzu."
+				}
+			},
+			"createReport": {
+				"sheetTitle": "Neuer Antrag",
+				"submit": "Antrag erstellen",
+				"errors": {
+					"costUnitsTitle": "Fehler beim Laden der Kostenstellen.",
+					"costUnitsDescription": "Die Kostenstellen konnten nicht geladen werden. Code: {code}",
+					"bankingDetailsTitle": "Fehler beim Laden der Bankverbindungen.",
+					"bankingDetailsDescription": "Die Bankverbindungen konnten nicht geladen werden. Code: {code}"
+				},
+				"noBankingDetails": {
+					"title": "Keine Bankverbindung vorhanden",
+					"textPrefix": "Um einen Antrag zu erstellen, musst du zuerst eine",
+					"linkText": "Bankverbindung hinterlegen"
+				},
+				"fields": {
+					"title": "Titel",
+					"titlePlaceholder": "Verpflegung Weihnachtsfeier",
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Beschreibung des Reports",
+					"descriptionHelper": "Optional. Wird deinem Antrag als erste Notiz hinzugefügt.",
+					"bankingDetails": "Bankverbindung",
+					"bankingDetailsPlaceholder": "Bankverbindung auswählen",
+					"bankingDetailsHelperPrefix": "Um Zahlungen zu erhalten, muss eine Bankverbindung hinterlegt haben. Du kannst deine Bankverbindung in den",
+					"bankingDetailsHelperLink": "Einstellungen",
+					"bankingDetailsHelperSuffix": "verwalten.",
+					"costUnit": "Kostenstelle",
+					"costUnitPlaceholder": "Kostenstelle auswählen",
+					"costUnitExamplesTitle": "Zu der ausgewählten Kostenstelle gehören die folgenden Anliegen:"
+				},
+				"toasts": {
+					"createSuccess": "Report erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen des Reports"
+				}
+			},
+			"foodExpenseForm": {
+				"days": "Dauer",
+				"daysUnit": "Tage",
+				"breakfastDeduction": "Frühstücksabzug",
+				"breakfastDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"lunchDeduction": "Mittagessenabzug",
+				"lunchDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"dinnerDeduction": "Abendessenabzug",
+				"dinnerDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"amountHelper": "Automatisch berechnet: {amount} € pro Tag - Abzüge",
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+				}
+			},
+			"receiptExpenseForm": {
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Beleg-Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Beleg-Ausgabe"
+				}
+			},
+			"travelExpenseForm": {
+				"from": "Startpunkt",
+				"fromPlaceholder": "Münster",
+				"to": "Endpunkt",
+				"toPlaceholder": "Berlin",
+				"distance": "Strecke",
+				"distanceUnit": "km",
+				"distanceHelper": "Abgelegte Strecke in km",
+				"amountHelper": "Automatisch berechnet: {rate} € pro Kilometer",
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+				}
+			},
+			"activity": {
+				"header": "Aktivität",
+				"commentPlaceholder": "Schreibe einen Kommentar",
+				"commentErrorTitle": "Fehler beim Senden der Nachricht",
+				"commentErrorDescription": "Ein unbekannter Fehler ist aufgetreten",
+				"loadError": "Fehler: {message}",
+				"fieldLabels": {
+					"title": "\"Titel\"",
+					"description": "\"Beschreibung\""
+				},
+				"events": {
+					"created": "hat diesen Bericht erstellt",
+					"updated": "hat <bold>{labels}</bold> bearbeitet",
+					"deleted": "hat diesen Bericht gelöscht",
+					"submittedPrefix": "hat den Antrag",
+					"resubmittedWord": "erneut",
+					"submittedSuffix": "eingereicht",
+					"revisionRequestedPrefix": "Revision angefordert von",
+					"acceptedPrefix": "Antrag wurde von",
+					"acceptedSuffix": "als akzeptiert markiert",
+					"paidPrefix": "Antrag wurde von",
+					"paidSuffix": "als ausgezahlt markiert",
+					"rejectedPrefix": "Antrag wurde von",
+					"rejectedSuffix": "abgelehnt",
+					"commented": "kommentierte",
+					"expenseAddedPrefix": "hat eine Ausgabe vom Typ",
+					"expenseAddedSuffix": "hinzugefügt",
+					"expenseUpdated": "hat eine Ausgabe aktualisiert",
+					"expenseDeleted": "hat eine Ausgabe entfernt",
+					"attachmentAdded": "hat eine Datei hinzugefügt:",
+					"attachmentDeleted": "hat eine Datei entfernt:"
+				}
+			},
+			"attachments": {
+				"header": "Anhänge",
+				"loadError": "Fehler",
+				"emptyTitle": "Keine Anhänge gefunden",
+				"emptyDescription": "Erstelle eine neue Ausgabe und hinterlege einen Anhang damit dieser hier erscheint.",
+				"downloadAriaLabel": "Anhang herunterladen",
+				"toasts": {
+					"deleteSuccess": "Anhang erfolgreich gelöscht.",
+					"deleteErrorTitle": "Fehler beim Löschen des Anhangs",
+					"deleteErrorDescription": "Ein unerwarteter Fehler ist aufgetreten.",
+					"downloadErrorTitle": "Fehler beim Herunterladen des Anhangs",
+					"downloadErrorDescription": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"details": {
+				"title": "Details",
+				"loadError": "Antragsdetails konnten nicht geladen werden",
+				"sum": "Summe",
+				"amountValue": "{amount} EUR",
+				"iban": "IBAN",
+				"accountName": "Kontoname",
+				"submitter": "Antragssteller",
+				"costUnit": "Kostenstelle",
+				"costUnitValue": "{tag} · {title}",
+				"created": "Erstellt",
+				"lastUpdated": "Zuletzt bearbeitet"
+			},
+			"expenses": {
+				"header": "Ausgaben",
+				"add": "Hinzufügen",
+				"table": {
+					"type": "Typ",
+					"description": "Beschreibung",
+					"date": "Datum",
+					"amount": "Betrag",
+					"sum": "Summe"
+				},
+				"emptyTitle": "Du hast noch keine Ausgaben hinzugefügt.",
+				"emptyDescription": "Füge eine neue Ausgabe hinzu um diese erstattten zu lassen.",
+				"menu": {
+					"edit": "Bearbeiten",
+					"delete": "Löschen"
+				},
+				"deleteDialog": {
+					"title": "Möchtest du diese Ausgabe wirklich löschen?",
+					"description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+					"confirm": "Löschen"
+				},
+				"toasts": {
+					"deleteErrorTitle": "Fehler beim Löschen der Ausgabe"
+				}
+			},
+			"header": {
+				"breadcrumb": "Anträge",
+				"submittedBy": "Antrag eingereicht von <bold>{ownerName}</bold>",
+				"createdAgo": "{timeAgo} erstellt",
+				"actions": {
+					"copy": "Kopieren",
+					"edit": "Bearbeiten",
+					"submit": "Einreichen"
+				},
+				"copyAction": {
+					"id": "ID",
+					"iban": "IBAN",
+					"accountName": "Kontoname",
+					"sum": "Summe",
+					"title": "Titel",
+					"copyLabel": "{title} kopieren",
+					"copiedToast": "{title} wurde zum Clipboard kopiert"
+				},
+				"editMenu": {
+					"editTitle": "Titel bearbeiten",
+					"delete": "Löschen"
+				},
+				"editTitleDialog": {
+					"title": "Titel bearbeiten",
+					"description": "Bearbeite den öffentlichen Titel deines Antrags.",
+					"fieldLabel": "Beschreibung",
+					"fieldPlaceholder": "Einkauf für die Weihnachtsfeier",
+					"fieldHelper": "Der Titel ist für dich und Administratoren sichtbar.",
+					"cancel": "Abbrechen",
+					"save": "Speichern"
+				},
+				"deleteDialog": {
+					"title": "Willst du deinen Antrag wirklich löschen?",
+					"description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+					"cancel": "Abbrechen",
+					"confirm": "Löschen"
+				},
+				"submitDialog": {
+					"title": "Willst du deinen Antrag wirklich einreichen?",
+					"description": "Du kannst den Antrag nicht mehr bearbeiten, nachdem du ihn eingereicht hast.",
+					"cancel": "Abbrechen",
+					"confirm": "Einreichen"
+				},
+				"toasts": {
+					"titleUpdated": "Titel wurde erfolgreich aktualisiert.",
+					"deleteSuccess": "Antrag wurde erfolgreich gelöscht",
+					"deleteErrorTitle": "Antrag konnte nicht gelöscht werden",
+					"deleteErrorDescription": "Ein unbekannter Fehler ist aufgetreten",
+					"submitSuccess": "Antrag wurde erfolgreich eingereicht",
+					"submitErrorTitle": "Antrag konnte nicht eingereicht werden",
+					"submitErrorDescription": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"paidNotice": {
+				"title": "Antrag wurde ausgezahlt",
+				"description": "Dein Antrag wurde {hasDate, select, yes {am {date} } other {}}akzeptiert und ausgezahlt. Wende dich bei Fragen bitte an die zuständige Person aus deiner Organisation."
+			},
+			"updateExpense": {
+				"sheetTitle": "Ausgabe",
+				"loadError": "Fehler beim Laden der Ausgabe.",
+				"saving": "Wird gespeichert…",
+				"save": "Speichern",
+				"toasts": {
+					"updateSuccess": "Ausgabe erfolgreich aktualisiert",
+					"updateErrorTitle": "Fehler beim Aktualisieren der Ausgabe"
+				},
+				"attachments": {
+					"header": "Anhänge",
+					"loadError": "Fehler beim Laden der Anhänge",
+					"empty": "Keine Anhänge vorhanden",
+					"addHeader": "Anhang hinzufügen",
+					"toasts": {
+						"addSuccess": "Anhänge erfolgreich hinzugefügt",
+						"addErrorTitle": "Fehler beim Hinzufügen der Anhänge",
+						"deleteSuccess": "Anhang erfolgreich gelöscht",
+						"deleteErrorTitle": "Fehler beim Löschen des Anhangs",
+						"downloadFailed": "Download fehlgeschlagen"
+					}
+				}
 			}
 		}
 	}

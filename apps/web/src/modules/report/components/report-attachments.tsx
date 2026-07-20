@@ -2,6 +2,7 @@
 
 import type { Attachment } from "@zemio/db";
 import { DownloadIcon, FileIcon, TrashIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,6 +16,7 @@ function ReportAttachments({
 }: React.ComponentProps<"section"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.attachments");
 	const attachmentsQuery = api.attachment.listForReport.useQuery({
 		id: reportId,
 	});
@@ -24,7 +26,7 @@ function ReportAttachments({
 	}
 
 	if (attachmentsQuery.error) {
-		return <p>Fehler</p>;
+		return <p>{t("loadError")}</p>;
 	}
 
 	const { data: attachments } = attachmentsQuery;
@@ -53,6 +55,8 @@ function AttachmentsHeader({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.report.attachments");
+
 	return (
 		<div
 			className={cn(
@@ -62,7 +66,7 @@ function AttachmentsHeader({
 			data-slot="report-expenses-header"
 			{...props}
 		>
-			<h3 className="font-semibold text-lg text-slate-800">Anhänge</h3>
+			<h3 className="font-semibold text-lg text-slate-800">{t("header")}</h3>
 		</div>
 	);
 }
@@ -71,6 +75,8 @@ function AttachmentsEmpty({
 	className,
 	...props
 }: React.ComponentProps<"section">) {
+	const t = useTranslations("modules.report.attachments");
+
 	return (
 		<section
 			className={cn("", className)}
@@ -84,12 +90,9 @@ function AttachmentsEmpty({
 						<FileIcon className="size-5 text-slate-500" />
 					</div>
 					<p className="mt-6 font-medium text-slate-800 text-sm">
-						Keine Anhänge gefunden
+						{t("emptyTitle")}
 					</p>
-					<p className="mt-1 text-slate-500 text-sm">
-						Erstelle eine neue Ausgabe und hinterlege einen Anhang damit dieser hier
-						erscheint.
-					</p>
+					<p className="mt-1 text-slate-500 text-sm">{t("emptyDescription")}</p>
 				</div>
 			</div>
 		</section>
@@ -147,16 +150,18 @@ function AttachmentRow({
 	attachment: Attachment;
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.attachments");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const downloadMutation = api.attachment.getDownloadUrl.useMutation();
 	const deleteMutation = api.attachment.delete.useMutation({
 		onSuccess: () => {
-			toast.success("Anhang erfolgreich gelöscht.");
+			toast.success(t("toasts.deleteSuccess"));
 			utils.attachment.listForReport.invalidate({ id: reportId });
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Löschen des Anhangs", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten.",
+			toast.error(t("toasts.deleteErrorTitle"), {
+				description: error.message ?? t("toasts.deleteErrorDescription"),
 			});
 		},
 	});
@@ -173,12 +178,12 @@ function AttachmentRow({
 				window.location.href = result.url;
 			}),
 			{
-				loading: "Download wird vorbereitet…",
-				success: "Download gestartet",
+				loading: tCommon("toasts.downloadPreparing"),
+				success: tCommon("toasts.downloadStarted"),
 				error: (error) => {
 					return {
-						message: "Fehler beim Herunterladen des Anhangs",
-						description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+						message: t("toasts.downloadErrorTitle"),
+						description: error.message ?? t("toasts.downloadErrorDescription"),
 					};
 				},
 			},
@@ -206,7 +211,7 @@ function AttachmentRow({
 			</div>
 			<div className="ml-8 flex items-center justify-center gap-2">
 				<Button
-					aria-label="Anhang herunterladen"
+					aria-label={t("downloadAriaLabel")}
 					className={
 						"opacity-0 transition-opacity group-hover/row:opacity-100 group-data-[pending=true]/row:opacity-100"
 					}

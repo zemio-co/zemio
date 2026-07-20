@@ -4,6 +4,7 @@ import { NumberField } from "@base-ui/react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { formatDate } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/date-picker";
@@ -32,19 +33,21 @@ export function CreateTravelExpenseForm({
 }: React.ComponentProps<"form"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.travelExpenseForm");
+	const tCommon = useTranslations("modules.report.common");
 	const [settings] = api.settings.get.useSuspenseQuery();
 
 	const utils = api.useUtils();
 	const router = useRouter();
 	const createTravel = api.expense.createTravel.useMutation({
 		onSuccess: () => {
-			toast.success("Ausgabe erfolgreich erstellt");
+			toast.success(t("toasts.createSuccess"));
 			utils.expense.invalidate();
 			router.push(ROUTES.REPORT_DETAIL(reportId));
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.createErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -104,7 +107,9 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Beschreibung</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.description")}
+								</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -112,11 +117,11 @@ export function CreateTravelExpenseForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Verpflegung Weihnachtsfeier"
+									placeholder={tCommon("fields.descriptionPlaceholder")}
 									value={field.state.value}
 								/>
 								<FieldDescription>
-									Beschreibung der Ausgabe oder Kommentar
+									{tCommon("fields.descriptionHelper")}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -130,14 +135,16 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Startdatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.startDate")}
+								</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={tCommon("fields.datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -151,14 +158,16 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Enddatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.endDate")}
+								</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={tCommon("fields.datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -173,7 +182,7 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Startpunkt</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("from")}</FieldLabel>
 								<Input
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -181,7 +190,7 @@ export function CreateTravelExpenseForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Münster"
+									placeholder={t("fromPlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -195,7 +204,7 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Endpunkt</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("to")}</FieldLabel>
 								<Input
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -203,7 +212,7 @@ export function CreateTravelExpenseForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Berlin"
+									placeholder={t("toPlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -217,7 +226,7 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Strecke</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("distance")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										style: "decimal",
@@ -243,11 +252,13 @@ export function CreateTravelExpenseForm({
 													/>
 												}
 											/>
-											<InputGroupAddon align={"inline-end"}>km</InputGroupAddon>
+											<InputGroupAddon align={"inline-end"}>
+												{t("distanceUnit")}
+											</InputGroupAddon>
 										</InputGroup>
 									</NumberField.Group>
 								</NumberField.Root>
-								<FieldDescription>Abgelegte Strecke in km</FieldDescription>
+								<FieldDescription>{t("distanceHelper")}</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
@@ -259,7 +270,7 @@ export function CreateTravelExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-2" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Betrag</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{tCommon("fields.amount")}</FieldLabel>
 								<NumberField.Root
 									disabled
 									format={{
@@ -297,8 +308,9 @@ export function CreateTravelExpenseForm({
 									</NumberField.Group>
 								</NumberField.Root>
 								<FieldDescription>
-									Automatisch berechnet: {settings.kilometerRate.toFixed(2)} € pro
-									Kilometer
+									{t("amountHelper", {
+										rate: settings.kilometerRate.toFixed(2),
+									})}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -313,7 +325,7 @@ export function CreateTravelExpenseForm({
 					form="form-create-travel-expense"
 					type="submit"
 				>
-					Erstellen
+					{t("submit")}
 				</Button>
 			</FieldGroup>
 		</form>

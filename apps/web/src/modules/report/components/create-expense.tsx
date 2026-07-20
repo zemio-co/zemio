@@ -4,6 +4,7 @@ import { Dialog, NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { formatDate, isValid, parse } from "date-fns";
 import { CarIcon, ReceiptIcon, UtensilsIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useRef } from "react";
 import { toast } from "sonner";
@@ -48,6 +49,7 @@ function CreateExpense({
 }: React.ComponentProps<typeof Button> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.createExpense.menu");
 	const receiptHandleRef = useRef<ReturnType<typeof Dialog.createHandle> | null>(
 		null,
 	);
@@ -62,15 +64,15 @@ function CreateExpense({
 				<DropdownMenuContent align="center" className={"min-w-52"}>
 					<DropdownMenuItem onClick={() => receiptHandle.open(null)}>
 						<ReceiptIcon />
-						Belege & Rechnungen
+						{t("receipts")}
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled>
 						<CarIcon />
-						Reisepauschale
+						{t("travelAllowance")}
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled>
 						<UtensilsIcon />
-						Verpflegungspauschale
+						{t("mealAllowance")}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -113,6 +115,8 @@ function ReceiptExpense({
 }: React.ComponentProps<typeof Sheet> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.createExpense.receiptSheet");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const createReceipt = api.expense.createReceipt.useMutation({
@@ -120,13 +124,13 @@ function ReceiptExpense({
 			utils.expense.list.invalidate({ reportId });
 			utils.report.financialSummary.invalidate({ id: reportId });
 			utils.attachment.listForReport.invalidate({ id: reportId });
-			toast.success("Ausgabe erfolgreich erstellt");
+			toast.success(t("toasts.createSuccess"));
 
 			props.handle?.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.createErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -159,16 +163,15 @@ function ReceiptExpense({
 							keys: uploadedKeys,
 						});
 					} catch {
-						toast.error("Upload fehlgeschlagen", {
-							description:
-								"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+						toast.error(tCommon("toasts.uploadFailedTitle"), {
+							description: tCommon("toasts.uploadCleanupFailedDescription"),
 						});
 						return;
 					}
 				}
 
-				toast.error("Upload fehlgeschlagen", {
-					description: "Nicht alle Dateien konnten hochgeladen werden",
+				toast.error(tCommon("toasts.uploadFailedTitle"), {
+					description: tCommon("toasts.uploadPartialFailureDescription"),
 				});
 				return;
 			}
@@ -208,7 +211,7 @@ function ReceiptExpense({
 		<Sheet {...props}>
 			<SheetContent>
 				<SheetHeader>
-					<SheetTitle>Belege und Rechnungen hinzufügen</SheetTitle>
+					<SheetTitle>{t("title")}</SheetTitle>
 				</SheetHeader>
 				<form
 					className="flex min-h-0 w-full grow flex-col data-[disabled=true]:opacity-50"
@@ -231,7 +234,7 @@ function ReceiptExpense({
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Beschreibung
+												{tCommon("fields.description")}
 											</FieldLabel>
 											<Textarea
 												aria-invalid={isInvalid}
@@ -240,12 +243,10 @@ function ReceiptExpense({
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="Verpflegung Weihnachtsfeier"
+												placeholder={tCommon("fields.descriptionPlaceholder")}
 												value={field.state.value}
 											/>
-											<FieldDescription>
-												Optional. Füge dieser Ausgabe eine Kurze Beschreibung hinzu.
-											</FieldDescription>
+											<FieldDescription>{t("descriptionHelper")}</FieldDescription>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
 										</Field>
 									);
@@ -262,7 +263,7 @@ function ReceiptExpense({
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Startdatum
+												{tCommon("fields.startDate")}
 											</FieldLabel>
 											<DatePicker
 												aria-invalid={isInvalid}
@@ -270,7 +271,7 @@ function ReceiptExpense({
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(date) => field.handleChange(date.target.value)}
-												placeholder="01.01.2026"
+												placeholder={tCommon("fields.datePlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -289,7 +290,7 @@ function ReceiptExpense({
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Enddatum
+												{tCommon("fields.endDate")}
 											</FieldLabel>
 											<DatePicker
 												aria-invalid={isInvalid}
@@ -297,7 +298,7 @@ function ReceiptExpense({
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(date) => field.handleChange(date.target.value)}
-												placeholder="01.01.2026"
+												placeholder={tCommon("fields.datePlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -312,7 +313,9 @@ function ReceiptExpense({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field className="md:col-span-2" data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Betrag</FieldLabel>
+											<FieldLabel htmlFor={field.name}>
+												{tCommon("fields.amount")}
+											</FieldLabel>
 											<NumberField.Root
 												format={{
 													style: "decimal",
@@ -362,7 +365,9 @@ function ReceiptExpense({
 
 									return (
 										<Field className="md:col-span-2" data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Anhänge</FieldLabel>
+											<FieldLabel htmlFor={field.name}>
+												{tCommon("fields.attachments")}
+											</FieldLabel>
 											<UploadDropzone
 												accept={{
 													"image/*": [],
@@ -430,7 +435,7 @@ function ReceiptExpense({
 							form="create-receipt-expense"
 							type="submit"
 						>
-							Hinzufügen
+							{t("submit")}
 						</Button>
 					</SheetFooter>
 				</form>

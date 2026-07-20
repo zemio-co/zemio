@@ -16,6 +16,7 @@ import {
 	RefreshCcwIcon,
 	SendIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import {
@@ -54,6 +55,8 @@ function ReportCreatedEvent({
 	event,
 	...props
 }: React.ComponentProps<"div"> & { event: BaseEventProps }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem {...props}>
 			<EventIconColumn>
@@ -61,7 +64,7 @@ function ReportCreatedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat diesen Bericht erstellt
+					<InlineActor actor={event.actor} /> {t("created")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -81,9 +84,11 @@ function ReportUpdatedEvent({
 		};
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+	const tFieldLabels = useTranslations("modules.report.activity.fieldLabels");
 	const fieldLabels: Record<string, string> = {
-		title: '"Titel"',
-		description: '"Beschreibung"',
+		title: tFieldLabels("title"),
+		description: tFieldLabels("description"),
 	};
 	const labels = Object.keys(event.diff.after)
 		.map((f) => fieldLabels[f] ?? f)
@@ -96,8 +101,13 @@ function ReportUpdatedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat{" "}
-					<span className="font-semibold text-slate-800">{labels}</span> bearbeitet
+					<InlineActor actor={event.actor} />{" "}
+					{t.rich("updated", {
+						bold: (chunks) => (
+							<span className="font-semibold text-slate-800">{chunks}</span>
+						),
+						labels,
+					})}
 				</p>
 				<EventDate date={event.createdAt} />
 			</EventContent>
@@ -109,6 +119,8 @@ function ReportDeletedEvent({
 	event,
 	...props
 }: React.ComponentProps<"div"> & { event: BaseEventProps }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-deleted-event" {...props}>
 			<EventIconColumn>
@@ -116,7 +128,7 @@ function ReportDeletedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat diesen Bericht gelöscht
+					<InlineActor actor={event.actor} /> {t("deleted")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -173,6 +185,7 @@ function ReportSubmittedEvent({
 		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
 	const resubmitted = event.diff.before.status !== "DRAFT";
 
 	return (
@@ -187,8 +200,11 @@ function ReportSubmittedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat den Antrag{" "}
-					{resubmitted && <span className="font-medium">erneut</span>} eingereicht
+					<InlineActor actor={event.actor} /> {t("submittedPrefix")}{" "}
+					{resubmitted && (
+						<span className="font-medium">{t("resubmittedWord")}</span>
+					)}{" "}
+					{t("submittedSuffix")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -205,6 +221,8 @@ function ReportRevisionRequestedEvent({
 		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-revision-event" {...props}>
 			<EventIconColumn>
@@ -212,7 +230,7 @@ function ReportRevisionRequestedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					Revision angefordert von <InlineActor actor={event.actor} />
+					{t("revisionRequestedPrefix")} <InlineActor actor={event.actor} />
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -229,6 +247,8 @@ function ReportAcceptedEvent({
 		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-accepted-event" {...props}>
 			<EventIconColumn>
@@ -236,8 +256,8 @@ function ReportAcceptedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					Antrag wurde von <InlineActor actor={event.actor} /> als akzeptiert
-					markiert
+					{t("acceptedPrefix")} <InlineActor actor={event.actor} />{" "}
+					{t("acceptedSuffix")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -254,6 +274,8 @@ function ReportPaidEvent({
 		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-paid-event" {...props}>
 			<EventIconColumn>
@@ -261,8 +283,7 @@ function ReportPaidEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					Antrag wurde von <InlineActor actor={event.actor} /> als ausgezahlt
-					markiert
+					{t("paidPrefix")} <InlineActor actor={event.actor} /> {t("paidSuffix")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -279,6 +300,8 @@ function ReportRejectedEvent({
 		diff: { before: { status: ReportStatus }; after: { status: ReportStatus } };
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-rejected-event" {...props}>
 			<EventIconColumn>
@@ -286,7 +309,8 @@ function ReportRejectedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					Antrag wurde von <InlineActor actor={event.actor} /> abgelehnt
+					{t("rejectedPrefix")} <InlineActor actor={event.actor} />{" "}
+					{t("rejectedSuffix")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -301,6 +325,8 @@ function ReportCommentAddedEvent({
 }: React.ComponentProps<"div"> & {
 	event: BaseEventProps & { text: string };
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="report-comment-event" {...props}>
 			<EventIconColumn>
@@ -309,7 +335,7 @@ function ReportCommentAddedEvent({
 			<EventContent className="grow flex-col gap-y-2">
 				<div className="flex flex-wrap gap-x-1 gap-y-0.5">
 					<p>
-						<InlineActor actor={event.actor} /> kommentierte
+						<InlineActor actor={event.actor} /> {t("commented")}
 					</p>
 					<span className="block text-slate-500">•</span>
 					<EventDate date={event.createdAt} />
@@ -330,6 +356,7 @@ function ExpenseAddedEvent({
 		type: ExpenseType;
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
 	const expenseTypeLabel = useExpenseTypeLabel(event.type);
 
 	return (
@@ -339,9 +366,9 @@ function ExpenseAddedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat eine Ausgabe vom Typ{" "}
+					<InlineActor actor={event.actor} /> {t("expenseAddedPrefix")}{" "}
 					<span className="font-semibold text-slate-800">{expenseTypeLabel}</span>{" "}
-					hinzugefügt
+					{t("expenseAddedSuffix")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -356,6 +383,8 @@ function ExpenseUpdatedEvent({
 }: React.ComponentProps<"div"> & {
 	event: BaseEventProps;
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="expense-updated-event" {...props}>
 			<EventIconColumn>
@@ -363,8 +392,7 @@ function ExpenseUpdatedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} />
-					hat eine Ausgabe aktualisiert
+					<InlineActor actor={event.actor} /> {t("expenseUpdated")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -381,6 +409,8 @@ function ExpenseDeletedEvent({
 		type: ExpenseType;
 	};
 }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<EventItem data-slot="expense-deleted-event" {...props}>
 			<EventIconColumn>
@@ -388,7 +418,7 @@ function ExpenseDeletedEvent({
 			</EventIconColumn>
 			<EventContent>
 				<p>
-					<InlineActor actor={event.actor} /> hat eine Ausgabe entfernt
+					<InlineActor actor={event.actor} /> {t("expenseDeleted")}
 				</p>
 				<span className="block text-slate-500">•</span>
 				<EventDate date={event.createdAt} />
@@ -402,11 +432,13 @@ function AttachmentAddedEvent({
 	createdAt,
 	fileName,
 }: BaseEventProps & { fileName: string }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<div>
 			<EventMeta actor={actor} createdAt={createdAt} />
 			<p className="text-slate-700 text-sm">
-				hat eine Datei hinzugefügt: <span className="font-medium">{fileName}</span>
+				{t("attachmentAdded")} <span className="font-medium">{fileName}</span>
 			</p>
 		</div>
 	);
@@ -417,11 +449,13 @@ function AttachmentDeletedEvent({
 	createdAt,
 	fileName,
 }: BaseEventProps & { fileName: string }) {
+	const t = useTranslations("modules.report.activity.events");
+
 	return (
 		<div>
 			<EventMeta actor={actor} createdAt={createdAt} />
 			<p className="text-slate-700 text-sm">
-				hat eine Datei entfernt: <span className="font-medium">{fileName}</span>
+				{t("attachmentDeleted")} <span className="font-medium">{fileName}</span>
 			</p>
 		</div>
 	);
@@ -539,13 +573,14 @@ function ActivityCommentField({
 }: React.ComponentProps<"div"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.activity");
 	const utils = api.useUtils();
 	const [value, setValue] = React.useState<string>("");
 
 	const commentMutation = api.audit.addComment.useMutation({
 		onError: (error) => {
-			toast.error("Fehler beim Senden der Nachricht", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("commentErrorTitle"), {
+				description: error.message ?? t("commentErrorDescription"),
 			});
 		},
 		onSuccess() {
@@ -581,7 +616,7 @@ function ActivityCommentField({
 					disabled={commentMutation.isPending}
 					onChange={(e) => setValue(e.currentTarget.value)}
 					onKeyDown={handleKeyDown}
-					placeholder="Schreibe einen Kommentar"
+					placeholder={t("commentPlaceholder")}
 					value={value}
 				/>
 				<InputGroupAddon align={"block-end"} className="justify-end">
@@ -698,13 +733,15 @@ function ReportActivityHeader({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.report.activity");
+
 	return (
 		<div
 			className={cn("", className)}
 			data-slot="report-activity-header"
 			{...props}
 		>
-			<h3 className="font-semibold text-lg text-slate-800">Aktivität</h3>
+			<h3 className="font-semibold text-lg text-slate-800">{t("header")}</h3>
 		</div>
 	);
 }
@@ -716,12 +753,13 @@ function ReportActivity({
 }: React.ComponentProps<"section"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.activity");
 	const eventHistoryQuery = api.audit.history.useQuery({ id: reportId });
 
 	if (eventHistoryQuery.isPending) return;
 
 	if (eventHistoryQuery.error) {
-		return <p>Error: {eventHistoryQuery.error.message}</p>;
+		return <p>{t("loadError", { message: eventHistoryQuery.error.message })}</p>;
 	}
 
 	const { data } = eventHistoryQuery;

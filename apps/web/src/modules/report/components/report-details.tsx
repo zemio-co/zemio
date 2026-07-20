@@ -15,6 +15,7 @@ import {
 	UserIcon,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +35,7 @@ function ReportDetails({
 }: React.ComponentProps<"aside"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.details");
 	const utils = api.useUtils();
 
 	const queries = useQueries({
@@ -52,9 +54,9 @@ function ReportDetails({
 	if (reportQuery.error || financialQuery.error) {
 		return (
 			<aside className={cn("", className)} data-slot="report-details" {...props}>
-				<h3 className="font-semibold text-lg text-slate-800">Details</h3>
+				<h3 className="font-semibold text-lg text-slate-800">{t("title")}</h3>
 				<p className="mt-6 text-center font-medium text-destructive text-sm">
-					Unable to load report details
+					{t("loadError")}
 				</p>
 			</aside>
 		);
@@ -64,24 +66,24 @@ function ReportDetails({
 
 	return (
 		<aside className={cn("", className)} data-slot="report-details" {...props}>
-			<h3 className="font-semibold text-lg text-slate-800">Details</h3>
+			<h3 className="font-semibold text-lg text-slate-800">{t("title")}</h3>
 			<div className="mt-6 space-y-6">
 				<ReportDetail
 					icon={<EuroIcon />}
-					render={(v) => `${v.toFixed(2)} EUR`}
-					title="Summe"
+					render={(v) => t("amountValue", { amount: v.toFixed(2) })}
+					title={t("sum")}
 					value={financialQuery.data.totalAmount}
 				/>
 
 				<ReportDetail
 					icon={<LandmarkIcon />}
-					title="IBAN"
+					title={t("iban")}
 					value={financialQuery.data.iban}
 				/>
 
 				<ReportDetail
 					icon={<UserIcon />}
-					title="Kontoname"
+					title={t("accountName")}
 					value={financialQuery.data.ownerName}
 				/>
 
@@ -99,14 +101,16 @@ function ReportDetails({
 							{report.owner.name}
 						</>
 					)}
-					title="Antragssteller"
+					title={t("submitter")}
 					value={report.owner.name}
 				/>
 
 				<ReportDetail
 					icon={<TagIcon />}
-					render={(v) => `${v} · ${report.costUnit.title}`}
-					title="Kostenstelle"
+					render={(v) =>
+						t("costUnitValue", { tag: v, title: report.costUnit.title })
+					}
+					title={t("costUnit")}
 					value={report.costUnit.tag}
 				/>
 
@@ -132,7 +136,7 @@ function ReportDetails({
 							</Tooltip>
 						);
 					}}
-					title="Erstellt"
+					title={t("created")}
 					value={report.createdAt}
 				/>
 
@@ -158,7 +162,7 @@ function ReportDetails({
 							</Tooltip>
 						);
 					}}
-					title="Zuletzt bearbeitet"
+					title={t("lastUpdated")}
 					value={report.lastUpdatedAt}
 				/>
 			</div>
