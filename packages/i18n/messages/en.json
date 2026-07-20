@@ -18,6 +18,38 @@
 		}
 	},
 	"modules": {
+		"dashboard": {
+			"header": {
+				"title": "Dashboard",
+				"newReport": "Neuer Antrag"
+			},
+			"stats": {
+				"selectorPlaceholder": "Wähle eine Statistik",
+				"submitted": "Ausgegeben",
+				"reimbursed": "Erstattet",
+				"amount": "Betrag",
+				"error": "Fehler",
+				"createdReportsLabel": "Anträge eingereicht",
+				"acceptedReportsLabel": "Anträge akzeptiert",
+				"last365Days": "In den letzten 365 Tagen"
+			},
+			"reportList": {
+				"loadErrorTitle": "Fehler beim Laden der Anhänge",
+				"loadErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Anträge gefunden",
+				"emptyDescription": "Es sieht so aus als hättest du noch keinen Antrag eingereicht.",
+				"header": {
+					"title": "Deine Anträge",
+					"viewAll": "Alle Anträge"
+				},
+				"table": {
+					"title": "Antrag",
+					"date": "Datum",
+					"expenses": "Ausgaben",
+					"status": "Status"
+				}
+			}
+		},
 		"review": {
 			"header": {
 				"payAction": "Auszahlen"

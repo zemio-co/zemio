@@ -2,6 +2,7 @@
 
 import { Select as SelectPrimitive } from "@base-ui/react";
 import { format, subDays } from "date-fns";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { Button } from "@/components/ui/button";
@@ -55,15 +56,16 @@ const _statistics = [
 
 type DashboardStat = "submitted" | "reimbursed";
 
-const chartConfig = {
-	amount: {
-		label: "Betrag",
-		color: "var(--color-violet-600)",
-	},
-} satisfies ChartConfig;
-
 function DashboardChart({ className, ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.dashboard.stats");
 	const [stat, setStat] = React.useState<DashboardStat>("submitted");
+
+	const chartConfig = {
+		amount: {
+			label: t("amount"),
+			color: "var(--color-violet-600)",
+		},
+	} satisfies ChartConfig;
 
 	const { startDate, endDate } = React.useMemo(
 		() => ({ endDate: new Date(), startDate: subDays(new Date(), 14) }),
@@ -94,7 +96,7 @@ function DashboardChart({ className, ...props }: React.ComponentProps<"div">) {
 	}
 
 	if (activeQuery.error) {
-		return <p>Fehler</p>;
+		return <p>{t("error")}</p>;
 	}
 
 	const { series, total } = activeQuery.data;
@@ -146,23 +148,18 @@ function DashboardChart({ className, ...props }: React.ComponentProps<"div">) {
 	);
 }
 
-const statItems: { value: DashboardStat; label: string }[] = [
-	{
-		value: "submitted",
-		label: "Ausgegeben",
-	},
-	{
-		value: "reimbursed",
-		label: "Erstattet",
-	},
-];
-
 function ChartStatSelector({
 	select,
 	...props
 }: React.ComponentProps<typeof Button> & {
 	select: React.ComponentProps<typeof Select>;
 }) {
+	const t = useTranslations("modules.dashboard.stats");
+	const statItems: { value: DashboardStat; label: string }[] = [
+		{ value: "submitted", label: t("submitted") },
+		{ value: "reimbursed", label: t("reimbursed") },
+	];
+
 	return (
 		<Select items={statItems} {...select}>
 			<SelectPrimitive.Trigger
@@ -174,7 +171,7 @@ function ChartStatSelector({
 						variant={"ghost"}
 						{...props}
 					>
-						<SelectValue placeholder="Wähle eine Statistik" />
+						<SelectValue placeholder={t("selectorPlaceholder")} />
 					</Button>
 				}
 			/>
@@ -195,6 +192,7 @@ function DashboardCreatedReports({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.dashboard.stats");
 	const query = api.dashboard.createdCount.useQuery();
 
 	if (query.isPending) {
@@ -222,9 +220,11 @@ function DashboardCreatedReports({
 			data-slot="dashboard-created-reports"
 			{...props}
 		>
-			<p className="font-medium text-slate-800 text-xs">Anträge eingereicht</p>
+			<p className="font-medium text-slate-800 text-xs">
+				{t("createdReportsLabel")}
+			</p>
 			<p className="mt-4 font-medium text-3xl text-slate-800">{data.count}</p>
-			<p className="mt-2 text-slate-500 text-xs">In den letzten 365 Tagen</p>
+			<p className="mt-2 text-slate-500 text-xs">{t("last365Days")}</p>
 		</div>
 	);
 }
@@ -232,6 +232,7 @@ function DashboardAcceptedReports({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.dashboard.stats");
 	const query = api.dashboard.acceptedCount.useQuery();
 
 	if (query.isPending) {
@@ -259,9 +260,11 @@ function DashboardAcceptedReports({
 			data-slot="dashboard-accepted-reports"
 			{...props}
 		>
-			<p className="font-medium text-slate-800 text-xs">Anträge akzeptiert</p>
+			<p className="font-medium text-slate-800 text-xs">
+				{t("acceptedReportsLabel")}
+			</p>
 			<p className="mt-4 font-medium text-3xl text-slate-800">{data.count}</p>
-			<p className="mt-2 text-slate-500 text-xs">In den letzten 365 Tagen</p>
+			<p className="mt-2 text-slate-500 text-xs">{t("last365Days")}</p>
 		</div>
 	);
 }
