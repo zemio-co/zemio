@@ -20,9 +20,10 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { reportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
-import { cn, formatTimeElapsed, translateReportStatus } from "@/lib/utils";
+import { cn, formatTimeElapsed } from "@/lib/utils";
 import type { ListReport } from "./types";
 
 export type CostUnitOption = FilterOption<
@@ -80,7 +81,7 @@ const statusColumn: ColumnDef<ListReport> = {
 	},
 	cell: ({ row }) => {
 		const Icon = StatusIcons[row.original.status];
-		const translatedStatus = translateReportStatus(row.original.status);
+		const translatedStatus = reportStatusLabel(row.original.status);
 		return (
 			<Tooltip>
 				<TooltipTrigger
@@ -119,7 +120,7 @@ const statusColumn: ColumnDef<ListReport> = {
 				"PAID",
 			] as const
 		).map((status) => ({
-			label: translateReportStatus(status),
+			label: reportStatusLabel(status),
 			value: status,
 			icon: StatusIcons[status],
 		})),

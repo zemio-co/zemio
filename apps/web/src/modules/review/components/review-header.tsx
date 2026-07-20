@@ -11,6 +11,7 @@ import {
 	TriangleAlertIcon,
 } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -41,8 +42,9 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { reportStatusKeys } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
-import { cn, translateReportStatus } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { generateEPCCode } from "../lib/epc-code";
 import type { ReviewReport } from "./review-types";
@@ -54,6 +56,8 @@ function ExpensesHeader({
 }: React.ComponentProps<"header"> & {
 	reportId: string;
 }) {
+	const tStatus = useTranslations("enums.reportStatus");
+	const tHeader = useTranslations("modules.review.header");
 	const {
 		data: review,
 		error,
@@ -130,7 +134,7 @@ function ExpensesHeader({
 							report.status === "PENDING_APPROVAL" && "text-yellow-600",
 						)}
 					>
-						{translateReportStatus(report.status)}
+						{tStatus(reportStatusKeys[report.status])}
 						<StatusIcon className="size-3.5" />
 					</p>
 					<p className="hidden text-sm text-zinc-500 sm:block">•</p>
@@ -162,7 +166,7 @@ function ExpensesHeader({
 					}
 					reportId={report.id}
 				>
-					Ausgleichen
+					{tHeader("payAction")}
 				</ReportPay>
 			</div>
 		</header>

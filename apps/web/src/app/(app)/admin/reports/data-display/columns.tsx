@@ -25,9 +25,10 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { reportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
-import { cn, formatTimeElapsed, translateReportStatus } from "@/lib/utils";
+import { cn, formatTimeElapsed } from "@/lib/utils";
 
 export type ExtendedReport = Report & {
 	owner: Pick<User, "name" | "image" | "email">;
@@ -97,7 +98,7 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 	},
 	cell: ({ row }) => {
 		const Icon = StatusIcons[row.original.status];
-		const translatedStatus = translateReportStatus(row.original.status);
+		const translatedStatus = reportStatusLabel(row.original.status);
 		return (
 			<Tooltip>
 				<TooltipTrigger
@@ -136,7 +137,7 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 				"PAID",
 			] as const
 		).map((status) => ({
-			label: translateReportStatus(status),
+			label: reportStatusLabel(status),
 			value: status,
 			icon: StatusIcons[status],
 		})),

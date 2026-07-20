@@ -1,5 +1,27 @@
 {
 	"common": {
 		"appName": "Zemio"
+	},
+	"enums": {
+		"reportStatus": {
+			"draft": "Entwurf",
+			"pendingApproval": "In Bearbeitung",
+			"needsRevision": "Benötigt Überarbeitung",
+			"accepted": "Akzeptiert",
+			"rejected": "Abgelehnt",
+			"paid": "Ausgezahlt"
+		},
+		"expenseType": {
+			"receipt": "Beleg",
+			"travel": "Reise",
+			"food": "Verpflegung"
+		}
+	},
+	"modules": {
+		"review": {
+			"header": {
+				"payAction": "Auszahlen"
+			}
+		}
 	}
 }

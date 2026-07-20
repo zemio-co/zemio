@@ -4,8 +4,8 @@ import { format } from "date-fns";
 import { PDFDocument as PDFLibDocument } from "pdf-lib";
 import PDFDocument from "pdfkit";
 import sharp from "sharp";
+import { expenseTypeLabel, reportStatusLabel } from "@/lib/i18n-labels";
 import { logger } from "@/lib/logger";
-import { translateExpenseType, translateReportStatus } from "@/lib/utils";
 import {
 	foodExpenseMetaSchema,
 	travelExpenseMetaSchema,
@@ -284,7 +284,7 @@ export async function generatePdfSummary({
 	doc.font("Helvetica");
 	doc.fillColor(MUTED_COLOR);
 	const creationDateStr = format(report.createdAt, "dd.MM.yyyy");
-	const statusStr = translateReportStatus(report.status);
+	const statusStr = reportStatusLabel(report.status);
 	doc.text(
 		`Erstellt am ${creationDateStr} | Report ID: ${report.tag} | Status: ${statusStr}`,
 		{
@@ -371,7 +371,7 @@ export async function generatePdfSummary({
 		doc.fontSize(9);
 
 		for (const expense of report.expenses) {
-			const typeStr = translateExpenseType(expense.type);
+			const typeStr = expenseTypeLabel(expense.type);
 			const startDateStr = format(expense.startDate, "dd.MM.yyyy");
 			const endDateStr = format(expense.endDate, "dd.MM.yyyy");
 			const metaStr = formatExpenseMeta(expense);

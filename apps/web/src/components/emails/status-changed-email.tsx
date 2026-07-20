@@ -12,8 +12,8 @@ import {
 	Text,
 } from "@react-email/components";
 import type { ReportStatus } from "@zemio/db";
+import { reportStatusLabel } from "@/lib/i18n-labels";
 import { ROUTES } from "@/lib/routes";
-import { translateReportStatus } from "@/lib/utils";
 
 interface StatusChangedEmailProps {
 	name: string;
@@ -39,8 +39,8 @@ export default function StatusChangedEmail({
 			<Tailwind config={{}}>
 				<Body className="bg-zinc-50 font-sans">
 					<Preview>
-						Der Status deines Spesenberichts wurde zu "{translateReportStatus(status)}
-						" geändert.
+						Der Status deines Spesenberichts wurde zu "{reportStatusLabel(status)}"
+						geändert.
 					</Preview>
 					<Container className="bg-white px-6 py-8">
 						<Img
@@ -53,7 +53,7 @@ export default function StatusChangedEmail({
 							<Text>
 								Der Status deines Spesenberichts{" "}
 								<strong className="font-medium">"{title}"</strong> wurde zu{" "}
-								<strong className="font-medium">{translateReportStatus(status)}</strong>{" "}
+								<strong className="font-medium">{reportStatusLabel(status)}</strong>{" "}
 								geändert. Du kannst den Bericht{" "}
 								<Button href={`${baseUrl}${ROUTES.USER_REPORT_DETAILS(reportId)}`}>
 									hier

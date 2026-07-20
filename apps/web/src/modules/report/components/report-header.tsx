@@ -49,8 +49,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { ROUTES } from "@/lib/routes";
-import { cn, translateReportStatus } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 function ReportHeader({
@@ -210,13 +211,15 @@ function HeaderStatusBadge({
 }: React.ComponentProps<"span"> & {
 	status: ReportStatus;
 }) {
+	const statusLabel = useReportStatusLabel(status);
+
 	return (
 		<span
 			className={cn(statusBadgeVariants({ status, className }))}
 			data-slot="header-status-badge"
 			{...props}
 		>
-			{translateReportStatus(status)}
+			{statusLabel}
 		</span>
 	);
 }

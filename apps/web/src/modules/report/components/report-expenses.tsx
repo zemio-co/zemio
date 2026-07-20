@@ -13,6 +13,7 @@ import {
 	ReceiptIcon,
 	TrashIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
 import {
@@ -34,7 +35,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, translateExpenseType } from "@/lib/utils";
+import { expenseTypeKeys } from "@/lib/i18n-labels";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { CreateExpense } from "./create-expense";
 import { ReportUpdateExpense } from "./report-update-expense";
@@ -46,6 +48,7 @@ function ReportExpenses({
 }: React.ComponentProps<"section"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("enums.expenseType");
 	const utils = api.useUtils();
 
 	const [expensesQuery, financialQuery] = useQueries({
@@ -105,7 +108,7 @@ function ReportExpenses({
 						{expenses.map((expense) => (
 							<tr className="border-slate-200 border-b" key={expense.id}>
 								<td className="px-3 py-2.5 pl-0 text-left font-medium text-slate-800">
-									{translateExpenseType(expense.type)}
+									{t(expenseTypeKeys[expense.type])}
 								</td>
 								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{expense.description}

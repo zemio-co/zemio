@@ -29,8 +29,9 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useExpenseTypeLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
-import { cn, formatTimeElapsed, translateExpenseType } from "@/lib/utils";
+import { cn, formatTimeElapsed } from "@/lib/utils";
 import type { AuditEventDTO } from "@/server/modules/audit/audit.dto";
 import { api } from "@/trpc/react";
 
@@ -329,6 +330,8 @@ function ExpenseAddedEvent({
 		type: ExpenseType;
 	};
 }) {
+	const expenseTypeLabel = useExpenseTypeLabel(event.type);
+
 	return (
 		<EventItem data-slot="expense-added-event" {...props}>
 			<EventIconColumn>
@@ -337,9 +340,7 @@ function ExpenseAddedEvent({
 			<EventContent>
 				<p>
 					<InlineActor actor={event.actor} /> hat eine Ausgabe vom Typ{" "}
-					<span className="font-semibold text-slate-800">
-						{translateExpenseType(event.type)}
-					</span>{" "}
+					<span className="font-semibold text-slate-800">{expenseTypeLabel}</span>{" "}
 					hinzugefügt
 				</p>
 				<span className="block text-slate-500">•</span>

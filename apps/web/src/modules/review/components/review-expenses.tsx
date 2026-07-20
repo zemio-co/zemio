@@ -6,7 +6,8 @@ import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, translateExpenseType } from "@/lib/utils";
+import { expenseTypeLabel, useExpenseTypeLabel } from "@/lib/i18n-labels";
+import { cn } from "@/lib/utils";
 import type { ReviewExpense, ReviewLoadState } from "./review-types";
 
 const CSV_MIME_TYPE = "text/csv;charset=utf-8";
@@ -36,7 +37,7 @@ function buildExpensesCsv(expenses: ReviewExpense[]): string {
 		"Metadaten",
 	];
 	const rows = expenses.map((expense) => [
-		translateExpenseType(expense.type),
+		expenseTypeLabel(expense.type),
 		format(expense.startDate, "yyyy-MM-dd"),
 		format(expense.endDate, "yyyy-MM-dd"),
 		expense.amount.toFixed(2),
@@ -171,11 +172,13 @@ function ExpenseRow({
 }: React.ComponentProps<"tr"> & {
 	expense: ReviewExpense;
 }) {
+	const expenseTypeLabelText = useExpenseTypeLabel(expense.type);
+
 	return (
 		<tr className={cn("", className)} data-slot="component" {...props}>
 			<td className="py-3">
 				<span className="font-medium text-sm text-zinc-800">
-					{translateExpenseType(expense.type)}
+					{expenseTypeLabelText}
 				</span>
 			</td>
 			<td className="py-3">
