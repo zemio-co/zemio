@@ -1870,7 +1870,8 @@ export type InvitationScalarFieldEnum = (typeof InvitationScalarFieldEnum)[keyof
 export const PreferencesScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  notifications: 'notifications'
+  notifications: 'notifications',
+  locale: 'locale'
 } as const
 
 export type PreferencesScalarFieldEnum = (typeof PreferencesScalarFieldEnum)[keyof typeof PreferencesScalarFieldEnum]
