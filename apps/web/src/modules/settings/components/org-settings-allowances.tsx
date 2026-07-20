@@ -2,6 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
 	Box,
@@ -32,23 +33,23 @@ import {
 import { api } from "@/trpc/react";
 
 function OrgSettingsAllowances() {
+	const t = useTranslations("modules.settings.allowancesLegacy");
+
 	return (
 		<main>
 			<div className="space-y-1">
-				<h1 className="font-semibold text-lg text-zinc-800">Zulagen & Abzüge</h1>
-				<p className="text-sm text-zinc-600">
-					Verwalte die Zulagen und Abzüge für Spesenanträge.
-				</p>
+				<h1 className="font-semibold text-lg text-zinc-800">{t("title")}</h1>
+				<p className="text-sm text-zinc-600">{t("description")}</p>
 			</div>
 			<div className="mt-12">
 				<div className="mb-3 flex flex-wrap items-end justify-between gap-4">
-					<p className="font-medium text-xs text-zinc-600">Reisepauschale</p>
+					<p className="font-medium text-xs text-zinc-600">{t("sections.travel")}</p>
 				</div>
 				<TravelAllowances />
 			</div>
 			<div className="mt-12">
 				<div className="mb-3 flex flex-wrap items-end justify-between gap-4">
-					<p className="font-medium text-xs text-zinc-600">Verpflegungspauschale</p>
+					<p className="font-medium text-xs text-zinc-600">{t("sections.meal")}</p>
 				</div>
 				<MealAllowances />
 			</div>
@@ -57,18 +58,20 @@ function OrgSettingsAllowances() {
 }
 
 function TravelAllowances() {
+	const t = useTranslations("modules.settings.allowancesLegacy");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [settings] = api.settings.get.useSuspenseQuery();
 
 	const updateTravelAllowances = api.settings.updateTravelAllowances.useMutation(
 		{
 			onSuccess: () => {
-				toast.success("Zulagen erfolgreich aktualisiert");
+				toast.success(t("savedToast"));
 				utils.settings.get.invalidate();
 			},
 			onError: (error) => {
-				toast.error("Fehler beim Aktualisieren der Zulagen", {
-					description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+				toast.error(t("saveErrorTitle"), {
+					description: error.message ?? t("saveErrorFallback"),
 				});
 			},
 		},
@@ -90,10 +93,8 @@ function TravelAllowances() {
 		<Box>
 			<BoxItem variant="grid">
 				<BoxItemContent>
-					<BoxItemTitle>Verpflegungspauschalen aktiviert</BoxItemTitle>
-					<BoxItemDescription>
-						Bestimmt ob Nutzer Verpflegungspauschalen einreichen können
-					</BoxItemDescription>
+					<BoxItemTitle>{t("mealToggle.title")}</BoxItemTitle>
+					<BoxItemDescription>{t("mealToggle.description")}</BoxItemDescription>
 				</BoxItemContent>
 				<div className="flex w-full justify-end">
 					<Switch checked={true} disabled />
@@ -115,9 +116,11 @@ function TravelAllowances() {
 							return (
 								<Field className="grid grid-cols-2 gap-6" data-invalid={isInvalid}>
 									<BoxItemContent>
-										<FieldLabel htmlFor={field.name}>Kilometerpauschale</FieldLabel>
+										<FieldLabel htmlFor={field.name}>
+											{t("kilometerRate.label")}
+										</FieldLabel>
 										<BoxItemDescription>
-											Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet.
+											{t("kilometerRate.description")}
 										</BoxItemDescription>
 									</BoxItemContent>
 									<div className="space-y-4">
@@ -162,7 +165,7 @@ function TravelAllowances() {
 												form="form-travel-allowance"
 												type="submit"
 											>
-												Speichern
+												{tActions("save")}
 											</Button>
 										</div>
 									</div>
@@ -177,17 +180,19 @@ function TravelAllowances() {
 }
 
 function MealAllowances() {
+	const t = useTranslations("modules.settings.allowancesLegacy");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [settings] = api.settings.get.useSuspenseQuery();
 
 	const updateMealAllowances = api.settings.updateMealAllowances.useMutation({
 		onSuccess: () => {
-			toast.success("Zulagen erfolgreich aktualisiert");
+			toast.success(t("savedToast"));
 			utils.settings.get.invalidate();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Zulagen", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -211,10 +216,8 @@ function MealAllowances() {
 		<Box>
 			<BoxItem variant="grid">
 				<BoxItemContent>
-					<BoxItemTitle>Verpflegungspauschalen aktiviert</BoxItemTitle>
-					<BoxItemDescription>
-						Bestimmt ob Nutzer Verpflegungspauschalen einreichen können
-					</BoxItemDescription>
+					<BoxItemTitle>{t("mealToggle.title")}</BoxItemTitle>
+					<BoxItemDescription>{t("mealToggle.description")}</BoxItemDescription>
 				</BoxItemContent>
 				<div className="flex w-full justify-end">
 					<Switch checked={true} disabled />
@@ -222,10 +225,8 @@ function MealAllowances() {
 			</BoxItem>
 			<BoxItem className="items-start" variant="grid">
 				<BoxItemContent className="h-fit">
-					<BoxItemTitle>Einstellugnen</BoxItemTitle>
-					<BoxItemDescription>
-						Bestimme die Raten für die Verpflegungspauschale
-					</BoxItemDescription>
+					<BoxItemTitle>{t("mealSettings.title")}</BoxItemTitle>
+					<BoxItemDescription>{t("mealSettings.description")}</BoxItemDescription>
 				</BoxItemContent>
 				<form
 					className="w-full"
@@ -243,7 +244,7 @@ function MealAllowances() {
 								return (
 									<Field className="md:col-span-2" data-invalid={isInvalid}>
 										<FieldLabel htmlFor={field.name}>
-											Tägliche Verpflegungszulage
+											{t("dailyFoodAllowance.label")}
 										</FieldLabel>
 										<NumberField.Root
 											format={{
@@ -280,7 +281,7 @@ function MealAllowances() {
 											</NumberField.Group>
 										</NumberField.Root>
 										<FieldDescription>
-											Dieser Betrag wird pro Tag für die Verpflegung erhoben.
+											{t("dailyFoodAllowance.description")}
 										</FieldDescription>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
@@ -293,7 +294,9 @@ function MealAllowances() {
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Morgenstückabzug</FieldLabel>
+										<FieldLabel htmlFor={field.name}>
+											{t("breakfastDeduction.label")}
+										</FieldLabel>
 										<NumberField.Root
 											format={{
 												style: "decimal",
@@ -342,7 +345,9 @@ function MealAllowances() {
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Mittagessenabzug</FieldLabel>
+										<FieldLabel htmlFor={field.name}>
+											{t("lunchDeduction.label")}
+										</FieldLabel>
 										<NumberField.Root
 											format={{
 												style: "decimal",
@@ -391,7 +396,9 @@ function MealAllowances() {
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel htmlFor={field.name}>Abendessenabzug</FieldLabel>
+										<FieldLabel htmlFor={field.name}>
+											{t("dinnerDeduction.label")}
+										</FieldLabel>
 										<NumberField.Root
 											format={{
 												style: "decimal",
@@ -440,7 +447,7 @@ function MealAllowances() {
 								form="form-meal-allowance"
 								type="submit"
 							>
-								Speichern
+								{tActions("save")}
 							</Button>
 						</div>
 					</FieldGroup>

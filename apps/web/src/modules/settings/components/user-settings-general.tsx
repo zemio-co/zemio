@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -23,17 +24,17 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 function UserSettingsGeneral() {
+	const t = useTranslations("modules.settings.preferences.general");
+
 	return (
 		<main>
 			<div className="space-y-1">
-				<SettingsTitle>Allgemeines</SettingsTitle>
-				<SettingsSubtitle>
-					Verwalte deine persönlichen Informationen
-				</SettingsSubtitle>
+				<SettingsTitle>{t("title")}</SettingsTitle>
+				<SettingsSubtitle>{t("description")}</SettingsSubtitle>
 			</div>
 			<div className="mt-12">
 				<div className="mb-3">
-					<p className="font-medium text-xs text-zinc-600">Profil</p>
+					<p className="font-medium text-xs text-zinc-600">{t("sectionProfile")}</p>
 				</div>
 				<ProfileForm />
 			</div>
@@ -42,6 +43,7 @@ function UserSettingsGeneral() {
 }
 
 function ProfileForm() {
+	const t = useTranslations("modules.settings.preferences.general");
 	const utils = api.useUtils();
 	const [user] = api.user.getOwn.useSuspenseQuery();
 	const [nameInput, setNameInput] = useState(user.name);
@@ -50,12 +52,12 @@ function ProfileForm() {
 
 	const updateName = api.user.updateOwnName.useMutation({
 		onSuccess: () => {
-			toast.success("Name gespeichert");
+			toast.success(t("savedToast"));
 			void utils.user.getOwn.invalidate();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Speichern", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -75,13 +77,11 @@ function ProfileForm() {
 		<Box>
 			<BoxItem variant="grid">
 				<BoxItemContent>
-					<BoxItemTitle>Name</BoxItemTitle>
-					<BoxItemDescription>
-						Dein vollständiger Name, wie er in der Anwendung angezeigt wird.
-					</BoxItemDescription>
+					<BoxItemTitle>{t("nameLabel")}</BoxItemTitle>
+					<BoxItemDescription>{t("nameDescription")}</BoxItemDescription>
 				</BoxItemContent>
 				<Input
-					aria-label="Name"
+					aria-label={t("nameAriaLabel")}
 					disabled={updateName.isPending}
 					onChange={(e) => setNameInput(e.target.value)}
 					value={nameInput}
@@ -89,13 +89,15 @@ function ProfileForm() {
 			</BoxItem>
 			<BoxItem variant="grid">
 				<BoxItemContent>
-					<BoxItemTitle>E-Mail</BoxItemTitle>
-					<BoxItemDescription>
-						Deine E-Mail-Adresse wird über Microsoft verwaltet und kann hier nicht
-						geändert werden.
-					</BoxItemDescription>
+					<BoxItemTitle>{t("emailLabel")}</BoxItemTitle>
+					<BoxItemDescription>{t("emailDescription")}</BoxItemDescription>
 				</BoxItemContent>
-				<Input aria-label="E-Mail" disabled readOnly value={user.email} />
+				<Input
+					aria-label={t("emailAriaLabel")}
+					disabled
+					readOnly
+					value={user.email}
+				/>
 			</BoxItem>
 		</Box>
 	);

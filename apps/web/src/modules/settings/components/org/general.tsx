@@ -3,6 +3,7 @@
 import { Dialog as DialogPrimitive, ScrollArea } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import React from "react";
 import { toast } from "sonner";
@@ -23,14 +24,14 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 function OrgSettingsGeneral() {
+	const t = useTranslations("modules.settings.general");
+
 	return (
 		<section className="container">
 			<header className="flex flex-wrap items-start justify-between gap-8">
 				<div className="space-y-1">
-					<h1 className="font-bold text-2xl text-zinc-800">Organisation</h1>
-					<p className="text-sm text-zinc-700">
-						Verwalte die Einstellungen zu deiner Organisation.
-					</p>
+					<h1 className="font-bold text-2xl text-zinc-800">{t("title")}</h1>
+					<p className="text-sm text-zinc-700">{t("description")}</p>
 				</div>
 			</header>
 			<section className="mt-12">
@@ -49,6 +50,7 @@ function OrgGeneralContent({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.general");
 	const orgQuery = api.settings.getOrg.useQuery();
 
 	const updateHandleRef = React.useRef<UpdateOrgGeneralHandle | null>(null);
@@ -69,12 +71,12 @@ function OrgGeneralContent({
 	return (
 		<div className={cn("", className)} data-slot="org-general-content" {...props}>
 			<div className="mb-6 flex justify-between">
-				<p className="font-semibold text-slate-800">Allgemeines</p>
+				<p className="font-semibold text-slate-800">{t("sections.general")}</p>
 				<DialogPrimitive.Trigger
 					handle={updateHandle}
 					render={
 						<Button size={"xs"} variant={"outline"}>
-							Bearbeiten
+							{t("editButton")}
 						</Button>
 					}
 				/>
@@ -82,7 +84,7 @@ function OrgGeneralContent({
 			<div className="space-y-4">
 				<Separator />
 				<OrgContentRow
-					title="Logo"
+					title={t("rows.logo")}
 					value={
 						<Avatar className={"size-12 after:rounded-md"}>
 							<AvatarImage className={"rounded-md"} src={org.logo ?? undefined} />
@@ -93,16 +95,16 @@ function OrgGeneralContent({
 					}
 				/>
 				<Separator />
-				<OrgContentRow title="Name" value={org.name} />
+				<OrgContentRow title={t("rows.name")} value={org.name} />
 				<Separator />
-				<OrgContentRow title="ID" value={org.id} />
+				<OrgContentRow title={t("rows.id")} value={org.id} />
 				<Separator />
-				<OrgContentRow title="Microsoft-Mandats-ID" value={org.microsoftTenantId} />
+				<OrgContentRow title={t("rows.tenantId")} value={org.microsoftTenantId} />
 				<Separator />
-				<OrgContentRow title="Slug" value={`/${org.slug}`} />
+				<OrgContentRow title={t("rows.slug")} value={`/${org.slug}`} />
 				<Separator />
 				<OrgContentRow
-					title="Erstellt am"
+					title={t("rows.createdAt")}
 					value={format(org.createdAt, "dd.MM.yyyy '-' HH:mm")}
 				/>
 				<Separator />
@@ -172,18 +174,20 @@ function OrgGeneralEdit({
 	...props
 }: Omit<React.ComponentProps<typeof DialogPrimitive.Root>, "handle"> &
 	WithHandle & { defaultValues: UpdateOrgGeneralFormValues }) {
+	const t = useTranslations("modules.settings.general");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [open, setOpen] = React.useState<boolean>(props.defaultOpen ?? false);
 
 	const updateMutation = api.settings.updateOrgGeneral.useMutation({
 		onSuccess: () => {
-			toast.success("Einstellungen wurden erfolgreich gespeichert");
+			toast.success(t("savedToast"));
 			utils.settings.getOrg.invalidate();
 			handleOpenChange(false);
 		},
 		onError: (error) => {
-			toast.error("Einstellungen konnten nicht gespeichert werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -223,7 +227,7 @@ function OrgGeneralEdit({
 							<DialogPrimitive.Title
 								className={"font-semibold text-slate-800 text-xl leading-none"}
 							>
-								Organisation aktualisieren
+								{t("updateDialog.title")}
 							</DialogPrimitive.Title>
 						</div>
 						<ScrollArea.Root className="relative flex min-h-0 flex-auto overflow-hidden has-[>_:first-child:focus-visible]:outline-2 has-[>_:first-child:focus-visible]:outline-blue-200 has-[>_:first-child:focus-visible]:outline-offset-0 dark:has-[>_:first-child:focus-visible]:outline-white">
@@ -245,18 +249,20 @@ function OrgGeneralEdit({
 
 														return (
 															<Field className="grow" data-invalid={isInvalid}>
-																<FieldLabel htmlFor={field.name}>Logo</FieldLabel>
+																<FieldLabel htmlFor={field.name}>
+																	{t("updateDialog.logoLabel")}
+																</FieldLabel>
 																<Input
 																	aria-invalid={isInvalid}
 																	id={field.name}
 																	name={field.name}
 																	onBlur={field.handleBlur}
 																	onChange={(e) => field.handleChange(e.currentTarget.value)}
-																	placeholder="https://example.com/logo.svg"
+																	placeholder={t("updateDialog.logoPlaceholder")}
 																	value={state.value ?? ""}
 																/>
 																<FieldDescription>
-																	Gib eine URL zu einem Logo an.
+																	{t("updateDialog.logoDescription")}
 																</FieldDescription>
 																{isInvalid && <FieldError errors={state.meta.errors} />}
 															</Field>
@@ -285,19 +291,20 @@ function OrgGeneralEdit({
 
 													return (
 														<Field data-invalid={isInvalid}>
-															<FieldLabel htmlFor={field.name}>Name</FieldLabel>
+															<FieldLabel htmlFor={field.name}>
+																{t("updateDialog.nameLabel")}
+															</FieldLabel>
 															<Input
 																aria-invalid={isInvalid}
 																id={field.name}
 																name={field.name}
 																onBlur={field.handleBlur}
 																onChange={(e) => field.handleChange(e.currentTarget.value)}
-																placeholder="Your Organisation"
+																placeholder={t("updateDialog.namePlaceholder")}
 																value={state.value}
 															/>
 															<FieldDescription>
-																Dieser Name ist für alle Mitglieder deiner Organisation
-																sichtbar.
+																{t("updateDialog.nameDescription")}
 															</FieldDescription>
 															{isInvalid && <FieldError errors={state.meta.errors} />}
 														</Field>
@@ -316,7 +323,7 @@ function OrgGeneralEdit({
 							<DialogPrimitive.Close
 								render={
 									<Button size={"sm"} variant={"outline"}>
-										Abbrechen
+										{tActions("cancel")}
 									</Button>
 								}
 							/>
@@ -339,7 +346,7 @@ function OrgGeneralEdit({
 										size={"sm"}
 										type="submit"
 									>
-										Speichern
+										{tActions("save")}
 									</Button>
 								)}
 							</form.Subscribe>
@@ -359,6 +366,7 @@ function OrgReviewerContent({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.general");
 	const orgQuery = api.settings.get.useQuery();
 
 	const updateHandleRef = React.useRef<UpdateOrgGeneralHandle | null>(null);
@@ -379,12 +387,12 @@ function OrgReviewerContent({
 	return (
 		<div className={cn("", className)} data-slot="org-general-content" {...props}>
 			<div className="mb-6 flex justify-between">
-				<p className="font-semibold text-slate-800">Reviewer</p>
+				<p className="font-semibold text-slate-800">{t("sections.reviewer")}</p>
 				<DialogPrimitive.Trigger
 					handle={updateHandle}
 					render={
 						<Button size={"xs"} variant={"outline"}>
-							Bearbeiten
+							{t("editButton")}
 						</Button>
 					}
 				/>
@@ -392,8 +400,8 @@ function OrgReviewerContent({
 			<div className="space-y-4">
 				<Separator />
 				<OrgContentRow
-					title="Reviewer"
-					value={org.reviewerEmail ?? "Nicht hinterlegt"}
+					title={t("rows.reviewer")}
+					value={org.reviewerEmail ?? t("rows.reviewerEmpty")}
 				/>
 			</div>
 			<OrgReviewerEdit
@@ -462,18 +470,20 @@ function OrgReviewerEdit({
 	...props
 }: Omit<React.ComponentProps<typeof DialogPrimitive.Root>, "handle"> &
 	WithHandle & { defaultValues: UpdateOrgReviewerFormValues }) {
+	const t = useTranslations("modules.settings.general");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [open, setOpen] = React.useState<boolean>(props.defaultOpen ?? false);
 
 	const updateMutation = api.settings.update.useMutation({
 		onSuccess: () => {
-			toast.success("Reviewer wurde erfolgreich gespeichert");
+			toast.success(t("reviewerSavedToast"));
 			utils.settings.get.invalidate();
 			handleOpenChange(false);
 		},
 		onError: (error) => {
-			toast.error("Reviewer konnte nicht gespeichert werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("reviewerSaveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -513,7 +523,7 @@ function OrgReviewerEdit({
 							<DialogPrimitive.Title
 								className={"font-semibold text-slate-800 text-xl leading-none"}
 							>
-								Reviewer aktualisieren
+								{t("reviewerDialog.title")}
 							</DialogPrimitive.Title>
 						</div>
 						<ScrollArea.Root className="relative flex min-h-0 flex-auto overflow-hidden has-[>_:first-child:focus-visible]:outline-2 has-[>_:first-child:focus-visible]:outline-blue-200 has-[>_:first-child:focus-visible]:outline-offset-0 dark:has-[>_:first-child:focus-visible]:outline-white">
@@ -534,19 +544,20 @@ function OrgReviewerEdit({
 
 													return (
 														<Field data-invalid={isInvalid}>
-															<FieldLabel htmlFor={field.name}>Reviewer</FieldLabel>
+															<FieldLabel htmlFor={field.name}>
+																{t("reviewerDialog.fieldLabel")}
+															</FieldLabel>
 															<Input
 																aria-invalid={isInvalid}
 																id={field.name}
 																name={field.name}
 																onBlur={field.handleBlur}
 																onChange={(e) => field.handleChange(e.currentTarget.value)}
-																placeholder="you@example.com"
+																placeholder={t("reviewerDialog.placeholder")}
 																value={state.value ?? ""}
 															/>
 															<FieldDescription>
-																Benachrichtigungen über neue Anträge werden an diese
-																E-Mail-Adresse versendet.
+																{t("reviewerDialog.fieldDescription")}
 															</FieldDescription>
 															{isInvalid && <FieldError errors={state.meta.errors} />}
 														</Field>
@@ -565,7 +576,7 @@ function OrgReviewerEdit({
 							<DialogPrimitive.Close
 								render={
 									<Button size={"sm"} variant={"outline"}>
-										Abbrechen
+										{tActions("cancel")}
 									</Button>
 								}
 							/>
@@ -588,7 +599,7 @@ function OrgReviewerEdit({
 										size={"sm"}
 										type="submit"
 									>
-										Speichern
+										{tActions("save")}
 									</Button>
 								)}
 							</form.Subscribe>

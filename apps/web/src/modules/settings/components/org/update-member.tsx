@@ -4,6 +4,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { CircleIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -59,12 +60,14 @@ function UpdateMemberSheet({
 }: Omit<React.ComponentProps<typeof Sheet>, "handle"> & {
 	handle: UpdateMemberHandle;
 }) {
+	const t = useTranslations("modules.settings.members.updateSheet");
+
 	return (
 		<DialogPrimitive.Root {...props} handle={handle}>
 			{({ payload }) => (
 				<SheetContent className={"data-nested-dialog-open:blur-xs"}>
 					<SheetHeader>
-						<SheetTitle>Edit Member</SheetTitle>
+						<SheetTitle>{t("title")}</SheetTitle>
 					</SheetHeader>
 
 					{payload ? (
@@ -94,6 +97,7 @@ function UpdateCostUnitFormConnected({
 	memberId: string;
 	handle: UpdateMemberHandle;
 }) {
+	const t = useTranslations("modules.settings.members.updateSheet");
 	const utils = api.useUtils();
 
 	const [membership] = api.settings.getMembershipDetails.useSuspenseQuery({
@@ -102,14 +106,14 @@ function UpdateCostUnitFormConnected({
 
 	const setRole = api.user.setMemberRole.useMutation({
 		onSuccess: () => {
-			toast.success("Rolle wurde erfolgreich aktualisiert", {});
+			toast.success(t("savedToast"), {});
 			utils.settings.listMembers.invalidate();
 			utils.settings.getMembershipDetails.invalidate({ id: memberId });
 			handle.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Rolle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -140,6 +144,8 @@ type UpdateMemberFormProps = {
 };
 
 function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
+	const t = useTranslations("modules.settings.members.updateSheet");
+	const tActions = useTranslations("modules.settings.actions");
 	const form = useForm({
 		defaultValues,
 		validators: {
@@ -172,12 +178,12 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Name
+											{t("nameLabel")}
 										</FieldLabel>
 										<Input
 											disabled
 											id={field.name}
-											placeholder="Name"
+											placeholder={t("nameLabel")}
 											value={field.state.value}
 										/>
 									</Field>
@@ -194,12 +200,12 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											E-Mail
+											{t("emailLabel")}
 										</FieldLabel>
 										<Input
 											disabled
 											id={field.name}
-											placeholder="E-Mail"
+											placeholder={t("emailLabel")}
 											value={field.state.value}
 										/>
 									</Field>
@@ -216,12 +222,12 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Beigetreten
+											{t("createdAtLabel")}
 										</FieldLabel>
 										<Input
 											disabled
 											id={field.name}
-											placeholder="E-Mail"
+											placeholder={t("createdAtLabel")}
 											value={field.state.value}
 										/>
 									</Field>
@@ -237,18 +243,18 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Rolle
+											{t("roleLabel")}
 										</FieldLabel>
 										<Select
 											items={{
-												member: "Mitglied",
-												admin: "Administrator",
+												member: t("roleOptions.member"),
+												admin: t("roleOptions.admin"),
 											}}
 											onValueChange={(value) => field.handleChange(value ?? "member")}
 											value={state.value}
 										>
 											<SelectTrigger>
-												<SelectValue placeholder="Wähle eine Rolle" />
+												<SelectValue placeholder={t("rolePlaceholder")} />
 											</SelectTrigger>
 											<SelectContent>
 												<SelectGroup>
@@ -260,7 +266,7 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 														value={"admin"}
 													>
 														<CircleIcon className="size-2.5 text-white **:fill-blue-500 group-focus/item:**:text-slate-100!" />
-														Admin
+														{t("roleOptions.admin")}
 													</SelectItem>
 													<SelectItem
 														className={cn(
@@ -270,7 +276,7 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 														value={"member"}
 													>
 														<CircleIcon className="size-2.5 text-white **:fill-orange-500 group-focus/item:**:text-slate-100!" />
-														Mitglied
+														{t("roleOptions.member")}
 													</SelectItem>
 												</SelectGroup>
 											</SelectContent>
@@ -286,7 +292,7 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 				<SheetClose
 					render={
 						<Button type="button" variant="outline">
-							Cancel
+							{tActions("cancel")}
 						</Button>
 					}
 				/>
@@ -304,7 +310,7 @@ function UpdateMemberForm({ defaultValues, onSubmit }: UpdateMemberFormProps) {
 							form={FORM_ID}
 							type="submit"
 						>
-							{isSubmitting ? "Saving…" : "Aktualisieren"}
+							{isSubmitting ? tActions("updating") : tActions("update")}
 						</Button>
 					)}
 				</form.Subscribe>

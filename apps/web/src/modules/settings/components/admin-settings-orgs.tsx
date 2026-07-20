@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { ChevronRightIcon, PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -44,22 +45,20 @@ interface _Organization {
 }
 
 function AdminSettingsOrgs() {
+	const t = useTranslations("modules.settings.adminOrgs");
+
 	return (
 		<div>
 			<div className="space-y-1">
-				<h1 className="font-semibold text-lg text-zinc-800">Organisationen</h1>
-				<p className="text-sm text-zinc-600">
-					Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.
-				</p>
+				<h1 className="font-semibold text-lg text-zinc-800">{t("title")}</h1>
+				<p className="text-sm text-zinc-600">{t("description")}</p>
 			</div>
 
 			<Box className="mt-12">
 				<BoxItem>
 					<BoxItemContent className="mr-auto">
-						<BoxItemTitle>Neue Organisation</BoxItemTitle>
-						<BoxItemDescription>
-							Erstelle eine neue Organisation um zu kollaborieren
-						</BoxItemDescription>
+						<BoxItemTitle>{t("newOrgTitle")}</BoxItemTitle>
+						<BoxItemDescription>{t("newOrgDescription")}</BoxItemDescription>
 					</BoxItemContent>
 					<CreateOrganization />
 				</BoxItem>
@@ -67,7 +66,7 @@ function AdminSettingsOrgs() {
 
 			<div className="mt-12">
 				<div className="flex flex-wrap items-end justify-between gap-4">
-					<p className="font-medium text-xs text-zinc-600">Organisationen</p>
+					<p className="font-medium text-xs text-zinc-600">{t("listHeading")}</p>
 				</div>
 				<div className="mt-3">
 					<OrgsList />
@@ -78,6 +77,7 @@ function AdminSettingsOrgs() {
 }
 
 function OrgsList() {
+	const t = useTranslations("modules.settings.adminOrgs");
 	const {
 		data: organizations,
 		error,
@@ -89,7 +89,7 @@ function OrgsList() {
 	}
 
 	if (!organizations || error) {
-		return <p>Error fetching orgs</p>;
+		return <p>{t("loadErrorFallback")}</p>;
 	}
 
 	if (organizations.length === 0) {
@@ -97,10 +97,8 @@ function OrgsList() {
 			<Box>
 				<BoxItem className="min-h-24">
 					<BoxItemContent className="flex w-full flex-col items-center justify-center text-center">
-						<BoxItemTitle>Noch keine Organisationen hinterlegt</BoxItemTitle>
-						<BoxItemDescription>
-							Hinterlege eine neue Organisation um Mitglieder zu verwalten
-						</BoxItemDescription>
+						<BoxItemTitle>{t("emptyTitle")}</BoxItemTitle>
+						<BoxItemDescription>{t("emptyDescription")}</BoxItemDescription>
 					</BoxItemContent>
 				</BoxItem>
 			</Box>
@@ -134,13 +132,15 @@ const createOrgFormSchema = z.object({
 });
 
 function CreateOrganization() {
+	const t = useTranslations("modules.settings.adminOrgs.createDialog");
+	const tActions = useTranslations("modules.settings.actions");
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const utils = api.useUtils();
 
 	const createOrg = api.platformAdmin.createOrganization.useMutation({
 		onSuccess: async () => {
-			toast.success("Organisation erfolgreich erstellt.");
+			toast.success(t("savedToast"));
 			setIsDialogOpen(false);
 			await utils.platformAdmin.listOrganizations.invalidate();
 		},
@@ -165,14 +165,14 @@ function CreateOrganization() {
 				render={
 					<Button size={"sm"} variant={"outline"}>
 						<PlusIcon />
-						Organisation erstellen
+						{t("triggerButton")}
 					</Button>
 				}
 			/>
 
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Neue Organisation erstellen</DialogTitle>
+					<DialogTitle>{t("title")}</DialogTitle>
 				</DialogHeader>
 				<form
 					id="create-org-form"
@@ -188,7 +188,7 @@ function CreateOrganization() {
 
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel>Name</FieldLabel>
+										<FieldLabel>{t("nameLabel")}</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
 											autoComplete="off"
@@ -196,7 +196,7 @@ function CreateOrganization() {
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="Meine Organisation"
+											placeholder={t("namePlaceholder")}
 											value={state.value}
 										/>
 									</Field>
@@ -209,7 +209,7 @@ function CreateOrganization() {
 
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel>Microsoft Tenant ID</FieldLabel>
+										<FieldLabel>{t("tenantIdLabel")}</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
 											autoComplete="off"
@@ -217,14 +217,10 @@ function CreateOrganization() {
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+											placeholder={t("tenantIdPlaceholder")}
 											value={state.value}
 										/>
-										<FieldDescription>
-											Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory).
-											Alle Benutzer aus diesem Tenant werden dieser Organisation
-											automatisch zugeordnet.
-										</FieldDescription>
+										<FieldDescription>{t("tenantIdDescription")}</FieldDescription>
 									</Field>
 								);
 							}}
@@ -239,14 +235,14 @@ function CreateOrganization() {
 							}}
 							variant="outline"
 						>
-							Abbrechen
+							{tActions("cancel")}
 						</Button>
 						<Button
 							disabled={createOrg.isPending}
 							form="create-org-form"
 							type="submit"
 						>
-							{createOrg.isPending ? "Wird erstellt…" : "Erstellen"}
+							{createOrg.isPending ? t("submitCreating") : t("submitIdle")}
 						</Button>
 					</DialogFooter>
 				</form>

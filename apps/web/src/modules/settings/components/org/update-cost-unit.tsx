@@ -8,6 +8,7 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup, CostUnitStatus } from "@zemio/db";
 import { CircleIcon, InfoIcon, TrashIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
@@ -86,12 +87,14 @@ function UpdateCostUnitSheet({
 }: Omit<React.ComponentProps<typeof Sheet>, "handle"> & {
 	handle: UpdateCostUnitHandle;
 }) {
+	const t = useTranslations("modules.settings.costUnits.updateSheet");
+
 	return (
 		<DialogPrimitive.Root {...props} handle={handle}>
 			{({ payload }) => (
 				<SheetContent className={"data-nested-dialog-open:blur-xs"}>
 					<SheetHeader>
-						<SheetTitle>Edit cost unit</SheetTitle>
+						<SheetTitle>{t("title")}</SheetTitle>
 					</SheetHeader>
 
 					{payload ? (
@@ -131,6 +134,8 @@ function UpdateCostUnitFormConnected({
 	costUnitId: string;
 	handle: UpdateCostUnitHandle;
 }) {
+	const t = useTranslations("modules.settings.costUnits.updateSheet");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 
 	const [{ data: groups }, { data: costUnit }] = useSuspenseQueries({
@@ -142,7 +147,7 @@ function UpdateCostUnitFormConnected({
 
 	const update = api.costUnit.update.useMutation({
 		onSuccess: (value) => {
-			toast.success("Kostenstelle wurde erfolgreich aktualisiert", {
+			toast.success(t("savedToast"), {
 				description: `${value.tag} • ${value.title}`,
 			});
 			utils.costUnit.listCostUnits.invalidate({});
@@ -150,22 +155,22 @@ function UpdateCostUnitFormConnected({
 			handle.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Kostenstelle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
 
 	const deleteCostUnit = api.costUnit.delete.useMutation({
 		onSuccess: (value) => {
-			toast.success("Kostenstelle wurde erfolgreich gelöscht", {
+			toast.success(t("deletedToast"), {
 				description: `${value.tag} • ${value.title}`,
 			});
 			handle.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Löschen der Kostenstelle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("deleteErrorTitle"), {
+				description: error.message ?? t("deleteErrorFallback"),
 			});
 		},
 	});
@@ -186,7 +191,7 @@ function UpdateCostUnitFormConnected({
 			onSubmit={async (values) => {
 				await update.mutateAsync(values);
 			}}
-			submitLabel="Update"
+			submitLabel={tActions("update")}
 		/>
 	);
 }
@@ -200,6 +205,8 @@ function UpdateCostUnitForm({
 	onSubmit,
 	onDelete,
 }: UpdateCostUnitFormProps) {
+	const t = useTranslations("modules.settings.costUnits.updateSheet");
+	const tActions = useTranslations("modules.settings.actions");
 	const deleteHandleRef = React.useRef<ReturnType<
 		typeof AlertDialogPrimitive.createHandle
 	> | null>(null);
@@ -240,15 +247,12 @@ function UpdateCostUnitForm({
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Tag
+												{t("tagLabel")}
 												<Tooltip>
 													<TooltipTrigger
 														render={<InfoIcon className="size-3.5 text-slate-500" />}
 													/>
-													<TooltipContent>
-														Jede Kostenstelle besteht aus einer Kombination eines
-														einzigartigen Tags und einem Titel
-													</TooltipContent>
+													<TooltipContent>{t("tagTooltip")}</TooltipContent>
 												</Tooltip>
 											</FieldLabel>
 											<Input
@@ -257,7 +261,7 @@ function UpdateCostUnitForm({
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="KS123"
+												placeholder={t("tagPlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -275,7 +279,7 @@ function UpdateCostUnitForm({
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Titel
+												{t("titleLabel")}
 											</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
@@ -283,7 +287,7 @@ function UpdateCostUnitForm({
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="Sommerfest"
+												placeholder={t("titlePlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -292,7 +296,7 @@ function UpdateCostUnitForm({
 								}}
 							</form.Field>
 							<FieldDescription className="col-span-2">
-								Wird zur eindeutigen Identifikation der Kostenstelle verwendet.
+								{t("tagTitleDescription")}
 							</FieldDescription>
 						</div>
 						<form.Field name="status">
@@ -304,18 +308,18 @@ function UpdateCostUnitForm({
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Status
+											{t("statusLabel")}
 										</FieldLabel>
 										<Select
 											items={{
-												ACTIVE: "Aktiv",
-												ARCHIVED: "Archiviert",
+												ACTIVE: t("statusActive"),
+												ARCHIVED: t("statusArchived"),
 											}}
 											onValueChange={(value) => field.handleChange(value ?? "ACTIVE")}
 											value={state.value}
 										>
 											<SelectTrigger>
-												<SelectValue placeholder="Wähle eine Rolle">
+												<SelectValue placeholder={t("statusPlaceholder")}>
 													{(status: CostUnitStatus) => (
 														<span
 															className={cn(
@@ -328,7 +332,7 @@ function UpdateCostUnitForm({
 																	status === "ARCHIVED" && "**:fill-orange-500",
 																)}
 															/>
-															{status === "ARCHIVED" ? "Archiviert" : "Aktiv"}
+															{status === "ARCHIVED" ? t("statusArchived") : t("statusActive")}
 														</span>
 													)}
 												</SelectValue>
@@ -343,7 +347,7 @@ function UpdateCostUnitForm({
 														value={"ACTIVE"}
 													>
 														<CircleIcon className="size-2.5 text-white **:fill-green-500 group-focus/item:**:text-slate-100!" />
-														Aktiv
+														{t("statusActive")}
 													</SelectItem>
 													<SelectItem
 														className={cn(
@@ -353,15 +357,12 @@ function UpdateCostUnitForm({
 														value={"ARCHIVED"}
 													>
 														<CircleIcon className="size-2.5 text-white **:fill-orange-500 group-focus/item:**:text-slate-100!" />
-														Archiviert
+														{t("statusArchived")}
 													</SelectItem>
 												</SelectGroup>
 											</SelectContent>
 										</Select>
-										<FieldDescription>
-											Wenn eine Kostenstelle als archiviert markiert ist, kann sie von
-											Benutzern nicht für neue Anträge verwendet werden.
-										</FieldDescription>
+										<FieldDescription>{t("statusDescription")}</FieldDescription>
 									</Field>
 								);
 							}}
@@ -376,16 +377,16 @@ function UpdateCostUnitForm({
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Gruppe
+											{t("groupLabel")}
 										</FieldLabel>
 										<NativeSelect
 											onChange={(e) => field.handleChange(e.target.value)}
 											value={field.state.value}
 										>
 											<NativeSelectOption value={NO_COST_UNIT_GROUP}>
-												Keine Gruppe
+												{t("noGroupOption")}
 											</NativeSelectOption>
-											<NativeSelectOptGroup label="Gruppen">
+											<NativeSelectOptGroup label={t("groupOptGroupLabel")}>
 												{groups.map((group) => (
 													<NativeSelectOption key={group.id} value={group.id}>
 														{group.title}
@@ -393,10 +394,7 @@ function UpdateCostUnitForm({
 												))}
 											</NativeSelectOptGroup>
 										</NativeSelect>
-										<FieldDescription>
-											Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden,
-											indem du sie in Gruppen sortierst.
-										</FieldDescription>
+										<FieldDescription>{t("groupDescription")}</FieldDescription>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -412,17 +410,14 @@ function UpdateCostUnitForm({
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Beispiele
+											{t("examplesLabel")}
 										</FieldLabel>
 										<ExamplesInput
 											onChange={field.handleChange}
-											placeholder="z.B. Getränke "
+											placeholder={t("examplesPlaceholder")}
 											value={field.state.value}
 										/>
-										<FieldDescription>
-											Beispiele können Nutzern helfen, besser zu verstehen ob sie die
-											richtige Kostenstelle für Ihren Antrag gewählt haben.
-										</FieldDescription>
+										<FieldDescription>{t("examplesDescription")}</FieldDescription>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -436,12 +431,12 @@ function UpdateCostUnitForm({
 							className="mb-1 font-semibold text-base text-red-600"
 							htmlFor={"delete-cost-unit"}
 						>
-							Kostenstelle löschen
+							{t("deleteSectionLabel")}
 						</Label>
 						<FieldDescription>
 							{canDelete
-								? "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet."
-								: "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden. Archiviere die Kostenstelle stattdessen."}
+								? t("deleteSectionDescriptionAllowed")
+								: t("deleteSectionDescriptionBlocked")}
 						</FieldDescription>
 					</div>
 					<AlertDialogTrigger
@@ -450,7 +445,7 @@ function UpdateCostUnitForm({
 						id={"delete-cost-unit"}
 						render={
 							<Button type="button" variant={"destructive"}>
-								<TrashIcon /> Löschen
+								<TrashIcon /> {tActions("delete")}
 							</Button>
 						}
 					/>
@@ -461,7 +456,7 @@ function UpdateCostUnitForm({
 				<SheetClose
 					render={
 						<Button type="button" variant="outline">
-							Cancel
+							{tActions("cancel")}
 						</Button>
 					}
 				/>
@@ -479,7 +474,7 @@ function UpdateCostUnitForm({
 							form={FORM_ID}
 							type="submit"
 						>
-							{isSubmitting ? "Saving…" : submitLabel}
+							{isSubmitting ? tActions("saving") : submitLabel}
 						</Button>
 					)}
 				</form.Subscribe>
@@ -487,17 +482,16 @@ function UpdateCostUnitForm({
 			<AlertDialog handle={deleteHandle}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Kostenstelle löschen</AlertDialogTitle>
+						<AlertDialogTitle>{t("deleteDialogTitle")}</AlertDialogTitle>
 						<AlertDialogDescription>
-							Bist du dir sicher, dass du diese Kostenstelle löschen möchtest? Diese
-							Aktion kann nicht rückängig gemacht werden.
+							{t("deleteDialogDescription")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+						<AlertDialogCancel>{tActions("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={onDelete}
-							render={<Button variant={"destructive"}>Löschen</Button>}
+							render={<Button variant={"destructive"}>{tActions("delete")}</Button>}
 						/>
 					</AlertDialogFooter>
 				</AlertDialogContent>

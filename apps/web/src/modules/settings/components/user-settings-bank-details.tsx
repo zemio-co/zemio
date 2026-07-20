@@ -2,6 +2,7 @@
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -37,24 +38,23 @@ import { api } from "@/trpc/react";
 import { SettingsSubtitle, SettingsTitle } from "./settings-typography";
 
 function UserSettingsBankDetails() {
+	const t = useTranslations("modules.settings.banking");
+
 	return (
 		<main>
 			<div className="space-y-1">
-				<SettingsTitle>Bankverbindungen</SettingsTitle>
-				<SettingsSubtitle>
-					Um Zahlungen an dein Konto zu erhalten, musst du mindestens eine
-					Bankverbindung anlegen.
-				</SettingsSubtitle>
+				<SettingsTitle>{t("title")}</SettingsTitle>
+				<SettingsSubtitle>{t("description")}</SettingsSubtitle>
 			</div>
 			<div className="mt-12">
 				<div className="flex flex-wrap items-center justify-between gap-4">
-					<p className="font-medium text-xs text-zinc-600">Deine Bankdaten</p>
+					<p className="font-medium text-xs text-zinc-600">{t("listHeading")}</p>
 					<CreateBankingDetails
 						className={"text-blue-500"}
 						size={"sm"}
 						variant={"ghost"}
 					>
-						Erstellen <PlusIcon />
+						{t("createButton")} <PlusIcon />
 					</CreateBankingDetails>
 				</div>
 				<div className="mt-1">
@@ -66,6 +66,7 @@ function UserSettingsBankDetails() {
 }
 
 function DetailsList() {
+	const t = useTranslations("modules.settings.banking");
 	const { data: details, isPending } = api.bankingDetails.list.useQuery();
 
 	if (isPending) {
@@ -73,7 +74,7 @@ function DetailsList() {
 	}
 
 	if (!details) {
-		return <p>No details found - error</p>;
+		return <p>{t("loadErrorFallback")}</p>;
 	}
 
 	if (details.length === 0) {
@@ -81,10 +82,8 @@ function DetailsList() {
 			<Box>
 				<BoxItem className="min-h-24">
 					<BoxItemContent className="flex w-full flex-col items-center justify-center text-center">
-						<BoxItemTitle>Noch keine Bankverbindung hinterlegt</BoxItemTitle>
-						<BoxItemDescription>
-							Hinterlege eine Bankverbindung um Zahlungen zu erhalten
-						</BoxItemDescription>
+						<BoxItemTitle>{t("emptyTitle")}</BoxItemTitle>
+						<BoxItemDescription>{t("emptyDescription")}</BoxItemDescription>
 					</BoxItemContent>
 				</BoxItem>
 			</Box>
@@ -98,8 +97,10 @@ function DetailsList() {
 					<BoxItemContent>
 						<BoxItemTitle>{detail.title}</BoxItemTitle>
 						<BoxItemDescription>
-							Erstellt am {format(detail.createdAt, "dd.MM.yyyy")} um{" "}
-							{format(detail.createdAt, "HH:MM")}
+							{t("createdOn", {
+								date: format(detail.createdAt, "dd.MM.yyyy"),
+								time: format(detail.createdAt, "HH:MM"),
+							})}
 						</BoxItemDescription>
 					</BoxItemContent>
 				</BoxItem>
@@ -117,19 +118,20 @@ const createBankingDetailsSchema = z.object({
 export function CreateBankingDetails({
 	...props
 }: React.ComponentProps<typeof Button>) {
+	const t = useTranslations("modules.settings.banking.createDialog");
 	const utils = api.useUtils();
 	const [open, setOpen] = useState(false);
 
 	const createBankingDetails = api.bankingDetails.create.useMutation({
 		onSuccess: () => {
-			toast.success("Bankverbindung erfolgreich erstellt");
+			toast.success(t("savedToast"));
 			utils.bankingDetails.list.invalidate();
 			setOpen(false);
 			form.reset();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Bankverbindung", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -153,10 +155,8 @@ export function CreateBankingDetails({
 			<DialogTrigger render={<Button {...props} />} />
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Neue Bankverbindung</DialogTitle>
-					<DialogDescription>
-						Lege eine neue Banverbindung an um Zahlungen zu erhalten.
-					</DialogDescription>
+					<DialogTitle>{t("title")}</DialogTitle>
+					<DialogDescription>{t("description")}</DialogDescription>
 				</DialogHeader>
 				<div>
 					<form
@@ -173,7 +173,7 @@ export function CreateBankingDetails({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Titel</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{t("titleLabel")}</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -182,10 +182,7 @@ export function CreateBankingDetails({
 												onChange={(e) => field.handleChange(e.target.value)}
 												value={field.state.value}
 											/>
-											<FieldDescription>
-												Nutze diesen Titel um die Bankverbindung später einfach
-												wiederzufinden.
-											</FieldDescription>
+											<FieldDescription>{t("titleDescription")}</FieldDescription>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
 										</Field>
 									);
@@ -197,7 +194,7 @@ export function CreateBankingDetails({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>IBAN</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{t("ibanLabel")}</FieldLabel>
 											<IbanInput
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -217,7 +214,7 @@ export function CreateBankingDetails({
 										field.state.meta.isTouched && !field.state.meta.isValid;
 									return (
 										<Field data-invalid={isInvalid}>
-											<FieldLabel htmlFor={field.name}>Name</FieldLabel>
+											<FieldLabel htmlFor={field.name}>{t("nameLabel")}</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
 												id={field.name}
@@ -226,10 +223,7 @@ export function CreateBankingDetails({
 												onChange={(e) => field.handleChange(e.target.value)}
 												value={field.state.value}
 											/>
-											<FieldDescription>
-												Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen
-												übereinstimmt.
-											</FieldDescription>
+											<FieldDescription>{t("nameDescription")}</FieldDescription>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
 										</Field>
 									);
@@ -240,7 +234,7 @@ export function CreateBankingDetails({
 								form="form-create-banking-details"
 								type="submit"
 							>
-								{createBankingDetails.isPending ? "Erstellen..." : "Erstellen"}
+								{createBankingDetails.isPending ? t("submitCreating") : t("submitIdle")}
 							</Button>
 						</FieldGroup>
 					</form>

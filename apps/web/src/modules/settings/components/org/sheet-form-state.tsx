@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { SheetBody, SheetFooter } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,17 +28,19 @@ function SheetFormSkeleton({ fieldCount }: { fieldCount: number }) {
 }
 
 function SheetFormError({ error, retry }: { error: Error; retry: () => void }) {
+	const t = useTranslations("modules.settings");
+
 	return (
 		<>
 			<SheetBody>
 				<div className="space-y-3">
-					<p className="font-medium text-sm">Couldn&apos;t load the form</p>
+					<p className="font-medium text-sm">{t("shared.loadFormErrorTitle")}</p>
 					<p className="text-muted-foreground text-sm">{error.message}</p>
 				</div>
 			</SheetBody>
 			<SheetFooter>
 				<Button onClick={retry} variant="outline">
-					Try again
+					{t("actions.tryAgain")}
 				</Button>
 			</SheetFooter>
 		</>
