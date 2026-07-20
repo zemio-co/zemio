@@ -454,7 +454,7 @@ function ReportHeaderEditAction({
 }
 
 const editTitleFormSchema = z.object({
-	title: z.string().min(1, "Titel darf nicht leer sein"),
+	title: z.string().min(1, "report.editTitleRequired"),
 });
 
 function ReportHeaderEditTitle({

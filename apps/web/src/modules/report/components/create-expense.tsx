@@ -86,24 +86,24 @@ const receiptExpenseFormSchema = z.object({
 	amount: z.number().min(0),
 	startDate: z
 		.string()
-		.min(1, "Startdatum ist erforderlich")
+		.min(1, "expense.startDateRequired")
 		.refine(
 			(val) => {
 				const date = parse(val, "dd.MM.yyyy", new Date());
 				return isValid(date);
 			},
-			{ message: "Ungültiges Startdatum" },
+			{ message: "expense.invalidStartDate" },
 		)
 		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
 	endDate: z
 		.string()
-		.min(1, "Enddatum ist erforderlich")
+		.min(1, "expense.endDateRequired")
 		.refine(
 			(val) => {
 				const date = parse(val, "dd.MM.yyyy", new Date());
 				return isValid(date);
 			},
-			{ message: "Ungültiges Enddatum" },
+			{ message: "expense.invalidEndDate" },
 		)
 		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
 	files: z.file().array(),

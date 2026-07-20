@@ -1208,5 +1208,29 @@
 			"acceptError": "Einladung konnte nicht angenommen werden",
 			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
 		}
+	},
+	"validation": {
+		"report": {
+			"titleRequired": "Bitte gib einen Titel ein.",
+			"costUnitRequired": "Bitte wähle eine Kostenstelle aus.",
+			"bankingDetailsRequired": "Bitte wähle eine Bankverbindung aus.",
+			"editTitleRequired": "Titel darf nicht leer sein."
+		},
+		"banking": {
+			"invalidIban": "Ungültige IBAN"
+		},
+		"expense": {
+			"startDateRequired": "Startdatum ist erforderlich",
+			"invalidStartDate": "Ungültiges Startdatum",
+			"endDateRequired": "Enddatum ist erforderlich",
+			"invalidEndDate": "Ungültiges Enddatum"
+		},
+		"organization": {
+			"nameRequired": "Name ist erforderlich",
+			"slugRequired": "Slug ist erforderlich",
+			"slugFormat": "Nur Kleinbuchstaben, Zahlen und \"-\" erlaubt",
+			"logoInvalid": "Bitte gib eine gültige Logo-URL ein",
+			"tenantIdInvalid": "Microsoft Tenant ID muss eine gültige UUID sein"
+		}
 	}
 }

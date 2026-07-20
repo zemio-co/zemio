@@ -170,21 +170,18 @@ function OrganizationDetailsMetrics({
 }
 
 const organizationDetailsGeneralFormSchema = z.object({
-	name: z.string().trim().min(1, "Name is required").max(100),
+	name: z.string().trim().min(1, "organization.nameRequired").max(100),
 	slug: z
 		.string()
 		.trim()
-		.min(1, "Slug is required")
+		.min(1, "organization.slugRequired")
 		.max(100)
-		.regex(
-			/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-			'Use lowercase letters, numbers, and "-" only',
-		),
+		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "organization.slugFormat"),
 	microsoftTenantId: z.union([
 		z.literal(""),
-		z.uuid("Microsoft Tenant ID must be a valid UUID"),
+		z.uuid("organization.tenantIdInvalid"),
 	]),
-	logoUrl: z.union([z.literal(""), z.url("Enter a valid logo URL")]),
+	logoUrl: z.union([z.literal(""), z.url("organization.logoInvalid")]),
 });
 
 function OrganizationDetailsGeneralForm({
