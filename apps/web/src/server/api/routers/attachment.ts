@@ -113,7 +113,10 @@ export const attachmentRouter = createTRPCRouter({
 					.array(
 						z
 							.string()
-							.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+							.regex(
+								/^attachment\/[^/]+\/[^/]+$/,
+								"Ungültiges Anhang-Schlüsselformat",
+							),
 					)
 					.max(5),
 			}),
