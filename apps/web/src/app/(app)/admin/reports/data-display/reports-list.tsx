@@ -41,6 +41,17 @@ import { createColumns, type ExtendedReport } from "./columns";
 
 const PAGE_SIZE = 50;
 
+const DEFAULT_STATUS_FILTER: ColumnFiltersState = [
+	{
+		id: "status",
+		value: {
+			filterType: "multiselect",
+			operator: "in",
+			value: ["PENDING_APPROVAL", "ACCEPTED"] satisfies ReportStatus[],
+		},
+	},
+];
+
 const SERVER_SORT_FIELDS = [
 	"createdAt",
 	"lastUpdatedAt",
@@ -64,7 +75,7 @@ function buildReportListSorting(
 }
 
 type AdminFilterRule =
-	| { field: "status"; op: "is" | "isNot"; value: ReportStatus }
+	| { field: "status"; op: "in" | "notIn"; value: ReportStatus[] }
 	| { field: "ownerId"; op: "is" | "isNot"; value: string }
 	| { field: "costUnitId"; op: "in" | "notIn"; value: string[] }
 	| { field: "createdAt"; op: "between"; value: { start: Date; end: Date } };
@@ -77,11 +88,15 @@ function buildReportListFilters(
 	const rules: AdminFilterRule[] = [];
 
 	for (const filter of columnFilters) {
-		if (filter.id === "status" && isSelectFilter(filter.value)) {
+		if (
+			filter.id === "status" &&
+			isMultiSelectFilter(filter.value) &&
+			filter.value.value.length > 0
+		) {
 			rules.push({
 				field: "status",
-				op: filter.value.operator === "is" ? "is" : "isNot",
-				value: filter.value.value as ReportStatus,
+				op: filter.value.operator === "in" ? "in" : "notIn",
+				value: filter.value.value as ReportStatus[],
 			});
 		}
 
@@ -121,7 +136,9 @@ function buildReportListFilters(
 
 export function ReportsList() {
 	const [page, setPage] = useState<number>(1);
-	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+		DEFAULT_STATUS_FILTER,
+	);
 	const [grouping, setGrouping] = useState<string[]>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [rowSelection, setRowSelection] = useState<RowSelectionState>({});

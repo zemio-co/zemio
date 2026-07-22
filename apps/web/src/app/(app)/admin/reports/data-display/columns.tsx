@@ -89,12 +89,14 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 		);
 	},
 	filterFn: (row, _columnId, filterValue) => {
-		const { operator = "is", value = "PENDING_APPROVAL" } = (filterValue ??
-			{}) as SelectFilterValue<ReportStatus>;
+		const { operator = "in", value = [] } = (filterValue ??
+			{}) as MultiSelectFilterValue<ReportStatus>;
 
-		return operator === "is"
-			? row.original.status === value
-			: row.original.status !== value;
+		if (value.length === 0) return true;
+
+		return operator === "in"
+			? value.includes(row.original.status)
+			: !value.includes(row.original.status);
 	},
 	cell: ({ row }) => {
 		const Icon = StatusIcons[row.original.status];
@@ -141,7 +143,7 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 			icon: StatusIcons[status],
 		})),
 		placeholder: "Status",
-		filterType: "select",
+		filterType: "multiselect",
 	},
 };
 
