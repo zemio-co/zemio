@@ -11,6 +11,7 @@ import {
 	Tailwind,
 	Text,
 } from "@react-email/components";
+import { createAppTranslator } from "@zemio/i18n";
 
 const baseUrl =
 	process.env.NODE_ENV === "production"
@@ -26,12 +27,15 @@ export default function ReportSubmittedEmail({
 	title,
 	name,
 }: ReportSubmittedEmailProps) {
+	const t = createAppTranslator({ namespace: "emails.reportSubmitted" });
+	const tShared = createAppTranslator({ namespace: "emails.shared" });
+
 	return (
 		<Html>
 			<Head />
 			<Tailwind config={{}}>
 				<Body className="bg-zinc-50 font-sans">
-					<Preview>Dein Spesenbericht wurde erfolgreich eingereicht</Preview>
+					<Preview>{t("preview")}</Preview>
 					<Container className="bg-white px-6 py-8">
 						<Img
 							className="h-5 w-fit"
@@ -39,27 +43,22 @@ export default function ReportSubmittedEmail({
 						/>
 						<Text className="mt-16 font-medium text-2xl">{title}</Text>
 						<Section>
-							<Text>Hallo {name},</Text>
+							<Text>{t("greeting", { name })}</Text>
+							<Text>{t("body", { title })}</Text>
 							<Text>
-								Hiermit bestätigen wir, dass dein Spesenbericht "{title}" erfolgreich
-								eingereicht wurde. Bitte warte nun auf die Freigabe durch einen
-								Reviewer.
+								{tShared.rich("supportPrompt", {
+									email: (chunks) => (
+										<Button href="mailto:support@zemio.co">{chunks}</Button>
+									),
+								})}
 							</Text>
 							<Text>
-								Wende dich bei Fragen bitte an{" "}
-								<Button href="mailto:support@zemio.co">support@zemio.co</Button>.
-							</Text>
-							<Text>
-								Beste Grüße,
+								{tShared("regards")}
 								<br />
-								Dein zemio Team
+								{tShared("team")}
 							</Text>
 							<Hr />
-							<Text className="text-xs text-zinc-500">
-								Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast.
-								Solltest du keinen Spesenbericht eingereicht haben, kannst du diese
-								E-Mail ignorieren.
-							</Text>
+							<Text className="text-xs text-zinc-500">{t("footer")}</Text>
 						</Section>
 					</Container>
 				</Body>

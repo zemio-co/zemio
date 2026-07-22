@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -18,6 +20,16 @@ function ReportingOverviewCard({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.reporting.overview");
+	const tCommon = useTranslations("modules.reporting.common");
+
+	const acceptedLabel = useReportStatusLabel("ACCEPTED");
+	const rejectedLabel = useReportStatusLabel("REJECTED");
+	const pendingApprovalLabel = useReportStatusLabel("PENDING_APPROVAL");
+	const needsRevisionLabel = useReportStatusLabel("NEEDS_REVISION");
+	const draftLabel = useReportStatusLabel("DRAFT");
+	const paidLabel = useReportStatusLabel("PAID");
+
 	const dates = useReportingStore((state) => state.dates);
 
 	const query = api.reporting.overview.useQuery({
@@ -43,9 +55,7 @@ function ReportingOverviewCard({
 				data-slot="reporting-cost-units"
 				{...props}
 			>
-				<p className="mb-3 font-semibold text-slate-700 text-xs">
-					Antragsübersicht
-				</p>
+				<p className="mb-3 font-semibold text-slate-700 text-xs">{t("title")}</p>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">
 					{[1, 2, 3, 4, 5, 6].map((row) => (
@@ -57,7 +67,7 @@ function ReportingOverviewCard({
 	}
 
 	if (query.error) {
-		return <p>Error</p>;
+		return <p>{tCommon("loadError")}</p>;
 	}
 
 	const { data } = query;
@@ -69,13 +79,13 @@ function ReportingOverviewCard({
 			{...props}
 		>
 			<ReportingCardHeader>
-				<ReportingCardDescription>Antragsübersicht</ReportingCardDescription>
+				<ReportingCardDescription>{t("title")}</ReportingCardDescription>
 			</ReportingCardHeader>
 			<ReportingCardBody className="grid gap-4 pb-4 sm:grid-cols-2">
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.ACCEPTED className="size-3.5 text-slate-500" />
-						Akzeptiert
+						{acceptedLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-green-500")} />
@@ -85,7 +95,7 @@ function ReportingOverviewCard({
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.REJECTED className="size-3.5 text-slate-500" />
-						Abgelehnt
+						{rejectedLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-red-500")} />
@@ -95,7 +105,7 @@ function ReportingOverviewCard({
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.PENDING_APPROVAL className="size-3.5 text-slate-500" />
-						Ausstehend
+						{pendingApprovalLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-yellow-500")} />
@@ -105,7 +115,7 @@ function ReportingOverviewCard({
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.NEEDS_REVISION className="size-3.5 text-slate-500" />
-						Revision angefordert
+						{needsRevisionLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-orange-500")} />
@@ -115,7 +125,7 @@ function ReportingOverviewCard({
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.DRAFT className="size-3.5 text-slate-500" />
-						Entwürfe
+						{draftLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-slate-500")} />
@@ -125,7 +135,7 @@ function ReportingOverviewCard({
 				<div className="space-y-2">
 					<p className="flex items-center justify-start gap-2 text-slate-500 text-sm">
 						<StatusIcons.PAID className="size-3.5 text-slate-500" />
-						Ausgezahlt
+						{paidLabel}
 					</p>
 					<ReportingCardTitle className="**:data-[slot='card-title-content']:flex **:data-[slot='card-title-content']:items-center **:data-[slot='card-title-content']:gap-4">
 						<span className={cn("block size-2.5 rounded-sm bg-green-500")} />

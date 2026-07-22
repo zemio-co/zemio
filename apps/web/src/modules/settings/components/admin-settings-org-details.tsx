@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -38,6 +39,7 @@ const _updateOrganizationSchema = z.object({
 });
 
 function AdminOrgDetails({ organizationId }: { organizationId: string }) {
+	const t = useTranslations("modules.settings.adminOrgs.details");
 	const {
 		data: organization,
 		isPending,
@@ -49,7 +51,7 @@ function AdminOrgDetails({ organizationId }: { organizationId: string }) {
 	}
 
 	if (!organization || error) {
-		return <p>An error ocurred</p>;
+		return <p>{t("loadErrorFallback")}</p>;
 	}
 
 	const admins = organization.members.filter(
@@ -64,7 +66,7 @@ function AdminOrgDetails({ organizationId }: { organizationId: string }) {
 					href={ROUTES.SETTINGS_ADMIN_ORGS()}
 				>
 					<ArrowLeftIcon className="size-4" />
-					Go back
+					{t("backLink")}
 				</Link>
 				<OrganizationDetailsHeader className="mt-8" name={organization.name} />
 
@@ -88,7 +90,9 @@ function AdminOrgDetails({ organizationId }: { organizationId: string }) {
 					}}
 				/>
 
-				<p className="mt-12 font-medium text-xs text-zinc-600">Admins</p>
+				<p className="mt-12 font-medium text-xs text-zinc-600">
+					{t("adminsSectionTitle")}
+				</p>
 				<OrganizationDetailsAdmins
 					admins={admins.map(({ user }) => {
 						return {
@@ -110,6 +114,8 @@ function OrganizationDetailsHeader({
 	name,
 	...props
 }: React.ComponentProps<"header"> & { name: string }) {
+	const t = useTranslations("modules.settings.adminOrgs.details");
+
 	return (
 		<header
 			className={cn("flex items-start justify-start gap-4", className)}
@@ -120,9 +126,7 @@ function OrganizationDetailsHeader({
 			</div>
 			<div className="space-y-1">
 				<h1 className="font-semibold text-lg text-zinc-800">{name}</h1>
-				<p className="text-sm text-zinc-500">
-					Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.
-				</p>
+				<p className="text-sm text-zinc-500">{t("description")}</p>
 			</div>
 		</header>
 	);
@@ -141,22 +145,24 @@ function OrganizationDetailsMetrics({
 	adminCount: number;
 	inviteCount: number;
 }) {
+	const t = useTranslations("modules.settings.adminOrgs.details.metrics");
+
 	return (
 		<div className={cn("grid grid-cols-4 gap-6", className)} {...props}>
 			<div className="space-y-2 rounded-lg border border-zinc-200 p-4 pb-3">
-				<p className="font-medium text-xs text-zinc-500">Mitglieder</p>
+				<p className="font-medium text-xs text-zinc-500">{t("members")}</p>
 				<p className="font-semibold text-2xl text-zinc-800">{memberCount}</p>
 			</div>
 			<div className="space-y-2 rounded-lg border border-zinc-200 p-4 pb-3">
-				<p className="font-medium text-xs text-zinc-500">Reports</p>
+				<p className="font-medium text-xs text-zinc-500">{t("reports")}</p>
 				<p className="font-semibold text-2xl text-zinc-800">{reportCount}</p>
 			</div>
 			<div className="space-y-2 rounded-lg border border-zinc-200 p-4 pb-3">
-				<p className="font-medium text-xs text-zinc-500">Admins</p>
+				<p className="font-medium text-xs text-zinc-500">{t("admins")}</p>
 				<p className="font-semibold text-2xl text-zinc-800">{adminCount}</p>
 			</div>
 			<div className="space-y-2 rounded-lg border border-zinc-200 p-4 pb-3">
-				<p className="font-medium text-xs text-zinc-500">Einladungen</p>
+				<p className="font-medium text-xs text-zinc-500">{t("invitations")}</p>
 				<p className="font-semibold text-2xl text-zinc-800">{inviteCount}</p>
 			</div>
 		</div>
@@ -164,21 +170,18 @@ function OrganizationDetailsMetrics({
 }
 
 const organizationDetailsGeneralFormSchema = z.object({
-	name: z.string().trim().min(1, "Name is required").max(100),
+	name: z.string().trim().min(1, "organization.nameRequired").max(100),
 	slug: z
 		.string()
 		.trim()
-		.min(1, "Slug is required")
+		.min(1, "organization.slugRequired")
 		.max(100)
-		.regex(
-			/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-			'Use lowercase letters, numbers, and "-" only',
-		),
+		.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "organization.slugFormat"),
 	microsoftTenantId: z.union([
 		z.literal(""),
-		z.uuid("Microsoft Tenant ID must be a valid UUID"),
+		z.uuid("organization.tenantIdInvalid"),
 	]),
-	logoUrl: z.union([z.literal(""), z.url("Enter a valid logo URL")]),
+	logoUrl: z.union([z.literal(""), z.url("organization.logoInvalid")]),
 });
 
 function OrganizationDetailsGeneralForm({
@@ -195,10 +198,13 @@ function OrganizationDetailsGeneralForm({
 		metadata: string | null;
 	};
 }) {
+	const t = useTranslations("modules.settings.adminOrgs.details.generalForm");
+	const tDetails = useTranslations("modules.settings.adminOrgs.details");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const updateOrganization = api.platformAdmin.updateOrganization.useMutation({
 		onSuccess: async () => {
-			toast.success("Organization settings saved.");
+			toast.success(t("savedToast"));
 			await Promise.all([
 				utils.platformAdmin.getOrganizationDetails.invalidate({
 					organizationId: initialData.id,
@@ -242,7 +248,9 @@ function OrganizationDetailsGeneralForm({
 			}}
 			{...props}
 		>
-			<p className="font-medium text-xs text-zinc-600">General</p>
+			<p className="font-medium text-xs text-zinc-600">
+				{tDetails("generalSectionTitle")}
+			</p>
 			<div className="rounded-lg bg-white shadow-xs ring-1 ring-zinc-700/10">
 				<form.Field name="name">
 					{({ state, ...field }) => {
@@ -255,10 +263,10 @@ function OrganizationDetailsGeneralForm({
 											className="font-medium text-sm text-zinc-800"
 											htmlFor={field.name}
 										>
-											Name
+											{t("nameLabel")}
 										</FieldLabel>
 										<FieldDescription className="mt-0.5 text-stone-500 text-xs">
-											Wird Nutzern in der App und E-Mails angezeigt
+											{t("nameDescription")}
 										</FieldDescription>
 									</div>
 									<div>
@@ -269,7 +277,7 @@ function OrganizationDetailsGeneralForm({
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="Meine Organisation"
+											placeholder={t("namePlaceholder")}
 											value={state.value}
 										/>
 										{isInvalid && <FieldError errors={state.meta.errors} />}
@@ -290,10 +298,10 @@ function OrganizationDetailsGeneralForm({
 											className="font-medium text-sm text-zinc-800"
 											htmlFor={field.name}
 										>
-											Slug
+											{t("slugLabel")}
 										</FieldLabel>
 										<FieldDescription className="mt-0.5 text-stone-500 text-xs">
-											Zur eindeutigen und nutzerfreundlichen Identifikation
+											{t("slugDescription")}
 										</FieldDescription>
 									</div>
 									<div>
@@ -304,7 +312,7 @@ function OrganizationDetailsGeneralForm({
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="my-org"
+											placeholder={t("slugPlaceholder")}
 											value={state.value}
 										/>
 										{isInvalid && <FieldError errors={state.meta.errors} />}
@@ -325,11 +333,10 @@ function OrganizationDetailsGeneralForm({
 											className="font-medium text-sm text-zinc-800"
 											htmlFor={field.name}
 										>
-											Microsoft Tenant ID
+											{t("tenantIdLabel")}
 										</FieldLabel>
 										<FieldDescription className="mt-0.5 text-stone-500 text-xs">
-											Users whose Entra ID tenant matches this UUID can be assigned to this
-											organization automatically.
+											{t("tenantIdDescription")}
 										</FieldDescription>
 									</div>
 									<div>
@@ -340,7 +347,7 @@ function OrganizationDetailsGeneralForm({
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+											placeholder={t("tenantIdPlaceholder")}
 											value={state.value}
 										/>
 										{isInvalid && <FieldError errors={state.meta.errors} />}
@@ -361,10 +368,10 @@ function OrganizationDetailsGeneralForm({
 											className="font-medium text-sm text-zinc-800"
 											htmlFor={field.name}
 										>
-											Logo URL
+											{t("logoUrlLabel")}
 										</FieldLabel>
 										<FieldDescription className="mt-0.5 text-stone-500 text-xs">
-											URL zum Logo der Organisation
+											{t("logoUrlDescription")}
 										</FieldDescription>
 									</div>
 									<div>
@@ -375,7 +382,7 @@ function OrganizationDetailsGeneralForm({
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="https://example.com/logo.png"
+											placeholder={t("logoUrlPlaceholder")}
 											value={state.value}
 										/>
 										{isInvalid && <FieldError errors={state.meta.errors} />}
@@ -393,7 +400,7 @@ function OrganizationDetailsGeneralForm({
 					type="submit"
 					variant={"outline"}
 				>
-					Speichern
+					{tActions("save")}
 				</Button>
 			</div>
 		</form>
@@ -407,6 +414,8 @@ function OrganizationDetailsAdmins({
 }: React.ComponentProps<"div"> & {
 	admins: { id: string; name: string; email: string; image: string | null }[];
 }) {
+	const t = useTranslations("modules.settings.adminOrgs.details");
+
 	return (
 		<div
 			className={cn(
@@ -417,10 +426,10 @@ function OrganizationDetailsAdmins({
 		>
 			{admins.length === 0 && (
 				<div className="flex w-full flex-col items-center justify-center p-5 text-center">
-					<p className="font-medium text-sm text-zinc-800">Keine Admins</p>
-					<p className="text-xs text-zinc-500">
-						In dieser Organisation wurden keine Administratoren gefunden
+					<p className="font-medium text-sm text-zinc-800">
+						{t("adminsEmptyTitle")}
 					</p>
+					<p className="text-xs text-zinc-500">{t("adminsEmptyDescription")}</p>
 				</div>
 			)}
 			{admins.map((admin) => (

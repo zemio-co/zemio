@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -49,8 +50,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { ROUTES } from "@/lib/routes";
-import { cn, translateReportStatus } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 function ReportHeader({
@@ -104,6 +106,7 @@ function ReportHeaderBreadcrumb({
 }: React.ComponentProps<"div"> & {
 	reportShortId: string | number;
 }) {
+	const t = useTranslations("modules.report.header");
 	const handleCopy = React.useCallback(() => {
 		navigator.clipboard.writeText(reportShortId.toString());
 	}, [reportShortId]);
@@ -118,7 +121,7 @@ function ReportHeaderBreadcrumb({
 				className="font-medium text-slate-500 text-sm"
 				href={ROUTES.USER_REPORTS_LIST()}
 			>
-				Anträge
+				{t("breadcrumb")}
 			</Link>
 			<ChevronRightIcon className="me-0 ml-1 size-4 text-slate-400" />
 			<Button
@@ -210,13 +213,15 @@ function HeaderStatusBadge({
 }: React.ComponentProps<"span"> & {
 	status: ReportStatus;
 }) {
+	const statusLabel = useReportStatusLabel(status);
+
 	return (
 		<span
 			className={cn(statusBadgeVariants({ status, className }))}
 			data-slot="header-status-badge"
 			{...props}
 		>
-			{translateReportStatus(status)}
+			{statusLabel}
 		</span>
 	);
 }
@@ -230,6 +235,8 @@ function ReportSubtitle({
 	reportOwnerName: string;
 	reportCreatedAt: Date;
 }) {
+	const t = useTranslations("modules.report.header");
+
 	return (
 		<div
 			className={cn(
@@ -242,16 +249,21 @@ function ReportSubtitle({
 			<CornerDownRightIcon className="mt-0.5 size-3.5 shrink-0 text-slate-400" />
 			<div className="flex flex-col items-start justify-start gap-x-2 gap-y-1 sm:flex-row">
 				<p className="text-slate-500">
-					Antrag eingereicht von{" "}
-					<span className="font-semibold text-violet-600">{reportOwnerName}</span>
+					{t.rich("submittedBy", {
+						bold: (chunks) => (
+							<span className="font-semibold text-violet-600">{chunks}</span>
+						),
+						ownerName: reportOwnerName,
+					})}
 				</p>
 				<p className="hidden shrink-0 text-slate-400 sm:block">•</p>
 				<p className="shrink-0 text-slate-500">
-					{formatDistanceToNow(reportCreatedAt, {
-						addSuffix: true,
-						locale: de,
-					})}{" "}
-					erstellt
+					{t("createdAgo", {
+						timeAgo: formatDistanceToNow(reportCreatedAt, {
+							addSuffix: true,
+							locale: de,
+						}),
+					})}
 				</p>
 			</div>
 		</div>
@@ -265,6 +277,8 @@ function ReportHeaderActions({
 }: React.ComponentProps<"div"> & {
 	report: Report;
 }) {
+	const t = useTranslations("modules.report.header.actions");
+
 	return (
 		<div
 			className={cn(
@@ -279,18 +293,18 @@ function ReportHeaderActions({
 				report={report}
 				variant={"outline"}
 			>
-				Kopieren
+				{t("copy")}
 			</ReportHeaderCopyAction>
 			<ReportHeaderEditAction
 				className={"w-full sm:w-fit"}
 				report={report}
 				variant={"outline"}
 			>
-				Bearbeiten
+				{t("edit")}
 			</ReportHeaderEditAction>
 
 			<ReportHeaderSubmitAction className={"w-full sm:w-fit"} report={report}>
-				Einreichen
+				{t("submit")}
 			</ReportHeaderSubmitAction>
 		</div>
 	);
@@ -302,6 +316,7 @@ function ReportHeaderCopyAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
+	const t = useTranslations("modules.report.header.copyAction");
 	const financialQuery = api.report.financialSummary.useQuery({
 		id: report.id,
 	});
@@ -320,31 +335,31 @@ function ReportHeaderCopyAction({
 		{
 			id: "id",
 			icon: FingerprintIcon,
-			title: "ID",
+			title: t("id"),
 			value: report.id,
 		},
 		{
 			id: "iban",
 			icon: CreditCardIcon,
-			title: "IBAN",
+			title: t("iban"),
 			value: financialSummary.iban,
 		},
 		{
 			id: "name",
 			icon: UserIcon,
-			title: "Kontoname",
+			title: t("accountName"),
 			value: financialSummary.ownerName,
 		},
 		{
 			id: "sum",
 			icon: CalculatorIcon,
-			title: "Summe",
+			title: t("sum"),
 			value: financialSummary.totalAmount,
 		},
 		{
 			id: "title",
 			icon: TextIcon,
-			title: "Titel",
+			title: t("title"),
 			value: report.title,
 		},
 	];
@@ -360,10 +375,10 @@ function ReportHeaderCopyAction({
 								key={action.id}
 								onClick={() => {
 									navigator.clipboard.writeText(action.value.toString());
-									toast.success(`${action.title} wurde zum Clipboard kopiert`);
+									toast.success(t("copiedToast", { title: action.title }));
 								}}
 							>
-								<Icon /> {action.title} kopieren
+								<Icon /> {t("copyLabel", { title: action.title })}
 							</DropdownMenuItem>
 						);
 					})}
@@ -380,6 +395,7 @@ function ReportHeaderEditAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
+	const t = useTranslations("modules.report.header.editMenu");
 	const editTitleHandleRef = React.useRef<ReturnType<
 		typeof AlertDialogPrimitive.createHandle
 	> | null>(null);
@@ -413,7 +429,7 @@ function ReportHeaderEditAction({
 				<DropdownMenuContent align="center" className="min-w-48">
 					<DropdownMenuGroup>
 						<DropdownMenuItem onClick={() => editTitleHandle.open(null)}>
-							<TextIcon /> Titel bearbeiten
+							<TextIcon /> {t("editTitle")}
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							disabled={
@@ -422,7 +438,7 @@ function ReportHeaderEditAction({
 							onClick={() => deleteHandle.open(null)}
 							variant="destructive"
 						>
-							<TrashIcon /> Löschen
+							<TrashIcon /> {t("delete")}
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 				</DropdownMenuContent>
@@ -438,7 +454,7 @@ function ReportHeaderEditAction({
 }
 
 const editTitleFormSchema = z.object({
-	title: z.string().min(1, "Titel darf nicht leer sein"),
+	title: z.string().min(1, "report.editTitleRequired"),
 });
 
 function ReportHeaderEditTitle({
@@ -449,10 +465,12 @@ function ReportHeaderEditTitle({
 	reportId: string;
 	reportTitle: string;
 }) {
+	const t = useTranslations("modules.report.header.editTitleDialog");
+	const tToasts = useTranslations("modules.report.header.toasts");
 	const utils = api.useUtils();
 	const updateMutation = api.report.update.useMutation({
 		onSuccess: () => {
-			toast.success("Titel wurde erfolgreich aktualisiert.");
+			toast.success(tToasts("titleUpdated"));
 			utils.report.byId.invalidate({ id: reportId });
 			props.handle?.close();
 		},
@@ -484,10 +502,8 @@ function ReportHeaderEditTitle({
 					}}
 				>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Titel bearbeiten</AlertDialogTitle>
-						<AlertDialogDescription>
-							Bearbeite den öffentlichen Titel deines Antrags.
-						</AlertDialogDescription>
+						<AlertDialogTitle>{t("title")}</AlertDialogTitle>
+						<AlertDialogDescription>{t("description")}</AlertDialogDescription>
 					</AlertDialogHeader>
 					<div className="pt-8 pb-8">
 						<form.Field
@@ -497,7 +513,7 @@ function ReportHeaderEditTitle({
 								return (
 									<Field data-invalid={isInvalid}>
 										<FieldLabel className="text-slate-800" htmlFor={field.name}>
-											Beschreibung
+											{t("fieldLabel")}
 										</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
@@ -506,12 +522,10 @@ function ReportHeaderEditTitle({
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="Einkauf für die Weihnachtsfeier"
+											placeholder={t("fieldPlaceholder")}
 											value={field.state.value}
 										/>
-										<FieldDescription>
-											Der Titel ist für dich und Administratoren sichtbar.
-										</FieldDescription>
+										<FieldDescription>{t("fieldHelper")}</FieldDescription>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -521,14 +535,14 @@ function ReportHeaderEditTitle({
 					</div>
 					<AlertDialogFooter>
 						<AlertDialogCancel disabled={updateMutation.isPending}>
-							Abbrechen
+							{t("cancel")}
 						</AlertDialogCancel>
 						<AlertDialogAction
 							disabled={updateMutation.isPending}
 							form="update-report-title"
 							type="submit"
 						>
-							Speichern
+							{t("save")}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</form>
@@ -543,18 +557,20 @@ function ReportHeaderDelete({
 }: React.ComponentProps<typeof AlertDialog> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.header.deleteDialog");
+	const tToasts = useTranslations("modules.report.header.toasts");
 	const utils = api.useUtils();
 	const router = useRouter();
 
 	const deleteMutation = api.report.delete.useMutation({
 		onSuccess() {
-			toast.success("Antrag wurde erfolgreich gelöscht");
+			toast.success(tToasts("deleteSuccess"));
 			utils.report.list.invalidate();
 			router.push(ROUTES.USER_DASHBOARD());
 		},
 		onError(error) {
-			toast.error("Antrag konnte nicht gelöscht werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(tToasts("deleteErrorTitle"), {
+				description: error.message ?? tToasts("deleteErrorDescription"),
 			});
 		},
 	});
@@ -569,22 +585,18 @@ function ReportHeaderDelete({
 		<AlertDialog data-slot="report-header-delete-action" {...props}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Willst du deinen Antrag wirklich löschen?
-					</AlertDialogTitle>
-					<AlertDialogDescription>
-						Diese Aktion kann nicht rückgängig gemacht werden.
-					</AlertDialogDescription>
+					<AlertDialogTitle>{t("title")}</AlertDialogTitle>
+					<AlertDialogDescription>{t("description")}</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel disabled={deleteMutation.isPending}>
-						Abbrechen
+						{t("cancel")}
 					</AlertDialogCancel>
 					<AlertDialogAction
 						disabled={deleteMutation.isPending}
 						onClick={handleDelete}
 					>
-						Löschen
+						{t("confirm")}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
@@ -599,6 +611,8 @@ function ReportHeaderSubmitAction({
 }: React.ComponentProps<typeof Button> & {
 	report: Report;
 }) {
+	const t = useTranslations("modules.report.header.submitDialog");
+	const tToasts = useTranslations("modules.report.header.toasts");
 	const utils = api.useUtils();
 	const handleRef = React.useRef<ReturnType<
 		typeof AlertDialogPrimitive.createHandle
@@ -613,13 +627,13 @@ function ReportHeaderSubmitAction({
 
 	const submitMutation = api.report.submit.useMutation({
 		onSuccess() {
-			toast.success("Antrag wurde erfolgreich eingereicht");
+			toast.success(tToasts("submitSuccess"));
 			utils.report.byId.invalidate({ id: report.id });
 			handle.close();
 		},
 		onError(error) {
-			toast.error("Antrag konnte nicht eingereicht werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(tToasts("submitErrorTitle"), {
+				description: error.message ?? tToasts("submitErrorDescription"),
 			});
 		},
 	});
@@ -637,23 +651,18 @@ function ReportHeaderSubmitAction({
 			/>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Willst du deinen Antrag wirklich einreichen?
-					</AlertDialogTitle>
-					<AlertDialogDescription>
-						Du kannst den Antrag nicht mehr bearbeiten, nachdem du ihn eingereicht
-						hast.
-					</AlertDialogDescription>
+					<AlertDialogTitle>{t("title")}</AlertDialogTitle>
+					<AlertDialogDescription>{t("description")}</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel disabled={submitMutation.isPending}>
-						Abbrechen
+						{t("cancel")}
 					</AlertDialogCancel>
 					<AlertDialogAction
 						disabled={submitMutation.isPending}
 						onClick={handleSubmit}
 					>
-						Einreichen
+						{t("confirm")}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

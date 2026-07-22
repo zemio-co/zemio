@@ -4,6 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ function CreateReport({
 }: Omit<React.ComponentProps<typeof Sheet>, "children"> & {
 	children?: ReactNode;
 }) {
+	const t = useTranslations("modules.report.createReport");
 	const formId = useId();
 	const [isFormPending, setIsFormPending] = useState(false);
 
@@ -53,7 +55,7 @@ function CreateReport({
 			{children}
 			<SheetContent className={"data-[side=right]:w-full"}>
 				<SheetHeader>
-					<SheetTitle>Neuer Antrag</SheetTitle>
+					<SheetTitle>{t("sheetTitle")}</SheetTitle>
 				</SheetHeader>
 				<CreateReportBody formId={formId} onPendingChange={setIsFormPending} />
 				<SheetFooter className="flex-row justify-end">
@@ -64,7 +66,7 @@ function CreateReport({
 						size={"sm"}
 						type="submit"
 					>
-						<PlusIcon /> Antrag erstellen
+						<PlusIcon /> {t("submit")}
 					</Button>
 				</SheetFooter>
 			</SheetContent>
@@ -81,6 +83,7 @@ function CreateReportBody({
 	formId: string;
 	onPendingChange: (isPending: boolean) => void;
 }) {
+	const t = useTranslations("modules.report.createReport");
 	const costUnitsQuery = api.costUnit.listGroupsWithUnits.useQuery();
 	const bankingDetailsQuery = api.bankingDetails.list.useQuery();
 
@@ -115,9 +118,10 @@ function CreateReportBody({
 				{...props}
 			>
 				<CreateReportErrorState
-					code={costUnitsQuery.error.data?.code ?? "UNKNOWN"}
-					description="Die Kostenstellen konnten nicht geladen werden."
-					title="Fehler beim Laden der Kostenstellen."
+					description={t("errors.costUnitsDescription", {
+						code: costUnitsQuery.error.data?.code ?? "UNKNOWN",
+					})}
+					title={t("errors.costUnitsTitle")}
 				/>
 			</SheetBody>
 		);
@@ -131,9 +135,10 @@ function CreateReportBody({
 				{...props}
 			>
 				<CreateReportErrorState
-					code={bankingDetailsQuery.error.data?.code ?? "UNKNOWN"}
-					description="Die Bankverbindungen konnten nicht geladen werden."
-					title="Fehler beim Laden der Bankverbindungen."
+					description={t("errors.bankingDetailsDescription", {
+						code: bankingDetailsQuery.error.data?.code ?? "UNKNOWN",
+					})}
+					title={t("errors.bankingDetailsTitle")}
 				/>
 			</SheetBody>
 		);
@@ -151,16 +156,14 @@ function CreateReportBody({
 				{...props}
 			>
 				<div className="flex w-full flex-col items-center justify-center border border-slate-200 border-dashed p-8 px-8 py-10 text-center">
-					<p className="font-medium text-slate-800">
-						Keine Bankverbindung vorhanden
-					</p>
+					<p className="font-medium text-slate-800">{t("noBankingDetails.title")}</p>
 					<p className="mt-1 text-slate-500 text-xs">
-						Um einen Antrag zu erstellen, musst du zuerst eine{" "}
+						{t("noBankingDetails.textPrefix")}{" "}
 						<Link
 							className="no-underline! font-semibold text-violet-600 transition-colors hover:text-violet-400"
 							href={ROUTES.SETTINGS_USER_BANK_DETAILS()}
 						>
-							Bankverbindung hinterlegen
+							{t("noBankingDetails.linkText")}
 						</Link>
 						.
 					</p>
@@ -188,13 +191,11 @@ function CreateReportBody({
 function CreateReportErrorState({
 	className,
 	title,
-	code,
 	description,
 	...props
 }: Omit<React.ComponentProps<"div">, "title"> & {
 	title: string;
 	description: string;
-	code: string;
 }) {
 	return (
 		<div
@@ -206,9 +207,7 @@ function CreateReportErrorState({
 			{...props}
 		>
 			<p className="font-medium text-destructive">{title}</p>
-			<p className="mt-1 text-slate-500 text-xs">
-				{description} Code: {code}
-			</p>
+			<p className="mt-1 text-slate-500 text-xs">{description}</p>
 		</div>
 	);
 }
@@ -225,6 +224,8 @@ function CreateReportForm({
 	formId: string;
 	onPendingChange?: (isPending: boolean) => void;
 }) {
+	const t = useTranslations("modules.report.createReport");
+	const tCommon = useTranslations("modules.report.common");
 	const { costUnitMap, costUnitSelectItems } = useMemo(() => {
 		const map = new Map<
 			string,
@@ -251,12 +252,12 @@ function CreateReportForm({
 
 	const createReport = api.report.create.useMutation({
 		onSuccess(data) {
-			toast.success("Report erfolgreich erstellt");
+			toast.success(t("toasts.createSuccess"));
 			router.push(ROUTES.USER_REPORT_DETAILS(data.id));
 		},
 		onError(error) {
-			toast.error("Fehler beim Erstellen des Reports", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.createErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -304,7 +305,7 @@ function CreateReportForm({
 									className="mb-1 font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Titel
+									{t("fields.title")}
 								</FieldLabel>
 								<Input
 									aria-invalid={isInvalid}
@@ -313,7 +314,7 @@ function CreateReportForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Verpflegung Weihnachtsfeier"
+									placeholder={t("fields.titlePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -331,7 +332,7 @@ function CreateReportForm({
 									className="mb-1 font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Beschreibung
+									{t("fields.description")}
 								</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
@@ -340,12 +341,10 @@ function CreateReportForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Beschreibung des Reports"
+									placeholder={t("fields.descriptionPlaceholder")}
 									value={field.state.value}
 								/>
-								<FieldDescription>
-									Optional. Wird deinem Antrag als erste Notiz hinzugefügt.
-								</FieldDescription>
+								<FieldDescription>{t("fields.descriptionHelper")}</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
 						);
@@ -362,7 +361,7 @@ function CreateReportForm({
 									className="mb-1 font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Bankverbindung
+									{t("fields.bankingDetails")}
 								</FieldLabel>
 								<Select
 									items={bankingDetails.map((d) => ({ value: d.id, label: d.title }))}
@@ -370,7 +369,7 @@ function CreateReportForm({
 									value={field.state.value}
 								>
 									<SelectTrigger aria-invalid={isInvalid} data-invalid={isInvalid}>
-										<SelectValue placeholder="Bankverbindung auswählen" />
+										<SelectValue placeholder={t("fields.bankingDetailsPlaceholder")} />
 									</SelectTrigger>
 									<SelectContent>
 										<SelectGroup>
@@ -384,15 +383,14 @@ function CreateReportForm({
 								</Select>
 
 								<FieldDescription className="max-w-prose font-normal text-slate-500 text-sm/relaxed">
-									Um Zahlungen zu erhalten, muss eine Bankverbindung hinterlegt haben. Du
-									kannst deine Bankverbindung in den{" "}
+									{t("fields.bankingDetailsHelperPrefix")}{" "}
 									<Link
 										className="no-underline! font-semibold text-violet-600 transition-colors hover:text-violet-400"
 										href={ROUTES.SETTINGS_USER_BANK_DETAILS()}
 									>
-										Einstellungen
+										{t("fields.bankingDetailsHelperLink")}
 									</Link>{" "}
-									verwalten.
+									{t("fields.bankingDetailsHelperSuffix")}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -416,7 +414,7 @@ function CreateReportForm({
 									className="font-semibold text-base text-slate-800"
 									htmlFor={field.name}
 								>
-									Kostenstelle
+									{t("fields.costUnit")}
 								</FieldLabel>
 								<Select
 									items={costUnitSelectItems}
@@ -424,7 +422,7 @@ function CreateReportForm({
 									value={field.state.value}
 								>
 									<SelectTrigger aria-invalid={isInvalid} data-invalid={isInvalid}>
-										<SelectValue placeholder="Kostenstelle auswählen" />
+										<SelectValue placeholder={t("fields.costUnitPlaceholder")} />
 									</SelectTrigger>
 									<SelectContent>
 										{costUnitsGroups.map((group) => (
@@ -443,9 +441,7 @@ function CreateReportForm({
 
 								{costUnitExamples && (
 									<div className="mt-1 rounded-lg border border-slate-300 p-4 text-muted-foreground text-sm">
-										<p className="mb-2">
-											Zu der ausgewählten Kostenstelle gehören die folgenden Anliegen:
-										</p>
+										<p className="mb-2">{t("fields.costUnitExamplesTitle")}</p>
 										<ul className="list-inside list-disc font-medium text-slate-800 marker:text-slate-500">
 											{costUnitExamples.map((example) => (
 												<li key={example}>{example}</li>

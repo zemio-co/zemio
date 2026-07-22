@@ -1,6 +1,7 @@
 "use client";
 
 import { MoonIcon, SunIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -8,6 +9,7 @@ import { Kbd, KbdGroup } from "./ui/kbd";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ThemeToggle({ ...props }: React.ComponentProps<typeof Button>) {
+	const t = useTranslations("modules.shared.themeToggle");
 	const { resolvedTheme, setTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
@@ -44,7 +46,7 @@ export function ThemeToggle({ ...props }: React.ComponentProps<typeof Button>) {
 				}
 			/>
 			<TooltipContent sideOffset={8}>
-				<span className="me-2">Toggle theme</span>
+				<span className="me-2">{t("tooltip")}</span>
 				<KbdGroup>
 					<Kbd>⌘</Kbd> + <Kbd>D</Kbd>
 				</KbdGroup>

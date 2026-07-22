@@ -3,7 +3,7 @@ import z from "zod";
 export const attachmentInputSchema = z.object({
 	key: z
 		.string()
-		.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+		.regex(/^attachment\/[^/]+\/[^/]+$/, "Ungültiges Anhang-Schlüsselformat"),
 	size: z
 		.number()
 		.int()

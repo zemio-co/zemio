@@ -17,6 +17,7 @@ import {
 	CircleIcon,
 	EllipsisIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ import {
 } from "./update-cost-unit";
 
 function OrgSettingsCostUnits() {
+	const t = useTranslations("modules.settings.costUnits");
 	const createHandleRef = React.useRef<CreateCostUnitHandle | null>(null);
 	if (!createHandleRef.current)
 		createHandleRef.current = createCostUnitCreateHandle();
@@ -53,20 +55,18 @@ function OrgSettingsCostUnits() {
 		<section className="container">
 			<header className="flex flex-wrap items-start justify-between gap-8">
 				<div className="space-y-1">
-					<h1 className="font-bold text-2xl text-zinc-800">Kostenstellen</h1>
-					<p className="text-sm text-zinc-700">
-						Kostenstellen werden verwendet um Ausgaben einfacher zuordnen zu können
-					</p>
+					<h1 className="font-bold text-2xl text-zinc-800">{t("title")}</h1>
+					<p className="text-sm text-zinc-700">{t("description")}</p>
 				</div>
 				<div className="flex flex-nowrap items-center justify-center gap-4">
 					<CreateCostUnitGroupSheetTrigger
 						handle={createGroupHandle}
 						variant={"outline"}
 					>
-						Neue Gruppe
+						{t("newGroupButton")}
 					</CreateCostUnitGroupSheetTrigger>
 					<CreateCostUnitSheetTrigger handle={createHandle}>
-						Neue Kostenstelle
+						{t("newCostUnitButton")}
 					</CreateCostUnitSheetTrigger>
 				</div>
 			</header>
@@ -94,19 +94,25 @@ type FetchedCostUnit = {
 	status: CostUnitStatus;
 };
 
+type ColumnTranslator = (
+	key: string,
+	values?: Record<string, string | number>,
+) => string;
+
 function createMembersTableColumns(
 	handle: UpdateCostUnitHandle,
+	t: ColumnTranslator,
 ): ColumnDef<FetchedCostUnit>[] {
 	return [
 		{
 			id: "tag",
 			accessorKey: "tag",
-			header: "Tag",
+			header: t("table.tag"),
 		},
 		{
 			id: "title",
 			accessorKey: "title",
-			header: "Titel",
+			header: t("table.title"),
 			cell: ({ row }) => {
 				return (
 					<span className="font-semibold text-slate-800">{row.original.title}</span>
@@ -119,14 +125,18 @@ function createMembersTableColumns(
 				return original.examples.length;
 			},
 			cell: ({ row }) => {
-				return <span>{row.original.examples.length} Beispiele</span>;
+				return (
+					<span>
+						{t("table.examplesCount", { count: row.original.examples.length })}
+					</span>
+				);
 			},
 			header: undefined,
 		},
 		{
 			id: "createdAt",
 			accessorKey: "",
-			header: "Erstellt",
+			header: t("table.createdAt"),
 			cell: ({ row }) => {
 				return format(row.original.createdAt, "dd.MM.yyyy, HH:mm");
 			},
@@ -134,13 +144,13 @@ function createMembersTableColumns(
 		{
 			id: "group",
 			accessorFn: (original) => {
-				return original.costUnitGroup?.title ?? "Keine Gruppe";
+				return original.costUnitGroup?.title ?? t("table.noGroup");
 			},
-			header: "Gruppe",
+			header: t("table.group"),
 			cell: ({ row }) => {
 				return (
 					<Badge variant={"outline"}>
-						{row.original.costUnitGroup?.title ?? "Keine Gruppe"}
+						{row.original.costUnitGroup?.title ?? t("table.noGroup")}
 					</Badge>
 				);
 			},
@@ -150,13 +160,13 @@ function createMembersTableColumns(
 			accessorFn: (original) => {
 				return original.status;
 			},
-			header: "Status",
+			header: t("table.status"),
 			cell: ({ row }) => {
 				if (row.original.status === "ARCHIVED") {
 					return (
 						<Badge className="pl-1.25" variant={"outline"}>
 							<CircleIcon className="text-white **:fill-orange-500" />
-							Archiviert
+							{t("table.statusArchived")}
 						</Badge>
 					);
 				}
@@ -164,7 +174,7 @@ function createMembersTableColumns(
 				return (
 					<Badge className="pl-1.25" variant={"outline"}>
 						<CircleIcon className="text-white **:fill-green-500" />
-						Aktiv
+						{t("table.statusActive")}
 					</Badge>
 				);
 			},
@@ -195,6 +205,7 @@ function createMembersTableColumns(
 }
 
 function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.costUnits");
 	const PAGE_SIZE = 20;
 
 	const [pagination, setPagination] = React.useState<PaginationState>({
@@ -208,8 +219,8 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 	const updateHandle = updateHandleRef.current;
 
 	const columns = React.useMemo(() => {
-		return createMembersTableColumns(updateHandle);
-	}, [updateHandle]);
+		return createMembersTableColumns(updateHandle, t as ColumnTranslator);
+	}, [updateHandle, t]);
 
 	const dataQuery = api.costUnit.listCostUnits.useQuery(
 		{
@@ -289,7 +300,7 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 									className="h-24 text-center"
 									colSpan={table.getVisibleFlatColumns().length}
 								>
-									No results.
+									{t("table.noResults")}
 								</td>
 							</tr>
 						)}
@@ -297,10 +308,15 @@ function CostUnitsTable({ className, ...props }: React.ComponentProps<"div">) {
 				</table>
 			</div>
 			<div className="mt-8 flex flex-wrap justify-between gap-4 border-slate-200 border-t pt-4">
-				<span className="text-slate-500 text-sm">{data.totalCount} Units</span>
+				<span className="text-slate-500 text-sm">
+					{t("table.unitsCount", { count: data.totalCount })}
+				</span>
 				<div className="flex items-center justify-center gap-2">
 					<span className="me-2 text-slate-500 text-sm">
-						Page {pagination.pageIndex + 1} / {Math.ceil(data.totalCount / PAGE_SIZE)}
+						{t("table.pageIndicator", {
+							current: pagination.pageIndex + 1,
+							total: Math.ceil(data.totalCount / PAGE_SIZE),
+						})}
 					</span>
 					<Button
 						disabled={!table.getCanPreviousPage()}

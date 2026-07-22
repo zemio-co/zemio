@@ -1,5 +1,6 @@
 "use client";
 
+import { createAppTranslator } from "@zemio/i18n";
 import {
 	BanknoteIcon,
 	BellIcon,
@@ -12,33 +13,35 @@ import {
 import { ROUTES } from "@/lib/routes";
 import type { SettingsGroup } from "./types";
 
+const t = createAppTranslator({ namespace: "modules.settings.nav" });
+
 const settingsRoutes: SettingsGroup[] = [
 	{
-		label: "Personal Settings",
+		label: t("groups.personal"),
 		hasPermission: () => true,
 		items: [
 			{
-				label: "General",
+				label: t("items.general.label"),
 				href: ROUTES.SETTINGS_USER_GENERAL(),
 				icon: SettingsIcon,
-				description: "Change your personal settings",
+				description: t("items.general.description"),
 			},
 			{
-				label: "Notifications",
+				label: t("items.notifications.label"),
 				href: ROUTES.SETTINGS_USER_NOTIFICATIONS(),
 				icon: BellIcon,
-				description: "Customize the emails, SMS and push notifications you receive",
+				description: t("items.notifications.description"),
 			},
 			{
-				label: "Bank Details",
+				label: t("items.bankDetails.label"),
 				href: ROUTES.SETTINGS_USER_BANK_DETAILS(),
 				icon: BanknoteIcon,
-				description: "Update your bank details to receive payments",
+				description: t("items.bankDetails.description"),
 			},
 		],
 	},
 	{
-		label: "Organisation",
+		label: t("groups.organisation"),
 		hasPermission: async (client) => {
 			const res = await client.organization.hasPermission({
 				permissions: {
@@ -54,34 +57,33 @@ const settingsRoutes: SettingsGroup[] = [
 		},
 		items: [
 			{
-				label: "Organisation",
+				label: t("items.orgGeneral.label"),
 				href: ROUTES.SETTINGS_ORG_GENERAL(),
 				icon: BuildingIcon,
-				description: "Verwalte die Einstellungen zu deiner Organisation",
+				description: t("items.orgGeneral.description"),
 			},
 			{
-				label: "Mitglieder",
+				label: t("items.orgMembers.label"),
 				href: ROUTES.SETTINGS_ORG_MEMBERS(),
 				icon: Users2Icon,
-				description: "Verwalten Sie die Mitglieder Ihrer Organisation",
+				description: t("items.orgMembers.description"),
 			},
 			{
-				label: "Zulagen",
+				label: t("items.orgAllowances.label"),
 				href: ROUTES.SETTINGS_ORG_ALLOWANCES(),
 				icon: EuroIcon,
-				description: "Verwalte die Zulagen und Abzüge für Spesenanträge",
+				description: t("items.orgAllowances.description"),
 			},
 			{
-				label: "Kostenstellen",
+				label: t("items.orgCostUnits.label"),
 				href: ROUTES.SETTINGS_ORG_COST_UNITS(),
 				icon: FolderTreeIcon,
-				description:
-					"Kostenstellen werden verwendet um Ausgaben einfacher zuordnen zu können",
+				description: t("items.orgCostUnits.description"),
 			},
 		],
 	},
 	{
-		label: "Platform",
+		label: t("groups.platform"),
 		hasPermission: async (client) => {
 			const res = await client.admin.hasPermission({
 				permissions: {
@@ -97,10 +99,10 @@ const settingsRoutes: SettingsGroup[] = [
 		},
 		items: [
 			{
-				label: "Organisationen",
+				label: t("items.adminOrgs.label"),
 				href: ROUTES.SETTINGS_ADMIN_ORGS(),
 				icon: BuildingIcon,
-				description: "Verwalte alle Organisationen auf dieser Platform",
+				description: t("items.adminOrgs.description"),
 			},
 		],
 	},

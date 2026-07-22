@@ -3,10 +3,13 @@
 import { ArrowLeftIcon, BuildingIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { cn } from "@/lib/utils";
 
 function AdminSidebar({ className, ...props }: React.ComponentProps<"aside">) {
+	const t = useTranslations("modules.admin.sidebar");
+
 	return (
 		<aside className={cn("", className)} {...props}>
 			<Link
@@ -16,11 +19,11 @@ function AdminSidebar({ className, ...props }: React.ComponentProps<"aside">) {
 				href={"/"}
 			>
 				<ArrowLeftIcon className="size-3.5" />
-				Zurück
+				{t("back")}
 			</Link>
 			<div className="mt-8 space-y-1">
 				<AdminSidebarButton href={"/platform-admin/organizations"}>
-					<BuildingIcon /> Organizations
+					<BuildingIcon /> {t("organizations")}
 				</AdminSidebarButton>
 			</div>
 		</aside>

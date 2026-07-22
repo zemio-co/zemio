@@ -1,6 +1,7 @@
 "use client";
 
 import { DownloadIcon, FileIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -42,6 +43,8 @@ function ReviewAttachments({
 }: React.ComponentProps<"section"> & {
 	attachments?: ReviewAttachment[];
 } & ReviewLoadState) {
+	const t = useTranslations("modules.review.attachments");
+
 	if (loading) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
@@ -57,11 +60,9 @@ function ReviewAttachments({
 				<AttachmentsHeader attachments={[]} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-destructive text-sm">
-						Fehler beim Laden der Anhänge
+						{t("loadErrorTitle")}
 					</p>
-					<p className="text-center text-xs">
-						{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
-					</p>
+					<p className="text-center text-xs">{errorMessage ?? t("unknownError")}</p>
 				</div>
 			</section>
 		);
@@ -72,9 +73,9 @@ function ReviewAttachments({
 			<section className={cn("space-y-4", className)} {...props}>
 				<AttachmentsHeader attachments={attachments} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
-					<p className="text-center font-medium text-sm">Keine Uploads gefunden</p>
+					<p className="text-center font-medium text-sm">{t("emptyTitle")}</p>
 					<p className="text-center text-muted-foreground text-xs">
-						Der Nutzer hat keine Dokumente hochgeladen.
+						{t("emptyDescription")}
 					</p>
 				</div>
 			</section>
@@ -102,13 +103,15 @@ function AttachmentsHeader({
 	attachments: ReviewAttachment[];
 	loading?: boolean;
 }) {
+	const t = useTranslations("modules.review.attachments");
+
 	return (
 		<div
 			className={cn("flex items-center justify-start gap-2", className)}
 			data-slot="attachments-header"
 			{...props}
 		>
-			<p className="font-semibold text-zinc-800">Anhänge</p>
+			<p className="font-semibold text-zinc-800">{t("title")}</p>
 			{loading ? (
 				<Skeleton className="h-5 w-7 rounded-full" />
 			) : (
@@ -132,6 +135,7 @@ function AttachmentsDownloadAll({
 }: React.ComponentProps<typeof Button> & {
 	attachments: ReviewAttachment[];
 }) {
+	const t = useTranslations("modules.review.attachments");
 	const attachmentIds = useMemo(
 		() => attachments.map((attachment) => attachment.id),
 		[attachments],
@@ -204,9 +208,9 @@ function AttachmentsDownloadAll({
 					}
 				}),
 				{
-					loading: "Downloads werden vorbereitet…",
-					success: "Downloads gestartet",
-					error: "Downloads fehlgeschlagen",
+					loading: t("downloadAllLoading"),
+					success: t("downloadAllSuccess"),
+					error: t("downloadAllError"),
 				},
 			);
 			return;
@@ -216,7 +220,7 @@ function AttachmentsDownloadAll({
 			triggerDownload(file.url, file.filename);
 		}
 
-		toast.success("Downloads gestartet");
+		toast.success(t("downloadAllSuccess"));
 	};
 
 	return (
@@ -228,13 +232,14 @@ function AttachmentsDownloadAll({
 			variant={"ghost"}
 			{...props}
 		>
-			Alle herunterladen
+			{t("downloadAllAction")}
 			<DownloadIcon />
 		</Button>
 	);
 }
 
 function AttachmentItem({ attachment }: { attachment: ReviewAttachment }) {
+	const t = useTranslations("modules.review.attachments");
 	const { mutateAsync, isPending } = api.attachment.getDownloadUrl.useMutation();
 
 	function handleDownload() {
@@ -243,9 +248,9 @@ function AttachmentItem({ attachment }: { attachment: ReviewAttachment }) {
 				window.location.href = result.url;
 			}),
 			{
-				loading: "Download wird vorbereitet…",
-				success: "Download gestartet",
-				error: "Download fehlgeschlagen",
+				loading: t("downloadLoading"),
+				success: t("downloadSuccess"),
+				error: t("downloadError"),
 			},
 		);
 	}
@@ -279,7 +284,7 @@ function AttachmentItem({ attachment }: { attachment: ReviewAttachment }) {
 					size={"sm"}
 					variant={"ghost"}
 				>
-					Herunterladen
+					{t("downloadAction")}
 					<DownloadIcon />
 				</Button>
 			</div>

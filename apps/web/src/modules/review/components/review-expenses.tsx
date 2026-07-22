@@ -1,12 +1,15 @@
 "use client";
 
+import { createAppTranslator } from "@zemio/i18n";
 import { format, isSameDay } from "date-fns";
 import { DownloadIcon, EllipsisIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, translateExpenseType } from "@/lib/utils";
+import { expenseTypeLabel, useExpenseTypeLabel } from "@/lib/i18n-labels";
+import { cn } from "@/lib/utils";
 import type { ReviewExpense, ReviewLoadState } from "./review-types";
 
 const CSV_MIME_TYPE = "text/csv;charset=utf-8";
@@ -27,16 +30,17 @@ function escapeCsvValue(value: string | number): string {
 }
 
 function buildExpensesCsv(expenses: ReviewExpense[]): string {
+	const t = createAppTranslator({ namespace: "modules.review.expenses.csv" });
 	const headers = [
-		"Titel",
-		"Startdatum",
-		"Enddatum",
-		"Betrag",
-		"Beschreibung",
-		"Metadaten",
+		t("title"),
+		t("startDate"),
+		t("endDate"),
+		t("amount"),
+		t("description"),
+		t("meta"),
 	];
 	const rows = expenses.map((expense) => [
-		translateExpenseType(expense.type),
+		expenseTypeLabel(expense.type),
 		format(expense.startDate, "yyyy-MM-dd"),
 		format(expense.endDate, "yyyy-MM-dd"),
 		expense.amount.toFixed(2),
@@ -73,6 +77,8 @@ function ReviewExpenses({
 	expenses?: ReviewExpense[];
 	totalAmount?: number;
 } & ReviewLoadState) {
+	const t = useTranslations("modules.review.expenses");
+
 	if (loading) {
 		return (
 			<section className={cn("space-y-4", className)} {...props}>
@@ -88,11 +94,9 @@ function ReviewExpenses({
 				<ExpensesHeader expenses={[]} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-destructive text-sm">
-						Fehler beim Laden der Ausgaben
+						{t("loadErrorTitle")}
 					</p>
-					<p className="text-center text-xs">
-						{errorMessage ?? "Ein unbekannter Fehler ist aufgetreten"}
-					</p>
+					<p className="text-center text-xs">{errorMessage ?? t("unknownError")}</p>
 				</div>
 			</section>
 		);
@@ -103,9 +107,9 @@ function ReviewExpenses({
 			<section className={cn("space-y-4", className)} {...props}>
 				<ExpensesHeader expenses={expenses} />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
-					<p className="text-center font-medium text-sm">Keine Ausgaben gefunden.</p>
+					<p className="text-center font-medium text-sm">{t("emptyTitle")}</p>
 					<p className="text-center text-muted-foreground text-xs">
-						Für diesen Spesenbericht wurden noch keine Ausgaben eingetragen
+						{t("emptyDescription")}
 					</p>
 				</div>
 			</section>
@@ -129,17 +133,23 @@ function ExpensesTable({
 	expenses: ReviewExpense[];
 	totalAmount: number;
 }) {
+	const t = useTranslations("modules.review.expenses.table");
+
 	return (
 		<table className={cn("w-full", className)} data-slot="component" {...props}>
 			<thead>
 				<tr className="border-b">
-					<th className="py-3 text-left font-medium text-xs text-zinc-500">Titel</th>
-					<th className="py-3 text-left font-medium text-xs text-zinc-500">Datum</th>
-					<th className="py-3 text-right font-medium text-xs text-zinc-500">
-						Betrag
+					<th className="py-3 text-left font-medium text-xs text-zinc-500">
+						{t("title")}
+					</th>
+					<th className="py-3 text-left font-medium text-xs text-zinc-500">
+						{t("date")}
 					</th>
 					<th className="py-3 text-right font-medium text-xs text-zinc-500">
-						Aktionen
+						{t("amount")}
+					</th>
+					<th className="py-3 text-right font-medium text-xs text-zinc-500">
+						{t("actions")}
 					</th>
 				</tr>
 			</thead>
@@ -152,7 +162,7 @@ function ExpensesTable({
 						className="rounded-bl-md py-3 text-right font-medium text-muted-foreground text-sm"
 						colSpan={2}
 					>
-						Summe
+						{t("total")}
 					</td>
 					<td className="border-t py-3 text-right font-medium text-sm">
 						{EUR_FORMATTER.format(totalAmount)}
@@ -171,11 +181,13 @@ function ExpenseRow({
 }: React.ComponentProps<"tr"> & {
 	expense: ReviewExpense;
 }) {
+	const expenseTypeLabelText = useExpenseTypeLabel(expense.type);
+
 	return (
 		<tr className={cn("", className)} data-slot="component" {...props}>
 			<td className="py-3">
 				<span className="font-medium text-sm text-zinc-800">
-					{translateExpenseType(expense.type)}
+					{expenseTypeLabelText}
 				</span>
 			</td>
 			<td className="py-3">
@@ -211,13 +223,15 @@ function ExpensesHeader({
 	expenses: ReviewExpense[];
 	loading?: boolean;
 }) {
+	const t = useTranslations("modules.review.expenses");
+
 	return (
 		<div
 			className={cn("flex items-center justify-start gap-2", className)}
 			data-slot="expenses-header"
 			{...props}
 		>
-			<p className="font-semibold text-zinc-800">Kostenaufstellung</p>
+			<p className="font-semibold text-zinc-800">{t("title")}</p>
 			{loading ? (
 				<Skeleton className="h-5 w-7 rounded-full" />
 			) : (
@@ -241,6 +255,7 @@ function ExportButton({
 }: React.ComponentProps<typeof Button> & {
 	expenses: ReviewExpense[];
 }) {
+	const t = useTranslations("modules.review.expenses");
 	const handleExport: NonNullable<
 		React.ComponentProps<typeof Button>["onClick"]
 	> = (event) => {
@@ -264,7 +279,7 @@ function ExportButton({
 			variant={"ghost"}
 			{...props}
 		>
-			Exportieren
+			{t("exportAction")}
 			<DownloadIcon />
 		</Button>
 	);

@@ -1,3 +1,4 @@
+import { createAppTranslator } from "@zemio/i18n";
 import {
 	ArrowLeftIcon,
 	EuroIcon,
@@ -19,24 +20,29 @@ import {
 } from "@/components/ui/sidebar";
 import { ADMIN_SETTINGS_MENU, ROUTES } from "@/lib/consts";
 
+const t = createAppTranslator({
+	namespace: "modules.shared.adminSettingsSidebar",
+});
+const tActions = createAppTranslator({ namespace: "modules.settings.actions" });
+
 const settingsMenu = [
 	{
-		label: "Allgemeines",
+		label: t("nav.general"),
 		href: ADMIN_SETTINGS_MENU.GENERAL,
 		icon: SettingsIcon,
 	},
 	{
-		label: "Benutzer",
+		label: t("nav.users"),
 		href: ADMIN_SETTINGS_MENU.USERS,
 		icon: UsersIcon,
 	},
 	{
-		label: "Zulagen",
+		label: t("nav.allowances"),
 		href: ADMIN_SETTINGS_MENU.ALLOWANCES,
 		icon: EuroIcon,
 	},
 	{
-		label: "Kostenstellen",
+		label: t("nav.costUnits"),
 		href: ADMIN_SETTINGS_MENU.COST_UNITS,
 		icon: FolderTreeIcon,
 	},
@@ -53,7 +59,7 @@ export function AdminSettingsSidebar({
 					nativeButton={false}
 					render={
 						<Link href={ROUTES.ADMIN_DASHBOARD}>
-							<ArrowLeftIcon /> Zurück
+							<ArrowLeftIcon /> {tActions("back")}
 						</Link>
 					}
 					variant={"ghost"}
@@ -61,7 +67,7 @@ export function AdminSettingsSidebar({
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>Einstellungen</SidebarGroupLabel>
+					<SidebarGroupLabel>{t("settingsLabel")}</SidebarGroupLabel>
 					<SidebarMenu>
 						{settingsMenu.map((item) => (
 							<SidebarMenuItem key={item.href}>

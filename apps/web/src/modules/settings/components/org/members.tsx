@@ -16,6 +16,7 @@ import {
 	CircleIcon,
 	EllipsisIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -29,14 +30,14 @@ import {
 } from "./update-member";
 
 function OrgSettingsMembers() {
+	const t = useTranslations("modules.settings.members");
+
 	return (
 		<section className="container">
 			<header className="flex flex-wrap items-start justify-between gap-8">
 				<div className="space-y-1">
-					<h1 className="font-bold text-2xl text-zinc-800">Mitglieder</h1>
-					<p className="text-sm text-zinc-700">
-						Die folgenden Benutzer sind Mitglieder deiner Organisation.
-					</p>
+					<h1 className="font-bold text-2xl text-zinc-800">{t("title")}</h1>
+					<p className="text-sm text-zinc-700">{t("description")}</p>
 				</div>
 			</header>
 
@@ -52,8 +53,14 @@ type Member = {
 	user: { email: string; id: string; name: string; image: string | null };
 };
 
+type ColumnTranslator = (
+	key: string,
+	values?: Record<string, string | number>,
+) => string;
+
 function createMembersTableColumns(
 	handle: UpdateMemberHandle,
+	t: ColumnTranslator,
 ): ColumnDef<Member>[] {
 	return [
 		{
@@ -79,19 +86,19 @@ function createMembersTableColumns(
 					</span>
 				);
 			},
-			header: "Name",
+			header: t("table.name"),
 		},
 		{
 			id: "email",
 			accessorFn: ({ user }) => {
 				return user.email;
 			},
-			header: "E-Mail",
+			header: t("table.email"),
 		},
 		{
 			id: "Rolle",
 			accessorKey: "role",
-			header: "Rolle",
+			header: t("table.role"),
 			cell: ({ row }) => {
 				const roles = row.original.role.split(",");
 
@@ -99,7 +106,7 @@ function createMembersTableColumns(
 					return (
 						<Badge className="pl-1.25" variant={"outline"}>
 							<CircleIcon className="text-white **:fill-violet-600" />
-							Besitzer
+							{t("roles.owner")}
 						</Badge>
 					);
 				}
@@ -108,7 +115,7 @@ function createMembersTableColumns(
 					return (
 						<Badge className="pl-1.25" variant={"outline"}>
 							<CircleIcon className="text-white **:fill-blue-500" />
-							Admin
+							{t("roles.admin")}
 						</Badge>
 					);
 				}
@@ -116,7 +123,7 @@ function createMembersTableColumns(
 				return (
 					<Badge className="pl-1.25" variant={"outline"}>
 						<CircleIcon className="text-white **:fill-orange-500" />
-						Mitglied
+						{t("roles.member")}
 					</Badge>
 				);
 			},
@@ -124,7 +131,7 @@ function createMembersTableColumns(
 		{
 			id: "createdAt",
 			accessorKey: "",
-			header: "Beigetreten",
+			header: t("table.createdAt"),
 			cell: ({ row }) => {
 				return format(row.original.createdAt, "dd.MM.yyyy, HH:mm");
 			},
@@ -155,6 +162,7 @@ function createMembersTableColumns(
 }
 
 function MembersTable({ className, ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.members");
 	const PAGE_SIZE = 20;
 
 	const [pagination, setPagination] = React.useState<PaginationState>({
@@ -168,8 +176,8 @@ function MembersTable({ className, ...props }: React.ComponentProps<"div">) {
 	const updateHandle = updateHandleRef.current;
 
 	const columns = React.useMemo(() => {
-		return createMembersTableColumns(updateHandle);
-	}, [updateHandle]);
+		return createMembersTableColumns(updateHandle, t as ColumnTranslator);
+	}, [updateHandle, t]);
 
 	const dataQuery = api.settings.listMembers.useQuery(
 		{
@@ -249,7 +257,7 @@ function MembersTable({ className, ...props }: React.ComponentProps<"div">) {
 									className="h-24 text-center"
 									colSpan={table.getVisibleFlatColumns().length}
 								>
-									No results.
+									{t("table.noResults")}
 								</td>
 							</tr>
 						)}
@@ -257,10 +265,15 @@ function MembersTable({ className, ...props }: React.ComponentProps<"div">) {
 				</table>
 			</div>
 			<div className="mt-8 flex flex-wrap justify-between gap-4 border-slate-200 border-t pt-4">
-				<span className="text-slate-500 text-sm">{data.total} Units</span>
+				<span className="text-slate-500 text-sm">
+					{t("table.unitsCount", { count: data.total })}
+				</span>
 				<div className="flex items-center justify-center gap-2">
 					<span className="me-2 text-slate-500 text-sm">
-						Page {pagination.pageIndex + 1} / {Math.ceil(data.total / PAGE_SIZE)}
+						{t("table.pageIndicator", {
+							current: pagination.pageIndex + 1,
+							total: Math.ceil(data.total / PAGE_SIZE),
+						})}
 					</span>
 					<Button
 						disabled={!table.getCanPreviousPage()}

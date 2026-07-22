@@ -1,4 +1,7 @@
+"use client";
+
 import { InfoIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -82,6 +85,8 @@ function ReportingCardEmpty({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.reporting.card");
+
 	return (
 		<div
 			className={cn("mb-4 px-4", className)}
@@ -89,9 +94,11 @@ function ReportingCardEmpty({
 			{...props}
 		>
 			<div className="flex flex-col items-center justify-center rounded-md border border-slate-200 border-dashed px-4 py-6 text-center">
-				<span className="font-medium text-slate-800 text-sm">Keine Daten</span>
+				<span className="font-medium text-slate-800 text-sm">
+					{t("emptyTitle")}
+				</span>
 				<span className="mt-1 block text-slate-500 text-xs">
-					Für den angegeben Zeitraum sind keine Daten verfügbar.
+					{t("emptyDescription")}
 				</span>
 			</div>
 		</div>

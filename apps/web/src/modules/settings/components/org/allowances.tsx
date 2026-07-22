@@ -2,6 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type z from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,14 +28,14 @@ import {
 import { api } from "@/trpc/react";
 
 function OrgSettingsAllowances() {
+	const t = useTranslations("modules.settings.allowances");
+
 	return (
 		<section className="container">
 			<header className="flex flex-wrap items-start justify-between gap-8">
 				<div className="space-y-1">
-					<h1 className="font-bold text-2xl text-zinc-800">Zulagen & Abzüge</h1>
-					<p className="text-sm text-zinc-700">
-						Verwalte die Zulagen und Abzüge für Spesenanträge.
-					</p>
+					<h1 className="font-bold text-2xl text-zinc-800">{t("title")}</h1>
+					<p className="text-sm text-zinc-700">{t("description")}</p>
 				</div>
 			</header>
 			<section className="mt-12">
@@ -90,17 +91,19 @@ function OrgTravelAllowancesForm({
 }: React.ComponentProps<"form"> & {
 	defaultValues: UpdateOrgTravelAllowancesFormValues;
 }) {
+	const t = useTranslations("modules.settings.allowances");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 
 	const updateMutation = api.settings.updateTravelAllowances.useMutation({
 		onSuccess: () => {
-			toast.success("Einstellungen wurden erfolgreich gespeichert");
+			toast.success(t("savedToast"));
 			utils.settings.get.invalidate();
 			form.reset();
 		},
 		onError: (error) => {
-			toast.error("Einstellungen konnten nicht gespeichert werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -132,7 +135,7 @@ function OrgTravelAllowancesForm({
 
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Kilometerpauschale</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("kilometerRate.label")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										style: "decimal",
@@ -167,9 +170,7 @@ function OrgTravelAllowancesForm({
 										</InputGroup>
 									</NumberField.Group>
 								</NumberField.Root>
-								<FieldDescription>
-									Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet.
-								</FieldDescription>
+								<FieldDescription>{t("kilometerRate.description")}</FieldDescription>
 								{isInvalid && <FieldError errors={state.meta.errors} />}
 							</Field>
 						);
@@ -195,7 +196,7 @@ function OrgTravelAllowancesForm({
 								size={"sm"}
 								type="submit"
 							>
-								Speichern
+								{tActions("save")}
 							</Button>
 						)}
 					</form.Subscribe>
@@ -278,17 +279,19 @@ function OrgMealAllowancesForm({
 }: React.ComponentProps<"form"> & {
 	defaultValues: UpdateOrgMealAllowancesFormValues;
 }) {
+	const t = useTranslations("modules.settings.allowances");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 
 	const updateMutation = api.settings.updateMealAllowances.useMutation({
 		onSuccess: () => {
-			toast.success("Einstellungen wurden erfolgreich gespeichert");
+			toast.success(t("savedToast"));
 			utils.settings.get.invalidate();
 			form.reset();
 		},
 		onError: (error) => {
-			toast.error("Einstellungen konnten nicht gespeichert werden", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -322,7 +325,7 @@ function OrgMealAllowancesForm({
 							return (
 								<Field className="md:col-span-2" data-invalid={isInvalid}>
 									<FieldLabel htmlFor={field.name}>
-										Tägliche Verpflegungszulage
+										{t("dailyFoodAllowance.label")}
 									</FieldLabel>
 									<NumberField.Root
 										format={{
@@ -359,7 +362,7 @@ function OrgMealAllowancesForm({
 										</NumberField.Group>
 									</NumberField.Root>
 									<FieldDescription>
-										Dieser Betrag wird pro Tag für die Verpflegung erhoben.
+										{t("dailyFoodAllowance.description")}
 									</FieldDescription>
 									{isInvalid && <FieldError errors={field.state.meta.errors} />}
 								</Field>
@@ -372,7 +375,9 @@ function OrgMealAllowancesForm({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Morgenstückabzug</FieldLabel>
+									<FieldLabel htmlFor={field.name}>
+										{t("breakfastDeduction.label")}
+									</FieldLabel>
 									<NumberField.Root
 										format={{
 											style: "decimal",
@@ -421,7 +426,9 @@ function OrgMealAllowancesForm({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Mittagessenabzug</FieldLabel>
+									<FieldLabel htmlFor={field.name}>
+										{t("lunchDeduction.label")}
+									</FieldLabel>
 									<NumberField.Root
 										format={{
 											style: "decimal",
@@ -470,7 +477,9 @@ function OrgMealAllowancesForm({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Abendessenabzug</FieldLabel>
+									<FieldLabel htmlFor={field.name}>
+										{t("dinnerDeduction.label")}
+									</FieldLabel>
 									<NumberField.Root
 										format={{
 											style: "decimal",
@@ -534,7 +543,7 @@ function OrgMealAllowancesForm({
 								size={"sm"}
 								type="submit"
 							>
-								Speichern
+								{tActions("save")}
 							</Button>
 						)}
 					</form.Subscribe>

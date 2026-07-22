@@ -4,11 +4,13 @@ import type { Report as ReportPrimitive } from "@zemio/db";
 import { format } from "date-fns";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { reportStatusKeys } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
-import { cn, translateReportStatus } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 type Report = ReportPrimitive & {
@@ -23,6 +25,8 @@ function DashboardReportList({
 		page: 1,
 		pageSize: 10,
 	});
+
+	const t = useTranslations("modules.dashboard.reportList");
 
 	if (isPending) {
 		return (
@@ -47,10 +51,10 @@ function DashboardReportList({
 				<ReportListHeader />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
 					<p className="text-center font-medium text-destructive text-sm">
-						Fehler beim Laden der Anhänge
+						{t("loadErrorTitle")}
 					</p>
 					<p className="text-center text-xs">
-						{error?.message ?? "Ein unbekannter Fehler ist aufgetreten"}
+						{error?.message ?? t("loadErrorFallback")}
 					</p>
 				</div>
 			</section>
@@ -68,9 +72,9 @@ function DashboardReportList({
 			>
 				<ReportListHeader />
 				<div className="flex min-h-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed px-6 py-10">
-					<p className="text-center font-medium text-sm">Keine Anträge gefunden</p>
+					<p className="text-center font-medium text-sm">{t("emptyTitle")}</p>
 					<p className="text-center text-muted-foreground text-xs">
-						Es sieht so aus als hättest du noch keinen Antrag eingereicht.
+						{t("emptyDescription")}
 					</p>
 				</div>
 			</section>
@@ -93,13 +97,15 @@ function ReportListHeader({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.dashboard.reportList.header");
+
 	return (
 		<div
 			className={cn("flex items-center justify-between gap-2", className)}
 			data-slot="component"
 			{...props}
 		>
-			<p className="font-medium">Deine Anträge</p>
+			<p className="font-medium">{t("title")}</p>
 			<Link
 				className={cn(
 					buttonVariants({ variant: "ghost", size: "sm" }),
@@ -107,7 +113,7 @@ function ReportListHeader({
 				)}
 				href={ROUTES.USER_REPORTS_LIST()}
 			>
-				Alle Anträge <ArrowRightIcon className="text-violet-600" />
+				{t("viewAll")} <ArrowRightIcon className="text-violet-600" />
 			</Link>
 		</div>
 	);
@@ -118,6 +124,9 @@ function ReportList({
 	reports,
 	...props
 }: React.ComponentProps<"div"> & { reports: Report[] }) {
+	const tStatus = useTranslations("enums.reportStatus");
+	const tTable = useTranslations("modules.dashboard.reportList.table");
+
 	return (
 		<div
 			className={cn("w-full overflow-x-auto bg-white", className)}
@@ -128,16 +137,16 @@ function ReportList({
 				<thead>
 					<tr className="bg-zinc-100">
 						<th className="rounded-l-md px-3 py-2 text-left font-medium text-muted-foreground text-xs">
-							Antrag
+							{tTable("title")}
 						</th>
 						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
-							Datum
+							{tTable("date")}
 						</th>
 						<th className="px-3 py-2 text-left font-medium text-muted-foreground text-xs">
-							Ausgaben
+							{tTable("expenses")}
 						</th>
 						<th className="rounded-r-md px-3 py-2 text-left font-medium text-muted-foreground text-xs">
-							Status
+							{tTable("status")}
 						</th>
 					</tr>
 				</thead>
@@ -173,7 +182,7 @@ function ReportList({
 									>
 										<Icon className="size-3.5 shrink-0" />
 										<span className="block shrink-0 text-slate-600">
-											{translateReportStatus(report.status)}
+											{tStatus(reportStatusKeys[report.status])}
 										</span>
 									</span>
 								</td>

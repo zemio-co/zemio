@@ -1,6 +1,7 @@
 "use client";
 
 import { Separator } from "@base-ui/react";
+import { createAppTranslator } from "@zemio/i18n";
 import {
 	ArrowLeftIcon,
 	BellIcon,
@@ -13,6 +14,7 @@ import {
 	Users2Icon,
 } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useEffect, useState } from "react";
 import * as SidebarPrimitive from "@/components/settings-sidebar";
@@ -48,25 +50,28 @@ function SettingsSidebar({
 }
 
 function SidebarBackLink() {
+	const t = useTranslations("modules.settings.actions");
+
 	return (
 		<Link
 			className="flex w-fit items-center justify-center gap-1.5 font-medium text-sm text-zinc-600 transition-colors hover:text-blue-500"
 			href={"/"}
 		>
-			<ArrowLeftIcon className="size-3.5" /> Zurück
+			<ArrowLeftIcon className="size-3.5" /> {t("back")}
 		</Link>
 	);
 }
 
 function SidebarProfile({ className, ...props }: React.ComponentProps<"div">) {
 	const { data, isPending } = authClient.useSession();
+	const t = useTranslations("modules.settings.nav");
 
 	if (isPending) {
 		return <Skeleton className="h-12 w-full" />;
 	}
 
 	if (!data) {
-		return <p>No Active session found</p>;
+		return <p>{t("noSession")}</p>;
 	}
 
 	return (
@@ -90,22 +95,24 @@ function SidebarProfile({ className, ...props }: React.ComponentProps<"div">) {
 	);
 }
 
+const tNav = createAppTranslator({ namespace: "modules.settings.nav" });
+
 const userMenuItems: MenuItem[] = [
 	{
 		key: "general",
-		label: "Allgemeines",
+		label: tNav("items.general.label"),
 		href: ROUTES.SETTINGS_USER_GENERAL(),
 		icon: SettingsIcon,
 	},
 	{
 		key: "notifications",
-		label: "Benachrichtigungen",
+		label: tNav("items.notifications.label"),
 		href: ROUTES.SETTINGS_USER_NOTIFICATIONS(),
 		icon: BellIcon,
 	},
 	{
 		key: "banking_details",
-		label: "Bankverbindungen",
+		label: tNav("items.bankDetails.label"),
 		href: ROUTES.SETTINGS_USER_BANK_DETAILS(),
 		icon: CreditCardIcon,
 	},
@@ -128,31 +135,32 @@ function SidebarUserMenu({
 const organizationMenuItems: MenuItem[] = [
 	{
 		key: "general",
-		label: "Organisation",
+		label: tNav("items.orgGeneral.label"),
 		href: ROUTES.SETTINGS_ORG_GENERAL(),
 		icon: BuildingIcon,
 	},
 	{
 		key: "members",
-		label: "Mitglieder",
+		label: tNav("items.orgMembers.label"),
 		href: ROUTES.SETTINGS_ORG_MEMBERS(),
 		icon: Users2Icon,
 	},
 	{
 		key: "allowances",
-		label: "Zulagen",
+		label: tNav("items.orgAllowances.label"),
 		href: ROUTES.SETTINGS_ORG_ALLOWANCES(),
 		icon: EuroIcon,
 	},
 	{
 		key: "cost_units",
-		label: "Kostenstellen",
+		label: tNav("items.orgCostUnits.label"),
 		href: ROUTES.SETTINGS_ORG_COST_UNITS(),
 		icon: FolderTreeIcon,
 	},
 ];
 
 function SidebarOrganizationMenu({ ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.nav");
 	const [hasPermission, setHasPermission] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -180,7 +188,9 @@ function SidebarOrganizationMenu({ ...props }: React.ComponentProps<"div">) {
 	return (
 		<div {...props}>
 			<div className="mb-2 flex items-center justify-start gap-3 px-2.5">
-				<span className="font-medium text-xs text-zinc-600">Organisation</span>
+				<span className="font-medium text-xs text-zinc-600">
+					{t("sidebarOrgHeading")}
+				</span>
 				<Separator className={"h-px grow bg-border"} />
 			</div>
 			<SidebarPrimitive.Menu>
@@ -197,13 +207,14 @@ function SidebarOrganizationMenu({ ...props }: React.ComponentProps<"div">) {
 const adminMenutItems: MenuItem[] = [
 	{
 		key: "orgs",
-		label: "Organisationen",
+		label: tNav("items.adminOrgs.label"),
 		href: ROUTES.SETTINGS_ADMIN_ORGS(),
 		icon: BuildingIcon,
 	},
 ];
 
 function SidebarAdminMenu({ ...props }: React.ComponentProps<"div">) {
+	const t = useTranslations("modules.settings.nav");
 	const [hasPermission, setHasPermission] = useState<boolean>(false);
 
 	useEffect(() => {
@@ -231,7 +242,9 @@ function SidebarAdminMenu({ ...props }: React.ComponentProps<"div">) {
 	return (
 		<div {...props}>
 			<div className="mb-2 flex items-center justify-start gap-3 px-2.5">
-				<span className="font-medium text-xs text-zinc-600">Admin</span>
+				<span className="font-medium text-xs text-zinc-600">
+					{t("sidebarAdminHeading")}
+				</span>
 				<Separator className={"h-px grow bg-border"} />
 			</div>
 			<SidebarPrimitive.Menu>

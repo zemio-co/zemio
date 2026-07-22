@@ -36,7 +36,7 @@ export const attachmentRouter = createTRPCRouter({
 					.min(1)
 					.max(100)
 					.refine((ids) => new Set(ids).size === ids.length, {
-						message: "Attachment ids must be unique",
+						message: "Anhang-IDs müssen eindeutig sein",
 					}),
 			}),
 		)
@@ -59,7 +59,7 @@ export const attachmentRouter = createTRPCRouter({
 								.number()
 								.int()
 								.nonnegative()
-								.max(5 * 1024 * 1024, "File exceeds the 5 MB size limit"),
+								.max(5 * 1024 * 1024, "Datei überschreitet das 5-MB-Limit"),
 						}),
 					)
 					.min(1)
@@ -78,7 +78,10 @@ export const attachmentRouter = createTRPCRouter({
 						z.object({
 							key: z
 								.string()
-								.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+								.regex(
+									/^attachment\/[^/]+\/[^/]+$/,
+									"Ungültiges Anhang-Schlüsselformat",
+								),
 							size: z
 								.number()
 								.int()
@@ -110,7 +113,10 @@ export const attachmentRouter = createTRPCRouter({
 					.array(
 						z
 							.string()
-							.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+							.regex(
+								/^attachment\/[^/]+\/[^/]+$/,
+								"Ungültiges Anhang-Schlüsselformat",
+							),
 					)
 					.max(5),
 			}),

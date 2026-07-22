@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ import MicrosoftLogo from "../../../../public/assets/microsoft-logo.svg";
 const formSchema = z.object({});
 
 export function AuthForm({ ...props }: React.ComponentProps<"form">) {
+	const t = useTranslations("modules.auth.form");
+
 	const signInWithMicrosoft = async () => {
 		const res = await authClient.signIn.social({
 			provider: "microsoft",
@@ -19,12 +22,12 @@ export function AuthForm({ ...props }: React.ComponentProps<"form">) {
 		});
 
 		if (res.error) {
-			toast.error(res.error.message ?? "Ein Fehler ist aufgetreten");
+			toast.error(res.error.message ?? t("signInError"));
 			return;
 		}
 
-		toast.success("Anmeldung erfolgreich", {
-			description: "Du wirst in Kürze weitergeleitet",
+		toast.success(t("signInSuccessTitle"), {
+			description: t("signInSuccessDescription"),
 		});
 	};
 
@@ -55,7 +58,7 @@ export function AuthForm({ ...props }: React.ComponentProps<"form">) {
 				variant={"outline"}
 			>
 				<Image alt="Microsoft Logo" className="mr-1 size-3.5" src={MicrosoftLogo} />
-				Mit Microsoft fortfahren
+				{t("continueWithMicrosoft")}
 			</Button>
 		</form>
 	);

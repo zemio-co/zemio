@@ -7,20 +7,20 @@ import {
 import { isValid, parse } from "date-fns";
 import z from "zod";
 export const createReportSchema = z.object({
-	title: z.string().min(1, "Bitte gib einen Titel ein."),
+	title: z.string().min(1, "report.titleRequired"),
 	description: z.string(),
-	costUnitId: z.string().min(1, "Bitte wähle eine Kostenstelle aus."),
-	bankingDetailsId: z.string().min(1, "Bitte wähle eine Bankverbindung aus."),
+	costUnitId: z.string().min(1, "report.costUnitRequired"),
+	bankingDetailsId: z.string().min(1, "report.bankingDetailsRequired"),
 });
 
 export const ibanSchema = z
 	.string()
 	.regex(/^DE\d{2} \d{4} \d{4} \d{4} \d{4} \d{2}$/, {
-		message: "Ungültige IBAN",
+		message: "banking.invalidIban",
 	});
 
 export const unformattedIbanSchema = z.string().regex(/^DE\d{20}$/, {
-	message: "Ungültige IBAN",
+	message: "banking.invalidIban",
 });
 
 export const baseCreateExpenseSchema = z.object({
@@ -28,24 +28,24 @@ export const baseCreateExpenseSchema = z.object({
 	amount: z.number().min(0),
 	startDate: z
 		.string()
-		.min(1, "Startdatum ist erforderlich")
+		.min(1, "expense.startDateRequired")
 		.refine(
 			(val) => {
 				const date = parse(val, "dd.MM.yyyy", new Date());
 				return isValid(date);
 			},
-			{ message: "Ungültiges Startdatum" },
+			{ message: "expense.invalidStartDate" },
 		)
 		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
 	endDate: z
 		.string()
-		.min(1, "Enddatum ist erforderlich")
+		.min(1, "expense.endDateRequired")
 		.refine(
 			(val) => {
 				const date = parse(val, "dd.MM.yyyy", new Date());
 				return isValid(date);
 			},
-			{ message: "Ungültiges Enddatum" },
+			{ message: "expense.invalidEndDate" },
 		)
 		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
 	type: z.enum(ExpenseType),
@@ -55,7 +55,7 @@ export const baseCreateExpenseSchema = z.object({
 export const attachmentInputSchema = z.object({
 	key: z
 		.string()
-		.regex(/^attachment\/[^/]+\/[^/]+$/, "Invalid attachment key format"),
+		.regex(/^attachment\/[^/]+\/[^/]+$/, "Ungültiges Anhang-Schlüsselformat"),
 	size: z
 		.number()
 		.int()

@@ -1,0 +1,1265 @@
+{
+	"common": {
+		"appName": "Zemio"
+	},
+	"enums": {
+		"reportStatus": {
+			"draft": "Entwurf",
+			"pendingApproval": "In Bearbeitung",
+			"needsRevision": "Benötigt Überarbeitung",
+			"accepted": "Akzeptiert",
+			"rejected": "Abgelehnt",
+			"paid": "Ausgezahlt"
+		},
+		"expenseType": {
+			"receipt": "Beleg",
+			"travel": "Reise",
+			"food": "Verpflegung"
+		}
+	},
+	"modules": {
+		"admin": {
+			"sidebar": {
+				"back": "Zurück",
+				"organizations": "Organisationen"
+			},
+			"orgsContent": {
+				"title": "Organisationen",
+				"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"createCardTitle": "Neue Organisation",
+				"createCardDescription": "Erstelle eine neue Organisation um zu kollaborieren",
+				"listTitle": "Organisationen",
+				"createSuccess": "Organisation erfolgreich erstellt.",
+				"createButton": "Organisation erstellen",
+				"createDialogTitle": "Neue Organisation erstellen",
+				"nameLabel": "Name",
+				"namePlaceholder": "Meine Organisation",
+				"microsoftTenantIdLabel": "Microsoft Tenant ID",
+				"microsoftTenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+				"microsoftTenantIdDescription": "Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory). Alle Benutzer aus diesem Tenant werden dieser Organisation automatisch zugeordnet.",
+				"cancelButton": "Abbrechen",
+				"createSubmitPending": "Wird erstellt…",
+				"createSubmitAction": "Erstellen"
+			},
+			"orgDetails": {
+				"backAction": "Zurück",
+				"headerDescription": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"metrics": {
+					"members": "Mitglieder",
+					"reports": "Reports",
+					"admins": "Admins",
+					"invitations": "Einladungen"
+				},
+				"adminsHeading": "Admins",
+				"emptyAdminsTitle": "Keine Admins",
+				"emptyAdminsDescription": "In dieser Organisation wurden keine Administratoren gefunden",
+				"generalForm": {
+					"sectionTitle": "Allgemein",
+					"nameLabel": "Name",
+					"nameDescription": "Wird Nutzern in der App und E-Mails angezeigt",
+					"namePlaceholder": "Meine Organisation",
+					"slugLabel": "Slug",
+					"slugDescription": "Zur eindeutigen und nutzerfreundlichen Identifikation",
+					"slugPlaceholder": "my-org",
+					"microsoftTenantIdLabel": "Microsoft Tenant ID",
+					"microsoftTenantIdDescription": "Nutzer, deren Entra ID Tenant mit dieser UUID übereinstimmt, können dieser Organisation automatisch zugeordnet werden.",
+					"microsoftTenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+					"logoUrlLabel": "Logo URL",
+					"logoUrlDescription": "URL zum Logo der Organisation",
+					"logoUrlPlaceholder": "https://example.com/logo.png",
+					"saveButton": "Speichern",
+					"saveSuccess": "Organisationseinstellungen gespeichert."
+				}
+			}
+		},
+		"dashboard": {
+			"header": {
+				"title": "Dashboard",
+				"newReport": "Neuer Antrag"
+			},
+			"stats": {
+				"selectorPlaceholder": "Wähle eine Statistik",
+				"submitted": "Ausgegeben",
+				"reimbursed": "Erstattet",
+				"amount": "Betrag",
+				"error": "Fehler",
+				"createdReportsLabel": "Anträge eingereicht",
+				"acceptedReportsLabel": "Anträge akzeptiert",
+				"last365Days": "In den letzten 365 Tagen"
+			},
+			"reportList": {
+				"loadErrorTitle": "Fehler beim Laden der Anhänge",
+				"loadErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Anträge gefunden",
+				"emptyDescription": "Es sieht so aus als hättest du noch keinen Antrag eingereicht.",
+				"header": {
+					"title": "Deine Anträge",
+					"viewAll": "Alle Anträge"
+				},
+				"table": {
+					"title": "Antrag",
+					"date": "Datum",
+					"expenses": "Ausgaben",
+					"status": "Status"
+				}
+			}
+		},
+		"review": {
+			"header": {
+				"payAction": "Auszahlen",
+				"loadErrorTitle": "Report konnte nicht geladen werden",
+				"createdAgo": "vor {distance}",
+				"createdAt": "Erstellt am {date}",
+				"editAction": "Bearbeiten",
+				"changeStatusLabel": "Status ändern",
+				"acceptAction": "Akzeptieren",
+				"rejectAction": "Ablehnen",
+				"needsRevisionAction": "Benötigt Revision",
+				"pendingApprovalAction": "In Bearbeitung",
+				"deleteReportAction": "Antrag löschen",
+				"exportAction": "Exportieren",
+				"exportPdfAction": "PDF exportieren",
+				"exportCsvAction": "CSV exportieren",
+				"statusUpdating": "Status wird aktualisiert",
+				"statusUpdated": "Status erfolgreich aktualisiert",
+				"statusUpdateError": "Fehler beim Aktualisieren des Reports",
+				"pdfGeneratingTitle": "PDF wird erstellt",
+				"pdfGeneratingDescription": "Dies kann einige Sekunden dauern",
+				"pdfGeneratedTitle": "PDF Zusammenfassung erstellt",
+				"pdfGeneratedDescription": "Datei wird heruntergeladen",
+				"pdfGenerationErrorTitle": "Fehler beim Erstellen der PDF Zusammenfassung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"payDialogTitle": "Antrag auszahlen",
+				"payDialogDescription": "Zahle den eingereichten Betrag aus.",
+				"giroCodeLabel": "Giro Code",
+				"giroCodeHint": "Scanne diesen QR-Code mit deiner Banking-App, um eine vorausgefüllte Überweisung zu erhalten.",
+				"markAcceptedAction": "Als akzeptiert markieren",
+				"markPaidAction": "Als ausgezahlt markieren",
+				"markPaidWarning": "Wenn ein Antrag als ausgezahlt markiert wurde, kann dies nicht rückgängig gemacht werden.",
+				"epcCodeErrorTitle": "QR-Code konnte nicht erstellt werden",
+				"epcCodeErrorDescription": "Das bedeutet meist, dass die angegebene IBAN ungültig ist oder die Validierung fehlgeschlagen ist."
+			},
+			"expenses": {
+				"title": "Kostenaufstellung",
+				"exportAction": "Exportieren",
+				"loadErrorTitle": "Fehler beim Laden der Ausgaben",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Ausgaben gefunden.",
+				"emptyDescription": "Für diesen Spesenbericht wurden noch keine Ausgaben eingetragen",
+				"table": {
+					"title": "Titel",
+					"date": "Datum",
+					"amount": "Betrag",
+					"actions": "Aktionen",
+					"total": "Summe"
+				},
+				"csv": {
+					"title": "Titel",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"amount": "Betrag",
+					"description": "Beschreibung",
+					"meta": "Metadaten"
+				}
+			},
+			"attachments": {
+				"title": "Anhänge",
+				"downloadAllAction": "Alle herunterladen",
+				"loadErrorTitle": "Fehler beim Laden der Anhänge",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Uploads gefunden",
+				"emptyDescription": "Der Nutzer hat keine Dokumente hochgeladen.",
+				"downloadAllLoading": "Downloads werden vorbereitet…",
+				"downloadAllSuccess": "Downloads gestartet",
+				"downloadAllError": "Downloads fehlgeschlagen",
+				"downloadAction": "Herunterladen",
+				"downloadLoading": "Download wird vorbereitet…",
+				"downloadSuccess": "Download gestartet",
+				"downloadError": "Download fehlgeschlagen"
+			},
+			"details": {
+				"loadErrorTitle": "Details konnten nicht geladen werden",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"totalCostLabel": "Gesamtkosten",
+				"ibanLabel": "IBAN",
+				"accountNameLabel": "Kontoname",
+				"copiedToClipboard": "{title} zum Clipboard kopiert"
+			},
+			"paidNotice": {
+				"title": "Antrag wurde ausgezahlt",
+				"description": "Dieser Antrag wurde {date} ausgezahlt und kann nicht mehr bearbeitet werden. Du kannst ihn noch einsehen und exportieren."
+			},
+			"reasoning": {
+				"title": "Begründung",
+				"loadErrorTitle": "Fehler beim Laden des Reports",
+				"unknownError": "Ein unbekannter Fehler ist aufgetreten",
+				"emptyTitle": "Keine Begründung",
+				"emptyDescription": "Der Nutzer hat keine Begründung für diesen Antrag angegeben.",
+				"byLabel": "Von"
+			}
+		},
+		"reports": {
+			"columns": {
+				"actions": {
+					"label": "Aktionen",
+					"placeholder": "Aktion"
+				},
+				"status": {
+					"label": "Status",
+					"placeholder": "Status"
+				},
+				"reportId": {
+					"label": "Report ID",
+					"placeholder": "Report ID"
+				},
+				"title": {
+					"label": "Titel",
+					"placeholder": "Titel"
+				},
+				"owner": {
+					"label": "Ersteller",
+					"placeholder": "Ersteller"
+				},
+				"lastUpdatedAt": {
+					"label": "Zuletzt aktualisiert",
+					"placeholder": "Zuletzt aktualisiert"
+				},
+				"costUnit": {
+					"label": "Kostenstelle",
+					"placeholder": "Kostenstelle"
+				},
+				"createdAt": {
+					"label": "Erstellt am",
+					"placeholder": "Erstellt am",
+					"tooltip": "Erstellt am {date} um {time} Uhr"
+				}
+			},
+			"empty": {
+				"title": "Noch keine Anträge erstellt",
+				"description": "Du hast noch keinen Antrag erstellt. Erstelle einen neuen Antrag, um loszulegen.",
+				"createButton": "Neuer Antrag"
+			},
+			"noResults": {
+				"title": "Keine Anträge gefunden",
+				"description": "Es wurden keine Anträge mit den aktuellen Filtern gefunden. Versuche es mit anderen Filtern erneut.",
+				"clearFilters": "Filter zurücksetzen"
+			},
+			"quickActions": {
+				"all": "Alle",
+				"draft": "Entwurf",
+				"completed": "Abgeschlossen"
+			},
+			"pagination": {
+				"indicator": "Seite {page} von {pageCount}"
+			}
+		},
+		"report": {
+			"common": {
+				"fields": {
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Verpflegung Weihnachtsfeier",
+					"descriptionHelper": "Beschreibung der Ausgabe oder Kommentar",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"datePlaceholder": "01.01.2026",
+					"amount": "Betrag",
+					"attachments": "Anhänge"
+				},
+				"actions": {
+					"cancel": "Abbrechen",
+					"delete": "Löschen",
+					"save": "Speichern",
+					"create": "Erstellen"
+				},
+				"toasts": {
+					"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+					"uploadFailedTitle": "Upload fehlgeschlagen",
+					"uploadCleanupFailedDescription": "Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					"uploadPartialFailureDescription": "Nicht alle Dateien konnten hochgeladen werden",
+					"downloadPreparing": "Download wird vorbereitet…",
+					"downloadStarted": "Download gestartet"
+				}
+			},
+			"createExpense": {
+				"menu": {
+					"receipts": "Belege & Rechnungen",
+					"travelAllowance": "Reisepauschale",
+					"mealAllowance": "Verpflegungspauschale"
+				},
+				"receiptSheet": {
+					"title": "Belege und Rechnungen hinzufügen",
+					"submit": "Hinzufügen",
+					"toasts": {
+						"createSuccess": "Ausgabe erfolgreich erstellt",
+						"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+					},
+					"descriptionHelper": "Optional. Füge dieser Ausgabe eine kurze Beschreibung hinzu."
+				}
+			},
+			"createReport": {
+				"sheetTitle": "Neuer Antrag",
+				"submit": "Antrag erstellen",
+				"errors": {
+					"costUnitsTitle": "Fehler beim Laden der Kostenstellen.",
+					"costUnitsDescription": "Die Kostenstellen konnten nicht geladen werden. Code: {code}",
+					"bankingDetailsTitle": "Fehler beim Laden der Bankverbindungen.",
+					"bankingDetailsDescription": "Die Bankverbindungen konnten nicht geladen werden. Code: {code}"
+				},
+				"noBankingDetails": {
+					"title": "Keine Bankverbindung vorhanden",
+					"textPrefix": "Um einen Antrag zu erstellen, musst du zuerst eine",
+					"linkText": "Bankverbindung hinterlegen"
+				},
+				"fields": {
+					"title": "Titel",
+					"titlePlaceholder": "Verpflegung Weihnachtsfeier",
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Beschreibung des Reports",
+					"descriptionHelper": "Optional. Wird deinem Antrag als erste Notiz hinzugefügt.",
+					"bankingDetails": "Bankverbindung",
+					"bankingDetailsPlaceholder": "Bankverbindung auswählen",
+					"bankingDetailsHelperPrefix": "Um Zahlungen zu erhalten, muss eine Bankverbindung hinterlegt haben. Du kannst deine Bankverbindung in den",
+					"bankingDetailsHelperLink": "Einstellungen",
+					"bankingDetailsHelperSuffix": "verwalten.",
+					"costUnit": "Kostenstelle",
+					"costUnitPlaceholder": "Kostenstelle auswählen",
+					"costUnitExamplesTitle": "Zu der ausgewählten Kostenstelle gehören die folgenden Anliegen:"
+				},
+				"toasts": {
+					"createSuccess": "Report erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen des Reports"
+				}
+			},
+			"foodExpenseForm": {
+				"days": "Dauer",
+				"daysUnit": "Tage",
+				"breakfastDeduction": "Frühstücksabzug",
+				"breakfastDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"lunchDeduction": "Mittagessenabzug",
+				"lunchDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"dinnerDeduction": "Abendessenabzug",
+				"dinnerDeductionHelper": "Automatisch berechnet: - {amount} € pro Tag",
+				"amountHelper": "Automatisch berechnet: {amount} € pro Tag - Abzüge",
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+				}
+			},
+			"receiptExpenseForm": {
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Beleg-Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Beleg-Ausgabe"
+				}
+			},
+			"travelExpenseForm": {
+				"from": "Startpunkt",
+				"fromPlaceholder": "Münster",
+				"to": "Endpunkt",
+				"toPlaceholder": "Berlin",
+				"distance": "Strecke",
+				"distanceUnit": "km",
+				"distanceHelper": "Abgelegte Strecke in km",
+				"amountHelper": "Automatisch berechnet: {rate} € pro Kilometer",
+				"submit": "Erstellen",
+				"toasts": {
+					"createSuccess": "Ausgabe erfolgreich erstellt",
+					"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
+				}
+			},
+			"activity": {
+				"header": "Aktivität",
+				"commentPlaceholder": "Schreibe einen Kommentar",
+				"commentErrorTitle": "Fehler beim Senden der Nachricht",
+				"commentErrorDescription": "Ein unbekannter Fehler ist aufgetreten",
+				"loadError": "Fehler: {message}",
+				"fieldLabels": {
+					"title": "\"Titel\"",
+					"description": "\"Beschreibung\""
+				},
+				"events": {
+					"created": "hat diesen Bericht erstellt",
+					"updated": "hat <bold>{labels}</bold> bearbeitet",
+					"deleted": "hat diesen Bericht gelöscht",
+					"submittedPrefix": "hat den Antrag",
+					"resubmittedWord": "erneut",
+					"submittedSuffix": "eingereicht",
+					"revisionRequestedPrefix": "Revision angefordert von",
+					"acceptedPrefix": "Antrag wurde von",
+					"acceptedSuffix": "als akzeptiert markiert",
+					"paidPrefix": "Antrag wurde von",
+					"paidSuffix": "als ausgezahlt markiert",
+					"rejectedPrefix": "Antrag wurde von",
+					"rejectedSuffix": "abgelehnt",
+					"commented": "kommentierte",
+					"expenseAddedPrefix": "hat eine Ausgabe vom Typ",
+					"expenseAddedSuffix": "hinzugefügt",
+					"expenseUpdated": "hat eine Ausgabe aktualisiert",
+					"expenseDeleted": "hat eine Ausgabe entfernt",
+					"attachmentAdded": "hat eine Datei hinzugefügt:",
+					"attachmentDeleted": "hat eine Datei entfernt:"
+				}
+			},
+			"attachments": {
+				"header": "Anhänge",
+				"loadError": "Fehler",
+				"emptyTitle": "Keine Anhänge gefunden",
+				"emptyDescription": "Erstelle eine neue Ausgabe und hinterlege einen Anhang damit dieser hier erscheint.",
+				"downloadAriaLabel": "Anhang herunterladen",
+				"toasts": {
+					"deleteSuccess": "Anhang erfolgreich gelöscht.",
+					"deleteErrorTitle": "Fehler beim Löschen des Anhangs",
+					"deleteErrorDescription": "Ein unerwarteter Fehler ist aufgetreten.",
+					"downloadErrorTitle": "Fehler beim Herunterladen des Anhangs",
+					"downloadErrorDescription": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"details": {
+				"title": "Details",
+				"loadError": "Antragsdetails konnten nicht geladen werden",
+				"sum": "Summe",
+				"amountValue": "{amount} EUR",
+				"iban": "IBAN",
+				"accountName": "Kontoname",
+				"submitter": "Antragsteller",
+				"costUnit": "Kostenstelle",
+				"costUnitValue": "{tag} · {title}",
+				"created": "Erstellt",
+				"lastUpdated": "Zuletzt bearbeitet"
+			},
+			"expenses": {
+				"header": "Ausgaben",
+				"add": "Hinzufügen",
+				"table": {
+					"type": "Typ",
+					"description": "Beschreibung",
+					"date": "Datum",
+					"amount": "Betrag",
+					"sum": "Summe"
+				},
+				"emptyTitle": "Du hast noch keine Ausgaben hinzugefügt.",
+				"emptyDescription": "Füge eine neue Ausgabe hinzu um diese erstatten zu lassen.",
+				"menu": {
+					"edit": "Bearbeiten",
+					"delete": "Löschen"
+				},
+				"deleteDialog": {
+					"title": "Möchtest du diese Ausgabe wirklich löschen?",
+					"description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+					"confirm": "Löschen"
+				},
+				"toasts": {
+					"deleteErrorTitle": "Fehler beim Löschen der Ausgabe"
+				}
+			},
+			"header": {
+				"breadcrumb": "Anträge",
+				"submittedBy": "Antrag eingereicht von <bold>{ownerName}</bold>",
+				"createdAgo": "{timeAgo} erstellt",
+				"actions": {
+					"copy": "Kopieren",
+					"edit": "Bearbeiten",
+					"submit": "Einreichen"
+				},
+				"copyAction": {
+					"id": "ID",
+					"iban": "IBAN",
+					"accountName": "Kontoname",
+					"sum": "Summe",
+					"title": "Titel",
+					"copyLabel": "{title} kopieren",
+					"copiedToast": "{title} wurde zum Clipboard kopiert"
+				},
+				"editMenu": {
+					"editTitle": "Titel bearbeiten",
+					"delete": "Löschen"
+				},
+				"editTitleDialog": {
+					"title": "Titel bearbeiten",
+					"description": "Bearbeite den öffentlichen Titel deines Antrags.",
+					"fieldLabel": "Beschreibung",
+					"fieldPlaceholder": "Einkauf für die Weihnachtsfeier",
+					"fieldHelper": "Der Titel ist für dich und Administratoren sichtbar.",
+					"cancel": "Abbrechen",
+					"save": "Speichern"
+				},
+				"deleteDialog": {
+					"title": "Willst du deinen Antrag wirklich löschen?",
+					"description": "Diese Aktion kann nicht rückgängig gemacht werden.",
+					"cancel": "Abbrechen",
+					"confirm": "Löschen"
+				},
+				"submitDialog": {
+					"title": "Willst du deinen Antrag wirklich einreichen?",
+					"description": "Du kannst den Antrag nicht mehr bearbeiten, nachdem du ihn eingereicht hast.",
+					"cancel": "Abbrechen",
+					"confirm": "Einreichen"
+				},
+				"toasts": {
+					"titleUpdated": "Titel wurde erfolgreich aktualisiert.",
+					"deleteSuccess": "Antrag wurde erfolgreich gelöscht",
+					"deleteErrorTitle": "Antrag konnte nicht gelöscht werden",
+					"deleteErrorDescription": "Ein unbekannter Fehler ist aufgetreten",
+					"submitSuccess": "Antrag wurde erfolgreich eingereicht",
+					"submitErrorTitle": "Antrag konnte nicht eingereicht werden",
+					"submitErrorDescription": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"paidNotice": {
+				"title": "Antrag wurde ausgezahlt",
+				"description": "Dein Antrag wurde {hasDate, select, yes {am {date} } other {}}akzeptiert und ausgezahlt. Wende dich bei Fragen bitte an die zuständige Person aus deiner Organisation."
+			},
+			"updateExpense": {
+				"sheetTitle": "Ausgabe",
+				"loadError": "Fehler beim Laden der Ausgabe.",
+				"saving": "Wird gespeichert…",
+				"save": "Speichern",
+				"toasts": {
+					"updateSuccess": "Ausgabe erfolgreich aktualisiert",
+					"updateErrorTitle": "Fehler beim Aktualisieren der Ausgabe"
+				},
+				"attachments": {
+					"header": "Anhänge",
+					"loadError": "Fehler beim Laden der Anhänge",
+					"empty": "Keine Anhänge vorhanden",
+					"addHeader": "Anhang hinzufügen",
+					"toasts": {
+						"addSuccess": "Anhänge erfolgreich hinzugefügt",
+						"addErrorTitle": "Fehler beim Hinzufügen der Anhänge",
+						"deleteSuccess": "Anhang erfolgreich gelöscht",
+						"deleteErrorTitle": "Fehler beim Löschen des Anhangs",
+						"downloadFailed": "Download fehlgeschlagen"
+					}
+				}
+			}
+		},
+		"reporting": {
+			"banner": {
+				"title": "Reporting ist ein experimentelles Feature",
+				"description": "Reporting ist ein Feature, welches sich aktiv in der Entwicklung befindet. Du kannst bereits auf Reporting zugreifen und erste Funktionen austesten, gehe jedoch davon aus, dass Fehler auftreten können."
+			},
+			"header": {
+				"title": "Reporting",
+				"exportButton": "Exportieren",
+				"datePicker": {
+					"placeholder": "Datum auswählen"
+				}
+			},
+			"card": {
+				"emptyTitle": "Keine Daten",
+				"emptyDescription": "Für den angegebenen Zeitraum sind keine Daten verfügbar."
+			},
+			"common": {
+				"lastUpdated": "Zuletzt aktualisiert {time}",
+				"loadError": "Fehler beim Laden der Daten"
+			},
+			"overview": {
+				"title": "Antragsübersicht"
+			},
+			"byCostUnit": {
+				"loadingTitle": "Top-Spender",
+				"description": "Nach Kostenstellen",
+				"tooltip": "In den {count} beliebtesten Kostenstellen wurden <highlight>{amount}</highlight> ausgegeben."
+			},
+			"byMember": {
+				"loadingTitle": "Top-Spender",
+				"description": "Nach Mitgliedern",
+				"tooltip": "Im ausgewählten Zeitraum haben die <highlight>{count} Personen</highlight>, welche am meisten Geld ausgegeben haben, gemeinsam <highlight>{amount}</highlight> ausgegeben."
+			},
+			"timeline": {
+				"description": "Verlauf erstattet",
+				"chart": {
+					"amountLabel": "Summe"
+				},
+				"metrics": {
+					"reimbursed": "Erstattet",
+					"submitted": "Eingereicht"
+				}
+			}
+		},
+		"settings": {
+			"actions": {
+				"save": "Speichern",
+				"saving": "Wird gespeichert…",
+				"cancel": "Abbrechen",
+				"delete": "Löschen",
+				"create": "Erstellen",
+				"creating": "Wird erstellt…",
+				"update": "Aktualisieren",
+				"updating": "Wird aktualisiert…",
+				"back": "Zurück",
+				"edit": "Bearbeiten",
+				"tryAgain": "Erneut versuchen"
+			},
+			"nav": {
+				"groups": {
+					"personal": "Persönliche Einstellungen",
+					"organisation": "Organisation",
+					"platform": "Plattform"
+				},
+				"items": {
+					"general": {
+						"label": "Allgemeines",
+						"description": "Ändere deine persönlichen Einstellungen"
+					},
+					"notifications": {
+						"label": "Benachrichtigungen",
+						"description": "Passe die E-Mails, SMS und Push-Benachrichtigungen an, die du erhältst"
+					},
+					"bankDetails": {
+						"label": "Bankverbindungen",
+						"description": "Aktualisiere deine Bankverbindung, um Zahlungen zu erhalten"
+					},
+					"orgGeneral": {
+						"label": "Organisation",
+						"description": "Verwalte die Einstellungen zu deiner Organisation"
+					},
+					"orgMembers": {
+						"label": "Mitglieder",
+						"description": "Verwalte die Mitglieder deiner Organisation"
+					},
+					"orgAllowances": {
+						"label": "Zulagen",
+						"description": "Verwalte die Zulagen und Abzüge für Spesenanträge"
+					},
+					"orgCostUnits": {
+						"label": "Kostenstellen",
+						"description": "Kostenstellen werden verwendet, um Ausgaben einfacher zuordnen zu können"
+					},
+					"adminOrgs": {
+						"label": "Organisationen",
+						"description": "Verwalte alle Organisationen auf dieser Plattform"
+					}
+				},
+				"sidebarOrgHeading": "Organisation",
+				"sidebarAdminHeading": "Admin",
+				"noSession": "Keine aktive Sitzung gefunden"
+			},
+			"shared": {
+				"loadFormErrorTitle": "Das Formular konnte nicht geladen werden"
+			},
+			"general": {
+				"title": "Organisation",
+				"description": "Verwalte die Einstellungen zu deiner Organisation.",
+				"editButton": "Bearbeiten",
+				"rows": {
+					"logo": "Logo",
+					"name": "Name",
+					"id": "ID",
+					"tenantId": "Microsoft-Mandats-ID",
+					"slug": "Slug",
+					"createdAt": "Erstellt am",
+					"reviewer": "Reviewer",
+					"reviewerEmpty": "Nicht hinterlegt"
+				},
+				"sections": {
+					"general": "Allgemeines",
+					"reviewer": "Reviewer"
+				},
+				"updateDialog": {
+					"title": "Organisation aktualisieren",
+					"logoLabel": "Logo",
+					"logoDescription": "Gib eine URL zu einem Logo an.",
+					"logoPlaceholder": "https://example.com/logo.svg",
+					"nameLabel": "Name",
+					"nameDescription": "Dieser Name ist für alle Mitglieder deiner Organisation sichtbar.",
+					"namePlaceholder": "Deine Organisation"
+				},
+				"reviewerDialog": {
+					"title": "Reviewer aktualisieren",
+					"fieldLabel": "Reviewer",
+					"fieldDescription": "Benachrichtigungen über neue Anträge werden an diese E-Mail-Adresse versendet.",
+					"placeholder": "you@example.com"
+				},
+				"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+				"saveErrorTitle": "Einstellungen konnten nicht gespeichert werden",
+				"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+				"reviewerSavedToast": "Reviewer wurde erfolgreich gespeichert",
+				"reviewerSaveErrorTitle": "Reviewer konnte nicht gespeichert werden"
+			},
+			"generalLegacy": {
+				"title": "Organisation",
+				"description": "Verwalte die Einstellungen zu deiner Organisation",
+				"sections": {
+					"general": "Allgemeines",
+					"reviewer": "Reviewer"
+				},
+				"orgName": {
+					"label": "Organisationsname",
+					"ariaLabel": "Organisationsname",
+					"description": "Der Name deiner Organisation, wie er in der Anwendung angezeigt wird.",
+					"savedToast": "Organisationsname gespeichert"
+				},
+				"slug": {
+					"label": "Slug",
+					"description": "Zur eindeutigen und nutzerfreundlichen Identifikation"
+				},
+				"tenantId": {
+					"label": "Microsoft Tenant ID",
+					"description": "Nutzer, deren Entra-ID-Mandant dieser UUID entspricht, werden dieser Organisation automatisch zugeordnet."
+				},
+				"reviewerEmail": {
+					"label": "Reviewer E-Mail",
+					"ariaLabel": "Reviewer E-Mail",
+					"description": "Spesenanträge werden nach der Einreichung an diese E-Mail-Adresse weitergeleitet.",
+					"placeholder": "reviewer@example.com",
+					"savedToast": "Reviewer E-Mail gespeichert",
+					"invalid": "Ungültige E-Mail-Adresse"
+				},
+				"saveErrorTitle": "Fehler beim Speichern",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"allowances": {
+				"title": "Zulagen & Abzüge",
+				"description": "Verwalte die Zulagen und Abzüge für Spesenanträge.",
+				"kilometerRate": {
+					"label": "Kilometerpauschale",
+					"description": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet."
+				},
+				"dailyFoodAllowance": {
+					"label": "Tägliche Verpflegungszulage",
+					"description": "Dieser Betrag wird pro Tag für die Verpflegung erhoben."
+				},
+				"breakfastDeduction": {
+					"label": "Morgenstückabzug"
+				},
+				"lunchDeduction": {
+					"label": "Mittagessenabzug"
+				},
+				"dinnerDeduction": {
+					"label": "Abendessenabzug"
+				},
+				"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+				"saveErrorTitle": "Einstellungen konnten nicht gespeichert werden",
+				"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+			},
+			"allowancesLegacy": {
+				"title": "Zulagen & Abzüge",
+				"description": "Verwalte die Zulagen und Abzüge für Spesenanträge.",
+				"sections": {
+					"travel": "Reisepauschale",
+					"meal": "Verpflegungspauschale"
+				},
+				"mealToggle": {
+					"title": "Verpflegungspauschalen aktiviert",
+					"description": "Bestimmt ob Nutzer Verpflegungspauschalen einreichen können"
+				},
+				"mealSettings": {
+					"title": "Einstellungen",
+					"description": "Bestimme die Raten für die Verpflegungspauschale"
+				},
+				"kilometerRate": {
+					"label": "Kilometerpauschale",
+					"description": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet."
+				},
+				"dailyFoodAllowance": {
+					"label": "Tägliche Verpflegungszulage",
+					"description": "Dieser Betrag wird pro Tag für die Verpflegung erhoben."
+				},
+				"breakfastDeduction": {
+					"label": "Morgenstückabzug"
+				},
+				"lunchDeduction": {
+					"label": "Mittagessenabzug"
+				},
+				"dinnerDeduction": {
+					"label": "Abendessenabzug"
+				},
+				"savedToast": "Zulagen erfolgreich aktualisiert",
+				"saveErrorTitle": "Fehler beim Aktualisieren der Zulagen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"members": {
+				"title": "Mitglieder",
+				"description": "Die folgenden Benutzer sind Mitglieder deiner Organisation.",
+				"table": {
+					"name": "Name",
+					"email": "E-Mail",
+					"role": "Rolle",
+					"createdAt": "Beigetreten",
+					"noResults": "Keine Ergebnisse.",
+					"unitsCount": "{count} Einheiten",
+					"pageIndicator": "Seite {current} / {total}"
+				},
+				"roles": {
+					"owner": "Besitzer",
+					"admin": "Admin",
+					"member": "Mitglied"
+				},
+				"updateSheet": {
+					"title": "Mitglied bearbeiten",
+					"nameLabel": "Name",
+					"emailLabel": "E-Mail",
+					"createdAtLabel": "Beigetreten",
+					"roleLabel": "Rolle",
+					"rolePlaceholder": "Wähle eine Rolle",
+					"savedToast": "Rolle wurde erfolgreich aktualisiert",
+					"saveErrorTitle": "Fehler beim Aktualisieren der Rolle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+					"roleOptions": {
+						"member": "Mitglied",
+						"admin": "Administrator"
+					}
+				}
+			},
+			"costUnits": {
+				"title": "Kostenstellen",
+				"description": "Kostenstellen werden verwendet um Ausgaben einfacher zuordnen zu können",
+				"newGroupButton": "Neue Gruppe",
+				"newCostUnitButton": "Neue Kostenstelle",
+				"table": {
+					"tag": "Tag",
+					"title": "Titel",
+					"examplesCount": "{count} Beispiele",
+					"createdAt": "Erstellt",
+					"group": "Gruppe",
+					"noGroup": "Keine Gruppe",
+					"status": "Status",
+					"statusActive": "Aktiv",
+					"statusArchived": "Archiviert",
+					"noResults": "Keine Ergebnisse.",
+					"unitsCount": "{count} Einheiten",
+					"pageIndicator": "Seite {current} / {total}"
+				},
+				"createSheet": {
+					"title": "Neue Kostenstelle",
+					"tagLabel": "Tag",
+					"tagTooltip": "Jede Kostenstelle besteht aus einer Kombination eines einzigartigen Tags und einem Titel",
+					"tagPlaceholder": "KS123",
+					"titleLabel": "Titel",
+					"titlePlaceholder": "Sommerfest",
+					"tagTitleDescription": "Wird zur eindeutigen Identifikation der Kostenstelle verwendet.",
+					"groupLabel": "Gruppe",
+					"noGroupOption": "Keine Gruppe",
+					"groupOptGroupLabel": "Gruppen",
+					"groupDescription": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst.",
+					"createGroupButton": "Neue Gruppe erstellen",
+					"examplesLabel": "Beispiele",
+					"examplesPlaceholder": "z.B. Getränke ",
+					"examplesDescription": "Beispiele können Nutzern helfen, besser zu verstehen ob sie die richtige Kostenstelle für Ihren Antrag gewählt haben.",
+					"savedToast": "Kostenstelle wurde erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Kostenstelle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				},
+				"createGroupSheet": {
+					"title": "Neue Kostenstellengruppe",
+					"nameLabel": "Gruppenname",
+					"namePlaceholder": "Projekte, Werbung, Sonstiges...",
+					"description": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst. Titel ist öffentlich sichtbar.",
+					"savedToast": "Kostenstellengruppe wurde erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Kostenstellengruppe",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				},
+				"updateSheet": {
+					"title": "Kostenstelle bearbeiten",
+					"tagLabel": "Tag",
+					"tagTooltip": "Jede Kostenstelle besteht aus einer Kombination eines einzigartigen Tags und einem Titel",
+					"tagPlaceholder": "KS123",
+					"titleLabel": "Titel",
+					"titlePlaceholder": "Sommerfest",
+					"tagTitleDescription": "Wird zur eindeutigen Identifikation der Kostenstelle verwendet.",
+					"statusLabel": "Status",
+					"statusPlaceholder": "Wähle eine Rolle",
+					"statusActive": "Aktiv",
+					"statusArchived": "Archiviert",
+					"statusDescription": "Wenn eine Kostenstelle als archiviert markiert ist, kann sie von Benutzern nicht für neue Anträge verwendet werden.",
+					"groupLabel": "Gruppe",
+					"noGroupOption": "Keine Gruppe",
+					"groupOptGroupLabel": "Gruppen",
+					"groupDescription": "Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden, indem du sie in Gruppen sortierst.",
+					"examplesLabel": "Beispiele",
+					"examplesPlaceholder": "z.B. Getränke ",
+					"examplesDescription": "Beispiele können Nutzern helfen, besser zu verstehen ob sie die richtige Kostenstelle für Ihren Antrag gewählt haben.",
+					"deleteSectionLabel": "Kostenstelle löschen",
+					"deleteSectionDescriptionAllowed": "Diese Aktion kann nicht rückgängig gemacht werden. Kostenstellen können nur gelöscht werden, wenn noch kein Antrag existiert, der diese Kostenstelle verwendet.",
+					"deleteSectionDescriptionBlocked": "Du kannst diese Kostenstelle nicht löschen, da es bereits Anträge gibt, die diese Kostenstelle verwenden. Archiviere die Kostenstelle stattdessen.",
+					"deleteDialogTitle": "Kostenstelle löschen",
+					"deleteDialogDescription": "Bist du dir sicher, dass du diese Kostenstelle löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+					"savedToast": "Kostenstelle wurde erfolgreich aktualisiert",
+					"saveErrorTitle": "Fehler beim Aktualisieren der Kostenstelle",
+					"saveErrorFallback": "Ein unbekannter Fehler ist aufgetreten",
+					"deletedToast": "Kostenstelle wurde erfolgreich gelöscht",
+					"deleteErrorTitle": "Fehler beim Löschen der Kostenstelle",
+					"deleteErrorFallback": "Ein unbekannter Fehler ist aufgetreten"
+				}
+			},
+			"banking": {
+				"title": "Bankverbindungen",
+				"description": "Um Zahlungen an dein Konto zu erhalten, musst du mindestens eine Bankverbindung anlegen.",
+				"listHeading": "Deine Bankdaten",
+				"createButton": "Erstellen",
+				"emptyTitle": "Noch keine Bankverbindung hinterlegt",
+				"emptyDescription": "Hinterlege eine Bankverbindung um Zahlungen zu erhalten",
+				"loadErrorFallback": "Keine Details gefunden - Fehler",
+				"createdOn": "Erstellt am {date} um {time}",
+				"createDialog": {
+					"title": "Neue Bankverbindung",
+					"description": "Lege eine neue Bankverbindung an um Zahlungen zu erhalten.",
+					"titleLabel": "Titel",
+					"titleDescription": "Nutze diesen Titel um die Bankverbindung später einfach wiederzufinden.",
+					"ibanLabel": "IBAN",
+					"nameLabel": "Name",
+					"nameDescription": "Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen übereinstimmt.",
+					"submitCreating": "Wird erstellt…",
+					"submitIdle": "Erstellen",
+					"savedToast": "Bankverbindung erfolgreich erstellt",
+					"saveErrorTitle": "Fehler beim Erstellen der Bankverbindung",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				}
+			},
+			"preferences": {
+				"general": {
+					"title": "Allgemeines",
+					"description": "Verwalte deine persönlichen Informationen",
+					"sectionProfile": "Profil",
+					"nameLabel": "Name",
+					"nameAriaLabel": "Name",
+					"nameDescription": "Dein vollständiger Name, wie er in der Anwendung angezeigt wird.",
+					"emailLabel": "E-Mail",
+					"emailAriaLabel": "E-Mail",
+					"emailDescription": "Deine E-Mail-Adresse wird über Microsoft verwaltet und kann hier nicht geändert werden.",
+					"savedToast": "Name gespeichert",
+					"saveErrorTitle": "Fehler beim Speichern",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				},
+				"notifications": {
+					"title": "Benachrichtigungen",
+					"description": "Wähle welche Benachrichtigungen du erhalten möchtest",
+					"fieldLabel": "Benachrichtigungen",
+					"fieldDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
+					"allTitle": "Alle Benachrichtigungen",
+					"allDescription": "Du erhältst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+					"statusTitle": "Statusänderungen",
+					"statusDescription": "Du erhältst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+					"noneTitle": "Keine Benachrichtigungen",
+					"noneDescription": "Du erhältst keine Benachrichtigungen.",
+					"savedToast": "Einstellungen wurden erfolgreich gespeichert",
+					"saveErrorTitle": "Fehler beim Speichern der Einstellungen",
+					"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+				}
+			},
+			"adminOrgs": {
+				"title": "Organisationen",
+				"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+				"newOrgTitle": "Neue Organisation",
+				"newOrgDescription": "Erstelle eine neue Organisation um zu kollaborieren",
+				"listHeading": "Organisationen",
+				"emptyTitle": "Noch keine Organisationen hinterlegt",
+				"emptyDescription": "Hinterlege eine neue Organisation um Mitglieder zu verwalten",
+				"loadErrorFallback": "Fehler beim Laden der Organisationen",
+				"createDialog": {
+					"title": "Neue Organisation erstellen",
+					"nameLabel": "Name",
+					"namePlaceholder": "Meine Organisation",
+					"tenantIdLabel": "Microsoft Tenant ID",
+					"tenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+					"tenantIdDescription": "Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory). Alle Benutzer aus diesem Tenant werden dieser Organisation automatisch zugeordnet.",
+					"savedToast": "Organisation erfolgreich erstellt.",
+					"submitCreating": "Wird erstellt…",
+					"submitIdle": "Erstellen",
+					"triggerButton": "Organisation erstellen"
+				},
+				"details": {
+					"backLink": "Zurück",
+					"description": "Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.",
+					"loadErrorFallback": "Ein Fehler ist aufgetreten",
+					"metrics": {
+						"members": "Mitglieder",
+						"reports": "Reports",
+						"admins": "Admins",
+						"invitations": "Einladungen"
+					},
+					"generalSectionTitle": "Allgemein",
+					"generalForm": {
+						"nameLabel": "Name",
+						"nameDescription": "Wird Nutzern in der App und E-Mails angezeigt",
+						"namePlaceholder": "Meine Organisation",
+						"slugLabel": "Slug",
+						"slugDescription": "Zur eindeutigen und nutzerfreundlichen Identifikation",
+						"slugPlaceholder": "my-org",
+						"tenantIdLabel": "Microsoft Tenant ID",
+						"tenantIdDescription": "Nutzer, deren Entra-ID-Mandant dieser UUID entspricht, werden dieser Organisation automatisch zugeordnet.",
+						"tenantIdPlaceholder": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+						"logoUrlLabel": "Logo URL",
+						"logoUrlDescription": "URL zum Logo der Organisation",
+						"logoUrlPlaceholder": "https://example.com/logo.png",
+						"savedToast": "Organisationseinstellungen gespeichert."
+					},
+					"adminsSectionTitle": "Admins",
+					"adminsEmptyTitle": "Keine Admins",
+					"adminsEmptyDescription": "In dieser Organisation wurden keine Administratoren gefunden"
+				}
+			}
+		},
+		"auth": {
+			"content": {
+				"title": "Willkommen zurück!",
+				"subtitle": "Melde dich mit deinem Microsoft-Konto an um fortzufahren.",
+				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
+			},
+			"form": {
+				"continueWithMicrosoft": "Mit Microsoft fortfahren",
+				"signInError": "Ein Fehler ist aufgetreten",
+				"signInSuccessTitle": "Anmeldung erfolgreich",
+				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet"
+			}
+		},
+		"legal": {
+			"document": {
+				"version": "Version {version}"
+			},
+			"footer": {
+				"privacyPolicy": "Datenschutzerklärung",
+				"termsAndConditions": "Nutzungsbedingungen"
+			}
+		},
+		"shared": {
+			"sidebarMenu": {
+				"triggerLoadError": "Organisation konnte nicht geladen werden.",
+				"settings": "Einstellungen",
+				"signOut": "Abmelden",
+				"signOutLoading": "Du wirst abgemeldet",
+				"signOutSuccess": "Du wurdest erfolgreich abgemeldet",
+				"signOutError": "Fehler beim Abmelden",
+				"orgsLoadError": "Organisationen konnten nicht geladen werden.",
+				"yourOrganizations": "Deine Organisationen",
+				"headerLoadError": "Aktive Organisation konnte nicht geladen werden."
+			},
+			"command": {
+				"searchPlaceholder": "Suchen..."
+			},
+			"sidebar": {
+				"nav": {
+					"dashboard": "Dashboard",
+					"myReports": "Meine Anträge",
+					"settings": "Einstellungen"
+				},
+				"admin": {
+					"label": "Administration",
+					"reporting": "Reporting",
+					"reports": "Anträge"
+				}
+			},
+			"datePicker": {
+				"openCalendar": "Kalender öffnen"
+			},
+			"adminSettingsSidebar": {
+				"nav": {
+					"general": "Allgemeines",
+					"users": "Benutzer",
+					"allowances": "Zulagen",
+					"costUnits": "Kostenstellen"
+				},
+				"settingsLabel": "Einstellungen"
+			},
+			"themeToggle": {
+				"tooltip": "Theme wechseln"
+			},
+			"preferencesForm": {
+				"notificationsLabel": "Benachrichtigungen",
+				"notificationsDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
+				"allLabel": "Alle Benachrichtigungen",
+				"allDescription": "Du erhältst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+				"statusLabel": "Statusänderungen",
+				"statusDescription": "Du erhältst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+				"noneLabel": "Keine Benachrichtigungen",
+				"noneDescription": "Du erhältst keine Benachrichtigungen.",
+				"saveSuccess": "Einstellungen wurden erfolgreich gespeichert",
+				"saveError": "Fehler beim Speichern der Einstellungen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"adminSettingsForm": {
+				"kilometerRateLabel": "Kilometerpauschale",
+				"kilometerRateDescription": "Dieser Betrag wird pro Kilometer für Reise-Ausgaben berechnet.",
+				"reviewerEmailLabel": "Reviewer-E-Mail",
+				"reviewerEmailDescription": "Diese E-Mail-Adresse erhält eine Benachrichtigung, wenn ein Spesenantrag eingereicht wird.",
+				"saveSuccess": "Einstellungen wurden erfolgreich gespeichert",
+				"saveError": "Fehler beim Speichern der Einstellungen",
+				"saveErrorFallback": "Ein unerwarteter Fehler ist aufgetreten"
+			},
+			"dataDisplay": {
+				"layout": "Layout",
+				"layoutCompact": "Kompakt",
+				"layoutDefault": "Standard",
+				"layoutLoose": "Locker",
+				"grouping": "Gruppierung",
+				"sorting": "Sortierung",
+				"columnVisibility": "Spaltensichtbarkeit",
+				"noGrouping": "Keine Gruppierung",
+				"noSorting": "Keine Sortierung"
+			},
+			"filterList": {
+				"clearAll": "Alle Filter löschen"
+			},
+			"filterMenu": {
+				"ariaLabel": "Filteroptionen"
+			},
+			"filterRegistry": {
+				"search": "Suchen…",
+				"noResults": "Keine Treffer",
+				"is": "ist",
+				"isNot": "ist nicht",
+				"contains": "enthält",
+				"containsNot": "enthält nicht",
+				"removeFilter": "Filter entfernen",
+				"selectedCount": "{count} ausgewählt",
+				"daysAgo": "vor",
+				"daysIn": "in",
+				"days": "{count, plural, one {1 Tag} other {# Tage}}"
+			},
+			"dataList": {
+				"unknown": "Unbekannt"
+			},
+			"expenseForm": {
+				"fields": {
+					"description": "Beschreibung",
+					"descriptionPlaceholder": "Verpflegung Weihnachtsfeier",
+					"descriptionHint": "Beschreibung der Ausgabe oder Kommentar",
+					"startDate": "Startdatum",
+					"endDate": "Enddatum",
+					"amount": "Betrag"
+				},
+				"datePlaceholder": "01.01.2026",
+				"createSuccess": "Ausgabe erfolgreich erstellt",
+				"createError": "Fehler beim Erstellen der Ausgabe",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"travel": {
+					"fromLabel": "Startpunkt",
+					"fromPlaceholder": "Münster",
+					"toLabel": "Endpunkt",
+					"toPlaceholder": "Berlin",
+					"distanceLabel": "Strecke",
+					"distanceHint": "Abgelegte Strecke in km",
+					"amountHint": "Automatisch berechnet: {rate} € pro Kilometer"
+				},
+				"food": {
+					"durationLabel": "Dauer",
+					"durationUnit": "Tage",
+					"breakfastLabel": "Frühstücksabzug",
+					"breakfastHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"lunchLabel": "Mittagessenabzug",
+					"lunchHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"dinnerLabel": "Abendessenabzug",
+					"dinnerHint": "Automatisch berechnet: - {amount} € pro Tag",
+					"amountHint": "Automatisch berechnet: {amount} € pro Tag - Abzüge"
+				},
+				"receipt": {
+					"createSuccess": "Beleg-Ausgabe erfolgreich erstellt",
+					"createError": "Fehler beim Erstellen der Beleg-Ausgabe",
+					"attachmentsLabel": "Anhänge",
+					"uploadFailedTitle": "Upload fehlgeschlagen",
+					"uploadFailedCleanupDescription": "Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					"uploadFailedDescription": "Nicht alle Dateien konnten hochgeladen werden"
+				}
+			}
+		},
+		"preferences": {
+			"page": {
+				"title": "Einstellungen",
+				"description": "Verwalte deine persönlichen Einstellungen",
+				"bankingDetailsTitle": "Bankverbindungen",
+				"bankingDetailsDescription": "Um Zahlungen an dein Konto zu erhalten, musst du mindestens eine Bankverbindung anlegen."
+			},
+			"bankingDetailsList": {
+				"addNew": "Neue Bankverbindung anlegen",
+				"createdAt": "Erstellt am {date} um {time}",
+				"deleteSuccess": "Bankverbindung erfolgreich gelöscht",
+				"deleteError": "Fehler beim Löschen der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"deleteDialogTitle": "Bankverbindung löschen?",
+				"deleteDialogDescription": "Die Bankverbindung \"{title}\" wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden."
+			},
+			"bankingDetailsForm": {
+				"titleLabel": "Titel",
+				"titleHint": "Nutze diesen Titel um die Bankverbindung später einfach wiederzufinden.",
+				"ibanLabel": "IBAN",
+				"nameLabel": "Name",
+				"nameHint": "Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen übereinstimmt."
+			},
+			"editBankingDetails": {
+				"dialogTitle": "Bankverbindung bearbeiten",
+				"dialogDescription": "Bearbeite deine Bankverbindung um Zahlungen zu erhalten.",
+				"loadError": "Fehler beim Laden der Bankverbindung",
+				"updateSuccess": "Bankverbindung erfolgreich aktualisiert",
+				"updateError": "Fehler beim Aktualisieren der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"saving": "Speichern..."
+			},
+			"createBankingDetails": {
+				"dialogTitle": "Neue Bankverbindung",
+				"dialogDescription": "Lege eine neue Banverbindung an um Zahlungen zu erhalten.",
+				"createSuccess": "Bankverbindung erfolgreich erstellt",
+				"createError": "Fehler beim Erstellen der Bankverbindung",
+				"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+				"creating": "Erstellen..."
+			}
+		},
+		"adminReports": {
+			"page": {
+				"title": "Admin Dashboard",
+				"description": "Verwalte deine Spesenanträge"
+			}
+		},
+		"acceptInvitation": {
+			"title": "Einladung annehmen",
+			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
+			"acceptButton": "Einladung annehmen",
+			"acceptError": "Einladung konnte nicht angenommen werden",
+			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+		}
+	},
+	"validation": {
+		"report": {
+			"titleRequired": "Bitte gib einen Titel ein.",
+			"costUnitRequired": "Bitte wähle eine Kostenstelle aus.",
+			"bankingDetailsRequired": "Bitte wähle eine Bankverbindung aus.",
+			"editTitleRequired": "Titel darf nicht leer sein."
+		},
+		"banking": {
+			"invalidIban": "Ungültige IBAN"
+		},
+		"expense": {
+			"startDateRequired": "Startdatum ist erforderlich",
+			"invalidStartDate": "Ungültiges Startdatum",
+			"endDateRequired": "Enddatum ist erforderlich",
+			"invalidEndDate": "Ungültiges Enddatum"
+		},
+		"organization": {
+			"nameRequired": "Name ist erforderlich",
+			"slugRequired": "Slug ist erforderlich",
+			"slugFormat": "Nur Kleinbuchstaben, Zahlen und \"-\" erlaubt",
+			"logoInvalid": "Bitte gib eine gültige Logo-URL ein",
+			"tenantIdInvalid": "Microsoft Tenant ID muss eine gültige UUID sein"
+		}
+	},
+	"emails": {
+		"shared": {
+			"supportPrompt": "Wende dich bei Fragen bitte an <email>support@zemio.co</email>.",
+			"regards": "Beste Grüße,",
+			"team": "Dein zemio Team",
+			"linkText": "hier"
+		},
+		"reportReceived": {
+			"subject": "Neuer Spesenbericht eingegangen",
+			"preview": "\"{title}\" von {from}",
+			"greeting": "Hallo,",
+			"body": "Der Nutzer <strong>{from}</strong> hat einen neuen Spesenbericht über zemio eingereicht. Den Antrag kannst du <link>hier</link> bearbeiten.",
+			"footer": "Du erhältst diese E-Mail, da du in zemio als Reviewer eingetragen bist. Solltest du kein Reviewer sein, kannst du diese E-Mail ignorieren."
+		},
+		"reportSubmitted": {
+			"subject": "Spesenbericht eingereicht",
+			"preview": "Dein Spesenbericht wurde erfolgreich eingereicht",
+			"greeting": "Hallo {name},",
+			"body": "Hiermit bestätigen wir, dass dein Spesenbericht \"{title}\" erfolgreich eingereicht wurde. Bitte warte nun auf die Freigabe durch einen Reviewer.",
+			"footer": "Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast. Solltest du keinen Spesenbericht eingereicht haben, kannst du diese E-Mail ignorieren."
+		},
+		"statusChanged": {
+			"subject": "Status deines Spesenberichts geändert",
+			"preview": "Der Status deines Spesenberichts wurde zu \"{status}\" geändert.",
+			"greeting": "Hallo {name},",
+			"body": "Der Status deines Spesenberichts <strong>\"{title}\"</strong> wurde zu <strong>{status}</strong> geändert. Du kannst den Bericht <link>hier</link> ansehen.",
+			"footer": "Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast. Solltest du keinen Spesenbericht eingereicht haben, kannst du diese E-Mail ignorieren."
+		}
+	}
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDate } from "date-fns";
+import { useTranslations } from "next-intl";
 import { PaidNotice } from "@/components/paid-notice";
 import { api } from "@/trpc/react";
 
@@ -9,6 +10,7 @@ function ReportPaidNotice({
 	reportId,
 	...props
 }: React.ComponentProps<"div"> & { reportId: string }) {
+	const t = useTranslations("modules.report.paidNotice");
 	const reportQuery = api.report.byId.useQuery({ id: reportId });
 
 	if (reportQuery.isPending) {
@@ -28,15 +30,11 @@ function ReportPaidNotice({
 		<PaidNotice
 			className={className}
 			dataSlot="report-paid-notice"
-			description={
-				<>
-					Dein Antrag wurde{" "}
-					{data.paidAt && `am ${formatDate(data.paidAt, "dd.MM.yyyy 'um' HH:mm")}`}{" "}
-					akzeptiert und ausgeglichen. Wende dich bei Fragen bitte an die zuständige
-					Person aus deiner Organisation.
-				</>
-			}
-			title="Antrag wurde ausgeglichen"
+			description={t("description", {
+				hasDate: data.paidAt ? "yes" : "other",
+				date: data.paidAt ? formatDate(data.paidAt, "dd.MM.yyyy 'um' HH:mm") : "",
+			})}
+			title={t("title")}
 			{...props}
 		/>
 	);

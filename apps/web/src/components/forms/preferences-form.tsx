@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { NotificationPreference } from "@zemio/db/enums";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { updatePreferencesSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
@@ -17,17 +18,19 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 export function PreferencesForm() {
+	const t = useTranslations("modules.shared.preferencesForm");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 	const [preferences] = api.preferences.getOwn.useSuspenseQuery();
 
 	const updatePreferences = api.preferences.updateOwn.useMutation({
 		onSuccess: () => {
-			toast.success("Einstellungen wurden erfolgreich gespeichert");
+			toast.success(t("saveSuccess"));
 			utils.preferences.getOwn.invalidate();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Speichern der Einstellungen", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("saveError"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -64,10 +67,8 @@ export function PreferencesForm() {
 								data-invalid={isInvalid}
 							>
 								<FieldContent>
-									<FieldLabel>Benachrichtigungen</FieldLabel>
-									<FieldDescription>
-										Wähle welche Benachrichtigungen du erhalten möchtest
-									</FieldDescription>
+									<FieldLabel>{t("notificationsLabel")}</FieldLabel>
+									<FieldDescription>{t("notificationsDescription")}</FieldDescription>
 								</FieldContent>
 								<RadioGroup
 									className={"gap-6"}
@@ -78,9 +79,9 @@ export function PreferencesForm() {
 									<div className="flex items-start gap-3">
 										<RadioGroupItem id="all" value={NotificationPreference.ALL} />
 										<div className="flex flex-col gap-1">
-											<Label htmlFor="all">Alle Benachrichtigungen</Label>
+											<Label htmlFor="all">{t("allLabel")}</Label>
 											<FieldDescription className="max-w-prose">
-												Du erhälst Benachrichtigungen zu allen Änderungen an deinen Reports.
+												{t("allDescription")}
 											</FieldDescription>
 										</div>
 									</div>
@@ -90,19 +91,18 @@ export function PreferencesForm() {
 											value={NotificationPreference.STATUS_CHANGES}
 										/>
 										<div className="flex flex-col gap-1">
-											<Label htmlFor="status">Statusänderungen</Label>
+											<Label htmlFor="status">{t("statusLabel")}</Label>
 											<FieldDescription className="max-w-prose">
-												Du erhälst Benachrichtigungen zu Änderungen an den Status deiner
-												Reports.
+												{t("statusDescription")}
 											</FieldDescription>
 										</div>
 									</div>
 									<div className="flex items-start gap-3">
 										<RadioGroupItem id="none" value={NotificationPreference.NONE} />
 										<div className="flex flex-col gap-1">
-											<Label htmlFor="none">Keine Benachrichtigungen</Label>
+											<Label htmlFor="none">{t("noneLabel")}</Label>
 											<FieldDescription className="max-w-prose">
-												Du erhältst keine Benachrichtigungen.
+												{t("noneDescription")}
 											</FieldDescription>
 										</div>
 									</div>
@@ -118,7 +118,7 @@ export function PreferencesForm() {
 						form="form-preferences"
 						type="submit"
 					>
-						Speichern
+						{tActions("save")}
 					</Button>
 				</div>
 			</FieldGroup>

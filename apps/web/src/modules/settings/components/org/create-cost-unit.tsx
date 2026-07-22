@@ -5,6 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQueries } from "@tanstack/react-query";
 import type { CostUnitGroup } from "@zemio/db";
 import { InfoIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
@@ -76,6 +77,8 @@ function CreateCostUnitSheet({
 	handle,
 	...props
 }: Omit<React.ComponentProps<typeof Sheet>, "handle"> & WithHandle) {
+	const t = useTranslations("modules.settings.costUnits.createSheet");
+
 	return (
 		<DialogPrimitive.Root handle={handle} {...props}>
 			<SheetContent
@@ -84,7 +87,7 @@ function CreateCostUnitSheet({
 				}
 			>
 				<SheetHeader>
-					<SheetTitle>Neue Kostenstelle</SheetTitle>
+					<SheetTitle>{t("title")}</SheetTitle>
 				</SheetHeader>
 
 				<AsyncBoundary
@@ -101,6 +104,7 @@ function CreateCostUnitSheet({
 }
 
 function CreateCostUnitFormConnected({ handle }: WithHandle) {
+	const t = useTranslations("modules.settings.costUnits.createSheet");
 	const utils = api.useUtils();
 
 	const [{ data: groups }] = useSuspenseQueries({
@@ -109,15 +113,15 @@ function CreateCostUnitFormConnected({ handle }: WithHandle) {
 
 	const create = api.costUnit.create.useMutation({
 		onSuccess: (value) => {
-			toast.success("Kostenstelle wurde erfolgreich erstellt", {
+			toast.success(t("savedToast"), {
 				description: `${value.tag} • ${value.title}`,
 			});
 			utils.costUnit.listCostUnits.invalidate({});
 			handle.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Kostenstelle", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -138,6 +142,8 @@ type CreateCostUnitFormProps = {
 };
 
 function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
+	const t = useTranslations("modules.settings.costUnits.createSheet");
+	const tActions = useTranslations("modules.settings.actions");
 	const createGroupHandleRef = React.useRef<CreateCostUnitGroupHandle | null>(
 		null,
 	);
@@ -183,15 +189,12 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Tag
+												{t("tagLabel")}
 												<Tooltip>
 													<TooltipTrigger
 														render={<InfoIcon className="size-3.5 text-slate-500" />}
 													/>
-													<TooltipContent>
-														Jede Kostenstelle besteht aus einer Kombination eines
-														einzigartigen Tags und einem Titel
-													</TooltipContent>
+													<TooltipContent>{t("tagTooltip")}</TooltipContent>
 												</Tooltip>
 											</FieldLabel>
 											<Input
@@ -200,7 +203,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="KS123"
+												placeholder={t("tagPlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -218,7 +221,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 												className="mb-1 font-semibold text-base text-slate-800"
 												htmlFor={field.name}
 											>
-												Titel
+												{t("titleLabel")}
 											</FieldLabel>
 											<Input
 												aria-invalid={isInvalid}
@@ -226,7 +229,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 												name={field.name}
 												onBlur={field.handleBlur}
 												onChange={(e) => field.handleChange(e.target.value)}
-												placeholder="Sommerfest"
+												placeholder={t("titlePlaceholder")}
 												value={field.state.value}
 											/>
 											{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -235,7 +238,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 								}}
 							</form.Field>
 							<FieldDescription className="col-span-2">
-								Wird zur eindeutigen Identifikation der Kostenstelle verwendet.
+								{t("tagTitleDescription")}
 							</FieldDescription>
 						</div>
 						<form.Field name="costUnitGroupId">
@@ -248,16 +251,16 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Gruppe
+											{t("groupLabel")}
 										</FieldLabel>
 										<NativeSelect
 											onChange={(e) => field.handleChange(e.target.value)}
 											value={field.state.value}
 										>
 											<NativeSelectOption value={NO_COST_UNIT_GROUP}>
-												Keine Gruppe
+												{t("noGroupOption")}
 											</NativeSelectOption>
-											<NativeSelectOptGroup label="Gruppen">
+											<NativeSelectOptGroup label={t("groupOptGroupLabel")}>
 												{groups.map((group) => (
 													<NativeSelectOption key={group.id} value={group.id}>
 														{group.title}
@@ -265,16 +268,13 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 												))}
 											</NativeSelectOptGroup>
 										</NativeSelect>
-										<FieldDescription>
-											Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden,
-											indem du sie in Gruppen sortierst.
-										</FieldDescription>
+										<FieldDescription>{t("groupDescription")}</FieldDescription>
 										<div>
 											<DialogPrimitive.Trigger
 												handle={createGroupHandle}
 												render={
 													<Button className={"w-fit -translate-x-2.5"} variant={"link"}>
-														Neue Gruppe erstellen
+														{t("createGroupButton")}
 													</Button>
 												}
 											/>
@@ -294,17 +294,14 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Beispiele
+											{t("examplesLabel")}
 										</FieldLabel>
 										<ExamplesInput
 											onChange={field.handleChange}
-											placeholder="z.B. Getränke "
+											placeholder={t("examplesPlaceholder")}
 											value={field.state.value}
 										/>
-										<FieldDescription>
-											Beispiele können Nutzern helfen, besser zu verstehen ob sie die
-											richtige Kostenstelle für Ihren Antrag gewählt haben.
-										</FieldDescription>
+										<FieldDescription>{t("examplesDescription")}</FieldDescription>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
 									</Field>
 								);
@@ -317,7 +314,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 				<SheetClose
 					render={
 						<Button type="button" variant="outline">
-							Cancel
+							{tActions("cancel")}
 						</Button>
 					}
 				/>
@@ -334,7 +331,7 @@ function CreateCostUnitForm({ onSubmit, groups }: CreateCostUnitFormProps) {
 							form={FORM_ID}
 							type="submit"
 						>
-							{isSubmitting ? "Saving…" : "Erstellen"}
+							{isSubmitting ? tActions("creating") : tActions("create")}
 						</Button>
 					)}
 				</form.Subscribe>

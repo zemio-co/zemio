@@ -6,6 +6,7 @@ import { keepPreviousData } from "@tanstack/react-query";
 import type { Attachment } from "@zemio/db";
 import { formatDate, isValid, parse } from "date-fns";
 import { DownloadIcon, ImageIcon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,7 @@ function UpdateExpenseContent({
 }: React.ComponentProps<"div"> & {
 	expenseId: string;
 }) {
+	const t = useTranslations("modules.report.updateExpense");
 	const expenseQuery = api.expense.byId.useQuery(
 		{ id: expenseId },
 		{
@@ -80,7 +82,7 @@ function UpdateExpenseContent({
 	if (expenseQuery.isPending) {
 		return (
 			<div>
-				<SheetHeader>Ausgabe</SheetHeader>
+				<SheetHeader>{t("sheetTitle")}</SheetHeader>
 				<SheetBody>
 					<Skeleton className="h-24" />
 				</SheetBody>
@@ -91,9 +93,9 @@ function UpdateExpenseContent({
 	if (expenseQuery.error) {
 		return (
 			<div>
-				<SheetHeader>Ausgabe</SheetHeader>
+				<SheetHeader>{t("sheetTitle")}</SheetHeader>
 				<SheetBody>
-					<p>Fehler beim Laden der Ausgabe.</p>
+					<p>{t("loadError")}</p>
 				</SheetBody>
 			</div>
 		);
@@ -108,7 +110,7 @@ function UpdateExpenseContent({
 			{...props}
 		>
 			<SheetHeader>
-				<SheetTitle>Ausgabe</SheetTitle>
+				<SheetTitle>{t("sheetTitle")}</SheetTitle>
 			</SheetHeader>
 			<SheetBody className="min-h-0">
 				{expense.type === "RECEIPT" && (
@@ -124,6 +126,8 @@ function UpdateExpenseContent({
 }
 
 function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
+	const t = useTranslations("modules.report.updateExpense");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const updateExpense = api.expense.update.useMutation({
 		onSuccess: () => {
@@ -131,11 +135,11 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 			utils.expense.byId.invalidate({
 				id: expense.id,
 			});
-			toast.success("Ausgabe erfolgreich aktualisiert");
+			toast.success(t("toasts.updateSuccess"));
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.updateErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -173,18 +177,20 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				<form.Field name="description">
 					{(field) => (
 						<Field className="md:col-span-2">
-							<FieldLabel htmlFor={field.name}>Beschreibung</FieldLabel>
+							<FieldLabel htmlFor={field.name}>
+								{tCommon("fields.description")}
+							</FieldLabel>
 							<Textarea
 								autoComplete="off"
 								id={field.name}
 								name={field.name}
 								onBlur={field.handleBlur}
 								onChange={(e) => field.handleChange(e.target.value)}
-								placeholder="Verpflegung Weihnachtsfeier"
+								placeholder={tCommon("fields.descriptionPlaceholder")}
 								value={field.state.value}
 							/>
 							<FieldDescription>
-								Beschreibung der Ausgabe oder Kommentar
+								{tCommon("fields.descriptionHelper")}
 							</FieldDescription>
 						</Field>
 					)}
@@ -193,13 +199,15 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				<form.Field name="startDate">
 					{(field) => (
 						<Field>
-							<FieldLabel htmlFor={field.name}>Startdatum</FieldLabel>
+							<FieldLabel htmlFor={field.name}>
+								{tCommon("fields.startDate")}
+							</FieldLabel>
 							<DatePicker
 								id={field.name}
 								name={field.name}
 								onBlur={field.handleBlur}
 								onChange={(date) => field.handleChange(date.target.value)}
-								placeholder="01.01.2026"
+								placeholder={tCommon("fields.datePlaceholder")}
 								value={field.state.value}
 							/>
 						</Field>
@@ -209,13 +217,13 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				<form.Field name="endDate">
 					{(field) => (
 						<Field>
-							<FieldLabel htmlFor={field.name}>Enddatum</FieldLabel>
+							<FieldLabel htmlFor={field.name}>{tCommon("fields.endDate")}</FieldLabel>
 							<DatePicker
 								id={field.name}
 								name={field.name}
 								onBlur={field.handleBlur}
 								onChange={(date) => field.handleChange(date.target.value)}
-								placeholder="01.01.2026"
+								placeholder={tCommon("fields.datePlaceholder")}
 								value={field.state.value}
 							/>
 						</Field>
@@ -225,7 +233,7 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				<form.Field name="amount">
 					{(field) => (
 						<Field className="md:col-span-2">
-							<FieldLabel htmlFor={field.name}>Betrag</FieldLabel>
+							<FieldLabel htmlFor={field.name}>{tCommon("fields.amount")}</FieldLabel>
 							<NumberField.Root
 								format={{
 									style: "decimal",
@@ -267,7 +275,7 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 					disabled={updateExpense.isPending}
 					type="submit"
 				>
-					{updateExpense.isPending ? "Wird gespeichert…" : "Speichern"}
+					{updateExpense.isPending ? t("saving") : t("save")}
 				</Button>
 			</FieldGroup>
 		</form>
@@ -281,6 +289,7 @@ function UpdateExpenseAttachments({
 }: React.ComponentProps<"div"> & {
 	expenseId: string;
 }) {
+	const t = useTranslations("modules.report.updateExpense.attachments");
 	const { isPending, data, error } = api.attachment.list.useQuery({
 		id: expenseId,
 	});
@@ -292,7 +301,7 @@ function UpdateExpenseAttachments({
 				data-slot="update-expense-attachments"
 				{...props}
 			>
-				<p className="font-semibold text-base text-zinc-800">Anhänge</p>
+				<p className="font-semibold text-base text-zinc-800">{t("header")}</p>
 				<div className="mt-4">
 					<Skeleton className="h-20 w-full" />
 				</div>
@@ -307,11 +316,9 @@ function UpdateExpenseAttachments({
 				data-slot="update-expense-attachments"
 				{...props}
 			>
-				<p className="font-semibold text-base text-zinc-800">Anhänge</p>
+				<p className="font-semibold text-base text-zinc-800">{t("header")}</p>
 				<div className="mt-4 flex flex-col items-center justify-center rounded-md border border-dashed px-4 py-8">
-					<p className="font-medium text-destructive text-sm">
-						Fehler beim Laden der Anhänge
-					</p>
+					<p className="font-medium text-destructive text-sm">{t("loadError")}</p>
 				</div>
 			</div>
 		);
@@ -325,7 +332,7 @@ function UpdateExpenseAttachments({
 			data-slot="update-expense-attachments"
 			{...props}
 		>
-			<p className="font-semibold text-base text-zinc-800">Anhänge</p>
+			<p className="font-semibold text-base text-zinc-800">{t("header")}</p>
 
 			{data.length > 0 ? (
 				<div className="mt-4 space-y-3">
@@ -338,9 +345,7 @@ function UpdateExpenseAttachments({
 					))}
 				</div>
 			) : (
-				<p className="mt-4 text-muted-foreground text-sm">
-					Keine Anhänge vorhanden
-				</p>
+				<p className="mt-4 text-muted-foreground text-sm">{t("empty")}</p>
 			)}
 
 			{remainingSlots > 0 && (
@@ -360,17 +365,19 @@ function AttachmentUploadSection({
 	expenseId: string;
 	remainingSlots: number;
 }) {
+	const t = useTranslations("modules.report.updateExpense.attachments");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const uploader = usePresignedUpload();
 	const deletePendingUploads = api.attachment.deletePendingUploads.useMutation();
 	const addToExpense = api.attachment.addToExpense.useMutation({
 		onSuccess: () => {
 			utils.attachment.list.invalidate({ id: expenseId });
-			toast.success("Anhänge erfolgreich hinzugefügt");
+			toast.success(t("toasts.addSuccess"));
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Hinzufügen der Anhänge", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.addErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -392,15 +399,14 @@ function AttachmentUploadSection({
 				try {
 					await deletePendingUploads.mutateAsync({ keys });
 				} catch {
-					toast.error("Upload fehlgeschlagen", {
-						description:
-							"Teilweise hochgeladene Dateien konnten nicht bereinigt werden",
+					toast.error(tCommon("toasts.uploadFailedTitle"), {
+						description: tCommon("toasts.uploadCleanupFailedDescription"),
 					});
 					return;
 				}
 			}
-			toast.error("Upload fehlgeschlagen", {
-				description: "Nicht alle Dateien konnten hochgeladen werden",
+			toast.error(tCommon("toasts.uploadFailedTitle"), {
+				description: tCommon("toasts.uploadPartialFailureDescription"),
 			});
 			return;
 		}
@@ -423,7 +429,7 @@ function AttachmentUploadSection({
 	return (
 		<div className="mt-6">
 			<p className="mb-3 font-semibold text-base text-zinc-800">
-				Anhang hinzufügen
+				{t("addHeader")}
 			</p>
 			<UploadDropzone
 				accept={{
@@ -454,16 +460,18 @@ function ReportExpenseAttachmentRow({
 	attachment: Attachment;
 	expenseId: string;
 }) {
+	const t = useTranslations("modules.report.updateExpense.attachments");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const downloadMutation = api.attachment.getDownloadUrl.useMutation();
 	const deleteMutation = api.attachment.delete.useMutation({
 		onSuccess: () => {
 			utils.attachment.list.invalidate({ id: expenseId });
-			toast.success("Anhang erfolgreich gelöscht");
+			toast.success(t("toasts.deleteSuccess"));
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Löschen des Anhangs", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.deleteErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -474,9 +482,9 @@ function ReportExpenseAttachmentRow({
 				window.location.href = result.url;
 			}),
 			{
-				loading: "Download wird vorbereitet…",
-				success: "Download gestartet",
-				error: "Download fehlgeschlagen",
+				loading: tCommon("toasts.downloadPreparing"),
+				success: tCommon("toasts.downloadStarted"),
+				error: t("toasts.downloadFailed"),
 			},
 		);
 	}

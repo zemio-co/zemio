@@ -1,6 +1,7 @@
 "use client";
 
 import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SheetTrigger } from "@/components/ui/sheet";
@@ -32,6 +33,8 @@ function DashboarHeader({
 	className,
 	...props
 }: React.ComponentProps<"section">) {
+	const t = useTranslations("modules.dashboard.header");
+
 	return (
 		<section
 			className={cn("container", className)}
@@ -39,12 +42,12 @@ function DashboarHeader({
 			{...props}
 		>
 			<div className="flex flex-wrap justify-between gap-4">
-				<h1 className="font-semibold text-2xl text-slate-800">Dashboard</h1>
+				<h1 className="font-semibold text-2xl text-slate-800">{t("title")}</h1>
 				<CreateReport>
 					<SheetTrigger
 						render={
 							<Button size={"sm"}>
-								<PlusIcon /> Neuer Antrag
+								<PlusIcon /> {t("newReport")}
 							</Button>
 						}
 					/>

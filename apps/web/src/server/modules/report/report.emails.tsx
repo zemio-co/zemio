@@ -1,4 +1,5 @@
 import { NotificationPreference } from "@zemio/db";
+import { createAppTranslator } from "@zemio/i18n";
 import ReportReceivedEmail from "@/components/emails/report-received-email";
 import ReportSubmittedEmail from "@/components/emails/report-submitted-email";
 import StatusChangedEmail from "@/components/emails/status-changed-email";
@@ -16,7 +17,9 @@ async function onReportSubmitted(event: ReportSubmittedEvent): Promise<void> {
 		const result = await getMailer().send({
 			from: DEFAULT_EMAIL_FROM,
 			to: [event.reviewerEmail],
-			subject: "New Report received",
+			subject: createAppTranslator({ namespace: "emails.reportReceived" })(
+				"subject",
+			),
 			react: (
 				<ReportReceivedEmail
 					from={event.ownerName}
@@ -37,7 +40,9 @@ async function onReportSubmitted(event: ReportSubmittedEvent): Promise<void> {
 		const result = await getMailer().send({
 			from: DEFAULT_EMAIL_FROM,
 			to: [event.ownerEmail],
-			subject: "Report submitted",
+			subject: createAppTranslator({ namespace: "emails.reportSubmitted" })(
+				"subject",
+			),
 			react: <ReportSubmittedEmail name={event.ownerName} title={event.title} />,
 		});
 		if (!result.ok) {
@@ -62,7 +67,9 @@ async function onReportStatusChanged(
 	const result = await getMailer().send({
 		from: DEFAULT_EMAIL_FROM,
 		to: [event.ownerEmail],
-		subject: "Report status changed",
+		subject: createAppTranslator({ namespace: "emails.statusChanged" })(
+			"subject",
+		),
 		react: (
 			<StatusChangedEmail
 				name={event.ownerName}

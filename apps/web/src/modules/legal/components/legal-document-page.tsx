@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,6 +15,8 @@ interface LegalDocumentPageProps {
 }
 
 function LegalDocumentPage({ document }: LegalDocumentPageProps) {
+	const t = useTranslations("modules.legal");
+
 	return (
 		<main className="min-h-svh bg-stone-50">
 			<div className="mx-auto w-full max-w-5xl md:px-8">
@@ -25,7 +28,9 @@ function LegalDocumentPage({ document }: LegalDocumentPageProps) {
 					</div>
 					<article className="w-full max-w-3xl">
 						<h1 className="font-semibold text-2xl text-zinc-900">{document.title}</h1>
-						<p className="mt-1 text-sm text-zinc-500">Version {document.version}</p>
+						<p className="mt-1 text-sm text-zinc-500">
+							{t("document.version", { version: document.version })}
+						</p>
 						<p className="mt-3 text-zinc-600">{document.summary}</p>
 						<div className="mt-8 text-sm text-zinc-700 leading-6">
 							<ReactMarkdown
@@ -81,13 +86,13 @@ function LegalDocumentPage({ document }: LegalDocumentPageProps) {
 								className="font-medium text-foreground text-xs transition-colors hover:text-primary"
 								href={"/legal/privacy-policy"}
 							>
-								Privacy Policy
+								{t("footer.privacyPolicy")}
 							</Link>
 							<Link
 								className="font-medium text-foreground text-xs transition-colors hover:text-primary"
 								href={"/legal/terms-and-conditions"}
 							>
-								Terms and Conditions
+								{t("footer.termsAndConditions")}
 							</Link>
 						</div>
 					</div>

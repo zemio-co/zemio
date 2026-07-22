@@ -1,6 +1,7 @@
 "use client";
 
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
+import { useTranslations } from "next-intl";
 import React, { createContext } from "react";
 import { cn } from "@/lib/utils";
 
@@ -41,12 +42,14 @@ function AppCommand({ className, ...props }: React.ComponentProps<"div">) {
 
 function AppCommandTrigger({
 	className,
-	placeholder = "Suchen...",
+	placeholder,
 	...props
 }: React.ComponentProps<typeof ButtonPrimitive> & {
 	placeholder?: string;
 }) {
+	const t = useTranslations("modules.shared.command");
 	const { open, setOpen } = React.useContext(AppCommandContext);
+	const resolvedPlaceholder = placeholder ?? t("searchPlaceholder");
 
 	return (
 		<ButtonPrimitive
@@ -60,7 +63,7 @@ function AppCommandTrigger({
 			{...props}
 		>
 			<span className="block font-medium text-slate-700 text-sm">
-				{placeholder}
+				{resolvedPlaceholder}
 			</span>
 			<span className="block rounded-xs bg-slate-200 px-1 py-0.5 font-medium text-slate-700 text-xs leading-none">
 				⌘K

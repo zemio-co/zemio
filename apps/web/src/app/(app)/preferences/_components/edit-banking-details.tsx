@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ export function EditBankingDetailsForm({
 	detailsId,
 	...props
 }: React.ComponentProps<typeof Button> & { detailsId: string }) {
+	const t = useTranslations("modules.preferences.editBankingDetails");
 	const [open, setOpen] = useState(false);
 
 	return (
@@ -44,10 +46,8 @@ export function EditBankingDetailsForm({
 			<DialogTrigger render={<Button {...props} />} />
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Bankverbindung bearbeiten</DialogTitle>
-					<DialogDescription>
-						Bearbeite deine Bankverbindung um Zahlungen zu erhalten.
-					</DialogDescription>
+					<DialogTitle>{t("dialogTitle")}</DialogTitle>
+					<DialogDescription>{t("dialogDescription")}</DialogDescription>
 				</DialogHeader>
 				{/* Only render (and fetch data) when dialog is open */}
 				{open && (
@@ -68,6 +68,7 @@ function EditBankingDetailsFormContent({
 	detailsId: string;
 	onClose: () => void;
 }) {
+	const t = useTranslations("modules.preferences.editBankingDetails");
 	const { data, isPending, isError } = api.bankingDetails.get.useQuery({
 		id: detailsId,
 	});
@@ -82,9 +83,7 @@ function EditBankingDetailsFormContent({
 
 	if (isError || !data) {
 		return (
-			<div className="py-4 text-center text-destructive">
-				Fehler beim Laden der Bankverbindung
-			</div>
+			<div className="py-4 text-center text-destructive">{t("loadError")}</div>
 		);
 	}
 
@@ -103,18 +102,21 @@ function EditBankingDetailsFormInner({
 	};
 	onClose: () => void;
 }) {
+	const t = useTranslations("modules.preferences.editBankingDetails");
+	const tFields = useTranslations("modules.preferences.bankingDetailsForm");
+	const tActions = useTranslations("modules.settings.actions");
 	const utils = api.useUtils();
 
 	const updateBankingDetails = api.bankingDetails.update.useMutation({
 		onSuccess: () => {
-			toast.success("Bankverbindung erfolgreich aktualisiert");
+			toast.success(t("updateSuccess"));
 			utils.bankingDetails.list.invalidate();
 			utils.bankingDetails.get.invalidate({ id: data.id });
 			onClose();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Aktualisieren der Bankverbindung", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("updateError"), {
+				description: error.message ?? t("unexpectedError"),
 			});
 		},
 	});
@@ -152,7 +154,7 @@ function EditBankingDetailsFormInner({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Titel</FieldLabel>
+									<FieldLabel htmlFor={field.name}>{tFields("titleLabel")}</FieldLabel>
 									<Input
 										aria-invalid={isInvalid}
 										id={field.name}
@@ -161,10 +163,7 @@ function EditBankingDetailsFormInner({
 										onChange={(e) => field.handleChange(e.target.value)}
 										value={field.state.value}
 									/>
-									<FieldDescription>
-										Nutze diesen Titel um die Bankverbindung später einfach
-										wiederzufinden.
-									</FieldDescription>
+									<FieldDescription>{tFields("titleHint")}</FieldDescription>
 									{isInvalid && <FieldError errors={field.state.meta.errors} />}
 								</Field>
 							);
@@ -176,7 +175,7 @@ function EditBankingDetailsFormInner({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>IBAN</FieldLabel>
+									<FieldLabel htmlFor={field.name}>{tFields("ibanLabel")}</FieldLabel>
 									<IbanInput
 										aria-invalid={isInvalid}
 										id={field.name}
@@ -196,7 +195,7 @@ function EditBankingDetailsFormInner({
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Name</FieldLabel>
+									<FieldLabel htmlFor={field.name}>{tFields("nameLabel")}</FieldLabel>
 									<Input
 										aria-invalid={isInvalid}
 										id={field.name}
@@ -205,10 +204,7 @@ function EditBankingDetailsFormInner({
 										onChange={(e) => field.handleChange(e.target.value)}
 										value={field.state.value}
 									/>
-									<FieldDescription>
-										Stelle sicher, dass der Name mit dem bei der Bank angegebenen Namen
-										übereinstimmt.
-									</FieldDescription>
+									<FieldDescription>{tFields("nameHint")}</FieldDescription>
 									{isInvalid && <FieldError errors={field.state.meta.errors} />}
 								</Field>
 							);
@@ -219,7 +215,7 @@ function EditBankingDetailsFormInner({
 						form="form-edit-banking-details"
 						type="submit"
 					>
-						{updateBankingDetails.isPending ? "Speichern..." : "Speichern"}
+						{updateBankingDetails.isPending ? t("saving") : tActions("save")}
 					</Button>
 				</FieldGroup>
 			</form>

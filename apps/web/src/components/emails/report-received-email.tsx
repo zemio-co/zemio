@@ -12,6 +12,7 @@ import {
 	Tailwind,
 	Text,
 } from "@react-email/components";
+import { createAppTranslator } from "@zemio/i18n";
 import { ROUTES } from "@/lib/routes";
 
 const baseUrl =
@@ -30,14 +31,15 @@ export default function ReportReceivedEmail({
 	from,
 	reportId,
 }: ReportReceivedEmailProps) {
+	const t = createAppTranslator({ namespace: "emails.reportReceived" });
+	const tShared = createAppTranslator({ namespace: "emails.shared" });
+
 	return (
 		<Html>
 			<Head />
 			<Tailwind config={{}}>
 				<Body className="bg-zinc-50 font-sans">
-					<Preview>
-						"{title}" von {from}
-					</Preview>
+					<Preview>{t("preview", { title, from })}</Preview>
 					<Container className="bg-white px-6 py-8">
 						<Img
 							className="h-5 w-fit"
@@ -45,29 +47,32 @@ export default function ReportReceivedEmail({
 						/>
 						<Text className="mt-16 font-medium text-2xl">{title}</Text>
 						<Section>
-							<Text>Hallo,</Text>
+							<Text>{t("greeting")}</Text>
 							<Text>
-								Der Nutzer <strong>{from}</strong> hat einen neuen Spesenbericht über
-								zemio eingereicht. Den Antrag kannst du{" "}
-								<Link href={`${baseUrl}${ROUTES.ADMIN_REVIEW_REPORT(reportId)}`}>
-									hier
-								</Link>{" "}
-								bearbeiten.
+								{t.rich("body", {
+									from,
+									strong: (chunks) => <strong>{chunks}</strong>,
+									link: (chunks) => (
+										<Link href={`${baseUrl}${ROUTES.ADMIN_REVIEW_REPORT(reportId)}`}>
+											{chunks}
+										</Link>
+									),
+								})}
 							</Text>
 							<Text>
-								Wende dich bei Fragen bitte an{" "}
-								<Button href="mailto:support@zemio.co">support@zemio.co</Button>.
+								{tShared.rich("supportPrompt", {
+									email: (chunks) => (
+										<Button href="mailto:support@zemio.co">{chunks}</Button>
+									),
+								})}
 							</Text>
 							<Text>
-								Beste Grüße,
+								{tShared("regards")}
 								<br />
-								Dein zemio Team
+								{tShared("team")}
 							</Text>
 							<Hr />
-							<Text className="text-xs text-zinc-500">
-								Du erhältst diese E-Mail, da du in zemio als Reviewer eingetragen bist.
-								Solltest du kein Reviewer sein, kannst du diese E-Mail ignorieren.
-							</Text>
+							<Text className="text-xs text-zinc-500">{t("footer")}</Text>
 						</Section>
 					</Container>
 				</Body>

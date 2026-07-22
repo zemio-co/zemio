@@ -13,6 +13,7 @@ import {
 	ReceiptIcon,
 	TrashIcon,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
 import {
@@ -34,7 +35,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, translateExpenseType } from "@/lib/utils";
+import { expenseTypeKeys } from "@/lib/i18n-labels";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { CreateExpense } from "./create-expense";
 import { ReportUpdateExpense } from "./report-update-expense";
@@ -46,6 +48,8 @@ function ReportExpenses({
 }: React.ComponentProps<"section"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("enums.expenseType");
+	const tExpenses = useTranslations("modules.report.expenses");
 	const utils = api.useUtils();
 
 	const [expensesQuery, financialQuery] = useQueries({
@@ -87,16 +91,16 @@ function ReportExpenses({
 					<thead>
 						<tr>
 							<th className="border-slate-200 border-b px-2 py-2 pl-0 text-left font-semibold text-slate-800 text-xs">
-								Typ
+								{tExpenses("table.type")}
 							</th>
 							<th className="border-slate-200 border-b px-2 py-2 text-left font-semibold text-slate-800 text-xs">
-								Beschreibung
+								{tExpenses("table.description")}
 							</th>
 							<th className="border-slate-200 border-b px-2 py-2 text-left font-semibold text-slate-800 text-xs">
-								Datum
+								{tExpenses("table.date")}
 							</th>
 							<th className="border-slate-200 border-b px-2 py-2 text-right font-semibold text-slate-800 text-xs">
-								Betrag
+								{tExpenses("table.amount")}
 							</th>
 							<th className="w-8 border-slate-200 border-b" />
 						</tr>
@@ -105,7 +109,7 @@ function ReportExpenses({
 						{expenses.map((expense) => (
 							<tr className="border-slate-200 border-b" key={expense.id}>
 								<td className="px-3 py-2.5 pl-0 text-left font-medium text-slate-800">
-									{translateExpenseType(expense.type)}
+									{t(expenseTypeKeys[expense.type])}
 								</td>
 								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{expense.description}
@@ -139,7 +143,7 @@ function ReportExpenses({
 							<td></td>
 							<td></td>
 							<td className="px-2 py-2.5 text-right font-semibold text-slate-800 text-sm">
-								Summe
+								{tExpenses("table.sum")}
 							</td>
 							<td className="px-2 py-2.5 text-right font-semibold text-slate-800 text-sm">
 								{financialData.totalAmount.toFixed(2)}
@@ -162,6 +166,8 @@ function ReportExpensesHeader({
 	disabled?: boolean;
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.expenses");
+
 	return (
 		<div
 			className={cn(
@@ -171,7 +177,7 @@ function ReportExpensesHeader({
 			data-slot="report-expenses-header"
 			{...props}
 		>
-			<h3 className="font-semibold text-lg text-slate-800">Ausgaben</h3>
+			<h3 className="font-semibold text-lg text-slate-800">{t("header")}</h3>
 			<CreateExpense
 				disabled={disabled}
 				reportId={reportId}
@@ -179,7 +185,7 @@ function ReportExpensesHeader({
 				variant={"outline"}
 			>
 				<PlusIcon />
-				Hinzufügen
+				{t("add")}
 			</CreateExpense>
 		</div>
 	);
@@ -215,6 +221,8 @@ function ReportExpensesEmpty({
 }: React.ComponentProps<"section"> & {
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.expenses");
+
 	return (
 		<section
 			className={cn("", className)}
@@ -228,11 +236,9 @@ function ReportExpensesEmpty({
 						<ReceiptIcon className="size-5 text-slate-500" />
 					</div>
 					<p className="mt-6 font-medium text-slate-800 text-sm">
-						Du hast noch keine Ausgaben hinzugefügt.
+						{t("emptyTitle")}
 					</p>
-					<p className="mt-1 text-slate-500 text-sm">
-						Füge eine neue Ausgabe hinzu um diese erstattten zu lassen.
-					</p>
+					<p className="mt-1 text-slate-500 text-sm">{t("emptyDescription")}</p>
 				</div>
 			</div>
 		</section>
@@ -247,6 +253,7 @@ function ExpenseActionMenu({
 	expenseId: string;
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.expenses");
 	const deleteHandleRef = useRef<ReturnType<
 		typeof AlertDialogPrimitive.createHandle
 	> | null>(null);
@@ -268,13 +275,13 @@ function ExpenseActionMenu({
 				<DropdownMenuContent>
 					<DropdownMenuGroup>
 						<DropdownMenuItem onClick={() => editHandle.open(null)}>
-							<PencilIcon /> Bearbeiten
+							<PencilIcon /> {t("menu.edit")}
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							onClick={() => deleteHandle.open(null)}
 							variant="destructive"
 						>
-							<TrashIcon /> Löschen
+							<TrashIcon /> {t("menu.delete")}
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 				</DropdownMenuContent>
@@ -297,6 +304,8 @@ function DeleteExpense({
 	expenseId: string;
 	reportId: string;
 }) {
+	const t = useTranslations("modules.report.expenses");
+	const tCommon = useTranslations("modules.report.common");
 	const utils = api.useUtils();
 	const deleteMutation = api.expense.delete.useMutation({
 		onSuccess: () => {
@@ -305,8 +314,8 @@ function DeleteExpense({
 			props.handle?.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Löschen der Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.deleteErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -315,21 +324,19 @@ function DeleteExpense({
 		<AlertDialog {...props}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Möchtest du diese Ausgabe wirklich löschen?
-					</AlertDialogTitle>
+					<AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
 					<AlertDialogDescription>
-						Diese Aktion kann nicht rückgängig gemacht werden.
+						{t("deleteDialog.description")}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>Abbrechen</AlertDialogCancel>
+					<AlertDialogCancel>{tCommon("actions.cancel")}</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={() => deleteMutation.mutate({ id: expenseId })}
 						variant={"destructive"}
 					>
 						<TrashIcon />
-						Löschen
+						{t("deleteDialog.confirm")}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

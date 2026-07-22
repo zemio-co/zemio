@@ -246,6 +246,7 @@ model Preferences {
   userId        String                 @unique
   user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   notifications NotificationPreference @default(ALL)
+  locale        String                 @default("de")
 
   @@map("preferences")
 }

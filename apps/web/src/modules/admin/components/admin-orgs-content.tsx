@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 import { ChevronRightIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -42,22 +43,23 @@ function AdminOrgsContent({
 		api.platformAdmin.listOrganizations.useQuery(undefined, {
 			initialData: initialOrgs,
 		});
+	const t = useTranslations("modules.admin.orgsContent");
 
 	return (
 		<div>
 			<div className="space-y-1">
-				<h1 className="font-semibold text-lg text-zinc-800">Organisationen</h1>
-				<p className="text-sm text-zinc-600">
-					Verwalten Sie Organisationen und deren Microsoft-Tenant-Zuordnung.
-				</p>
+				<h1 className="font-semibold text-lg text-zinc-800">{t("title")}</h1>
+				<p className="text-sm text-zinc-600">{t("description")}</p>
 			</div>
 
 			<div className="mt-12 rounded-lg bg-white shadow-xs ring-1 ring-zinc-700/10">
 				<div className="flex items-center justify-between gap-6 p-5">
 					<div>
-						<p className="font-medium text-sm text-zinc-800">Neue Organisation</p>
+						<p className="font-medium text-sm text-zinc-800">
+							{t("createCardTitle")}
+						</p>
 						<p className="mt-0.5 text-stone-500 text-xs">
-							Erstelle eine neue Organisation um zu kollaborieren
+							{t("createCardDescription")}
 						</p>
 					</div>
 					<CreateOrganization />
@@ -66,7 +68,7 @@ function AdminOrgsContent({
 
 			<div className="mt-12">
 				<div className="flex flex-wrap items-end justify-between gap-4">
-					<p className="font-medium text-xs text-zinc-600">Organisationen</p>
+					<p className="font-medium text-xs text-zinc-600">{t("listTitle")}</p>
 				</div>
 				<div className="mt-3 rounded-lg bg-white shadow-xs ring-1 ring-zinc-700/10">
 					{organizations.map((org) => (
@@ -101,12 +103,13 @@ const createOrgFormSchema = z.object({
 
 function CreateOrganization() {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const t = useTranslations("modules.admin.orgsContent");
 
 	const utils = api.useUtils();
 
 	const createOrg = api.platformAdmin.createOrganization.useMutation({
 		onSuccess: async () => {
-			toast.success("Organisation erfolgreich erstellt.");
+			toast.success(t("createSuccess"));
 			setIsDialogOpen(false);
 			await utils.platformAdmin.listOrganizations.invalidate();
 		},
@@ -131,14 +134,14 @@ function CreateOrganization() {
 				render={
 					<Button size={"sm"} variant={"outline"}>
 						<PlusIcon />
-						Organisation erstellen
+						{t("createButton")}
 					</Button>
 				}
 			/>
 
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>Neue Organisation erstellen</DialogTitle>
+					<DialogTitle>{t("createDialogTitle")}</DialogTitle>
 				</DialogHeader>
 				<form
 					id="create-org-form"
@@ -154,7 +157,7 @@ function CreateOrganization() {
 
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel>Name</FieldLabel>
+										<FieldLabel>{t("nameLabel")}</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
 											autoComplete="off"
@@ -162,7 +165,7 @@ function CreateOrganization() {
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="Meine Organisation"
+											placeholder={t("namePlaceholder")}
 											value={state.value}
 										/>
 									</Field>
@@ -175,7 +178,7 @@ function CreateOrganization() {
 
 								return (
 									<Field data-invalid={isInvalid}>
-										<FieldLabel>Microsoft Tenant ID</FieldLabel>
+										<FieldLabel>{t("microsoftTenantIdLabel")}</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
 											autoComplete="off"
@@ -183,13 +186,11 @@ function CreateOrganization() {
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+											placeholder={t("microsoftTenantIdPlaceholder")}
 											value={state.value}
 										/>
 										<FieldDescription>
-											Die Tenant-ID aus dem Microsoft Entra ID (Azure Active Directory).
-											Alle Benutzer aus diesem Tenant werden dieser Organisation
-											automatisch zugeordnet.
+											{t("microsoftTenantIdDescription")}
 										</FieldDescription>
 									</Field>
 								);
@@ -205,14 +206,16 @@ function CreateOrganization() {
 							}}
 							variant="outline"
 						>
-							Abbrechen
+							{t("cancelButton")}
 						</Button>
 						<Button
 							disabled={createOrg.isPending}
 							form="create-org-form"
 							type="submit"
 						>
-							{createOrg.isPending ? "Wird erstellt…" : "Erstellen"}
+							{createOrg.isPending
+								? t("createSubmitPending")
+								: t("createSubmitAction")}
 						</Button>
 					</DialogFooter>
 				</form>

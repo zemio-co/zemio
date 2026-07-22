@@ -2,6 +2,7 @@
 
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,6 +20,8 @@ function ReportingHeader({
 	className,
 	...props
 }: React.ComponentProps<"section">) {
+	const t = useTranslations("modules.reporting.header");
+
 	return (
 		<section
 			className={cn("container", className)}
@@ -26,10 +29,10 @@ function ReportingHeader({
 			{...props}
 		>
 			<div className="flex flex-wrap justify-between gap-4">
-				<h1 className="font-semibold text-2xl text-slate-800">Reporting</h1>
+				<h1 className="font-semibold text-2xl text-slate-800">{t("title")}</h1>
 				<div className="flex items-center justify-center gap-4">
 					<DatePickerWithRange />
-					<Button disabled>Exportieren</Button>
+					<Button disabled>{t("exportButton")}</Button>
 				</div>
 			</div>
 
@@ -39,6 +42,8 @@ function ReportingHeader({
 }
 
 export function DatePickerWithRange() {
+	const t = useTranslations("modules.reporting.header.datePicker");
+
 	const dates = useReportingStore((state) => state.dates);
 	const setDates = useReportingStore((state) => state.setDates);
 
@@ -63,7 +68,7 @@ export function DatePickerWithRange() {
 									format(dates.start, "LLL dd, y")
 								)
 							) : (
-								<span>Pick a date</span>
+								<span>{t("placeholder")}</span>
 							)}
 						</Button>
 					}

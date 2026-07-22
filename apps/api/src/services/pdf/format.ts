@@ -1,31 +1,18 @@
 import type { Expense, Report } from "@zemio/db";
+import {
+	createAppTranslator,
+	expenseTypeKeys,
+	reportStatusKeys,
+} from "@zemio/i18n";
 
 export function translateReportStatus(status: Report["status"]): string {
-	switch (status) {
-		case "DRAFT":
-			return "Entwurf";
-		case "PENDING_APPROVAL":
-			return "In Bearbeitung";
-		case "NEEDS_REVISION":
-			return "Benötigt Überarbeitung";
-		case "ACCEPTED":
-			return "Akzeptiert";
-		case "REJECTED":
-			return "Abgelehnt";
-		case "PAID":
-			return "Ausgezahlt";
-	}
+	const t = createAppTranslator({ namespace: "enums.reportStatus" });
+	return t(reportStatusKeys[status]);
 }
 
 export function translateExpenseType(type: Expense["type"]): string {
-	switch (type) {
-		case "RECEIPT":
-			return "Beleg";
-		case "TRAVEL":
-			return "Reise";
-		case "FOOD":
-			return "Verpflegung";
-	}
+	const t = createAppTranslator({ namespace: "enums.expenseType" });
+	return t(expenseTypeKeys[type]);
 }
 
 export function formatEuroAmount(amount: number): string {

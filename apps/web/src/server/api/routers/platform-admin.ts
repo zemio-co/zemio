@@ -8,11 +8,11 @@ const organizationIdSchema = z.object({
 
 const organizationSlugSchema = z
 	.string()
-	.min(1, "Slug is required")
-	.max(100, "Slug must be at most 100 characters")
+	.min(1, "Slug ist erforderlich")
+	.max(100, "Slug darf höchstens 100 Zeichen lang sein")
 	.regex(
 		/^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-		'Slug must contain only lowercase letters, numbers, and "-"',
+		'Slug darf nur Kleinbuchstaben, Zahlen und "-" enthalten',
 	);
 
 export const platformAdminRouter = createTRPCRouter({
@@ -149,7 +149,7 @@ export const platformAdminRouter = createTRPCRouter({
 				organizationId: z.string().min(1),
 				name: z.string().trim().min(1).max(100),
 				slug: organizationSlugSchema,
-				logo: z.url("Logo must be a valid URL").nullable(),
+				logo: z.url("Logo muss eine gültige URL sein").nullable(),
 				metadata: z.string().trim().max(5000).nullable(),
 				microsoftTenantId: z
 					.string()

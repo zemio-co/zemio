@@ -2,6 +2,7 @@
 
 import { formatDate as formatDateFn } from "date-fns";
 import { CalendarIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { de } from "react-day-picker/locale";
 import { Calendar } from "./ui/calendar";
@@ -31,6 +32,7 @@ export function DatePicker({
 	value: controlledValue,
 	...props
 }: React.ComponentProps<typeof Input>) {
+	const t = useTranslations("modules.shared.datePicker");
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(new Date());
 	const [month, setMonth] = React.useState<Date | undefined>(date);
@@ -66,7 +68,7 @@ export function DatePicker({
 						render={
 							<InputGroupButton variant={"ghost"}>
 								<CalendarIcon />
-								<span className="sr-only">Open calendar</span>
+								<span className="sr-only">{t("openCalendar")}</span>
 							</InputGroupButton>
 						}
 					/>

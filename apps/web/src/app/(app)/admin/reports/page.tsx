@@ -1,3 +1,4 @@
+import { createAppTranslator } from "@zemio/i18n";
 import { Suspense } from "react";
 import { PageDescription, PageTitle } from "@/components/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -5,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { AdminReportsContent } from "@/modules/admin";
 import { api, HydrateClient } from "@/trpc/server";
 import { ReportsList } from "./data-display/reports-list";
+
+const t = createAppTranslator({ namespace: "modules.adminReports.page" });
 
 export default async function ServerPage() {
 	// Prefetch filter options and first page of reports in parallel
@@ -21,10 +24,8 @@ export default async function ServerPage() {
 					)}
 				>
 					<div>
-						<PageTitle>Admin Dashboard</PageTitle>
-						<PageDescription className="mt-2">
-							Verwalte deine Spesenanträge
-						</PageDescription>
+						<PageTitle>{t("title")}</PageTitle>
+						<PageDescription className="mt-2">{t("description")}</PageDescription>
 					</div>
 				</section>
 				<section className="mt-8">

@@ -2,6 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
@@ -61,11 +62,13 @@ function CreateCostUnitGroupSheet({
 	WithHandle & {
 		closeOnSuccess?: boolean;
 	}) {
+	const t = useTranslations("modules.settings.costUnits.createGroupSheet");
+
 	return (
 		<DialogPrimitive.Root handle={handle} {...props}>
 			<SheetContent>
 				<SheetHeader>
-					<SheetTitle>Neue Kostenstellengruppe</SheetTitle>
+					<SheetTitle>{t("title")}</SheetTitle>
 				</SheetHeader>
 
 				<AsyncBoundary
@@ -92,11 +95,12 @@ function CreateCostUnitGroupFormConnected({
 }: WithHandle & {
 	closeOnSuccess?: boolean;
 }) {
+	const t = useTranslations("modules.settings.costUnits.createGroupSheet");
 	const utils = api.useUtils();
 
 	const create = api.costUnit.createGroup.useMutation({
 		onSuccess: (value) => {
-			toast.success("Kostenstellengruppe wurde erfolgreich erstellt", {
+			toast.success(t("savedToast"), {
 				description: `${value.title}`,
 			});
 			utils.costUnit.listGroups.invalidate();
@@ -104,8 +108,8 @@ function CreateCostUnitGroupFormConnected({
 			closeOnSuccess && handle.close();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Kostenstellengruppe", {
-				description: error.message ?? "Ein unbekannter Fehler ist aufgetreten",
+			toast.error(t("saveErrorTitle"), {
+				description: error.message ?? t("saveErrorFallback"),
 			});
 		},
 	});
@@ -124,6 +128,8 @@ type CreateCostUnitGroupFormProps = {
 };
 
 function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
+	const t = useTranslations("modules.settings.costUnits.createGroupSheet");
+	const tActions = useTranslations("modules.settings.actions");
 	const form = useForm({
 		defaultValues: {
 			title: "",
@@ -158,7 +164,7 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 											className="mb-1 font-semibold text-base text-slate-800"
 											htmlFor={field.name}
 										>
-											Gruppenname
+											{t("nameLabel")}
 										</FieldLabel>
 										<Input
 											aria-invalid={isInvalid}
@@ -166,7 +172,7 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 											name={field.name}
 											onBlur={field.handleBlur}
 											onChange={(e) => field.handleChange(e.target.value)}
-											placeholder="Projekte, Werbung, Sonstiges..."
+											placeholder={t("namePlaceholder")}
 											value={field.state.value}
 										/>
 										{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -175,8 +181,7 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 							}}
 						</form.Field>
 						<FieldDescription className="col-span-2">
-							Hilfe deinen Nutzern schneller eine passende Kostenstelle zu finden,
-							indem du sie in Gruppen sortierst. Titel ist öffentlich sichtbar.
+							{t("description")}
 						</FieldDescription>
 					</FieldGroup>
 				</form>
@@ -186,7 +191,7 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 				<SheetClose
 					render={
 						<Button type="button" variant="outline">
-							Cancel
+							{tActions("cancel")}
 						</Button>
 					}
 				/>
@@ -203,7 +208,7 @@ function CreateCostUnitGroupForm({ onSubmit }: CreateCostUnitGroupFormProps) {
 							form={FORM_ID}
 							type="submit"
 						>
-							{isSubmitting ? "Saving…" : "Erstellen"}
+							{isSubmitting ? tActions("creating") : tActions("create")}
 						</Button>
 					)}
 				</form.Subscribe>

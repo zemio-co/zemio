@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
 import { ReportStatus } from "@zemio/db";
 import { env } from "@/env";
-import { translateExpenseType, translateReportStatus } from "@/lib/utils";
+import { expenseTypeLabel, reportStatusLabel } from "@/lib/i18n-labels";
 import {
 	buildPeriodSeries,
 	fillPeriodGaps,
@@ -124,7 +124,7 @@ async function statusBuckets(
 		reports,
 		sums,
 		keyOf: (report) => report.status,
-		labelOf: (report) => translateReportStatus(report.status),
+		labelOf: (report) => reportStatusLabel(report.status),
 	});
 }
 
@@ -218,7 +218,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 
 			return rankBuckets(buckets).map(([status, bucket]) => ({
 				key: status,
-				label: translateReportStatus(status),
+				label: reportStatusLabel(status),
 				amount: bucket.amount,
 				count: bucket.count,
 			}));
@@ -291,7 +291,7 @@ export function createReportingService(deps: { repo: ReportingRepository }) {
 
 			return rows.map((row) => ({
 				key: row.type,
-				label: translateExpenseType(row.type),
+				label: expenseTypeLabel(row.type),
 				amount: row.amount,
 				count: row.count,
 			}));

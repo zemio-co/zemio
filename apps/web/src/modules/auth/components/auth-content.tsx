@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -7,6 +8,8 @@ import AuthBackgroundImage from "../../../../public/assets/auth-background.jpg";
 import { AuthForm } from "./auth-form";
 
 function AuthContent() {
+	const t = useTranslations("modules.auth.content");
+
 	return (
 		<main className="flex bg-slate-100">
 			<div className="w-full max-w-2xl shrink-0 bg-white">
@@ -14,10 +17,10 @@ function AuthContent() {
 					<Image alt="Zemio logo" className="h-5 w-auto" src={ZemioLogo} />
 					<div className="mx-auto">
 						<h1 className="text-center font-semibold text-2xl text-slate-800">
-							Willkommen zurück!
+							{t("title")}
 						</h1>
 						<p className="mt-2 max-w-prose text-center text-slate-500 text-sm">
-							Melde dich mit deinem Microsoft-Konto an um fortzufahren.
+							{t("subtitle")}
 						</p>
 						<AuthForm className="mt-10" />
 					</div>
@@ -28,15 +31,17 @@ function AuthContent() {
 								"[&_a]:font-medium [&_a]:text-slate-800 [&_a]:transition-colors [&_a]:hover:text-violet-800",
 							)}
 						>
-							Mit der Erstellung eines Kontos akzeptierst du die{" "}
-							<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>
-								Nutzungsbedingungen
-							</Link>{" "}
-							und bestätigst, die{" "}
-							<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>Datenschutzerklärung</Link>{" "}
-							sowie die{" "}
-							<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>Plattformrichtlinien</Link>{" "}
-							zur Kenntnis genommen zu haben.
+							{t.rich("legal", {
+								terms: (chunks) => (
+									<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>{chunks}</Link>
+								),
+								privacy: (chunks) => (
+									<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{chunks}</Link>
+								),
+								platform: (chunks) => (
+									<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{chunks}</Link>
+								),
+							})}
 						</p>
 					</div>
 				</div>

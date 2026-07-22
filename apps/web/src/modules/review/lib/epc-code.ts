@@ -37,7 +37,7 @@ async function generateEPCCode(config: {
 		);
 	}
 
-	const remittanceInfo = `Ausgleich Spesenantrag #${tag}`;
+	const remittanceInfo = `Auszahlung Spesenantrag #${tag}`;
 	if (remittanceInfo.length > MAX_REMITTANCE_INFO_LENGTH) {
 		throw new Error(
 			`Remittance information exceeds the EPC limit of ${MAX_REMITTANCE_INFO_LENGTH} characters`,

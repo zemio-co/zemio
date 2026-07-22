@@ -1,6 +1,7 @@
 import type { Table } from "@tanstack/react-table";
 import type { ReportStatus } from "@zemio/db";
 import { ListFilterIcon, Settings2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { DisplayOptions } from "@/components/data/display-options";
 import { FilterList } from "@/components/data/filter-list";
 import { FilterMenu } from "@/components/data/filter-menu";
@@ -57,6 +58,8 @@ function ReportsListQuickActions({
 }: React.ComponentProps<"div"> & {
 	table: Table<ListReport>;
 }) {
+	const t = useTranslations("modules.reports.quickActions");
+
 	return (
 		<div
 			className={cn("flex items-center justify-center gap-2", className)}
@@ -71,7 +74,7 @@ function ReportsListQuickActions({
 				size={"sm"}
 				variant={"outline"}
 			>
-				Alle
+				{t("all")}
 			</Button>{" "}
 			<Button
 				onClick={() => {
@@ -88,7 +91,7 @@ function ReportsListQuickActions({
 				size={"sm"}
 				variant={"outline"}
 			>
-				Entwurf
+				{t("draft")}
 			</Button>
 			<Button
 				onClick={() => {
@@ -105,7 +108,7 @@ function ReportsListQuickActions({
 				size={"sm"}
 				variant={"outline"}
 			>
-				Abgeschlossen
+				{t("completed")}
 			</Button>
 		</div>
 	);

@@ -1,6 +1,7 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
+import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -179,6 +180,21 @@ function FieldError({
 }: React.ComponentProps<"div"> & {
 	errors?: Array<{ message?: string } | undefined>;
 }) {
+	const t = useTranslations("validation");
+
+	// Zod schemas emit stable message keys (relative to the "validation"
+	// namespace) instead of literal text, so translation happens here, at the
+	// single place every form error is rendered. `t()`'s key type can't be
+	// statically narrowed since the key arrives as a runtime string from a
+	// Zod issue — the cast bridges that to next-intl's typed API. `t.has`
+	// guards messages that aren't registered keys (e.g. Zod's own built-in
+	// default messages), so those still render as-is.
+	const translate = (message: string) =>
+		t.has(message as Parameters<typeof t>[0])
+			? t(message as Parameters<typeof t>[0])
+			: message;
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: translate is a plain closure over `t` (already a dependency), not memoized itself
 	const content = useMemo(() => {
 		if (children) {
 			return children;
@@ -193,19 +209,22 @@ function FieldError({
 		];
 
 		if (uniqueErrors?.length === 1) {
-			return uniqueErrors[0]?.message;
+			const message = uniqueErrors[0]?.message;
+			return message && translate(message);
 		}
 
 		return (
 			<ul className="ml-4 flex list-disc flex-col gap-1">
 				{uniqueErrors.map(
 					(error, index) =>
-						// biome-ignore lint/suspicious/noArrayIndexKey: TODO add a unique key
-						error?.message && <li key={`err-${index}`}>{error.message}</li>,
+						error?.message && (
+							// biome-ignore lint/suspicious/noArrayIndexKey: TODO add a unique key
+							<li key={`err-${index}`}>{translate(error.message)}</li>
+						),
 				)}
 			</ul>
 		);
-	}, [children, errors]);
+	}, [children, errors, t]);
 
 	if (!content) {
 		return null;

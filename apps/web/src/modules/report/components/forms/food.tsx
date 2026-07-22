@@ -3,6 +3,7 @@
 import { NumberField } from "@base-ui/react";
 import { useForm, useStore } from "@tanstack/react-form";
 import { differenceInDays, formatDate, isValid, parse } from "date-fns";
+import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/date-picker";
@@ -33,17 +34,19 @@ export function CreateFoodExpenseForm({
 	reportId: string;
 	onSuccess?: () => void;
 }) {
+	const t = useTranslations("modules.report.foodExpenseForm");
+	const tCommon = useTranslations("modules.report.common");
 	const [settings] = api.settings.get.useSuspenseQuery();
 	const utils = api.useUtils();
 	const createTravel = api.expense.createFood.useMutation({
 		onSuccess: () => {
 			utils.expense.invalidate();
-			toast.success("Ausgabe erfolgreich erstellt");
+			toast.success(t("toasts.createSuccess"));
 			onSuccess?.();
 		},
 		onError: (error) => {
-			toast.error("Fehler beim Erstellen der Ausgabe", {
-				description: error.message ?? "Ein unerwarteter Fehler ist aufgetreten",
+			toast.error(t("toasts.createErrorTitle"), {
+				description: error.message ?? tCommon("toasts.unexpectedError"),
 			});
 		},
 	});
@@ -134,7 +137,9 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-3" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Beschreibung</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.description")}
+								</FieldLabel>
 								<Textarea
 									aria-invalid={isInvalid}
 									autoComplete="off"
@@ -142,11 +147,11 @@ export function CreateFoodExpenseForm({
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder="Verpflegung Weihnachtsfeier"
+									placeholder={tCommon("fields.descriptionPlaceholder")}
 									value={field.state.value}
 								/>
 								<FieldDescription>
-									Beschreibung der Ausgabe oder Kommentar
+									{tCommon("fields.descriptionHelper")}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -160,14 +165,16 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Startdatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.startDate")}
+								</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={tCommon("fields.datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -181,14 +188,16 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Enddatum</FieldLabel>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.endDate")}
+								</FieldLabel>
 								<DatePicker
 									aria-invalid={isInvalid}
 									id={field.name}
 									name={field.name}
 									onBlur={field.handleBlur}
 									onChange={(date) => field.handleChange(date.target.value)}
-									placeholder="01.01.2026"
+									placeholder={tCommon("fields.datePlaceholder")}
 									value={field.state.value}
 								/>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -203,7 +212,7 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Dauer</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("days")}</FieldLabel>
 								<NumberField.Root
 									disabled
 									format={{
@@ -231,7 +240,7 @@ export function CreateFoodExpenseForm({
 												}
 											/>
 											<InputGroupAddon align={"inline-end"}>
-												<InputGroupText>Tage</InputGroupText>
+												<InputGroupText>{t("daysUnit")}</InputGroupText>
 											</InputGroupAddon>
 										</InputGroup>
 									</NumberField.Group>
@@ -247,7 +256,7 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Frühstücksabzug</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("breakfastDeduction")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										minimumFractionDigits: 0,
@@ -277,8 +286,9 @@ export function CreateFoodExpenseForm({
 									</NumberField.Group>
 								</NumberField.Root>
 								<FieldDescription>
-									Automatisch berechnet: - {settings.breakfastDeduction.toFixed(2)} € pro
-									Tag
+									{t("breakfastDeductionHelper", {
+										amount: settings.breakfastDeduction.toFixed(2),
+									})}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -291,7 +301,7 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Mittagessenabzug</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("lunchDeduction")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										minimumFractionDigits: 0,
@@ -321,7 +331,9 @@ export function CreateFoodExpenseForm({
 									</NumberField.Group>
 								</NumberField.Root>
 								<FieldDescription>
-									Automatisch berechnet: - {settings.lunchDeduction.toFixed(2)} € pro Tag
+									{t("lunchDeductionHelper", {
+										amount: settings.lunchDeduction.toFixed(2),
+									})}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -334,7 +346,7 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Abendessenabzug</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{t("dinnerDeduction")}</FieldLabel>
 								<NumberField.Root
 									format={{
 										minimumFractionDigits: 0,
@@ -364,8 +376,9 @@ export function CreateFoodExpenseForm({
 									</NumberField.Group>
 								</NumberField.Root>
 								<FieldDescription>
-									Automatisch berechnet: - {settings.dinnerDeduction.toFixed(2)} € pro
-									Tag
+									{t("dinnerDeductionHelper", {
+										amount: settings.dinnerDeduction.toFixed(2),
+									})}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -378,7 +391,7 @@ export function CreateFoodExpenseForm({
 						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 						return (
 							<Field className="md:col-span-3" data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Betrag</FieldLabel>
+								<FieldLabel htmlFor={field.name}>{tCommon("fields.amount")}</FieldLabel>
 								<NumberField.Root
 									disabled
 									format={{
@@ -416,8 +429,9 @@ export function CreateFoodExpenseForm({
 									</NumberField.Group>
 								</NumberField.Root>
 								<FieldDescription>
-									Automatisch berechnet: {settings.dailyFoodAllowance.toFixed(2)} € pro
-									Tag - Abzüge
+									{t("amountHelper", {
+										amount: settings.dailyFoodAllowance.toFixed(2),
+									})}
 								</FieldDescription>
 								{isInvalid && <FieldError errors={field.state.meta.errors} />}
 							</Field>
@@ -432,7 +446,7 @@ export function CreateFoodExpenseForm({
 					form="form-create-travel-expense"
 					type="submit"
 				>
-					Erstellen
+					{t("submit")}
 				</Button>
 			</FieldGroup>
 		</form>
