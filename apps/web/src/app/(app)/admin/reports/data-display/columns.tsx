@@ -89,7 +89,7 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 		);
 	},
 	filterFn: (row, _columnId, filterValue) => {
-		const { operator = "is", value = "DRAFT" } = (filterValue ??
+		const { operator = "is", value = "PENDING_APPROVAL" } = (filterValue ??
 			{}) as SelectFilterValue<ReportStatus>;
 
 		return operator === "is"
@@ -129,7 +129,6 @@ const statusColumn: ColumnDef<ExtendedReport> = {
 		icon: CircleDotDashedIcon,
 		options: (
 			[
-				"DRAFT",
 				"PENDING_APPROVAL",
 				"NEEDS_REVISION",
 				"ACCEPTED",
