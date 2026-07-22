@@ -1232,5 +1232,34 @@
 			"logoInvalid": "Bitte gib eine gültige Logo-URL ein",
 			"tenantIdInvalid": "Microsoft Tenant ID muss eine gültige UUID sein"
 		}
+	},
+	"emails": {
+		"shared": {
+			"supportPrompt": "Wende dich bei Fragen bitte an <email>support@zemio.co</email>.",
+			"regards": "Beste Grüße,",
+			"team": "Dein zemio Team",
+			"linkText": "hier"
+		},
+		"reportReceived": {
+			"subject": "Neuer Spesenbericht eingegangen",
+			"preview": "\"{title}\" von {from}",
+			"greeting": "Hallo,",
+			"body": "Der Nutzer <strong>{from}</strong> hat einen neuen Spesenbericht über zemio eingereicht. Den Antrag kannst du <link>hier</link> bearbeiten.",
+			"footer": "Du erhältst diese E-Mail, da du in zemio als Reviewer eingetragen bist. Solltest du kein Reviewer sein, kannst du diese E-Mail ignorieren."
+		},
+		"reportSubmitted": {
+			"subject": "Spesenbericht eingereicht",
+			"preview": "Dein Spesenbericht wurde erfolgreich eingereicht",
+			"greeting": "Hallo {name},",
+			"body": "Hiermit bestätigen wir, dass dein Spesenbericht \"{title}\" erfolgreich eingereicht wurde. Bitte warte nun auf die Freigabe durch einen Reviewer.",
+			"footer": "Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast. Solltest du keinen Spesenbericht eingereicht haben, kannst du diese E-Mail ignorieren."
+		},
+		"statusChanged": {
+			"subject": "Status deines Spesenberichts geändert",
+			"preview": "Der Status deines Spesenberichts wurde zu \"{status}\" geändert.",
+			"greeting": "Hallo {name},",
+			"body": "Der Status deines Spesenberichts <strong>\"{title}\"</strong> wurde zu <strong>{status}</strong> geändert. Du kannst den Bericht <link>hier</link> ansehen.",
+			"footer": "Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast. Solltest du keinen Spesenbericht eingereicht haben, kannst du diese E-Mail ignorieren."
+		}
 	}
 }
