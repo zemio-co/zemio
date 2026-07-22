@@ -18,7 +18,7 @@
 		"build": "tsc --build",
 		"clean": "rm -rf dist tsconfig.tsbuildinfo",
 		"typecheck": "tsc --noEmit",
-		"check": "biome check ."
+		"check": "biome check . && bun run scripts/check-messages-parity.ts"
 	},
 	"dependencies": {
 		"use-intl": "^4.13.2"
