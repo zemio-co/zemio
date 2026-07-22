@@ -1,7 +1,6 @@
 "use client";
 
 import { keepPreviousData } from "@tanstack/react-query";
-import { createAppTranslator } from "@zemio/i18n";
 import { differenceInDays, format } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -34,17 +33,6 @@ import {
 	ReportingCardTitle,
 } from "./reporting-card";
 
-const tModule = createAppTranslator({
-	namespace: "modules.reporting.timeline",
-});
-
-const timelineChartConfig = {
-	amount: {
-		label: tModule("chart.amountLabel"),
-		color: "var(--color-violet-600)",
-	},
-} satisfies ChartConfig;
-
 function determineChartGranularity(
 	start: Date,
 	end: Date,
@@ -70,6 +58,13 @@ function ReportingReportsTimeline({
 }: React.ComponentProps<"div">) {
 	const t = useTranslations("modules.reporting.timeline");
 	const tCommon = useTranslations("modules.reporting.common");
+
+	const timelineChartConfig = {
+		amount: {
+			label: t("chart.amountLabel"),
+			color: "var(--color-violet-600)",
+		},
+	} satisfies ChartConfig;
 
 	const [metric, setMetric] = React.useState<TimelineMetric>("submitted");
 
@@ -169,12 +164,13 @@ function ReportingReportsTimeline({
 
 type TimelineMetric = "reimbursed" | "submitted";
 
-const metricItems = {
-	reimbursed: tModule("metrics.reimbursed"),
-	submitted: tModule("metrics.submitted"),
-};
-
 function MetricSelector({ ...props }: React.ComponentProps<typeof Select>) {
+	const t = useTranslations("modules.reporting.timeline");
+	const metricItems = {
+		reimbursed: t("metrics.reimbursed"),
+		submitted: t("metrics.submitted"),
+	};
+
 	return (
 		<Select items={metricItems} {...props}>
 			<SelectTrigger>
