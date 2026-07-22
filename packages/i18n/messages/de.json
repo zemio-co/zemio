@@ -108,8 +108,8 @@
 			"header": {
 				"payAction": "Auszahlen",
 				"loadErrorTitle": "Report konnte nicht geladen werden",
-				"createdAgo": "vor {distance} Uhr",
-				"createdAt": "Erstellt am {date} Uhr",
+				"createdAgo": "vor {distance}",
+				"createdAt": "Erstellt am {date}",
 				"editAction": "Bearbeiten",
 				"changeStatusLabel": "Status ändern",
 				"acceptAction": "Akzeptieren",
@@ -187,7 +187,7 @@
 			},
 			"paidNotice": {
 				"title": "Antrag wurde ausgezahlt",
-				"description": "Dieser Antrag wurde{date} ausgezahlt und kann nicht mehr bearbeitet werden. Du kannst ihn noch einsehen und exportieren."
+				"description": "Dieser Antrag wurde {date} ausgezahlt und kann nicht mehr bearbeitet werden. Du kannst ihn noch einsehen und exportieren."
 			},
 			"reasoning": {
 				"title": "Begründung",
@@ -293,7 +293,7 @@
 						"createSuccess": "Ausgabe erfolgreich erstellt",
 						"createErrorTitle": "Fehler beim Erstellen der Ausgabe"
 					},
-					"descriptionHelper": "Optional. Füge dieser Ausgabe eine Kurze Beschreibung hinzu."
+					"descriptionHelper": "Optional. Füge dieser Ausgabe eine kurze Beschreibung hinzu."
 				}
 			},
 			"createReport": {
@@ -422,7 +422,7 @@
 				"amountValue": "{amount} EUR",
 				"iban": "IBAN",
 				"accountName": "Kontoname",
-				"submitter": "Antragssteller",
+				"submitter": "Antragsteller",
 				"costUnit": "Kostenstelle",
 				"costUnitValue": "{tag} · {title}",
 				"created": "Erstellt",
@@ -439,7 +439,7 @@
 					"sum": "Summe"
 				},
 				"emptyTitle": "Du hast noch keine Ausgaben hinzugefügt.",
-				"emptyDescription": "Füge eine neue Ausgabe hinzu um diese erstattten zu lassen.",
+				"emptyDescription": "Füge eine neue Ausgabe hinzu um diese erstatten zu lassen.",
 				"menu": {
 					"edit": "Bearbeiten",
 					"delete": "Löschen"
@@ -929,9 +929,9 @@
 					"fieldLabel": "Benachrichtigungen",
 					"fieldDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
 					"allTitle": "Alle Benachrichtigungen",
-					"allDescription": "Du erhälst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+					"allDescription": "Du erhältst Benachrichtigungen zu allen Änderungen an deinen Reports.",
 					"statusTitle": "Statusänderungen",
-					"statusDescription": "Du erhälst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+					"statusDescription": "Du erhältst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
 					"noneTitle": "Keine Benachrichtigungen",
 					"noneDescription": "Du erhältst keine Benachrichtigungen.",
 					"savedToast": "Einstellungen wurden erfolgreich gespeichert",
@@ -1060,9 +1060,9 @@
 				"notificationsLabel": "Benachrichtigungen",
 				"notificationsDescription": "Wähle welche Benachrichtigungen du erhalten möchtest",
 				"allLabel": "Alle Benachrichtigungen",
-				"allDescription": "Du erhälst Benachrichtigungen zu allen Änderungen an deinen Reports.",
+				"allDescription": "Du erhältst Benachrichtigungen zu allen Änderungen an deinen Reports.",
 				"statusLabel": "Statusänderungen",
-				"statusDescription": "Du erhälst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
+				"statusDescription": "Du erhältst Benachrichtigungen zu Änderungen an den Status deiner Reports.",
 				"noneLabel": "Keine Benachrichtigungen",
 				"noneDescription": "Du erhältst keine Benachrichtigungen.",
 				"saveSuccess": "Einstellungen wurden erfolgreich gespeichert",
