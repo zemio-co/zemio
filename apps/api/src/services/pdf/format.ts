@@ -1,20 +1,9 @@
 import type { Expense, Report } from "@zemio/db";
-import { createAppTranslator } from "@zemio/i18n";
-
-const reportStatusKeys = {
-	DRAFT: "draft",
-	PENDING_APPROVAL: "pendingApproval",
-	NEEDS_REVISION: "needsRevision",
-	ACCEPTED: "accepted",
-	REJECTED: "rejected",
-	PAID: "paid",
-} as const satisfies Record<Report["status"], string>;
-
-const expenseTypeKeys = {
-	RECEIPT: "receipt",
-	TRAVEL: "travel",
-	FOOD: "food",
-} as const satisfies Record<Expense["type"], string>;
+import {
+	createAppTranslator,
+	expenseTypeKeys,
+	reportStatusKeys,
+} from "@zemio/i18n";
 
 export function translateReportStatus(status: Report["status"]): string {
 	const t = createAppTranslator({ namespace: "enums.reportStatus" });

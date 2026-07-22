@@ -1,21 +1,12 @@
 import type { ExpenseType, ReportStatus } from "@zemio/db";
-import { createAppTranslator } from "@zemio/i18n";
+import {
+	createAppTranslator,
+	expenseTypeKeys,
+	reportStatusKeys,
+} from "@zemio/i18n";
 import { useTranslations } from "next-intl";
 
-export const reportStatusKeys = {
-	DRAFT: "draft",
-	PENDING_APPROVAL: "pendingApproval",
-	NEEDS_REVISION: "needsRevision",
-	ACCEPTED: "accepted",
-	REJECTED: "rejected",
-	PAID: "paid",
-} as const satisfies Record<ReportStatus, string>;
-
-export const expenseTypeKeys = {
-	RECEIPT: "receipt",
-	TRAVEL: "travel",
-	FOOD: "food",
-} as const satisfies Record<ExpenseType, string>;
+export { expenseTypeKeys, reportStatusKeys };
 
 /** Client-component hook — resolves through the active next-intl locale. */
 export function useReportStatusLabel(status: ReportStatus): string {
