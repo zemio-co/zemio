@@ -3,7 +3,6 @@
 import { Button as ButtonPrimitive } from "@base-ui/react";
 import { useQueries } from "@tanstack/react-query";
 import { formatDate, formatDistanceToNow } from "date-fns";
-import { de } from "date-fns/locale";
 import {
 	CalendarPlusIcon,
 	CalendarSyncIcon,
@@ -25,6 +24,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useDateFnsLocale } from "@/hooks/use-date-fns-locale";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
@@ -36,6 +36,7 @@ function ReportDetails({
 	reportId: string;
 }) {
 	const t = useTranslations("modules.report.details");
+	const dateFnsLocale = useDateFnsLocale();
 	const utils = api.useUtils();
 
 	const queries = useQueries({
@@ -124,13 +125,13 @@ function ReportDetails({
 									<span>
 										{formatDistanceToNow(v, {
 											addSuffix: true,
-											locale: de,
+											locale: dateFnsLocale,
 										})}
 									</span>
 								</TooltipTrigger>
 								<TooltipContent>
 									{formatDate(v, "dd. MMM yyyy 'um' HH:mm", {
-										locale: de,
+										locale: dateFnsLocale,
 									})}
 								</TooltipContent>
 							</Tooltip>
@@ -150,13 +151,13 @@ function ReportDetails({
 									<span>
 										{formatDistanceToNow(v, {
 											addSuffix: true,
-											locale: de,
+											locale: dateFnsLocale,
 										})}
 									</span>
 								</TooltipTrigger>
 								<TooltipContent>
 									{formatDate(v, "dd. MMM yyyy 'um' HH:mm", {
-										locale: de,
+										locale: dateFnsLocale,
 									})}
 								</TooltipContent>
 							</Tooltip>
