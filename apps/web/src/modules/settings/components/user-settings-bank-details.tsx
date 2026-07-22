@@ -99,7 +99,7 @@ function DetailsList() {
 						<BoxItemDescription>
 							{t("createdOn", {
 								date: format(detail.createdAt, "dd.MM.yyyy"),
-								time: format(detail.createdAt, "HH:MM"),
+								time: format(detail.createdAt, "HH:mm"),
 							})}
 						</BoxItemDescription>
 					</BoxItemContent>
