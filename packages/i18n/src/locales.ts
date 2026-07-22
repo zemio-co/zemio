@@ -1,11 +1,10 @@
 import de from "../messages/de.json";
-import en from "../messages/en.json";
 
 export const locales = ["de"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "de";
 
-const messagesByFileLocale = { de, en };
+const messagesByFileLocale = { de };
 
 export type Messages = typeof de;
 
