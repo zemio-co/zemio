@@ -268,7 +268,9 @@ export function buildReportListWhere({
 	userId,
 }: ReportListWhereInput): Prisma.ReportWhereInput {
 	const base: Prisma.ReportWhereInput =
-		scope === "own" ? { organizationId, ownerId: userId } : { organizationId };
+		scope === "own"
+			? { organizationId, ownerId: userId }
+			: { organizationId, status: { not: ReportStatus.DRAFT } };
 
 	if (!filters) {
 		return base;
