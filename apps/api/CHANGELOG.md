@@ -1,5 +1,12 @@
 # @zemio/api
 
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [[`fc226aa`](https://github.com/zemio-co/zemio/commit/fc226aaf860c59b6b7599da2ce4478d20ac6a1e8)]:
+  - @zemio/i18n@0.1.0
+
 ## 1.0.0
 
 Exits the prerelease cycle entered for the 1.0.0 major bump below; no
