@@ -161,25 +161,39 @@ describe("organizationRepository.update", () => {
 		expect(db.$transaction).not.toHaveBeenCalled();
 	});
 
-	/** Runs the interactive transaction against the same mock the test reads. */
-	function withTransaction(existingTenants: string[]) {
+	/**
+	 * Runs the interactive transaction against the same mock the test reads.
+	 *
+	 * `resulting` is what the organization read-back carries afterwards, so the
+	 * flattening on the way out is exercised rather than assumed.
+	 */
+	function withTransaction(existingTenants: string[], resulting?: string) {
 		db.$transaction.mockImplementation(((fn: (tx: unknown) => unknown) =>
 			fn(db)) as never);
 		db.$queryRaw.mockResolvedValue([{ id: "org_1" }] as never);
 		db.joiningRule.findMany.mockResolvedValue(
 			existingTenants.map((value) => ({ value })) as never,
 		);
-		db.organization.update.mockResolvedValue({ joiningRules: [] } as never);
+		db.organization.update.mockResolvedValue({
+			id: "org_1",
+			joiningRules: resulting === undefined ? [] : [{ value: resulting }],
+		} as never);
 	}
 
 	it("replaces the tenant rule when a different tenant is passed", async () => {
-		withTransaction(["tenant_1"]);
+		withTransaction(["tenant_1"], "tenant_2");
 
-		await organizationRepository.update(db, {
+		const row = await organizationRepository.update(db, {
 			id: "org_1",
 			data: { name: "Renamed" },
 			microsoftTenantId: "TENANT_2",
 		});
+
+		// The flattened field is what the admin forms read, so a change that
+		// wrote the rule but reported the old tenant would be invisible here
+		// without this.
+		expect(row.microsoftTenantId).toBe("tenant_2");
+		expect(row).not.toHaveProperty("joiningRules");
 
 		expect(db.joiningRule.deleteMany).toHaveBeenCalledWith({
 			where: { organizationId: "org_1", type: "MS_TENANT" },
@@ -212,9 +226,9 @@ describe("organizationRepository.update", () => {
 
 	it("leaves an unchanged tenant rule where it is", async () => {
 		// Saving the profile must not churn the rule row under a new id.
-		withTransaction(["tenant_1"]);
+		withTransaction(["tenant_1"], "tenant_1");
 
-		await organizationRepository.update(db, {
+		const row = await organizationRepository.update(db, {
 			id: "org_1",
 			data: { name: "Renamed" },
 			microsoftTenantId: "TENANT_1",
@@ -222,12 +236,13 @@ describe("organizationRepository.update", () => {
 
 		expect(db.joiningRule.deleteMany).not.toHaveBeenCalled();
 		expect(db.joiningRule.createMany).not.toHaveBeenCalled();
+		expect(row.microsoftTenantId).toBe("tenant_1");
 	});
 
 	it("removes the tenant rule when the tenant is cleared", async () => {
 		withTransaction(["tenant_1"]);
 
-		await organizationRepository.update(db, {
+		const row = await organizationRepository.update(db, {
 			id: "org_1",
 			data: { name: "Renamed" },
 			microsoftTenantId: null,
@@ -235,6 +250,7 @@ describe("organizationRepository.update", () => {
 
 		expect(db.joiningRule.deleteMany).toHaveBeenCalled();
 		expect(db.joiningRule.createMany).not.toHaveBeenCalled();
+		expect(row.microsoftTenantId).toBeNull();
 	});
 
 	it("does nothing to the rules when there were none and none is wanted", async () => {

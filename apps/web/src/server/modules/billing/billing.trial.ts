@@ -84,11 +84,11 @@ export async function startTrial(
 		}),
 	);
 
-	// Recorded from the API response rather than left to the webhook. The
-	// caller switches enforcement on next, and an organization with enforcement
-	// on and no subscription row is read-only — which is what it would be for
-	// however long `customer.subscription.created` takes to arrive. The webhook
-	// overwrites this row when it lands (ADR-0004).
+	// Recorded from the API response rather than left to the webhook. Enforcement
+	// is switched on just below, and an organization with enforcement on and no
+	// subscription row is read-only — which is what it would be for however long
+	// `customer.subscription.created` takes to arrive. The webhook overwrites
+	// this row when it lands (ADR-0004).
 	const item = subscription.items.data[0];
 
 	// No item means no row, and reporting a trial the caller would then switch

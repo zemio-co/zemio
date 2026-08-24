@@ -180,7 +180,11 @@ describe("createSelfServeOrganization under concurrency", () => {
 		// chose.
 		const d = deps();
 		d.createOrganization
-			.mockRejectedValueOnce(new Error("organization already exists"))
+			.mockRejectedValueOnce(
+				Object.assign(new Error("Organization already exists"), {
+					body: { code: "ORGANIZATION_ALREADY_EXISTS" },
+				}),
+			)
 			.mockResolvedValueOnce({ id: "org_new" });
 
 		await expect(
@@ -193,13 +197,18 @@ describe("createSelfServeOrganization under concurrency", () => {
 		expect(second?.[0].slug).toMatch(/^robotics-[a-z0-9]+$/);
 	});
 
-	it("still reports a creation that fails for another reason", async () => {
+	it("reports a creation that failed for any other reason, without retrying", async () => {
+		// Asking again under a different name fixes nothing here, reports the
+		// second failure in place of the real one, and risks a second
+		// organization if the first attempt partly succeeded.
 		const d = deps();
 		d.createOrganization.mockRejectedValue(new Error("database is down"));
 
 		await expect(
 			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
 		).rejects.toThrow("database is down");
+
+		expect(d.createOrganization).toHaveBeenCalledTimes(1);
 	});
 
 	it("does not fail creation when remembering the organization fails", async () => {

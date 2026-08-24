@@ -49,6 +49,35 @@ async function tenantIdOf(userId: string): Promise<string | null> {
 	return user?.microsoftTenantId ?? null;
 }
 
+/**
+ * Opens a freshly joined organization in the sessions already running.
+ *
+ * The session hook that chooses an active organization runs when a session is
+ * *created*, and verification happens inside one that already exists. Without
+ * this, someone who verifies and is auto-joined is redirected out of `/no-org`
+ * into an application whose every organization-scoped call refuses them for
+ * having no active organization — until they log out and back in.
+ *
+ * Only sessions with no organization are touched, so this never moves someone
+ * who is already working somewhere. The user record is updated on the same
+ * terms, so the next login lands in the same place.
+ */
+async function openJoinedOrganization(userId: string): Promise<void> {
+	const organizationId = await resolveSessionOrganization(db, userId);
+	if (!organizationId) return;
+
+	await db.$transaction([
+		db.session.updateMany({
+			where: { userId, activeOrganizationId: null },
+			data: { activeOrganizationId: organizationId },
+		}),
+		db.user.updateMany({
+			where: { id: userId, lastActiveOrganizationId: null },
+			data: { lastActiveOrganizationId: organizationId },
+		}),
+	]);
+}
+
 export const auth = betterAuth({
 	// Explicit secret with a build-time fallback so Docker builds (which run without
 	// secrets) don't throw during Next.js module evaluation. At runtime the real
@@ -95,11 +124,15 @@ export const auth = betterAuth({
 		 */
 		afterEmailVerification: async (user) => {
 			try {
-				await applyAutoJoins(db, user.id, {
+				const joined = await applyAutoJoins(db, user.id, {
 					email: user.email,
 					emailVerified: true,
 					microsoftTenantId: await tenantIdOf(user.id),
 				});
+
+				if (joined.length === 0) return;
+
+				await openJoinedOrganization(user.id);
 			} catch (error) {
 				logger.error("Could not resolve joining rules after verification", {
 					userId: user.id,

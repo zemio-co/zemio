@@ -65,6 +65,22 @@ async function availableSlug(db: PrismaClient, name: string): Promise<string> {
 }
 
 /**
+ * The one failure a different slug can fix.
+ *
+ * Better Auth raises this when the slug is already held; every other failure —
+ * a validation error, a refused permission, a database that is down — is
+ * unchanged by asking again under another name.
+ */
+function isSlugTaken(error: unknown): boolean {
+	if (typeof error !== "object" || error === null || !("body" in error)) {
+		return false;
+	}
+
+	const body = (error as { body?: { code?: unknown } }).body;
+	return body?.code === "ORGANIZATION_ALREADY_EXISTS";
+}
+
+/**
  * Creates the organization, working around a slug someone else holds.
  *
  * Checking availability is not enough on its own: two people creating
@@ -74,8 +90,10 @@ async function availableSlug(db: PrismaClient, name: string): Promise<string> {
  * check keeps the common case tidy; this is what makes its promise hold under
  * concurrency.
  *
- * Two attempts: the second asks for a fresh suffix, and a random suffix losing
- * as well is not a collision any more.
+ * Only a taken slug is retried. Retrying anything else would report the second
+ * failure in place of the real one, and would ask again for something that may
+ * have partly succeeded — leaving the person with two organizations where the
+ * error said they had none.
  */
 async function createWithFreeSlug(
 	deps: SelfServeDependencies,
@@ -88,7 +106,9 @@ async function createWithFreeSlug(
 			slug: await availableSlug(deps.db, name),
 			userId,
 		});
-	} catch {
+	} catch (error) {
+		if (!isSlugTaken(error)) throw error;
+
 		return deps.createOrganization({
 			name,
 			slug: `${createOrganizationSlug(name) || "org"}-${crypto.randomUUID().slice(0, 6)}`,
