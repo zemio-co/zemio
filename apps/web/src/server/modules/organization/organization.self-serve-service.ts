@@ -5,8 +5,8 @@ import { logger } from "@/lib/logger";
 import { createOrganizationSlug, SELF_SERVE_REFUSAL } from "@/lib/organization";
 import type { TrialStarted } from "@/server/modules/billing/billing.trial";
 import {
+	mayStartTrial,
 	refuseSelfServeCreation,
-	type SelfServeRefusal,
 } from "./organization.self-serve";
 
 /**
@@ -40,10 +40,6 @@ export type SelfServeDependencies = {
 // because this module is server-only and the browser needs the same strings.
 export { SELF_SERVE_REFUSAL };
 
-// Every refusal the rule can produce must have a marker to travel as.
-const _exhaustive: Record<SelfServeRefusal, string> = SELF_SERVE_REFUSAL;
-void _exhaustive;
-
 /**
  * A slug nobody else holds.
  *
@@ -62,6 +58,22 @@ async function availableSlug(db: PrismaClient, name: string): Promise<string> {
 	if (!taken) return base;
 
 	return `${base}-${crypto.randomUUID().slice(0, 6)}`;
+}
+
+/**
+ * Puts the organization under billing enforcement.
+ *
+ * `updateMany` rather than `update` so an organization deleted in the moment
+ * between creating it and this line is a no-op rather than a throw.
+ */
+async function enforceBilling(
+	deps: SelfServeDependencies,
+	organizationId: string,
+): Promise<void> {
+	await deps.db.organization.updateMany({
+		where: { id: organizationId },
+		data: { billingEnforced: true },
+	});
 }
 
 export async function createSelfServeOrganization(
@@ -87,7 +99,6 @@ export async function createSelfServeOrganization(
 
 	const refusal = refuseSelfServeCreation({
 		emailVerified: user?.emailVerified ?? false,
-		trialingOrganizations,
 	});
 
 	if (refusal) {
@@ -103,23 +114,33 @@ export async function createSelfServeOrganization(
 		userId: actor.userId,
 	});
 
-	// Enforcement is switched on only once the trial exists. A trial that could
-	// not start — billing switched off, a Stripe outage, no price tagged as the
-	// trial tier — leaves a working organization and a log line, never a
-	// brand-new organization that is read-only on arrival (ADR-0009, ADR-0001).
-	try {
-		const trial = await deps.startTrial(organization.id);
+	if (mayStartTrial({ trialingOrganizations })) {
+		// Enforcement is switched on only once the trial exists. A trial that
+		// could not start — billing switched off, a Stripe outage, no price
+		// tagged as the trial tier — leaves a working organization and a log
+		// line, never a brand-new organization that is read-only for a reason
+		// its owner can neither see nor fix (ADR-0009, ADR-0001).
+		try {
+			const trial = await deps.startTrial(organization.id);
 
-		if (trial) {
-			await deps.db.organization.updateMany({
-				where: { id: organization.id },
-				data: { billingEnforced: true },
+			if (trial) await enforceBilling(deps, organization.id);
+		} catch (error) {
+			logger.error("Could not start a trial for a new organization", {
+				organizationId: organization.id,
+				error: error instanceof Error ? error.message : String(error),
 			});
 		}
-	} catch (error) {
-		logger.error("Could not start a trial for a new organization", {
+	} else {
+		// Their one trial is already running elsewhere. This organization is
+		// unentitled from the start and deliberately so — read-only until it
+		// subscribes, which is a state its owner can see and act on, unlike the
+		// failures above. Checkout stays open to them precisely because there is
+		// no subscription yet.
+		await enforceBilling(deps, organization.id);
+
+		logger.info("organization.created_without_trial", {
 			organizationId: organization.id,
-			error: error instanceof Error ? error.message : String(error),
+			userId: actor.userId,
 		});
 	}
 

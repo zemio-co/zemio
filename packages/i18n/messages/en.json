@@ -1430,9 +1430,11 @@
 			"createButton": "Create organization",
 			"createFailed": "The organization could not be created",
 			"needsVerification": "Confirm your email address ({email}) first to create an organization.",
-			"trialInProgress": "You are already trialling zemio with another organization. You can create another one once that trial has ended.",
 			"manageOrgs": "Manage organizations",
-			"signOut": "Sign out"
+			"signOut": "Sign out",
+			"sendVerification": "Send confirmation email",
+			"verificationSent": "We have sent an email to {email}.",
+			"verificationFailed": "The confirmation email could not be sent"
 		}
 	},
 	"validation": {

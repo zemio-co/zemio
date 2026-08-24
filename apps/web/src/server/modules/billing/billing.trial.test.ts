@@ -167,3 +167,25 @@ describe("startTrial", () => {
 		).resolves.toBeNull();
 	});
 });
+
+describe("startTrial when Stripe answers oddly", () => {
+	it("reports no trial when the subscription came back with no items", async () => {
+		// Nothing to record a tier or a period end from. Reporting a trial here
+		// would have the caller switch enforcement on for an organization with
+		// no subscription row — read-only on arrival, which is the one outcome
+		// a new organization must never have (ADR-0009).
+		const d = deps({
+			subscription: {
+				id: "sub_1",
+				status: "trialing",
+				cancel_at_period_end: false,
+				items: { data: [] },
+			},
+		});
+
+		await expect(
+			startTrial(d as never, { organizationId: "org_1" }),
+		).resolves.toBeNull();
+		expect(d.db.subscription.upsert).not.toHaveBeenCalled();
+	});
+});

@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES as ROUTES_DEPR } from "@/lib/consts";
-import { SELF_SERVE_REFUSAL } from "@/lib/organization";
+import { selfServeRefusalOf } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
 import { authClient } from "@/server/better-auth/client";
 import { api } from "@/trpc/react";
@@ -37,6 +37,7 @@ export function NoOrgPageContent({
 	const t = useTranslations("modules.noOrg");
 	const router = useRouter();
 	const [name, setName] = useState("");
+	const [sendingVerification, setSendingVerification] = useState(false);
 
 	const createOrg = api.organization.createSelfServe.useMutation({
 		onSuccess: () => {
@@ -48,16 +49,31 @@ export function NoOrgPageContent({
 		onError: (error) => {
 			// The procedure answers with a marker rather than a sentence so the
 			// interface can say which of the two rules was hit.
-			const description =
-				error.message === SELF_SERVE_REFUSAL.email_not_verified
-					? t("needsVerification", { email: userEmail })
-					: error.message === SELF_SERVE_REFUSAL.trial_in_progress
-						? t("trialInProgress")
-						: error.message;
+			const description = selfServeRefusalOf(error)
+				? t("needsVerification", { email: userEmail })
+				: error.message;
 
 			toast.error(t("createFailed"), { description });
 		},
 	});
+
+	async function handleSendVerification() {
+		setSendingVerification(true);
+		const result = await authClient.sendVerificationEmail({
+			email: userEmail,
+			callbackURL: ROUTES_DEPR.NO_ORG,
+		});
+		setSendingVerification(false);
+
+		if (result.error) {
+			toast.error(t("verificationFailed"), {
+				description: result.error.message,
+			});
+			return;
+		}
+
+		toast.success(t("verificationSent", { email: userEmail }));
+	}
 
 	async function handleSignOut() {
 		await authClient.signOut();
@@ -148,9 +164,23 @@ export function NoOrgPageContent({
 										</Button>
 									</form>
 								) : (
-									<p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-amber-900 text-sm">
-										{t("needsVerification", { email: userEmail })}
-									</p>
+									<div className="mt-3 rounded-md bg-amber-50 px-3 py-2">
+										<p className="text-amber-900 text-sm">
+											{t("needsVerification", { email: userEmail })}
+										</p>
+										{/* The ask appears where it matters, with the action that
+										    answers it — a gate with no way through is just a wall
+										    (ADR-0008). */}
+										<Button
+											className="mt-2"
+											disabled={sendingVerification}
+											onClick={handleSendVerification}
+											size="sm"
+											variant="outline"
+										>
+											{t("sendVerification")}
+										</Button>
+									</div>
 								)}
 							</div>
 

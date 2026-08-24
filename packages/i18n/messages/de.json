@@ -1430,9 +1430,11 @@
 			"createButton": "Organisation anlegen",
 			"createFailed": "Organisation konnte nicht angelegt werden",
 			"needsVerification": "Bestätige zuerst deine E-Mail-Adresse ({email}), um eine Organisation anzulegen.",
-			"trialInProgress": "Du testest zemio bereits mit einer anderen Organisation. Eine weitere Organisation kannst du anlegen, sobald dieser Test beendet ist.",
 			"manageOrgs": "Organisationen verwalten",
-			"signOut": "Abmelden"
+			"signOut": "Abmelden",
+			"sendVerification": "Bestätigungsmail senden",
+			"verificationSent": "Wir haben dir eine E-Mail an {email} geschickt.",
+			"verificationFailed": "Bestätigungsmail konnte nicht gesendet werden"
 		}
 	},
 	"validation": {

@@ -87,17 +87,27 @@ export async function startTrial(
 	// overwrites this row when it lands (ADR-0004).
 	const item = subscription.items.data[0];
 
-	if (item) {
-		await billingRepository.upsertSubscription(deps.db, args.organizationId, {
-			stripeSubscriptionId: subscription.id,
-			stripePriceId: item.price.id,
-			status: subscription.status,
-			currentPeriodEnd: new Date(item.current_period_end * 1000),
-			cancelAtPeriodEnd: subscription.cancel_at_period_end,
-			tier: tier.name,
-			seatLimit: tier.seatLimit,
+	// No item means no row, and reporting a trial the caller would then switch
+	// enforcement on for is exactly the read-only-on-arrival this method exists
+	// to avoid. Reported as no trial instead: the subscription in Stripe is
+	// real and the log says so, but the organization keeps working.
+	if (!item) {
+		logger.error("Stripe returned a trial subscription with no items", {
+			organizationId: args.organizationId,
+			subscriptionId: subscription.id,
 		});
+		return null;
 	}
+
+	await billingRepository.upsertSubscription(deps.db, args.organizationId, {
+		stripeSubscriptionId: subscription.id,
+		stripePriceId: item.price.id,
+		status: subscription.status,
+		currentPeriodEnd: new Date(item.current_period_end * 1000),
+		cancelAtPeriodEnd: subscription.cancel_at_period_end,
+		tier: tier.name,
+		seatLimit: tier.seatLimit,
+	});
 
 	logger.info("billing.trial_started", {
 		organizationId: args.organizationId,

@@ -61,14 +61,44 @@ describe("createSelfServeOrganization", () => {
 		expect(d.createOrganization).not.toHaveBeenCalled();
 	});
 
-	it("refuses a second organization while a trial is running", async () => {
+	it("creates a second organization while a trial is running", async () => {
+		// Somebody genuinely running two initiatives is not turned away.
 		const d = deps({ trialing: 1 });
 
-		await expectTRPCErrorCode(
+		await expect(
 			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
-			"FORBIDDEN",
+		).resolves.toEqual({ id: "org_new" });
+	});
+
+	it("gives that second organization no trial", async () => {
+		const d = deps({ trialing: 1 });
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
 		);
-		expect(d.createOrganization).not.toHaveBeenCalled();
+
+		expect(d.startTrial).not.toHaveBeenCalled();
+	});
+
+	it("leaves that second organization unentitled, so it can subscribe", async () => {
+		// Read-only from the start and deliberately so: a state its owner can
+		// see and act on, unlike a trial that failed to start (ADR-0009).
+		const d = deps({ trialing: 1 });
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
+		);
+
+		expect(d.db.organization.updateMany).toHaveBeenCalledWith(
+			expect.objectContaining({
+				where: { id: "org_new" },
+				data: { billingEnforced: true },
+			}),
+		);
 	});
 
 	it("gives the organization a distinct slug when the obvious one is taken", async () => {

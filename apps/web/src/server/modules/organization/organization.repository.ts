@@ -17,6 +17,21 @@ const tenantRuleSelect = {
 
 type WithTenantRule = { joiningRules: { value: string }[] };
 
+/**
+ * The rule that opens an organization to a Microsoft tenant.
+ *
+ * One definition for both writes: a create nests it, an update inserts it, and
+ * a tenant lowercased on one path and not the other would resolve for some
+ * people and not others.
+ */
+function tenantRule(value: string) {
+	return {
+		type: "MS_TENANT",
+		value: value.toLowerCase(),
+		mode: "AUTO_JOIN",
+	} as const;
+}
+
 function flattenTenant<T extends WithTenantRule>(
 	row: T,
 ): Omit<T, "joiningRules"> & { microsoftTenantId: string | null } {
@@ -183,17 +198,7 @@ export const organizationRepository = {
 				slug: args.slug,
 				createdAt: new Date(),
 				...(args.microsoftTenantId
-					? {
-							joiningRules: {
-								create: [
-									{
-										type: "MS_TENANT",
-										value: args.microsoftTenantId.toLowerCase(),
-										mode: "AUTO_JOIN",
-									},
-								],
-							},
-						}
+					? { joiningRules: { create: [tenantRule(args.microsoftTenantId)] } }
 					: {}),
 			},
 			select: organizationSelect,
@@ -242,14 +247,7 @@ export const organizationRepository = {
 			}),
 			db.joiningRule.createMany({
 				data: tenantId
-					? [
-							{
-								organizationId: args.id,
-								type: "MS_TENANT",
-								value: tenantId.toLowerCase(),
-								mode: "AUTO_JOIN",
-							},
-						]
+					? [{ organizationId: args.id, ...tenantRule(tenantId) }]
 					: [],
 			}),
 			db.organization.update({

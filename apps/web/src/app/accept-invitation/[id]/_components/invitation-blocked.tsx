@@ -19,10 +19,12 @@ import type { InvitationGate } from "@/server/modules/joining";
  */
 export function InvitationBlocked({
 	reason,
+	invitationId,
 	invitedEmail,
 	currentEmail,
 }: {
 	reason: Exclude<InvitationGate, "ready">;
+	invitationId: string;
 	invitedEmail: string | null;
 	currentEmail: string;
 }) {
@@ -39,7 +41,9 @@ export function InvitationBlocked({
 		setSending(true);
 		const result = await authClient.sendVerificationEmail({
 			email: currentEmail,
-			callbackURL: ROUTES.ACCEPT_INVITATION(""),
+			// Back to this invitation, not to the route it lives under: the
+			// whole point of verifying here is to carry on accepting it.
+			callbackURL: ROUTES.ACCEPT_INVITATION(invitationId),
 		});
 		setSending(false);
 

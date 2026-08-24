@@ -1,4 +1,5 @@
 import "server-only";
+import type { SelfServeRefusal } from "@/lib/organization";
 
 /**
  * Who may create an organization for themselves.
@@ -8,28 +9,39 @@ import "server-only";
  * refuse them if they ask anyway.
  */
 
-/** Why a person may not create an organization right now. */
-export type SelfServeRefusal = "email_not_verified" | "trial_in_progress";
+export type { SelfServeRefusal };
 
 export type SelfServeFacts = {
 	/** Verified by Zemio, never by an identity provider (ADR-0008). */
 	emailVerified: boolean;
-	/** Organizations this person owns whose subscription is still trialing. */
-	trialingOrganizations: number;
 };
 
 /**
  * Returns why this person may not create an organization, or `null` if they
  * may.
  *
- * One trial at a time, not one organization: somebody genuinely running two
- * initiatives may create a second organization, it just starts unentitled and
- * has to subscribe (ADR-0009).
+ * A verified address is the only bar. Holding a trial already is deliberately
+ * not one: somebody genuinely running two initiatives may create a second
+ * organization, it just does not come with a trial — see
+ * {@link mayStartTrial}.
  */
 export function refuseSelfServeCreation(
 	facts: SelfServeFacts,
 ): SelfServeRefusal | null {
 	if (!facts.emailVerified) return "email_not_verified";
-	if (facts.trialingOrganizations > 0) return "trial_in_progress";
 	return null;
+}
+
+/**
+ * Whether this person's new organization comes with a trial.
+ *
+ * One trial at a time, per person rather than per organization. A second
+ * organization is created all the same and starts unentitled, which is what
+ * sends its owner to checkout rather than turning them away (ADR-0009).
+ */
+export function mayStartTrial(facts: {
+	/** Organizations this person owns whose subscription is still trialing. */
+	trialingOrganizations: number;
+}): boolean {
+	return facts.trialingOrganizations === 0;
 }

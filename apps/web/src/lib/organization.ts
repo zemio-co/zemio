@@ -31,12 +31,33 @@ export function createOrganizationSlug(name: string): string {
  * Why a person may not create an organization for themselves.
  *
  * Defined here rather than beside the rule because the rule is `server-only`
- * and the browser needs the same two strings: the procedure answers with a
- * marker so the page can say which of the two applies — one is fixed by
- * confirming an address, the other by waiting for a trial to end, and a single
- * `FORBIDDEN` cannot tell them apart.
+ * and the browser needs the same strings: the procedure answers with a marker
+ * so the page can tell this `FORBIDDEN` from every other one the API raises,
+ * and offer the one action that resolves it.
  */
 export const SELF_SERVE_REFUSAL = {
 	email_not_verified: "EMAIL_NOT_VERIFIED",
-	trial_in_progress: "TRIAL_IN_PROGRESS",
 } as const;
+
+/**
+ * Why a person may not create an organization.
+ *
+ * Derived from the markers rather than declared beside them, so a reason
+ * without a marker to travel as cannot be written in the first place.
+ */
+export type SelfServeRefusal = keyof typeof SELF_SERVE_REFUSAL;
+
+/** Which refusal a failed creation carries, or null if it was something else. */
+export function selfServeRefusalOf(error: unknown): SelfServeRefusal | null {
+	if (typeof error !== "object" || error === null || !("message" in error)) {
+		return null;
+	}
+
+	const message = (error as { message?: unknown }).message;
+
+	const found = Object.entries(SELF_SERVE_REFUSAL).find(
+		([, marker]) => marker === message,
+	);
+
+	return found ? (found[0] as SelfServeRefusal) : null;
+}

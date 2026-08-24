@@ -39,6 +39,7 @@ export default async function AcceptInvitationPage({
 		return (
 			<InvitationBlocked
 				currentEmail={session.user.email}
+				invitationId={id}
 				invitedEmail={invitation?.email ?? null}
 				reason={gate}
 			/>

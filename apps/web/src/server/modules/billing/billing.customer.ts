@@ -58,7 +58,9 @@ async function discardUnclaimedCustomer(
  * Finds the Stripe customer this organization pays as, creating one if this is
  * its first checkout.
  *
- * Lazy by design: an organization that never subscribes never gets a customer.
+ * Lazy by design, but no longer only at checkout: a self-created organization
+ * gets its customer when its trial starts, which is at creation (ADR-0009). An
+ * organization that neither subscribes nor trials still never gets one.
  */
 export async function resolveCustomerId(
 	deps: CustomerDependencies,
