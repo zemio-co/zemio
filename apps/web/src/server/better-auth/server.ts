@@ -5,6 +5,7 @@ import { admin as adminPlugin, organization } from "better-auth/plugins";
 import { env } from "@/env";
 import { logger } from "@/lib/logger";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
+import { sendEmailVerification } from "@/server/better-auth/verification";
 import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
 import {
@@ -56,6 +57,21 @@ export const auth = betterAuth({
 	],
 	emailAndPassword: {
 		enabled: false,
+	},
+
+	/**
+	 * An address is verified by Zemio or not at all (ADR-0008).
+	 *
+	 * Asked for lazily rather than at every first login: most people arrive
+	 * through a tenant joining rule, which reads `tid` and needs no verified
+	 * address, so making everyone verify on day one would tax the common path
+	 * to protect the rare one.
+	 */
+	emailVerification: {
+		sendVerificationEmail: async ({ user, url }) => {
+			await sendEmailVerification({ to: user.email, verifyUrl: url });
+		},
+		expiresIn: 60 * 60 * 24,
 	},
 	socialProviders: {
 		microsoft: {
@@ -167,9 +183,16 @@ export const auth = betterAuth({
 			},
 		}),
 		organization({
-			// Only platform admins (user.role === "admin") may create organizations
-			// via the server-side platform admin API. Regular users cannot.
+			// The public create endpoint is closed to everyone. Organizations are
+			// created either by a platform admin or through `organization.
+			// createSelfServe`, both of which reach Better Auth as system actions
+			// — so the eligibility rules cannot be stepped around by posting here
+			// directly.
 			allowUserToCreateOrganization: false,
+
+			// An invitation is a grant addressed to an email, so accepting one
+			// requires that Zemio has proved the address (ADR-0008).
+			requireEmailVerificationOnInvitation: true,
 			sendInvitationEmail: async (data) => {
 				await sendOrgInvitationEmail(data);
 			},

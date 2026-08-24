@@ -4,6 +4,7 @@ import {
 	type EmailAddress,
 	type SendResult,
 } from "./client/scaleway";
+import EmailVerificationEmail from "./templates/email-verification";
 import OrgInvitationEmail from "./templates/org-invitation";
 import ReportReceivedEmail from "./templates/report-received";
 import ReportSubmittedEmail from "./templates/report-submitted";
@@ -51,16 +52,23 @@ export interface OrgInvitationInput {
 	acceptUrl: string;
 }
 
+export interface EmailVerificationInput {
+	to: string;
+	/** Absolute URL that marks the address verified. */
+	verifyUrl: string;
+}
+
 export interface Emailer {
 	sendReportReceived(input: ReportReceivedInput): Promise<SendResult>;
 	sendReportSubmitted(input: ReportSubmittedInput): Promise<SendResult>;
 	sendStatusChanged(input: StatusChangedInput): Promise<SendResult>;
 	sendOrgInvitation(input: OrgInvitationInput): Promise<SendResult>;
+	sendEmailVerification(input: EmailVerificationInput): Promise<SendResult>;
 }
 
 /**
  * The only way to send mail. Templates and the transport stay internal so a
- * caller cannot assemble a send of its own and drift from these four.
+ * caller cannot assemble a send of its own and drift from these five.
  */
 export function createEmailer({
 	apiKey,
@@ -136,6 +144,17 @@ export function createEmailer({
 						organizationName={organizationName}
 					/>
 				),
+			});
+		},
+
+		sendEmailVerification({ to, verifyUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.emailVerification" })(
+					"subject",
+				),
+				react: <EmailVerificationEmail logoUrl={logoUrl} verifyUrl={verifyUrl} />,
 			});
 		},
 	};

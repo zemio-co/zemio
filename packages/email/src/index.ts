@@ -6,6 +6,7 @@ export {
 	createEmailer,
 	type Emailer,
 	type EmailerConfig,
+	type EmailVerificationInput,
 	type OrgInvitationInput,
 	type ReportReceivedInput,
 	type ReportSubmittedInput,

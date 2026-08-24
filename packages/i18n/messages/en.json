@@ -1462,6 +1462,16 @@
 			"cta": "Einladung annehmen",
 			"expiry": "Dieser Link verfällt in 48 Stunden.",
 			"footer": "Du erhältst diese E-Mail, da du zu einer Organisation in zemio eingeladen wurdest. Solltest du diese Einladung nicht erwarten, kannst du diese E-Mail ignorieren."
+		},
+		"emailVerification": {
+			"subject": "Confirm your email address",
+			"preview": "Confirm your email address for zemio",
+			"heading": "Confirm your email address",
+			"greeting": "Hello,",
+			"body": "Please confirm that this email address belongs to you. Until you do, you cannot accept an invitation or create an organization.",
+			"cta": "Confirm email address",
+			"expiry": "This link expires in 24 hours.",
+			"footer": "You are receiving this email because this address was used at zemio. If that was not you, you can ignore this email."
 		}
 	}
 }

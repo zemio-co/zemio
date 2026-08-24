@@ -1,5 +1,6 @@
 import "server-only";
 import type Stripe from "stripe";
+import { logger } from "@/lib/logger";
 import { withStripe } from "./billing.stripe";
 
 /**
@@ -25,6 +26,16 @@ const SEATS_KEY = "zemio_seats";
  * public catalogue for every other customer to read and subscribe to.
  */
 const ORG_KEY = "zemio_org";
+
+/**
+ * Marks the one price a trial runs on.
+ *
+ * Explicit rather than inferred. "The lowest tier" is ambiguous between fewest
+ * seats and cheapest, the two diverge across billing intervals, and any
+ * inference would break the first time a promotional price is added
+ * (ADR-0009).
+ */
+const TRIAL_KEY = "zemio_trial";
 
 /** A tier as the product displays it. Every field comes from Stripe. */
 export type Tier = {
@@ -122,7 +133,11 @@ export const TIER_CACHE_TTL_MS = 5 * 60 * 1000;
  * `offeredTo` never leaves this module: which organization a negotiated deal
  * belongs to is nobody else's business, least of all the browser's.
  */
-type CatalogueEntry = { tier: Tier; offeredTo: string | null };
+type CatalogueEntry = {
+	tier: Tier;
+	offeredTo: string | null;
+	isTrial: boolean;
+};
 
 let cached: { entries: CatalogueEntry[]; expiresAt: number } | null = null;
 
@@ -167,6 +182,7 @@ async function fetchCatalogue(
 				entries.push({
 					tier,
 					offeredTo: price.metadata?.[ORG_KEY]?.trim() || null,
+					isTrial: price.metadata?.[TRIAL_KEY]?.trim() === "true",
 				});
 			}
 		}
@@ -222,4 +238,37 @@ export async function listTiers(
 			(entry) => entry.offeredTo === null || entry.offeredTo === organizationId,
 		)
 		.map((entry) => ({ ...entry.tier }));
+}
+
+/**
+ * The tier a trial runs on, or `null` if the dashboard names none.
+ *
+ * A negotiated price is never eligible however it is tagged: a trial is
+ * offered to everyone who creates an organization, and a deal negotiated for
+ * one customer is not something to hand the next one.
+ *
+ * More than one tagged price is a misconfiguration rather than a choice. The
+ * cheapest is used so that organizations keep being created, and the mistake
+ * is logged rather than swallowed — silently picking one and saying nothing is
+ * how a dashboard edit becomes an unexplained charge.
+ */
+export async function findTrialTier(
+	stripe: TierPriceSource,
+): Promise<Tier | null> {
+	const entries = await readCatalogue(stripe);
+	const eligible = entries.filter(
+		(entry) => entry.isTrial && entry.offeredTo === null,
+	);
+
+	const chosen = eligible[0];
+	if (!chosen) return null;
+
+	if (eligible.length > 1) {
+		logger.error("More than one Stripe price is tagged as the trial tier", {
+			priceIds: eligible.map((entry) => entry.tier.priceId),
+			using: chosen.tier.priceId,
+		});
+	}
+
+	return { ...chosen.tier };
 }
