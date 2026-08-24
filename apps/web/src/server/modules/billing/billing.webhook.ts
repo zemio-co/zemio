@@ -134,23 +134,46 @@ export async function handleStripeEvent(
 			event.type === "customer.subscription.trial_will_end" &&
 			subscription
 		) {
-			const customerId = idOf(subscription.customer);
-			const organizationId = customerId
-				? await billingRepository.findOrganizationIdByStripeCustomer(
-						deps.db,
-						customerId,
-					)
-				: null;
-
-			if (organizationId) {
-				await notifyTrialEnding(deps.db, organizationId);
-			}
+			await warnTrialEnding(deps, subscription);
 		}
 
 		return outcome;
 	} catch (error) {
 		if (error instanceof EventAlreadyProcessed) return "duplicate";
 		throw error;
+	}
+}
+
+/**
+ * Warns an owner that their trial is ending, without ever failing the event.
+ *
+ * Everything here runs after the commit, so the state the event describes is
+ * already recorded and claimed. A throw would answer Stripe non-2xx and ask for
+ * a redelivery that the claim then answers `duplicate` forever — reporting
+ * failure for work that succeeded, and still leaving the owner unwarned. The
+ * lookup is inside the guard for the same reason the send is.
+ */
+async function warnTrialEnding(
+	deps: WebhookDependencies,
+	subscription: Stripe.Subscription,
+): Promise<void> {
+	try {
+		const customerId = idOf(subscription.customer);
+		const organizationId = customerId
+			? await billingRepository.findOrganizationIdByStripeCustomer(
+					deps.db,
+					customerId,
+				)
+			: null;
+
+		if (organizationId) {
+			await notifyTrialEnding(deps.db, organizationId);
+		}
+	} catch (error) {
+		logger.error("Could not warn an owner that a trial is ending", {
+			subscriptionId: subscription.id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 	}
 }
 

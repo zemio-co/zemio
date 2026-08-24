@@ -31,7 +31,9 @@ describe("mayStartTrial", () => {
 	it("does not refuse the organization itself", () => {
 		// One trial at a time, not one organization: somebody running two
 		// initiatives may create the second, it just starts unentitled and has
-		// to subscribe (ADR-0009).
+		// to subscribe (ADR-0009). Both halves asserted together, because the
+		// claim is that the two answers differ.
+		expect(mayStartTrial({ trialingOrganizations: 1 })).toBe(false);
 		expect(refuseSelfServeCreation({ emailVerified: true })).toBeNull();
 	});
 });

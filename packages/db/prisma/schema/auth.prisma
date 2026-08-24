@@ -40,6 +40,9 @@ model User {
   auditEvents      AuditEvent[]
 
   @@unique([email])
+  // Postgres does not index a foreign key on its own, and this one is read
+  // backwards: deleting an organization has to null every user pointing at it.
+  @@index([lastActiveOrganizationId])
   @@map("user")
 }
 

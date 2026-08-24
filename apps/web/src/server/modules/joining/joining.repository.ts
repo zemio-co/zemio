@@ -15,11 +15,16 @@ import {
 /**
  * The rules that could match this person.
  *
- * Deliberately a superset: the query narrows by matcher, and
- * {@link matchesPerson} has the final say — the email-domain rules it returns
- * are still refused for an unverified address. Filtering on verification here
- * as well would put the same rule in two places, and the one that matters is
- * the pure one.
+ * The query narrows by matcher and {@link matchesPerson} has the final say —
+ * the email-domain rules this returns are still refused for an unverified
+ * address. Filtering on verification here as well would put the same rule in
+ * two places, and the one that matters is the pure one.
+ *
+ * It narrows on the *stored* form, which the schema requires to be lowercased:
+ * a rule written with any uppercase in its value is invisible here however
+ * tolerantly {@link matchesPerson} would compare it. Anything that comes to
+ * write a rule has to lowercase its value, as
+ * `organizationRepository.tenantRule` does.
  */
 export async function findCandidateRules(
 	db: PrismaClient,

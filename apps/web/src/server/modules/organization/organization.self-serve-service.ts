@@ -48,7 +48,11 @@ export { SELF_SERVE_REFUSAL };
  * about a name it did not pick.
  */
 async function availableSlug(db: PrismaClient, name: string): Promise<string> {
-	const base = createOrganizationSlug(name);
+	// A name carrying no Latin letters or digits — "研究会", "Δ" — slugifies to
+	// nothing, and Better Auth refuses an empty slug with a validation error
+	// about a field the person never filled in. Given a base to distinguish
+	// instead, which the collision branch below then makes unique.
+	const base = createOrganizationSlug(name) || "org";
 
 	const taken = await db.organization.findFirst({
 		where: { slug: base },

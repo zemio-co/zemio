@@ -55,9 +55,7 @@ export function selfServeRefusalOf(error: unknown): SelfServeRefusal | null {
 
 	const message = (error as { message?: unknown }).message;
 
-	const found = Object.entries(SELF_SERVE_REFUSAL).find(
-		([, marker]) => marker === message,
-	);
-
-	return found ? (found[0] as SelfServeRefusal) : null;
+	return message === SELF_SERVE_REFUSAL.email_not_verified
+		? "email_not_verified"
+		: null;
 }

@@ -85,6 +85,25 @@ export const auth = betterAuth({
 	databaseHooks: {
 		user: {
 			create: {
+				/**
+				 * An address is verified by Zemio or not at all (ADR-0008).
+				 *
+				 * Better Auth's Entra provider will happily set `emailVerified`
+				 * from the provider's own claims — `email_verified`, or the
+				 * address appearing in `verified_primary_email` /
+				 * `verified_secondary_email`, which a personal Microsoft account
+				 * does return. Left alone, such an account would arrive already
+				 * verified and pass both the invitation gate and organization
+				 * creation without Zemio ever sending a mail.
+				 *
+				 * Microsoft's own documentation says the email claim "isn't
+				 * guaranteed to be correct" and must never be used for
+				 * authorization, so this is not distrust of one provider: no
+				 * assertion verifies an address, whoever makes it.
+				 */
+				before: async (user) => ({
+					data: { ...user, emailVerified: false },
+				}),
 				after: async (user) => {
 					await Promise.all([
 						db.preferences.create({

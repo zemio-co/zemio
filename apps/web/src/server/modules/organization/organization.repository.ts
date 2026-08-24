@@ -12,6 +12,10 @@ type Db = PrismaClient;
 const tenantRuleSelect = {
 	where: { type: "MS_TENANT" as const },
 	select: { value: true },
+	// Ordered, because `take: 1` without one picks whichever row the database
+	// happened to return: the admin API reports a single tenant, and which one
+	// it reports must not change between two reads of the same organization.
+	orderBy: { createdAt: "asc" as const },
 	take: 1,
 } satisfies Prisma.Organization$joiningRulesArgs;
 
