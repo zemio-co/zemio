@@ -108,3 +108,23 @@ export async function findPendingInvitations(db: PrismaClient, email: string) {
 		orderBy: { createdAt: "desc" },
 	});
 }
+
+/**
+ * One invitation, as the link that carries it needs to describe it.
+ *
+ * Read from Zemio's own tables rather than through Better Auth's
+ * `getInvitation`, which refuses on the same email mismatch this is here to
+ * explain.
+ */
+export async function findInvitationById(db: PrismaClient, id: string) {
+	return db.invitation.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			email: true,
+			status: true,
+			expiresAt: true,
+			organization: { select: { name: true } },
+		},
+	});
+}

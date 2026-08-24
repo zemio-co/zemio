@@ -1343,7 +1343,12 @@
 					"description": "Neue Berichte und Ausgaben können erst wieder erstellt und eingereicht werden, wenn das Abonnement erneuert wurde."
 				},
 				"action": "Abrechnung verwalten",
-				"memberHint": "Wende dich an die Inhaberin oder den Inhaber deiner Organisation."
+				"memberHint": "Wende dich an die Inhaberin oder den Inhaber deiner Organisation.",
+				"trial": {
+					"title": "Testzeitraum läuft",
+					"description": "Du testest zemio noch {days, plural, one {einen Tag} other {# Tage}}. Hinterlege Zahlungsdaten, damit deine Organisation danach weiterarbeiten kann.",
+					"descriptionLastDay": "Dein Testzeitraum endet heute. Ohne Zahlungsdaten wird deine Organisation danach schreibgeschützt."
+				}
 			}
 		},
 		"preferences": {
@@ -1398,7 +1403,36 @@
 			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
 			"acceptButton": "Einladung annehmen",
 			"acceptError": "Einladung konnte nicht angenommen werden",
-			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+			"invitedTo": "Du wurdest zu {organization} eingeladen.",
+			"wrongAccountTitle": "Diese Einladung gehört zu einer anderen Adresse",
+			"wrongAccountBody": "Diese Einladung wurde an {invited} geschickt. Angemeldet bist du als {current}.",
+			"wrongAccountHint": "Melde dich mit {invited} an, um sie anzunehmen — oder bitte um eine neue Einladung an {current}.",
+			"switchAccount": "Mit anderem Konto anmelden",
+			"needsVerificationTitle": "Bestätige zuerst deine E-Mail-Adresse",
+			"needsVerificationBody": "Bevor du eine Einladung annehmen kannst, musst du bestätigen, dass dir {email} gehört.",
+			"sendVerification": "Bestätigungsmail senden",
+			"verificationSent": "Wir haben dir eine E-Mail an {email} geschickt.",
+			"verificationFailed": "Bestätigungsmail konnte nicht gesendet werden",
+			"unavailableTitle": "Diese Einladung ist nicht mehr gültig",
+			"unavailableBody": "Sie wurde bereits angenommen oder ist abgelaufen. Bitte deine Organisation um eine neue Einladung."
+		},
+		"noOrg": {
+			"title": "Noch keine Organisation",
+			"subtitle": "Dein Konto ({email}) gehört noch zu keiner Organisation.",
+			"invitationsTitle": "Offene Einladungen",
+			"invitationsHint": "Nimm eine Einladung an, um der Organisation beizutreten.",
+			"openInvitation": "Einladung öffnen",
+			"createTitle": "Eigene Organisation anlegen",
+			"createHint": "Lege eine Organisation für deine Initiative an. Du testest zemio 30 Tage kostenlos, ohne Zahlungsdaten.",
+			"nameLabel": "Name der Organisation",
+			"namePlaceholder": "z. B. Robotics Society",
+			"createButton": "Organisation anlegen",
+			"createFailed": "Organisation konnte nicht angelegt werden",
+			"needsVerification": "Bestätige zuerst deine E-Mail-Adresse ({email}), um eine Organisation anzulegen.",
+			"trialInProgress": "Du testest zemio bereits mit einer anderen Organisation. Eine weitere Organisation kannst du anlegen, sobald dieser Test beendet ist.",
+			"manageOrgs": "Organisationen verwalten",
+			"signOut": "Abmelden"
 		}
 	},
 	"validation": {
@@ -1472,6 +1506,16 @@
 			"cta": "E-Mail-Adresse bestätigen",
 			"expiry": "Dieser Link verfällt in 24 Stunden.",
 			"footer": "Du erhältst diese E-Mail, da diese Adresse bei zemio verwendet wurde. Solltest du das nicht gewesen sein, kannst du diese E-Mail ignorieren."
+		},
+		"trialEnding": {
+			"subject": "Dein zemio-Test endet in drei Tagen",
+			"preview": "Der Testzeitraum von {organization} endet in drei Tagen",
+			"heading": "Der Testzeitraum von {organization} endet bald",
+			"greeting": "Hallo,",
+			"body": "Der kostenlose Testzeitraum von {organization} endet in drei Tagen.",
+			"consequence": "Ohne hinterlegte Zahlungsdaten wird die Organisation danach schreibgeschützt: Alle bestehenden Abrechnungen bleiben sichtbar und exportierbar, neue können aber nicht mehr angelegt oder eingereicht werden.",
+			"cta": "Zahlungsdaten hinterlegen",
+			"footer": "Du erhältst diese E-Mail, da du Eigentümer:in dieser Organisation bei zemio bist."
 		}
 	}
 }

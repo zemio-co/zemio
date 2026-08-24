@@ -1,25 +1,63 @@
 "use client";
 
-import { ArrowRightIcon, BuildingIcon, LogOutIcon } from "lucide-react";
+import {
+	ArrowRightIcon,
+	BuildingIcon,
+	LogOutIcon,
+	MailIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ROUTES as ROUTES_DEPR } from "@/lib/consts";
+import { SELF_SERVE_REFUSAL } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
 import { authClient } from "@/server/better-auth/client";
+import { api } from "@/trpc/react";
 
 interface NoOrgPageContentProps {
 	userEmail: string;
+	emailVerified: boolean;
 	isPlatformAdmin: boolean;
+	invitations: { id: string; organizationName: string }[];
 }
 
 export function NoOrgPageContent({
 	userEmail,
+	emailVerified,
 	isPlatformAdmin,
+	invitations,
 }: NoOrgPageContentProps) {
+	const t = useTranslations("modules.noOrg");
 	const router = useRouter();
+	const [name, setName] = useState("");
+
+	const createOrg = api.organization.createSelfServe.useMutation({
+		onSuccess: () => {
+			// A full reload rather than a push: the active organization is
+			// decided when the session is read, and the app shell was rendered
+			// for somebody who belonged to nothing.
+			window.location.assign(ROUTES.USER_DASHBOARD());
+		},
+		onError: (error) => {
+			// The procedure answers with a marker rather than a sentence so the
+			// interface can say which of the two rules was hit.
+			const description =
+				error.message === SELF_SERVE_REFUSAL.email_not_verified
+					? t("needsVerification", { email: userEmail })
+					: error.message === SELF_SERVE_REFUSAL.trial_in_progress
+						? t("trialInProgress")
+						: error.message;
+
+			toast.error(t("createFailed"), { description });
+		},
+	});
 
 	async function handleSignOut() {
 		await authClient.signOut();
@@ -39,7 +77,7 @@ export function NoOrgPageContent({
 								}
 								href={ROUTES.SETTINGS_ADMIN_ORGS()}
 							>
-								Organisationen verwalten
+								{t("manageOrgs")}
 								<ArrowRightIcon className="size-3.5" />
 							</Link>
 						)}
@@ -49,20 +87,80 @@ export function NoOrgPageContent({
 							<div className="mb-8 w-fit rounded-md bg-zinc-50 p-2 shadow-sm ring-1 ring-zinc-700/10">
 								<BuildingIcon className="size-5 text-zinc-600" />
 							</div>
-							<h1 className="font-semibold text-lg text-zinc-800">
-								Kein Zugang zu einer Organisation
-							</h1>
+							<h1 className="font-semibold text-lg text-zinc-800">{t("title")}</h1>
 							<p className="mt-1.5 max-w-prose text-sm text-zinc-500">
-								Ihr Konto ({userEmail}) ist derzeit keiner Organisation zugeordnet.
-								Bitte wenden Sie sich an Ihren Administrator.
+								{t("subtitle", { email: userEmail })}
 							</p>
+
+							{invitations.length > 0 && (
+								<div className="mt-8">
+									<h2 className="font-medium text-sm text-zinc-800">
+										{t("invitationsTitle")}
+									</h2>
+									<p className="mt-1 text-sm text-zinc-500">{t("invitationsHint")}</p>
+									<ul className="mt-3 flex flex-col gap-2">
+										{invitations.map((invitation) => (
+											<li key={invitation.id}>
+												<Link
+													className="flex items-center justify-between gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm hover:bg-zinc-50"
+													href={ROUTES_DEPR.ACCEPT_INVITATION(invitation.id)}
+												>
+													<span className="flex items-center gap-2 truncate">
+														<MailIcon className="size-4 shrink-0 text-zinc-500" />
+														<span className="truncate">{invitation.organizationName}</span>
+													</span>
+													<span className="shrink-0 font-medium text-blue-600">
+														{t("openInvitation")}
+													</span>
+												</Link>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+
+							<div className="mt-8 border-zinc-200 border-t pt-8">
+								<h2 className="font-medium text-sm text-zinc-800">
+									{t("createTitle")}
+								</h2>
+								<p className="mt-1 text-sm text-zinc-500">{t("createHint")}</p>
+
+								{emailVerified ? (
+									<form
+										className="mt-3 flex flex-col gap-3"
+										onSubmit={(event) => {
+											event.preventDefault();
+											createOrg.mutate({ name: name.trim() });
+										}}
+									>
+										<Input
+											aria-label={t("nameLabel")}
+											maxLength={100}
+											onChange={(event) => setName(event.target.value)}
+											placeholder={t("namePlaceholder")}
+											value={name}
+										/>
+										<Button
+											disabled={name.trim() === "" || createOrg.isPending}
+											type="submit"
+										>
+											{t("createButton")}
+										</Button>
+									</form>
+								) : (
+									<p className="mt-3 rounded-md bg-amber-50 px-3 py-2 text-amber-900 text-sm">
+										{t("needsVerification", { email: userEmail })}
+									</p>
+								)}
+							</div>
+
 							<Button
-								className={"mt-6 w-full"}
+								className={"mt-8 w-full"}
 								onClick={handleSignOut}
 								variant={"outline"}
 							>
 								<LogOutIcon />
-								Abmelden
+								{t("signOut")}
 							</Button>
 						</div>
 					</div>

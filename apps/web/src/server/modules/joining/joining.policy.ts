@@ -143,3 +143,41 @@ export function chooseActiveOrganization(
 
 	return earliest.organizationId;
 }
+
+/** What an invitation link can show the person who opened it. */
+export type InvitationGate =
+	| "ready"
+	| "wrong_account"
+	| "needs_verification"
+	| "unavailable";
+
+/**
+ * What to show someone who opened an invitation link.
+ *
+ * Better Auth enforces the same rules when the invitation is actually
+ * accepted; this decides what to *say* beforehand. The refusal it raises —
+ * "you are not the recipient of the invitation" — is accurate and useless: it
+ * never names the address that would work, and someone signed in with the
+ * wrong one of their two university accounts has no way to find out.
+ *
+ * A mismatch outranks a missing verification, because verifying the address
+ * they are signed in with would not help — it is not the address the
+ * invitation was sent to.
+ */
+export function gateInvitation(
+	invitation: { email: string; status: string; expiresAt: Date } | null,
+	viewer: { email: string; emailVerified: boolean },
+	now: Date,
+): InvitationGate {
+	if (!invitation) return "unavailable";
+	if (invitation.status !== "pending") return "unavailable";
+	if (invitation.expiresAt <= now) return "unavailable";
+
+	if (invitation.email.toLowerCase() !== viewer.email.toLowerCase()) {
+		return "wrong_account";
+	}
+
+	if (!viewer.emailVerified) return "needs_verification";
+
+	return "ready";
+}

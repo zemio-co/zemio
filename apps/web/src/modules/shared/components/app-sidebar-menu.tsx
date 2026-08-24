@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
+import { api } from "@/trpc/react";
 
 type ActiveOrgQuery = ReturnType<typeof authClient.useActiveOrganization>;
 
@@ -194,10 +195,19 @@ function SidebarMenuOrgsButton({
 	const t = useTranslations("modules.shared.sidebarMenu");
 	const organizations = authClient.useListOrganizations();
 
+	const rememberOrg = api.user.setLastActiveOrganization.useMutation();
+
 	const handleOrgChange = async (organizationId: string) => {
 		await authClient.organization.setActive({
 			organizationId,
 		});
+
+		// Better Auth writes the session; this writes the person. Without it the
+		// choice lasts until they log out and then silently reverts.
+		// Best-effort: failing to remember must not cost them the switch they
+		// just made, which has already happened.
+		await rememberOrg.mutateAsync({ organizationId }).catch(() => {});
+
 		window.location.reload();
 	};
 

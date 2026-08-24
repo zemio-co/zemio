@@ -11,4 +11,5 @@ export {
 	type ReportReceivedInput,
 	type ReportSubmittedInput,
 	type StatusChangedInput,
+	type TrialEndingInput,
 } from "./emailer";

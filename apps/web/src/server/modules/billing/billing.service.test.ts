@@ -75,6 +75,7 @@ describe("getBillingStatus with a subscription", () => {
 			seatLimit: 25,
 			seatCount: 12,
 			overSeatLimit: false,
+			trialing: false,
 			currentPeriodEnd: PERIOD_END,
 			cancelAtPeriodEnd: false,
 		});

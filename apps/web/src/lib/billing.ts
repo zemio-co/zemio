@@ -51,6 +51,7 @@ export type CheckoutResult = keyof typeof CHECKOUT_RESULT;
 export type BillingBannerKind =
 	| "read_only"
 	| "payment_failing"
+	| "trial"
 	| "over_seat_limit";
 
 /**
@@ -66,6 +67,7 @@ export type BannerStatus =
 			enforced: boolean;
 			state: "entitled" | "payment_failing" | "read_only";
 			overSeatLimit: boolean;
+			trialing: boolean;
 	  };
 
 export function resolveBillingBanner(
@@ -84,7 +86,27 @@ export function resolveBillingBanner(
 	if (status.state === "read_only") return "read_only";
 	if (status.state === "payment_failing") return "payment_failing";
 
+	// A trial is entitled, so nothing else would ever mention it. Shown from
+	// the first day rather than near the end: the deadline is what makes a
+	// card-less trial fair, and it should never arrive as a surprise
+	// (ADR-0009).
+	if (status.trialing) return "trial";
+
 	// Advisory only, and deliberately last: nothing is refused over seats
 	// (ADR-0005).
 	return status.overSeatLimit ? "over_seat_limit" : null;
+}
+
+/**
+ * Whole days left of a trial, never negative.
+ *
+ * Rounded up, so the last partial day still reads as "1 day left" rather than
+ * as none — a countdown that reaches zero while the organization is still
+ * working would be telling people something untrue.
+ */
+export function trialDaysRemaining(end: Date | null, now: Date): number | null {
+	if (!end) return null;
+
+	const days = Math.ceil((end.getTime() - now.getTime()) / 86_400_000);
+	return Math.max(days, 0);
 }

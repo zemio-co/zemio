@@ -6,6 +6,7 @@ import { isUniqueConstraintError } from "@/server/shared/errors";
 import { tierFromPrice } from "./billing.catalogue";
 import { entitlementFromStripeStatus, isEntitled } from "./billing.policy";
 import { billingRepository } from "./billing.repository";
+import { notifyTrialEnding } from "./billing.trial";
 
 /**
  * Keeping Zemio's copy of a subscription in step with Stripe.
@@ -58,6 +59,9 @@ function subscriptionIdFrom(event: Stripe.Event): string | null {
 		case "customer.subscription.created":
 		case "customer.subscription.updated":
 		case "customer.subscription.deleted":
+		// Three days before a trial ends. Acted on so the owner can be warned;
+		// its facts are recorded like any other subscription event.
+		case "customer.subscription.trial_will_end":
 			return event.data.object.id;
 		default:
 			return null;
@@ -103,7 +107,7 @@ export async function handleStripeEvent(
 		: null;
 
 	try {
-		return await deps.db.$transaction(async (tx) => {
+		const outcome = await deps.db.$transaction(async (tx) => {
 			const db = tx as unknown as PrismaClient;
 
 			// Every event is claimed, not just the four acted on, so the table grows
@@ -121,6 +125,29 @@ export async function handleStripeEvent(
 
 			return await applyEvent(db, event, subscription);
 		});
+
+		// After the commit, never inside it: the send is slow, it can fail on
+		// its own, and rolling the claim back over a failed email would have
+		// Stripe redeliver an event whose state was already recorded.
+		if (
+			outcome === "processed" &&
+			event.type === "customer.subscription.trial_will_end" &&
+			subscription
+		) {
+			const customerId = idOf(subscription.customer);
+			const organizationId = customerId
+				? await billingRepository.findOrganizationIdByStripeCustomer(
+						deps.db,
+						customerId,
+					)
+				: null;
+
+			if (organizationId) {
+				await notifyTrialEnding(deps.db, organizationId);
+			}
+		}
+
+		return outcome;
 	} catch (error) {
 		if (error instanceof EventAlreadyProcessed) return "duplicate";
 		throw error;

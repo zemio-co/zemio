@@ -4,7 +4,11 @@ import { InfoIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { type BillingBannerKind, resolveBillingBanner } from "@/lib/billing";
+import {
+	type BillingBannerKind,
+	resolveBillingBanner,
+	trialDaysRemaining,
+} from "@/lib/billing";
 import { isOrganizationOwnerRole } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -30,6 +34,13 @@ const TONE = {
 		icon: "text-amber-600",
 		title: "text-amber-800",
 		body: "text-amber-700",
+	},
+	trial: {
+		Icon: InfoIcon,
+		container: "bg-blue-50",
+		icon: "text-blue-600",
+		title: "text-blue-800",
+		body: "text-blue-700",
 	},
 	over_seat_limit: {
 		Icon: InfoIcon,
@@ -83,6 +94,20 @@ function BillingBanner({ className, ...props }: React.ComponentProps<"div">) {
 			title = t("paymentFailing.title");
 			description = t("paymentFailing.description");
 			break;
+		case "trial": {
+			// Counted from the period end, which during a trial is when the trial
+			// ends rather than when a payment is due.
+			const days = trialDaysRemaining(
+				data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
+				new Date(),
+			);
+			title = t("trial.title");
+			description =
+				days && days > 0
+					? t("trial.description", { days })
+					: t("trial.descriptionLastDay");
+			break;
+		}
 		case "over_seat_limit":
 			title = t("overSeatLimit.title");
 			description = t("overSeatLimit.description", {

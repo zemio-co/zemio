@@ -2,7 +2,7 @@ import "server-only";
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
 import { logger } from "@/lib/logger";
-import { createOrganizationSlug } from "@/lib/organization";
+import { createOrganizationSlug, SELF_SERVE_REFUSAL } from "@/lib/organization";
 import type { TrialStarted } from "@/server/modules/billing/billing.trial";
 import {
 	refuseSelfServeCreation,
@@ -36,11 +36,13 @@ export type SelfServeDependencies = {
 	startTrial: (organizationId: string) => Promise<TrialStarted | null>;
 };
 
-/** The refusal, as the interface needs to tell it apart from any other. */
-export const SELF_SERVE_REFUSAL = {
-	email_not_verified: "EMAIL_NOT_VERIFIED",
-	trial_in_progress: "TRIAL_IN_PROGRESS",
-} as const satisfies Record<SelfServeRefusal, string>;
+// Re-exported because this is what raises it; defined in `@/lib/organization`
+// because this module is server-only and the browser needs the same strings.
+export { SELF_SERVE_REFUSAL };
+
+// Every refusal the rule can produce must have a marker to travel as.
+const _exhaustive: Record<SelfServeRefusal, string> = SELF_SERVE_REFUSAL;
+void _exhaustive;
 
 /**
  * A slug nobody else holds.

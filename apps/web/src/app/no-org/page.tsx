@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ROUTES } from "@/lib/consts";
 import { auth } from "@/server/better-auth";
 import { db } from "@/server/db";
+import { resolveOpenings } from "@/server/modules/joining";
 import { NoOrgPageContent } from "./_components/no-org-page";
 
 export default async function NoOrgPage() {
@@ -24,11 +25,18 @@ export default async function NoOrgPage() {
 		redirect(ROUTES.USER_DASHBOARD);
 	}
 
-	const isPlatformAdmin = session.user.role === "admin";
+	// Belonging to nothing is a state someone can act on, not a dead end: an
+	// invitation to accept, or an organization to create.
+	const openings = await resolveOpenings(db, session.user.email);
 
 	return (
 		<NoOrgPageContent
-			isPlatformAdmin={isPlatformAdmin}
+			emailVerified={session.user.emailVerified}
+			invitations={openings.invitations.map((invitation) => ({
+				id: invitation.id,
+				organizationName: invitation.organization.name,
+			}))}
+			isPlatformAdmin={session.user.role === "admin"}
 			userEmail={session.user.email}
 		/>
 	);

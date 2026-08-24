@@ -1343,7 +1343,12 @@
 					"description": "New reports and expenses can be created and submitted again once the subscription has been renewed."
 				},
 				"action": "Manage billing",
-				"memberHint": "Contact your organization owner to resolve this."
+				"memberHint": "Contact your organization owner to resolve this.",
+				"trial": {
+					"title": "Trial in progress",
+					"description": "You have {days, plural, one {one day} other {# days}} left of your zemio trial. Add payment details so your organization can keep working afterwards.",
+					"descriptionLastDay": "Your trial ends today. Without payment details your organization becomes read-only afterwards."
+				}
 			}
 		},
 		"preferences": {
@@ -1394,11 +1399,40 @@
 			}
 		},
 		"acceptInvitation": {
-			"title": "Einladung annehmen",
-			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
-			"acceptButton": "Einladung annehmen",
-			"acceptError": "Einladung konnte nicht angenommen werden",
-			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+			"title": "Accept invitation",
+			"description": "You have been invited to an organization. Confirm to join.",
+			"acceptButton": "Accept invitation",
+			"acceptError": "The invitation could not be accepted",
+			"unexpectedError": "An unexpected error occurred",
+			"invitedTo": "You have been invited to {organization}.",
+			"wrongAccountTitle": "This invitation belongs to a different address",
+			"wrongAccountBody": "This invitation was sent to {invited}. You are signed in as {current}.",
+			"wrongAccountHint": "Sign in as {invited} to accept it — or ask for a new invitation to {current}.",
+			"switchAccount": "Sign in with a different account",
+			"needsVerificationTitle": "Confirm your email address first",
+			"needsVerificationBody": "Before you can accept an invitation, you need to confirm that {email} belongs to you.",
+			"sendVerification": "Send confirmation email",
+			"verificationSent": "We have sent an email to {email}.",
+			"verificationFailed": "The confirmation email could not be sent",
+			"unavailableTitle": "This invitation is no longer valid",
+			"unavailableBody": "It has already been accepted or has expired. Ask your organization for a new invitation."
+		},
+		"noOrg": {
+			"title": "No organization yet",
+			"subtitle": "Your account ({email}) does not belong to an organization yet.",
+			"invitationsTitle": "Open invitations",
+			"invitationsHint": "Accept an invitation to join that organization.",
+			"openInvitation": "Open invitation",
+			"createTitle": "Create your own organization",
+			"createHint": "Create an organization for your initiative. You get 30 days of zemio free, with no payment details.",
+			"nameLabel": "Organization name",
+			"namePlaceholder": "e.g. Robotics Society",
+			"createButton": "Create organization",
+			"createFailed": "The organization could not be created",
+			"needsVerification": "Confirm your email address ({email}) first to create an organization.",
+			"trialInProgress": "You are already trialling zemio with another organization. You can create another one once that trial has ended.",
+			"manageOrgs": "Manage organizations",
+			"signOut": "Sign out"
 		}
 	},
 	"validation": {
@@ -1472,6 +1506,16 @@
 			"cta": "Confirm email address",
 			"expiry": "This link expires in 24 hours.",
 			"footer": "You are receiving this email because this address was used at zemio. If that was not you, you can ignore this email."
+		},
+		"trialEnding": {
+			"subject": "Your zemio trial ends in three days",
+			"preview": "The trial for {organization} ends in three days",
+			"heading": "The trial for {organization} is ending",
+			"greeting": "Hello,",
+			"body": "The free trial for {organization} ends in three days.",
+			"consequence": "Without payment details the organization becomes read-only afterwards: everything already recorded stays visible and exportable, but no new reports can be created or submitted.",
+			"cta": "Add payment details",
+			"footer": "You are receiving this email because you own this organization at zemio."
 		}
 	}
 }

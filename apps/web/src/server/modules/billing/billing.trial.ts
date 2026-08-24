@@ -2,6 +2,8 @@ import "server-only";
 import type { PrismaClient } from "@zemio/db";
 import type Stripe from "stripe";
 import { logger } from "@/lib/logger";
+import { ROUTES } from "@/lib/routes";
+import { absoluteUrl, getEmailer, logSend } from "@/server/email";
 import { findTrialTier, type TierPriceSource } from "./billing.catalogue";
 import {
 	type CustomerStripeSource,
@@ -104,4 +106,42 @@ export async function startTrial(
 	});
 
 	return { subscriptionId: subscription.id, status: subscription.status };
+}
+
+/**
+ * Tells an organization's owner that its trial is about to end.
+ *
+ * Stripe raises `customer.subscription.trial_will_end` three days out. Without
+ * acting on it a card-less trial simply stops: the organization goes read-only
+ * mid-report, having been told nothing (ADR-0009).
+ *
+ * Best-effort, and deliberately outside the webhook's transaction. The event is
+ * already claimed by the time this runs, so a throw would have Stripe retry an
+ * event that has already been applied — and be answered `duplicate` forever
+ * while the owner still heard nothing.
+ */
+export async function notifyTrialEnding(
+	db: PrismaClient,
+	organizationId: string,
+): Promise<void> {
+	try {
+		const contact = await billingRepository.findOwnerContact(db, organizationId);
+
+		if (!contact) {
+			logger.error("No owner to warn that a trial is ending", {
+				organizationId,
+			});
+			return;
+		}
+
+		const result = await getEmailer().sendTrialEnding({
+			to: contact.ownerEmail,
+			organizationName: contact.organizationName,
+			billingUrl: absoluteUrl(ROUTES.SETTINGS_ORG_BILLING()),
+		});
+
+		logSend("email.trial_ending", result, { organizationId });
+	} catch (error) {
+		logger.error("email.trial_ending_failed", { organizationId, error });
+	}
 }

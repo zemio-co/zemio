@@ -152,6 +152,35 @@ export const billingRepository = {
 	},
 
 	/**
+	 * The organization's name and the address its owner is reachable at.
+	 *
+	 * Only the owner: a trial is theirs to convert, and telling every member
+	 * about a payment they cannot make is noise.
+	 */
+	async findOwnerContact(
+		db: Db,
+		organizationId: string,
+	): Promise<{ organizationName: string; ownerEmail: string } | null> {
+		const organization = await db.organization.findUnique({
+			where: { id: organizationId },
+			select: {
+				name: true,
+				members: {
+					where: { role: "owner" },
+					orderBy: { createdAt: "asc" },
+					take: 1,
+					select: { user: { select: { email: true } } },
+				},
+			},
+		});
+
+		const ownerEmail = organization?.members[0]?.user.email;
+		if (!organization || !ownerEmail) return null;
+
+		return { organizationName: organization.name, ownerEmail };
+	},
+
+	/**
 	 * Updates a subscription only where one already exists, reporting how many
 	 * rows moved. Used where Zemio has facts to record but not enough to create
 	 * a row from.

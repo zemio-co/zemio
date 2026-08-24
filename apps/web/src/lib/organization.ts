@@ -26,3 +26,17 @@ export function createOrganizationSlug(name: string): string {
 		.replace(/-+/g, "-")
 		.replace(/^[-]+|[-]+$/g, "");
 }
+
+/**
+ * Why a person may not create an organization for themselves.
+ *
+ * Defined here rather than beside the rule because the rule is `server-only`
+ * and the browser needs the same two strings: the procedure answers with a
+ * marker so the page can say which of the two applies — one is fixed by
+ * confirming an address, the other by waiting for a trial to end, and a single
+ * `FORBIDDEN` cannot tell them apart.
+ */
+export const SELF_SERVE_REFUSAL = {
+	email_not_verified: "EMAIL_NOT_VERIFIED",
+	trial_in_progress: "TRIAL_IN_PROGRESS",
+} as const;

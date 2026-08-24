@@ -9,6 +9,7 @@ import OrgInvitationEmail from "./templates/org-invitation";
 import ReportReceivedEmail from "./templates/report-received";
 import ReportSubmittedEmail from "./templates/report-submitted";
 import StatusChangedEmail from "./templates/status-changed";
+import TrialEndingEmail from "./templates/trial-ending";
 
 export interface EmailerConfig {
 	/** Scaleway IAM secret key, sent as `X-Auth-Token`. */
@@ -58,17 +59,25 @@ export interface EmailVerificationInput {
 	verifyUrl: string;
 }
 
+export interface TrialEndingInput {
+	to: string;
+	organizationName: string;
+	/** Absolute URL of the organization's billing page. */
+	billingUrl: string;
+}
+
 export interface Emailer {
 	sendReportReceived(input: ReportReceivedInput): Promise<SendResult>;
 	sendReportSubmitted(input: ReportSubmittedInput): Promise<SendResult>;
 	sendStatusChanged(input: StatusChangedInput): Promise<SendResult>;
 	sendOrgInvitation(input: OrgInvitationInput): Promise<SendResult>;
 	sendEmailVerification(input: EmailVerificationInput): Promise<SendResult>;
+	sendTrialEnding(input: TrialEndingInput): Promise<SendResult>;
 }
 
 /**
  * The only way to send mail. Templates and the transport stay internal so a
- * caller cannot assemble a send of its own and drift from these five.
+ * caller cannot assemble a send of its own and drift from these six.
  */
 export function createEmailer({
 	apiKey,
@@ -155,6 +164,23 @@ export function createEmailer({
 					"subject",
 				),
 				react: <EmailVerificationEmail logoUrl={logoUrl} verifyUrl={verifyUrl} />,
+			});
+		},
+
+		sendTrialEnding({ to, organizationName, billingUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.trialEnding" })(
+					"subject",
+				),
+				react: (
+					<TrialEndingEmail
+						billingUrl={billingUrl}
+						logoUrl={logoUrl}
+						organizationName={organizationName}
+					/>
+				),
 			});
 		},
 	};

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	chooseActiveOrganization,
 	emailDomain,
+	gateInvitation,
 	type JoiningRuleFacts,
 	matchesPerson,
 	organizationsToAutoJoin,
@@ -212,5 +213,70 @@ describe("chooseActiveOrganization", () => {
 		expect(chooseActiveOrganization(null, [...memberships].reverse())).toBe(
 			"org_old",
 		);
+	});
+});
+
+describe("gateInvitation", () => {
+	const now = new Date("2026-08-24T10:00:00Z");
+	const invitation = {
+		email: "first.last@uni.de",
+		status: "pending",
+		expiresAt: new Date("2026-08-26T10:00:00Z"),
+	};
+	const recipient = { email: "first.last@uni.de", emailVerified: true };
+
+	it("lets the recipient through", () => {
+		expect(gateInvitation(invitation, recipient, now)).toBe("ready");
+	});
+
+	it("compares addresses case-insensitively", () => {
+		expect(
+			gateInvitation(
+				invitation,
+				{ ...recipient, email: "First.Last@Uni.de" },
+				now,
+			),
+		).toBe("ready");
+	});
+
+	it("names a mismatch rather than refusing flatly", () => {
+		// The dead end this exists to remove: Better Auth answers "you are not
+		// the recipient", which tells someone signed in as f.last@uni.de nothing
+		// about which address would work.
+		expect(
+			gateInvitation(invitation, { ...recipient, email: "f.last@uni.de" }, now),
+		).toBe("wrong_account");
+	});
+
+	it("asks for verification before accepting", () => {
+		expect(
+			gateInvitation(invitation, { ...recipient, emailVerified: false }, now),
+		).toBe("needs_verification");
+	});
+
+	it("treats the wrong account as the first problem to solve", () => {
+		// Verifying the address they are signed in with would not help: it is
+		// not the address the invitation was sent to.
+		expect(
+			gateInvitation(
+				invitation,
+				{ email: "f.last@uni.de", emailVerified: false },
+				now,
+			),
+		).toBe("wrong_account");
+	});
+
+	it("reports an invitation that is missing, spent or expired", () => {
+		expect(gateInvitation(null, recipient, now)).toBe("unavailable");
+		expect(
+			gateInvitation({ ...invitation, status: "accepted" }, recipient, now),
+		).toBe("unavailable");
+		expect(
+			gateInvitation(
+				{ ...invitation, expiresAt: new Date("2026-08-23T10:00:00Z") },
+				recipient,
+				now,
+			),
+		).toBe("unavailable");
 	});
 });
