@@ -1,0 +1,53 @@
+// How a person comes to be a member of an organization without being invited.
+//
+// An Invitation names one person once and expires; a JoiningRule is a standing
+// statement by an organization about who may join it, matched against a
+// property of whoever signs in. Two tables, deliberately — an invitation
+// forced into this shape would carry a null matcher, and a rule forced into
+// the invitation table would carry a null email.
+
+enum JoiningRuleType {
+  // A Microsoft Entra tenant id, matched against the `tid` claim. The claim is
+  // a GUID inside a signed token, so it carries its own proof and needs no
+  // verified email (ADR-0008).
+  MS_TENANT
+
+  // The domain part of a person's email address. Matched only against a
+  // verified address, because the email claim carries no proof (ADR-0008).
+  EMAIL_DOMAIN
+
+  // A SAML connection. Reserved; nothing resolves this yet.
+  SSO_CONNECTION
+}
+
+enum JoiningRuleMode {
+  // Matching people are joined during session creation, without anyone
+  // approving it. This is the only mode implemented.
+  AUTO_JOIN
+
+  // Matching people ask, and an administrator admits them. Reserved so that
+  // adding it later is not a migration of live rows.
+  REQUEST
+}
+
+model JoiningRule {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  type JoiningRuleType
+
+  // What the type matches on: a tenant GUID, a domain, or a connection id.
+  // Stored lowercased, and compared as stored.
+  value String
+
+  mode JoiningRuleMode @default(AUTO_JOIN)
+
+  createdAt DateTime @default(now())
+
+  // Resolution reads by matcher, never by organization: "who is this person
+  // allowed to join?" is the only question asked at login.
+  @@unique([organizationId, type, value])
+  @@index([type, value])
+  @@map("joining_rule")
+}

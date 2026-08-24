@@ -395,6 +395,7 @@ export const ModelName = {
   ProcessedStripeEvent: 'ProcessedStripeEvent',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
+  JoiningRule: 'JoiningRule',
   LegalAcceptance: 'LegalAcceptance',
   Organization: 'Organization',
   Member: 'Member',
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auditEvent" | "user" | "session" | "account" | "verification" | "bankingDetails" | "reportBankingSnapshot" | "subscription" | "processedStripeEvent" | "costUnitGroup" | "costUnit" | "legalAcceptance" | "organization" | "member" | "invitation" | "report" | "expense" | "travelExpenseDetail" | "foodExpenseDetail" | "attachment" | "settings" | "preferences"
+    modelProps: "auditEvent" | "user" | "session" | "account" | "verification" | "bankingDetails" | "reportBankingSnapshot" | "subscription" | "processedStripeEvent" | "costUnitGroup" | "costUnit" | "joiningRule" | "legalAcceptance" | "organization" | "member" | "invitation" | "report" | "expense" | "travelExpenseDetail" | "foodExpenseDetail" | "attachment" | "settings" | "preferences"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1236,6 +1237,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CostUnitCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CostUnitCountAggregateOutputType> | number
+        }
+      }
+    }
+    JoiningRule: {
+      payload: Prisma.$JoiningRulePayload<ExtArgs>
+      fields: Prisma.JoiningRuleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JoiningRuleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JoiningRuleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        findFirst: {
+          args: Prisma.JoiningRuleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JoiningRuleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        findMany: {
+          args: Prisma.JoiningRuleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>[]
+        }
+        create: {
+          args: Prisma.JoiningRuleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        createMany: {
+          args: Prisma.JoiningRuleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JoiningRuleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>[]
+        }
+        delete: {
+          args: Prisma.JoiningRuleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        update: {
+          args: Prisma.JoiningRuleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        deleteMany: {
+          args: Prisma.JoiningRuleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JoiningRuleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JoiningRuleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>[]
+        }
+        upsert: {
+          args: Prisma.JoiningRuleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JoiningRulePayload>
+        }
+        aggregate: {
+          args: Prisma.JoiningRuleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJoiningRule>
+        }
+        groupBy: {
+          args: Prisma.JoiningRuleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JoiningRuleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JoiningRuleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JoiningRuleCountAggregateOutputType> | number
         }
       }
     }
@@ -2117,6 +2192,7 @@ export const UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   role: 'role',
   microsoftTenantId: 'microsoftTenantId',
+  lastActiveOrganizationId: 'lastActiveOrganizationId',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires'
@@ -2251,6 +2327,18 @@ export const CostUnitScalarFieldEnum = {
 export type CostUnitScalarFieldEnum = (typeof CostUnitScalarFieldEnum)[keyof typeof CostUnitScalarFieldEnum]
 
 
+export const JoiningRuleScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  type: 'type',
+  value: 'value',
+  mode: 'mode',
+  createdAt: 'createdAt'
+} as const
+
+export type JoiningRuleScalarFieldEnum = (typeof JoiningRuleScalarFieldEnum)[keyof typeof JoiningRuleScalarFieldEnum]
+
+
 export const LegalAcceptanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2270,7 +2358,6 @@ export const OrganizationScalarFieldEnum = {
   logo: 'logo',
   metadata: 'metadata',
   createdAt: 'createdAt',
-  microsoftTenantId: 'microsoftTenantId',
   reportCounter: 'reportCounter',
   stripeCustomerId: 'stripeCustomerId',
   billingEnforced: 'billingEnforced'
@@ -2545,6 +2632,34 @@ export type ListEnumCostUnitColorFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'JoiningRuleType'
+ */
+export type EnumJoiningRuleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JoiningRuleType'>
+    
+
+
+/**
+ * Reference to a field of type 'JoiningRuleType[]'
+ */
+export type ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JoiningRuleType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'JoiningRuleMode'
+ */
+export type EnumJoiningRuleModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JoiningRuleMode'>
+    
+
+
+/**
+ * Reference to a field of type 'JoiningRuleMode[]'
+ */
+export type ListEnumJoiningRuleModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'JoiningRuleMode[]'>
+    
+
+
+/**
  * Reference to a field of type 'LegalAcceptanceType'
  */
 export type EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LegalAcceptanceType'>
@@ -2762,6 +2877,7 @@ export type GlobalOmitConfig = {
   processedStripeEvent?: Prisma.ProcessedStripeEventOmit
   costUnitGroup?: Prisma.CostUnitGroupOmit
   costUnit?: Prisma.CostUnitOmit
+  joiningRule?: Prisma.JoiningRuleOmit
   legalAcceptance?: Prisma.LegalAcceptanceOmit
   organization?: Prisma.OrganizationOmit
   member?: Prisma.MemberOmit

@@ -62,6 +62,7 @@ export const ModelName = {
   ProcessedStripeEvent: 'ProcessedStripeEvent',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
+  JoiningRule: 'JoiningRule',
   LegalAcceptance: 'LegalAcceptance',
   Organization: 'Organization',
   Member: 'Member',
@@ -116,6 +117,7 @@ export const UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   role: 'role',
   microsoftTenantId: 'microsoftTenantId',
+  lastActiveOrganizationId: 'lastActiveOrganizationId',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires'
@@ -250,6 +252,18 @@ export const CostUnitScalarFieldEnum = {
 export type CostUnitScalarFieldEnum = (typeof CostUnitScalarFieldEnum)[keyof typeof CostUnitScalarFieldEnum]
 
 
+export const JoiningRuleScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  type: 'type',
+  value: 'value',
+  mode: 'mode',
+  createdAt: 'createdAt'
+} as const
+
+export type JoiningRuleScalarFieldEnum = (typeof JoiningRuleScalarFieldEnum)[keyof typeof JoiningRuleScalarFieldEnum]
+
+
 export const LegalAcceptanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -269,7 +283,6 @@ export const OrganizationScalarFieldEnum = {
   logo: 'logo',
   metadata: 'metadata',
   createdAt: 'createdAt',
-  microsoftTenantId: 'microsoftTenantId',
   reportCounter: 'reportCounter',
   stripeCustomerId: 'stripeCustomerId',
   billingEnforced: 'billingEnforced'

@@ -22,6 +22,12 @@ model User {
   // Microsoft Entra ID tenant ID captured from the OAuth id_token on first login
   microsoftTenantId String?
 
+  // The organization this person was last working in. Read when a session is
+  // created so someone with several organizations returns to the one they were
+  // using, rather than to whichever they joined first.
+  lastActiveOrganizationId String?
+  lastActiveOrganization   Organization? @relation("LastActiveOrganization", fields: [lastActiveOrganizationId], references: [id], onDelete: SetNull)
+
   // Banning fields required by better-auth admin plugin
   banned     Boolean?  @default(false)
   banReason  String?

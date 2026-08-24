@@ -41,6 +41,23 @@ export const CostUnitColor = {
 export type CostUnitColor = (typeof CostUnitColor)[keyof typeof CostUnitColor]
 
 
+export const JoiningRuleType = {
+  MS_TENANT: 'MS_TENANT',
+  EMAIL_DOMAIN: 'EMAIL_DOMAIN',
+  SSO_CONNECTION: 'SSO_CONNECTION'
+} as const
+
+export type JoiningRuleType = (typeof JoiningRuleType)[keyof typeof JoiningRuleType]
+
+
+export const JoiningRuleMode = {
+  AUTO_JOIN: 'AUTO_JOIN',
+  REQUEST: 'REQUEST'
+} as const
+
+export type JoiningRuleMode = (typeof JoiningRuleMode)[keyof typeof JoiningRuleMode]
+
+
 export const LegalAcceptanceType = {
   CHECKBOX_AND_BUTTON: 'CHECKBOX_AND_BUTTON',
   IMPLICIT_ON_SIGNUP: 'IMPLICIT_ON_SIGNUP'

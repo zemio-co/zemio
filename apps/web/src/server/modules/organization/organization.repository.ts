@@ -2,19 +2,43 @@ import type { Prisma, PrismaClient } from "@zemio/db";
 
 type Db = PrismaClient;
 
+/**
+ * The platform admin manages a single Microsoft tenant per organization. That
+ * is no longer a column — it is one `MS_TENANT` joining rule — so every read
+ * selects the rule and flattens it back to `microsoftTenantId`, and every write
+ * goes the other way. The admin API keeps the shape its forms are written
+ * against; the storage is the one the resolver reads.
+ */
+const tenantRuleSelect = {
+	where: { type: "MS_TENANT" as const },
+	select: { value: true },
+	take: 1,
+} satisfies Prisma.Organization$joiningRulesArgs;
+
+type WithTenantRule = { joiningRules: { value: string }[] };
+
+function flattenTenant<T extends WithTenantRule>(
+	row: T,
+): Omit<T, "joiningRules"> & { microsoftTenantId: string | null } {
+	const { joiningRules, ...rest } = row;
+	return { ...rest, microsoftTenantId: joiningRules[0]?.value ?? null };
+}
+
 const organizationSelect = {
 	id: true,
 	name: true,
 	slug: true,
 	logo: true,
 	metadata: true,
-	microsoftTenantId: true,
+	joiningRules: tenantRuleSelect,
 	createdAt: true,
 } satisfies Prisma.OrganizationSelect;
 
-export type OrganizationRow = Prisma.OrganizationGetPayload<{
-	select: typeof organizationSelect;
-}>;
+export type OrganizationRow = ReturnType<
+	typeof flattenTenant<
+		Prisma.OrganizationGetPayload<{ select: typeof organizationSelect }>
+	>
+>;
 
 /** Platform-admin detail view: the org plus its settings, members and invites. */
 const organizationDetailSelect = {
@@ -23,7 +47,7 @@ const organizationDetailSelect = {
 	slug: true,
 	logo: true,
 	metadata: true,
-	microsoftTenantId: true,
+	joiningRules: tenantRuleSelect,
 	createdAt: true,
 	settings: {
 		select: {
@@ -83,40 +107,50 @@ const organizationSummarySelect = {
 	id: true,
 	name: true,
 	slug: true,
-	microsoftTenantId: true,
+	joiningRules: tenantRuleSelect,
 	createdAt: true,
 	_count: { select: { members: true } },
 } satisfies Prisma.OrganizationSelect;
 
-export type OrganizationDetail = Prisma.OrganizationGetPayload<{
-	select: typeof organizationDetailSelect;
-}>;
+export type OrganizationDetail = ReturnType<
+	typeof flattenTenant<
+		Prisma.OrganizationGetPayload<{ select: typeof organizationDetailSelect }>
+	>
+>;
 
-export type OrganizationSummary = Prisma.OrganizationGetPayload<{
-	select: typeof organizationSummarySelect;
-}>;
+export type OrganizationSummary = ReturnType<
+	typeof flattenTenant<
+		Prisma.OrganizationGetPayload<{ select: typeof organizationSummarySelect }>
+	>
+>;
 
 export const organizationRepository = {
-	findById(db: Db, id: string): Promise<OrganizationRow | null> {
-		return db.organization.findUnique({
+	async findById(db: Db, id: string): Promise<OrganizationRow | null> {
+		const row = await db.organization.findUnique({
 			where: { id },
 			select: organizationSelect,
 		});
+
+		return row && flattenTenant(row);
 	},
 
 	/** Platform scope: every organization, no tenant filter. */
-	listAll(db: Db): Promise<OrganizationSummary[]> {
-		return db.organization.findMany({
+	async listAll(db: Db): Promise<OrganizationSummary[]> {
+		const rows = await db.organization.findMany({
 			orderBy: { createdAt: "asc" },
 			select: organizationSummarySelect,
 		});
+
+		return rows.map(flattenTenant);
 	},
 
-	findDetailById(db: Db, id: string): Promise<OrganizationDetail | null> {
-		return db.organization.findUnique({
+	async findDetailById(db: Db, id: string): Promise<OrganizationDetail | null> {
+		const row = await db.organization.findUnique({
 			where: { id },
 			select: organizationDetailSelect,
 		});
+
+		return row && flattenTenant(row);
 	},
 
 	/** Returns the id of a different org already holding `slug`, if any. */
@@ -133,31 +167,99 @@ export const organizationRepository = {
 		});
 	},
 
-	create(
+	/**
+	 * Creates an organization and, when a tenant is given, the rule that opens
+	 * it to that tenant. One statement, so an organization is never briefly
+	 * visible without the rule its members are resolved by.
+	 */
+	async create(
 		db: Db,
-		args: { name: string; slug: string; microsoftTenantId: string },
+		args: { name: string; slug: string; microsoftTenantId: string | null },
 	): Promise<OrganizationRow> {
-		return db.organization.create({
+		const row = await db.organization.create({
 			data: {
 				id: crypto.randomUUID(),
 				name: args.name,
 				slug: args.slug,
-				microsoftTenantId: args.microsoftTenantId,
 				createdAt: new Date(),
+				...(args.microsoftTenantId
+					? {
+							joiningRules: {
+								create: [
+									{
+										type: "MS_TENANT",
+										value: args.microsoftTenantId.toLowerCase(),
+										mode: "AUTO_JOIN",
+									},
+								],
+							},
+						}
+					: {}),
 			},
 			select: organizationSelect,
 		});
+
+		return flattenTenant(row);
 	},
 
-	update(
+	/**
+	 * Updates the organization's profile, and its tenant rule when one is given.
+	 *
+	 * `microsoftTenantId` follows Prisma's own convention: omit it to leave the
+	 * rule alone, pass `null` to remove it. Only the platform admin passes it —
+	 * an organization admin renaming their organization must not silently drop
+	 * the rule its members are resolved by.
+	 *
+	 * When it is given the rule is replaced rather than edited: there is at most
+	 * one, and delete-then-insert expresses "set it" and "clear it" without a
+	 * three-branch upsert. Both happen with the profile update in one
+	 * transaction, so an organization is never briefly open to a tenant its
+	 * profile no longer names.
+	 */
+	async update(
 		db: Db,
-		args: { id: string; data: Prisma.OrganizationUpdateInput },
+		args: {
+			id: string;
+			data: Prisma.OrganizationUpdateInput;
+			microsoftTenantId?: string | null;
+		},
 	): Promise<OrganizationRow> {
-		return db.organization.update({
-			where: { id: args.id },
-			data: args.data,
-			select: organizationSelect,
-		});
+		if (args.microsoftTenantId === undefined) {
+			const row = await db.organization.update({
+				where: { id: args.id },
+				data: args.data,
+				select: organizationSelect,
+			});
+
+			return flattenTenant(row);
+		}
+
+		const tenantId = args.microsoftTenantId;
+
+		const [, , row] = await db.$transaction([
+			db.joiningRule.deleteMany({
+				where: { organizationId: args.id, type: "MS_TENANT" },
+			}),
+			db.joiningRule.createMany({
+				data: tenantId
+					? [
+							{
+								organizationId: args.id,
+								type: "MS_TENANT",
+								value: tenantId.toLowerCase(),
+								mode: "AUTO_JOIN",
+							},
+						]
+					: [],
+			}),
+			db.organization.update({
+				where: { id: args.id },
+				data: args.data,
+				select: organizationSelect,
+			}),
+		]);
+
+		return flattenTenant(row);
 	},
 } as const;
 

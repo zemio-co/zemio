@@ -7,6 +7,10 @@ import { logger } from "@/lib/logger";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
 import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
+import {
+	applyAutoJoins,
+	resolveSessionOrganization,
+} from "@/server/modules/joining";
 import * as adminAc from "./ac/admin";
 import * as organizationAc from "./ac/organization";
 
@@ -97,13 +101,20 @@ export const auth = betterAuth({
 					// idToken. The idToken is written to the account record by
 					// better-auth during the OAuth callback, so it is always present
 					// by the time this session hook runs.
-					const msAccount = await db.account.findFirst({
-						where: {
-							userId: session.userId,
-							providerId: "microsoft",
-						},
-						select: { idToken: true },
-					});
+					const [msAccount, user] = await Promise.all([
+						db.account.findFirst({
+							where: { userId: session.userId, providerId: "microsoft" },
+							select: { idToken: true },
+						}),
+						db.user.findUnique({
+							where: { id: session.userId },
+							select: {
+								email: true,
+								emailVerified: true,
+								microsoftTenantId: true,
+							},
+						}),
+					]);
 
 					const tenantIdFromToken = msAccount?.idToken
 						? extractMicrosoftTenantId(msAccount.idToken)
@@ -111,66 +122,35 @@ export const auth = betterAuth({
 
 					// Fall back to the value stored on the user record from a
 					// previous login (covers sessions where the idToken is unavailable).
-					let resolvedTenantId: string | null = tenantIdFromToken;
+					const resolvedTenantId =
+						tenantIdFromToken ?? user?.microsoftTenantId ?? null;
 
-					if (!resolvedTenantId) {
-						const user = await db.user.findFirst({
-							where: { id: session.userId },
-							select: { microsoftTenantId: true },
-						});
-						resolvedTenantId = user?.microsoftTenantId ?? null;
-					} else {
+					if (tenantIdFromToken) {
 						// Persist the tenant ID on the user for future sessions.
 						await db.user.update({
 							where: { id: session.userId },
-							data: { microsoftTenantId: resolvedTenantId },
+							data: { microsoftTenantId: tenantIdFromToken },
 						});
 					}
 
-					if (resolvedTenantId) {
-						// Find all organizations configured for this tenant.
-						const matchingOrgs = await db.organization.findMany({
-							where: { microsoftTenantId: resolvedTenantId },
-							select: { id: true },
+					if (user) {
+						// Joining rules decide who is admitted, not this hook. A `tid`
+						// needs no verified address and an email domain does, and that
+						// asymmetry belongs in one place (ADR-0008).
+						await applyAutoJoins(db, session.userId, {
+							email: user.email,
+							emailVerified: user.emailVerified,
+							microsoftTenantId: resolvedTenantId,
 						});
-
-						// Auto-add the user as a member of every matching organization
-						// they have not yet joined. Handles both the initial login and
-						// the case where a new organization is created for an existing
-						// tenant after users have already logged in.
-						for (const org of matchingOrgs) {
-							const existingMember = await db.member.findFirst({
-								where: {
-									userId: session.userId,
-									organizationId: org.id,
-								},
-							});
-
-							if (!existingMember) {
-								await db.member.create({
-									data: {
-										id: crypto.randomUUID(),
-										userId: session.userId,
-										organizationId: org.id,
-										role: "member",
-										createdAt: new Date(),
-									},
-								});
-							}
-						}
 					}
-
-					// Set the active organization to the user's earliest membership
-					// so they land in an org context immediately after login.
-					const firstMember = await db.member.findFirst({
-						where: { userId: session.userId },
-						orderBy: { createdAt: "asc" },
-					});
 
 					return {
 						data: {
 							...session,
-							activeOrganizationId: firstMember?.organizationId ?? null,
+							activeOrganizationId: await resolveSessionOrganization(
+								db,
+								session.userId,
+							),
 						},
 					};
 				},

@@ -273,6 +273,40 @@ export type EnumCostUnitColorWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumCostUnitColorFilter<$PrismaModel>
 }
 
+export type EnumJoiningRuleTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleType | Prisma.EnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel> | $Enums.JoiningRuleType
+}
+
+export type EnumJoiningRuleModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleMode | Prisma.EnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel> | $Enums.JoiningRuleMode
+}
+
+export type EnumJoiningRuleTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleType | Prisma.EnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleTypeWithAggregatesFilter<$PrismaModel> | $Enums.JoiningRuleType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel>
+}
+
+export type EnumJoiningRuleModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleMode | Prisma.EnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleModeWithAggregatesFilter<$PrismaModel> | $Enums.JoiningRuleMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel>
+}
+
 export type EnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.LegalAcceptanceType | Prisma.EnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
   in?: $Enums.LegalAcceptanceType[] | Prisma.ListEnumLegalAcceptanceTypeFieldRefInput<$PrismaModel>
@@ -689,6 +723,40 @@ export type NestedEnumCostUnitColorWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCostUnitColorFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCostUnitColorFilter<$PrismaModel>
+}
+
+export type NestedEnumJoiningRuleTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleType | Prisma.EnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel> | $Enums.JoiningRuleType
+}
+
+export type NestedEnumJoiningRuleModeFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleMode | Prisma.EnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel> | $Enums.JoiningRuleMode
+}
+
+export type NestedEnumJoiningRuleTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleType | Prisma.EnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleType[] | Prisma.ListEnumJoiningRuleTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleTypeWithAggregatesFilter<$PrismaModel> | $Enums.JoiningRuleType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJoiningRuleTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumJoiningRuleModeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.JoiningRuleMode | Prisma.EnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  in?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.JoiningRuleMode[] | Prisma.ListEnumJoiningRuleModeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumJoiningRuleModeWithAggregatesFilter<$PrismaModel> | $Enums.JoiningRuleMode
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumJoiningRuleModeFilter<$PrismaModel>
 }
 
 export type NestedEnumLegalAcceptanceTypeFilter<$PrismaModel = never> = {
