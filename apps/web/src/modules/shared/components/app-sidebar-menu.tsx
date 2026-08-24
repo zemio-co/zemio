@@ -196,8 +196,15 @@ function SidebarMenuOrgsButton({
 	const organizations = authClient.useListOrganizations();
 
 	const rememberOrg = api.user.setLastActiveOrganization.useMutation();
+	const [switching, setSwitching] = useState(false);
 
 	const handleOrgChange = async (organizationId: string) => {
+		// One switch at a time. Two in flight can finish out of order and leave
+		// the session on one organization and `lastActiveOrganizationId` on the
+		// other, which only shows up at the next login.
+		if (switching) return;
+		setSwitching(true);
+
 		await authClient.organization.setActive({
 			organizationId,
 		});

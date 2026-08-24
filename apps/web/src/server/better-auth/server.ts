@@ -39,6 +39,16 @@ function extractMicrosoftTenantId(idToken: string): string | null {
 	}
 }
 
+/** The tenant recorded on a user by a previous login, if any. */
+async function tenantIdOf(userId: string): Promise<string | null> {
+	const user = await db.user.findUnique({
+		where: { id: userId },
+		select: { microsoftTenantId: true },
+	});
+
+	return user?.microsoftTenantId ?? null;
+}
+
 export const auth = betterAuth({
 	// Explicit secret with a build-time fallback so Docker builds (which run without
 	// secrets) don't throw during Next.js module evaluation. At runtime the real
@@ -72,6 +82,31 @@ export const auth = betterAuth({
 			await sendEmailVerification({ to: user.email, verifyUrl: url });
 		},
 		expiresIn: 60 * 60 * 24,
+
+		/**
+		 * Verifying an address can open an organization to this person, and the
+		 * session hook that would notice only runs when a session is created.
+		 * Without this, an `EMAIL_DOMAIN` rule takes effect at their next login
+		 * rather than the moment they proved the address.
+		 *
+		 * Best-effort: the address is verified either way, and the next login
+		 * resolves the same rules. Failing here would report verification as
+		 * failed for something that succeeded.
+		 */
+		afterEmailVerification: async (user) => {
+			try {
+				await applyAutoJoins(db, user.id, {
+					email: user.email,
+					emailVerified: true,
+					microsoftTenantId: await tenantIdOf(user.id),
+				});
+			} catch (error) {
+				logger.error("Could not resolve joining rules after verification", {
+					userId: user.id,
+					error,
+				});
+			}
+		},
 	},
 	socialProviders: {
 		microsoft: {

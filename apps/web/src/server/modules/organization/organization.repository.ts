@@ -219,11 +219,16 @@ export const organizationRepository = {
 	 * an organization admin renaming their organization must not silently drop
 	 * the rule its members are resolved by.
 	 *
-	 * When it is given the rule is replaced rather than edited: there is at most
-	 * one, and delete-then-insert expresses "set it" and "clear it" without a
-	 * three-branch upsert. Both happen with the profile update in one
-	 * transaction, so an organization is never briefly open to a tenant its
-	 * profile no longer names.
+	 * The organization row is locked before its rules are touched. Without it
+	 * two concurrent tenant changes can both delete before either inserts —
+	 * each statement takes its own snapshot under `READ COMMITTED`, so the
+	 * second delete never sees the first insert — and the organization is left
+	 * open to both tenants, which the unique key permits because the values
+	 * differ.
+	 *
+	 * An unchanged tenant is left alone rather than rewritten, so an
+	 * administrator saving the profile does not silently replace the rule with
+	 * an identical one under a new id.
 	 */
 	async update(
 		db: Db,
@@ -243,25 +248,43 @@ export const organizationRepository = {
 			return flattenTenant(row);
 		}
 
-		const tenantId = args.microsoftTenantId;
+		const desired = args.microsoftTenantId?.toLowerCase() ?? null;
 
-		const [, , row] = await db.$transaction([
-			db.joiningRule.deleteMany({
+		return db.$transaction(async (tx) => {
+			await tx.$queryRaw`SELECT id FROM "organization" WHERE id = ${args.id} FOR UPDATE`;
+
+			const existing = await tx.joiningRule.findMany({
 				where: { organizationId: args.id, type: "MS_TENANT" },
-			}),
-			db.joiningRule.createMany({
-				data: tenantId
-					? [{ organizationId: args.id, ...tenantRule(tenantId) }]
-					: [],
-			}),
-			db.organization.update({
+				select: { value: true },
+			});
+
+			const unchanged =
+				existing.length === (desired === null ? 0 : 1) &&
+				existing.every((rule) => rule.value === desired);
+
+			if (!unchanged) {
+				// Replaced rather than edited: there is at most one, and
+				// delete-then-insert expresses "set it" and "clear it" without a
+				// three-branch upsert.
+				await tx.joiningRule.deleteMany({
+					where: { organizationId: args.id, type: "MS_TENANT" },
+				});
+
+				if (desired) {
+					await tx.joiningRule.createMany({
+						data: [{ organizationId: args.id, ...tenantRule(desired) }],
+					});
+				}
+			}
+
+			const row = await tx.organization.update({
 				where: { id: args.id },
 				data: args.data,
 				select: organizationSelect,
-			}),
-		]);
+			});
 
-		return flattenTenant(row);
+			return flattenTenant(row);
+		});
 	},
 } as const;
 

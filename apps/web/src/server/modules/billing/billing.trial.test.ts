@@ -25,6 +25,10 @@ function deps(
 	} = {},
 ) {
 	const db = createMockDb();
+	// The row and the enforcement switch share one transaction, so the mock
+	// runs the callback against the same client the assertions read.
+	db.$transaction.mockImplementation(((fn: (tx: unknown) => unknown) =>
+		fn(db)) as never);
 	db.organization.findUnique.mockResolvedValue({
 		id: "org_1",
 		name: "Robotics Society",
@@ -125,6 +129,31 @@ describe("startTrial", () => {
 				}),
 			}),
 		);
+	});
+
+	it("switches enforcement on with the row, not separately", async () => {
+		// Two halves of one fact: Stripe is now billing this organization.
+		// Enforced without a row is read-only on arrival; a row without
+		// enforcement is free forever once Stripe cancels the trial.
+		const d = deps();
+
+		await startTrial(d as never, { organizationId: "org_1" });
+
+		expect(d.db.organization.updateMany).toHaveBeenCalledWith({
+			where: { id: "org_1" },
+			data: { billingEnforced: true },
+		});
+		expect(d.db.$transaction).toHaveBeenCalled();
+	});
+
+	it("switches nothing on when there was no trial to start", async () => {
+		const d = deps({
+			prices: [price({ metadata: { zemio_tier: "S", zemio_seats: "10" } })],
+		});
+
+		await startTrial(d as never, { organizationId: "org_1" });
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
 	});
 
 	it("reports the trial it started", async () => {

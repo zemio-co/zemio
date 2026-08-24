@@ -1463,10 +1463,10 @@
 	},
 	"emails": {
 		"shared": {
-			"supportPrompt": "Wende dich bei Fragen bitte an <email>support@zemio.co</email>.",
-			"regards": "Beste Grüße,",
-			"team": "Dein zemio Team",
-			"linkText": "hier"
+			"supportPrompt": "If you have any questions, please contact <email>support@zemio.co</email>.",
+			"regards": "Best regards,",
+			"team": "Your zemio team",
+			"linkText": "here"
 		},
 		"reportReceived": {
 			"subject": "Neuer Spesenbericht eingegangen",

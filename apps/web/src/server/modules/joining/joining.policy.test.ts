@@ -209,6 +209,20 @@ describe("chooseActiveOrganization", () => {
 		expect(chooseActiveOrganization("org_gone", [])).toBeNull();
 	});
 
+	it("picks the same organization every time when timestamps tie", () => {
+		// Joining several organizations on one login writes them in a single
+		// statement, so their timestamps are equal and the database is free to
+		// return them in any order.
+		const sameMoment = new Date("2026-01-01");
+		const tied = [
+			{ organizationId: "org_b", createdAt: sameMoment },
+			{ organizationId: "org_a", createdAt: sameMoment },
+		];
+
+		expect(chooseActiveOrganization(null, tied)).toBe("org_a");
+		expect(chooseActiveOrganization(null, [...tied].reverse())).toBe("org_a");
+	});
+
 	it("does not depend on the order rows arrive in", () => {
 		expect(chooseActiveOrganization(null, [...memberships].reverse())).toBe(
 			"org_old",

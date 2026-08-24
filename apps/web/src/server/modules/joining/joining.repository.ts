@@ -76,15 +76,19 @@ export async function findMembershipOrganizationIds(
  * `skipDuplicates` rather than a check-then-insert: two concurrent logins race
  * here, and the unique constraint on (userId, organizationId) is the only real
  * guard against a duplicate member.
+ *
+ * Returns how many rows were actually inserted, which is not the same as how
+ * many were asked for — the concurrent login that lost the race skips them all
+ * and must not then report them as joined.
  */
 export async function createMemberships(
 	db: PrismaClient,
 	userId: string,
 	organizationIds: readonly string[],
-): Promise<void> {
-	if (organizationIds.length === 0) return;
+): Promise<number> {
+	if (organizationIds.length === 0) return 0;
 
-	await db.member.createMany({
+	const { count } = await db.member.createMany({
 		data: organizationIds.map((organizationId) => ({
 			id: crypto.randomUUID(),
 			userId,
@@ -94,9 +98,19 @@ export async function createMemberships(
 		})),
 		skipDuplicates: true,
 	});
+
+	return count;
 }
 
-/** Pending invitations addressed to this person, newest first. */
+/**
+ * Pending invitations addressed to this person, newest first.
+ *
+ * Matched exactly, which is safe because Better Auth lowercases an invitation's
+ * address before storing it (`crud-invites.mjs`) and this lowercases the
+ * address it is given. Said out loud because it is an invariant another
+ * package maintains: a case-insensitive match here would be immune to it, at
+ * the cost of the index on `invitation.email`.
+ */
 export async function findPendingInvitations(db: PrismaClient, email: string) {
 	return db.invitation.findMany({
 		where: {

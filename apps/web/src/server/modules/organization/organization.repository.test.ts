@@ -161,12 +161,19 @@ describe("organizationRepository.update", () => {
 		expect(db.$transaction).not.toHaveBeenCalled();
 	});
 
-	it("replaces the tenant rule when a tenant is passed", async () => {
-		db.$transaction.mockResolvedValue([
-			null,
-			null,
-			{ joiningRules: [{ value: "tenant_2" }] },
-		] as never);
+	/** Runs the interactive transaction against the same mock the test reads. */
+	function withTransaction(existingTenants: string[]) {
+		db.$transaction.mockImplementation(((fn: (tx: unknown) => unknown) =>
+			fn(db)) as never);
+		db.$queryRaw.mockResolvedValue([{ id: "org_1" }] as never);
+		db.joiningRule.findMany.mockResolvedValue(
+			existingTenants.map((value) => ({ value })) as never,
+		);
+		db.organization.update.mockResolvedValue({ joiningRules: [] } as never);
+	}
+
+	it("replaces the tenant rule when a different tenant is passed", async () => {
+		withTransaction(["tenant_1"]);
 
 		await organizationRepository.update(db, {
 			id: "org_1",
@@ -189,12 +196,36 @@ describe("organizationRepository.update", () => {
 		});
 	});
 
+	it("locks the organization before touching its rules", async () => {
+		// Two concurrent tenant changes can otherwise both delete before either
+		// inserts, leaving the organization open to both tenants.
+		withTransaction(["tenant_1"]);
+
+		await organizationRepository.update(db, {
+			id: "org_1",
+			data: { name: "Renamed" },
+			microsoftTenantId: "TENANT_2",
+		});
+
+		expect(db.$queryRaw).toHaveBeenCalled();
+	});
+
+	it("leaves an unchanged tenant rule where it is", async () => {
+		// Saving the profile must not churn the rule row under a new id.
+		withTransaction(["tenant_1"]);
+
+		await organizationRepository.update(db, {
+			id: "org_1",
+			data: { name: "Renamed" },
+			microsoftTenantId: "TENANT_1",
+		});
+
+		expect(db.joiningRule.deleteMany).not.toHaveBeenCalled();
+		expect(db.joiningRule.createMany).not.toHaveBeenCalled();
+	});
+
 	it("removes the tenant rule when the tenant is cleared", async () => {
-		db.$transaction.mockResolvedValue([
-			null,
-			null,
-			{ joiningRules: [] },
-		] as never);
+		withTransaction(["tenant_1"]);
 
 		await organizationRepository.update(db, {
 			id: "org_1",
@@ -203,6 +234,18 @@ describe("organizationRepository.update", () => {
 		});
 
 		expect(db.joiningRule.deleteMany).toHaveBeenCalled();
-		expect(db.joiningRule.createMany).toHaveBeenCalledWith({ data: [] });
+		expect(db.joiningRule.createMany).not.toHaveBeenCalled();
+	});
+
+	it("does nothing to the rules when there were none and none is wanted", async () => {
+		withTransaction([]);
+
+		await organizationRepository.update(db, {
+			id: "org_1",
+			data: { name: "Renamed" },
+			microsoftTenantId: null,
+		});
+
+		expect(db.joiningRule.deleteMany).not.toHaveBeenCalled();
 	});
 });

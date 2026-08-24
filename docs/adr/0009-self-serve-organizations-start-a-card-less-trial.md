@@ -8,8 +8,9 @@ card arrives before the trial ends, the organization becomes read-only.
 The trial is a Stripe subscription rather than a date column on `Organization`,
 because Stripe's `trialing` status already maps to entitled and nothing else has
 to know a trial exists. The portal, the webhooks, the cached `Subscription` row
-and the tier metadata all work unchanged, and ADR-0003 and ADR-0004 hold. The
-word "trial" appears nowhere in `billing.policy.ts`.
+and the tier metadata all work unchanged, and ADR-0003 and ADR-0004 hold.
+`billing.policy.ts` gains no branch for a trial: `trialing` is one more Stripe
+status mapping to entitled, beside the ones already there.
 
 **The ending is the decision, and it is `cancel`.** Stripe offers three endings
 for a trial that expires with no payment method, chosen when the subscription is

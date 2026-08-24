@@ -59,20 +59,31 @@ export function NoOrgPageContent({
 
 	async function handleSendVerification() {
 		setSendingVerification(true);
-		const result = await authClient.sendVerificationEmail({
-			email: userEmail,
-			callbackURL: ROUTES_DEPR.NO_ORG,
-		});
-		setSendingVerification(false);
 
-		if (result.error) {
-			toast.error(t("verificationFailed"), {
-				description: result.error.message,
+		// Reset in `finally`: a rejected request — offline, a 500 — would
+		// otherwise leave the one button that unblocks this person disabled
+		// until they reload the page.
+		try {
+			const result = await authClient.sendVerificationEmail({
+				email: userEmail,
+				callbackURL: ROUTES_DEPR.NO_ORG,
 			});
-			return;
-		}
 
-		toast.success(t("verificationSent", { email: userEmail }));
+			if (result.error) {
+				toast.error(t("verificationFailed"), {
+					description: result.error.message,
+				});
+				return;
+			}
+
+			toast.success(t("verificationSent", { email: userEmail }));
+		} catch (error) {
+			toast.error(t("verificationFailed"), {
+				description: error instanceof Error ? error.message : undefined,
+			});
+		} finally {
+			setSendingVerification(false);
+		}
 	}
 
 	async function handleSignOut() {

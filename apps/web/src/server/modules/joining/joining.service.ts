@@ -39,11 +39,17 @@ export async function applyAutoJoins(
 
 	if (toJoin.length === 0) return [];
 
-	await repo.createMemberships(db, userId, toJoin);
+	// A concurrent login for the same person can have inserted these already,
+	// in which case every row is skipped and nothing was joined here. Reporting
+	// `toJoin` regardless would log memberships this call did not create.
+	const joined = await repo.createMemberships(db, userId, toJoin);
+
+	if (joined === 0) return [];
 
 	logger.info("joining.auto_joined", {
 		userId,
 		organizationIds: toJoin,
+		joined,
 	});
 
 	return toJoin;

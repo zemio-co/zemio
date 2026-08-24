@@ -40,12 +40,16 @@ export type TrialStarted = {
 };
 
 /**
- * Starts a card-less trial for an organization, or reports that it could not.
+ * Starts a card-less trial for an organization and puts it under enforcement,
+ * or reports that it could not.
  *
  * Returns `null` rather than throwing when the dashboard names no trial tier.
  * The caller is in the middle of creating somebody's organization, and a
  * missing price is the operator's mistake to fix — refusing the organization
  * would make it the new customer's problem instead (ADR-0009).
+ *
+ * Enforcement is switched on here rather than by the caller because it is the
+ * other half of the same fact, and the two must not be able to disagree.
  */
 export async function startTrial(
 	deps: TrialDependencies,
@@ -99,14 +103,28 @@ export async function startTrial(
 		return null;
 	}
 
-	await billingRepository.upsertSubscription(deps.db, args.organizationId, {
-		stripeSubscriptionId: subscription.id,
-		stripePriceId: item.price.id,
-		status: subscription.status,
-		currentPeriodEnd: new Date(item.current_period_end * 1000),
-		cancelAtPeriodEnd: subscription.cancel_at_period_end,
-		tier: tier.name,
-		seatLimit: tier.seatLimit,
+	// The row and the enforcement switch move together or not at all.
+	//
+	// They are two halves of one fact: Stripe is now billing this organization.
+	// Written apart, a failure between them leaves either an organization that
+	// is read-only on arrival (enforced, no row) or one that is free forever
+	// (a real trial, never enforced, still entitled when Stripe cancels it) —
+	// and nothing later repairs the second, because the webhook writes the row
+	// and never touches enforcement.
+	await deps.db.$transaction(async (tx) => {
+		const db = tx as unknown as PrismaClient;
+
+		await billingRepository.upsertSubscription(db, args.organizationId, {
+			stripeSubscriptionId: subscription.id,
+			stripePriceId: item.price.id,
+			status: subscription.status,
+			currentPeriodEnd: new Date(item.current_period_end * 1000),
+			cancelAtPeriodEnd: subscription.cancel_at_period_end,
+			tier: tier.name,
+			seatLimit: tier.seatLimit,
+		});
+
+		await billingRepository.setBillingEnforced(db, args.organizationId, true);
 	});
 
 	logger.info("billing.trial_started", {

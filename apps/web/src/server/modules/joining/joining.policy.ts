@@ -137,9 +137,16 @@ export function chooseActiveOrganization(
 		return lastActiveOrganizationId;
 	}
 
-	const earliest = memberships.reduce((oldest, candidate) =>
-		candidate.createdAt < oldest.createdAt ? candidate : oldest,
-	);
+	// Ties are the common case, not the rare one: joining several organizations
+	// on a first login writes them in one statement, so their timestamps land
+	// in the same millisecond. Without the second comparison the answer is
+	// whichever row the database happened to return first, and the same person
+	// can land somewhere different on each login.
+	const earliest = memberships.reduce((oldest, candidate) => {
+		if (candidate.createdAt < oldest.createdAt) return candidate;
+		if (candidate.createdAt > oldest.createdAt) return oldest;
+		return candidate.organizationId < oldest.organizationId ? candidate : oldest;
+	});
 
 	return earliest.organizationId;
 }

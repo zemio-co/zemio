@@ -116,7 +116,10 @@ describe("createSelfServeOrganization", () => {
 		expect(slug).toMatch(/^robotics-[a-z0-9]+$/);
 	});
 
-	it("switches enforcement on only once the trial exists", async () => {
+	it("starts the trial, which is what switches enforcement on", async () => {
+		// Enforcement moves with the subscription row inside startTrial, so
+		// this path must not switch it on separately — doing both would risk
+		// enforcing an organization whose trial never started.
 		const d = deps();
 
 		await createSelfServeOrganization(
@@ -125,12 +128,8 @@ describe("createSelfServeOrganization", () => {
 			{ name: "Robotics" },
 		);
 
-		expect(d.db.organization.updateMany).toHaveBeenCalledWith(
-			expect.objectContaining({
-				where: { id: "org_new" },
-				data: { billingEnforced: true },
-			}),
-		);
+		expect(d.startTrial).toHaveBeenCalledWith("org_new");
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
 	});
 
 	it("leaves a working organization when no trial could be started", async () => {
@@ -171,5 +170,46 @@ describe("createSelfServeOrganization", () => {
 			where: { id: "user_1" },
 			data: { lastActiveOrganizationId: "org_new" },
 		});
+	});
+});
+
+describe("createSelfServeOrganization under concurrency", () => {
+	it("retries with a distinct slug when someone else took it first", async () => {
+		// Two people creating "Robotics" at the same moment both see the slug
+		// free. The loser must not be handed an error about a name they never
+		// chose.
+		const d = deps();
+		d.createOrganization
+			.mockRejectedValueOnce(new Error("organization already exists"))
+			.mockResolvedValueOnce({ id: "org_new" });
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
+
+		expect(d.createOrganization).toHaveBeenCalledTimes(2);
+		const [first, second] = d.createOrganization.mock.calls;
+		expect(second?.[0].slug).not.toBe(first?.[0].slug);
+		expect(second?.[0].slug).toMatch(/^robotics-[a-z0-9]+$/);
+	});
+
+	it("still reports a creation that fails for another reason", async () => {
+		const d = deps();
+		d.createOrganization.mockRejectedValue(new Error("database is down"));
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).rejects.toThrow("database is down");
+	});
+
+	it("does not fail creation when remembering the organization fails", async () => {
+		// The organization exists and its trial has started; reporting failure
+		// here would have them create a second one.
+		const d = deps();
+		d.db.user.update.mockRejectedValue(new Error("write conflict"));
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
 	});
 });

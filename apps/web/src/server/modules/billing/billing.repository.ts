@@ -152,6 +152,23 @@ export const billingRepository = {
 	},
 
 	/**
+	 * Puts an organization under billing enforcement.
+	 *
+	 * `updateMany` rather than `update` so an organization deleted in the
+	 * moment before this runs is a no-op rather than a throw.
+	 */
+	async setBillingEnforced(
+		db: Db,
+		organizationId: string,
+		enforced: boolean,
+	): Promise<void> {
+		await db.organization.updateMany({
+			where: { id: organizationId },
+			data: { billingEnforced: enforced },
+		});
+	},
+
+	/**
 	 * The organization's name and the address its owner is reachable at.
 	 *
 	 * Only the owner: a trial is theirs to convert, and telling every member

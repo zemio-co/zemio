@@ -28,8 +28,11 @@ _Avoid_: account, profile
 
 **Verified Email**:
 An address Zemio has itself confirmed the person receives mail at. An address
-asserted by an identity provider is not verified, however it arrived. Only a
-verified address grants anything (ADR-0008).
+asserted by an identity provider is not verified, however it arrived. Nothing an
+address alone would grant is granted until it is verified — an **Invitation**,
+a domain **Joining Rule**, creating an **Organization**. A tenant Joining Rule
+is the exception, because it reads a signed claim rather than an address
+(ADR-0008).
 _Avoid_: confirmed email, validated email, primary email
 
 **Joining Rule**:

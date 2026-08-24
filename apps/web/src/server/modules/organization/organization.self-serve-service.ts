@@ -65,6 +65,39 @@ async function availableSlug(db: PrismaClient, name: string): Promise<string> {
 }
 
 /**
+ * Creates the organization, working around a slug someone else holds.
+ *
+ * Checking availability is not enough on its own: two people creating
+ * "Robotics" in the same moment both see the slug free, and one of them then
+ * loses on the unique constraint — receiving an error about a name they never
+ * chose, which is exactly what {@link availableSlug} exists to prevent. The
+ * check keeps the common case tidy; this is what makes its promise hold under
+ * concurrency.
+ *
+ * Two attempts: the second asks for a fresh suffix, and a random suffix losing
+ * as well is not a collision any more.
+ */
+async function createWithFreeSlug(
+	deps: SelfServeDependencies,
+	name: string,
+	userId: string,
+): Promise<{ id: string }> {
+	try {
+		return await deps.createOrganization({
+			name,
+			slug: await availableSlug(deps.db, name),
+			userId,
+		});
+	} catch {
+		return deps.createOrganization({
+			name,
+			slug: `${createOrganizationSlug(name) || "org"}-${crypto.randomUUID().slice(0, 6)}`,
+			userId,
+		});
+	}
+}
+
+/**
  * Puts the organization under billing enforcement.
  *
  * `updateMany` rather than `update` so an organization deleted in the moment
@@ -112,22 +145,17 @@ export async function createSelfServeOrganization(
 		});
 	}
 
-	const organization = await deps.createOrganization({
-		name: input.name,
-		slug: await availableSlug(deps.db, input.name),
-		userId: actor.userId,
-	});
+	const organization = await createWithFreeSlug(deps, input.name, actor.userId);
 
 	if (mayStartTrial({ trialingOrganizations })) {
-		// Enforcement is switched on only once the trial exists. A trial that
-		// could not start — billing switched off, a Stripe outage, no price
-		// tagged as the trial tier — leaves a working organization and a log
-		// line, never a brand-new organization that is read-only for a reason
-		// its owner can neither see nor fix (ADR-0009, ADR-0001).
+		// Starting the trial is what switches enforcement on, atomically with
+		// the subscription row it depends on. A trial that could not start —
+		// billing switched off, a Stripe outage, no price tagged as the trial
+		// tier — leaves a working organization and a log line, never a
+		// brand-new organization that is read-only for a reason its owner can
+		// neither see nor fix (ADR-0009, ADR-0001).
 		try {
-			const trial = await deps.startTrial(organization.id);
-
-			if (trial) await enforceBilling(deps, organization.id);
+			await deps.startTrial(organization.id);
 		} catch (error) {
 			logger.error("Could not start a trial for a new organization", {
 				organizationId: organization.id,
@@ -149,11 +177,21 @@ export async function createSelfServeOrganization(
 	}
 
 	// So the next session opens here rather than in whichever organization they
-	// happened to join first.
-	await deps.db.user.update({
-		where: { id: actor.userId },
-		data: { lastActiveOrganizationId: organization.id },
-	});
+	// happened to join first. Best-effort: the organization exists and its
+	// trial has started, and failing the mutation over a convenience would
+	// report creation as failed and have them create a second one.
+	try {
+		await deps.db.user.update({
+			where: { id: actor.userId },
+			data: { lastActiveOrganizationId: organization.id },
+		});
+	} catch (error) {
+		logger.error("Could not remember the newly created organization", {
+			organizationId: organization.id,
+			userId: actor.userId,
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
 
 	logger.info("organization.self_serve_created", {
 		organizationId: organization.id,
