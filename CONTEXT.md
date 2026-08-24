@@ -26,6 +26,24 @@ _Avoid_: seat, user, participant
 A person with a Zemio login, independent of any organization.
 _Avoid_: account, profile
 
+**Verified Email**:
+An address Zemio has itself confirmed the person receives mail at. An address
+asserted by an identity provider is not verified, however it arrived. Only a
+verified address grants anything (ADR-0008).
+_Avoid_: confirmed email, validated email, primary email
+
+**Joining Rule**:
+A standing statement by an organization about who may join it without being
+invited — a Microsoft tenant, an email domain, or an SSO connection — and on
+what terms: joined automatically, or admitted on request. Distinct from an
+**Invitation**, which names one person once and expires.
+_Avoid_: domain rule, auto-join, allowlist, provisioning rule
+
+**Invitation**:
+A named person's one-time, expiring grant to join a single organization,
+attributed to the member who sent it.
+_Avoid_: invite link, request, referral
+
 ### Expenses
 
 **Report**:
@@ -39,6 +57,13 @@ allowance.
 _Avoid_: line item, entry, cost
 
 ### Billing
+
+**Trial**:
+A fixed period during which a newly self-created organization is entitled
+without having paid and without having given a card. It ends on a date fixed
+when it starts; an organization whose trial ends without a card becomes
+**Read-Only**. Only ever an organization's first trial.
+_Avoid_: free tier, demo, evaluation, freemium
 
 **Subscription**:
 An organization's ongoing agreement to pay for Zemio. An organization has at
