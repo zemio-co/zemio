@@ -18,5 +18,5 @@ export default async function AuthLayout({
 		redirect(ROUTES.USER_DASHBOARD());
 	}
 
-	return <>{children}</>;
+	return <AuthLayout>{children}</AuthLayout>;
 }

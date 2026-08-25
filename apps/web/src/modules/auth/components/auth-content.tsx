@@ -1,57 +1,48 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import ZemioLogo from "public/assets/zemio-logo-dark.svg";
+import ZemioIcon from "public/assets/zemio-icon-light.svg";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import AuthBackgroundImage from "../../../../public/assets/auth-background.jpg";
 import { AuthForm } from "./auth-form";
 
 function AuthContent() {
 	const t = useTranslations("modules.auth.content");
 
 	return (
-		<main className="flex bg-slate-100">
-			<div className="w-full max-w-2xl shrink-0 bg-white">
-				<div className="container flex min-h-svh max-w-2xl flex-col items-start justify-between gap-20 px-12 py-20">
-					<Image alt="Zemio logo" className="h-5 w-auto" src={ZemioLogo} />
-					<div className="mx-auto">
-						<h1 className="text-center font-semibold text-2xl text-slate-800">
-							{t("title")}
-						</h1>
-						<p className="mt-2 max-w-prose text-center text-slate-500 text-sm">
-							{t("subtitle")}
-						</p>
-						<AuthForm className="mt-10" />
-					</div>
-					<div className="flex flex-wrap justify-between gap-x-6 gap-y-2">
-						<p
-							className={cn(
-								"mx-auto block text-center text-slate-500 text-xs/4.5",
-								"[&_a]:font-medium [&_a]:text-slate-800 [&_a]:transition-colors [&_a]:hover:text-violet-800",
-							)}
-						>
-							{t.rich("legal", {
-								terms: (chunks) => (
-									<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>{chunks}</Link>
-								),
-								privacy: (chunks) => (
-									<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{chunks}</Link>
-								),
-								platform: (chunks) => (
-									<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{chunks}</Link>
-								),
-							})}
-						</p>
-					</div>
-				</div>
+		<main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-base-50 py-32">
+			<div className="relative z-20 w-full max-w-sm">
+				<Image alt="" className="size-8" src={ZemioIcon} />
+				<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
+				<p className="mt-0.5 text-base-500 text-sm">
+					Sign up or log in to continue
+				</p>
+
+				<AuthForm className="mt-8" />
+
+				<p
+					className={cn(
+						"mt-6 block text-slate-500 text-xs/4.5",
+						"[&_a]:font-medium [&_a]:text-base-600 [&_a]:transition-colors [&_a]:hover:text-accent-800",
+					)}
+				>
+					{t.rich("legal", {
+						terms: (chunks) => (
+							<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>{chunks}</Link>
+						),
+						privacy: (chunks) => (
+							<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{chunks}</Link>
+						),
+						platform: (chunks) => (
+							<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{chunks}</Link>
+						),
+					})}
+				</p>
 			</div>
-			<div className="relative min-h-svh grow bg-linear-to-tl from-violet-100 to-slate-50">
-				<Image
-					alt="Auth Background Image"
-					className="h-full w-full object-cover object-left"
-					src={AuthBackgroundImage}
-				/>
+			<div className="absolute bottom-8 left-1/2 flex w-full -translate-x-1/2 items-center justify-center gap-8 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600">
+				<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>Privacy Policy</Link>
+				<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>Terms and Conditions</Link>
+				<Link href={ROUTES.LEGAL_IMPRINT()}>Imprint</Link>
 			</div>
 		</main>
 	);

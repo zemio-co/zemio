@@ -17,7 +17,7 @@ function OnboardingLayout({
 }: React.ComponentProps<"main">) {
 	return (
 		<main
-			className={cn("bg-stone-50", className)}
+			className={cn("bg-base-50", className)}
 			data-slot="onboarding-layout"
 			{...props}
 		>

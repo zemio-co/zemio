@@ -43,4 +43,5 @@ export const ROUTES = {
 	LEGAL_TERMS_AND_CONDITIONS: () => "/legal/terms-and-conditions",
 	LEGAL_PRIVACY_POLICY: () => "/legal/privacy-policy",
 	LEGAL_PLATFORM_POLICIES: () => "/legal/platform-policies",
+	LEGAL_IMPRINT: () => "/legal/imprint",
 } as const;

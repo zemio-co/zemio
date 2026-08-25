@@ -1,1 +1,1 @@
-export * from "./components";
+export { AuthContent, AuthLayout, AuthMagicLinkSent } from "./components";

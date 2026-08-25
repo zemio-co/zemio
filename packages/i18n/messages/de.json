@@ -1176,7 +1176,7 @@
 				"signInSuccessTitle": "Anmeldung erfolgreich",
 				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet",
 				"emailLabel": "E-Mail-Adresse",
-				"emailPlaceholder": "du@hochschule.de",
+				"emailPlaceholder": "Deine Arbeits Email...",
 				"continueWithEmail": "Anmeldelink senden",
 				"orSeparator": "oder",
 				"magicLinkSent": "Wir haben einen Anmeldelink an {email} gesendet.",

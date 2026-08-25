@@ -1,19 +1,12 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { Button, Field, FieldContent, FieldError, Input } from "@zemio/ui";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import {
-	Field,
-	FieldContent,
-	FieldError,
-	FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
@@ -96,7 +89,7 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 	}
 
 	return (
-		<div className={cn("flex flex-col gap-6", className)} {...props}>
+		<div className={cn("flex flex-col", className)} {...props}>
 			<Button
 				className={"w-full"}
 				onClick={signInWithMicrosoft}
@@ -107,11 +100,12 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 				<Image alt="Microsoft Logo" className="mr-1 size-3.5" src={MicrosoftLogo} />
 				{t("continueWithMicrosoft")}
 			</Button>
-
-			<div className="flex items-center gap-3">
-				<span className="h-px grow bg-slate-200" />
-				<span className="text-slate-400 text-xs uppercase">{t("orSeparator")}</span>
-				<span className="h-px grow bg-slate-200" />
+			<div className="my-4 flex items-center justify-center gap-2">
+				<div className="h-px grow bg-base-200" />
+				<span className="shrink-0 text-base-500 text-xs uppercase">
+					{t("orSeparator")}
+				</span>
+				<div className="h-px grow bg-base-200" />
 			</div>
 
 			<form
@@ -129,10 +123,10 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 						return (
 							<Field data-invalid={isInvalid}>
 								<FieldContent>
-									<FieldLabel htmlFor={field.name}>{t("emailLabel")}</FieldLabel>
 									<Input
 										aria-invalid={isInvalid}
 										autoComplete="email"
+										className="bg-white"
 										id={field.name}
 										name={field.name}
 										onBlur={field.handleBlur}
@@ -148,11 +142,16 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 					}}
 				</form.Field>
 
-				<form.Subscribe selector={(state) => state.isSubmitting}>
-					{(isSubmitting) => (
+				<form.Subscribe
+					selector={(state) => ({
+						isSubmitting: state.isSubmitting,
+						isDefaultValue: state.isDefaultValue,
+					})}
+				>
+					{({ isSubmitting, isDefaultValue }) => (
 						<Button
 							className={"w-full"}
-							disabled={isSubmitting}
+							disabled={isSubmitting || isDefaultValue}
 							form={MAGIC_LINK_FORM_ID}
 							size={"lg"}
 							type="submit"
