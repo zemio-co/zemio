@@ -1,10 +1,19 @@
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
-import { admin as adminPlugin, organization } from "better-auth/plugins";
+import {
+	admin as adminPlugin,
+	magicLink,
+	organization,
+} from "better-auth/plugins";
 import { env } from "@/env";
 import { logger } from "@/lib/logger";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
+import { sendMagicLinkEmail } from "@/server/better-auth/magic-link";
+import {
+	extractMicrosoftTenantId,
+	isWorkAccountTenant,
+} from "@/server/better-auth/microsoft";
 import { sendEmailVerification } from "@/server/better-auth/verification";
 import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
@@ -19,25 +28,6 @@ import * as organizationAc from "./ac/organization";
 const authUrl = env.BETTER_AUTH_URL;
 const _microsoftTenantId = env.MICROSOFT_TENANT_ID;
 const microsoftClientId = env.MICROSOFT_CLIENT_ID;
-
-/**
- * Decodes the payload of a Microsoft JWT id_token (without re-verification —
- * better-auth has already verified the token) and extracts the `tid` claim,
- * which is the Microsoft Entra ID tenant identifier.
- */
-function extractMicrosoftTenantId(idToken: string): string | null {
-	try {
-		const payloadBase64 = idToken.split(".")[1];
-		if (!payloadBase64) return null;
-
-		const payloadJson = Buffer.from(payloadBase64, "base64url").toString("utf-8");
-		const payload = JSON.parse(payloadJson) as Record<string, unknown>;
-
-		return typeof payload.tid === "string" ? payload.tid : null;
-	} catch {
-		return null;
-	}
-}
 
 /** The tenant recorded on a user by a previous login, if any. */
 async function tenantIdOf(userId: string): Promise<string | null> {
@@ -54,7 +44,7 @@ async function tenantIdOf(userId: string): Promise<string | null> {
  *
  * The session hook that chooses an active organization runs when a session is
  * *created*, and verification happens inside one that already exists. Without
- * this, someone who verifies and is auto-joined is redirected out of `/no-org`
+ * this, someone who verifies and is auto-joined is redirected out of onboarding
  * into an application whose every organization-scoped call refuses them for
  * having no active organization — until they log out and back in.
  *
@@ -168,6 +158,11 @@ export const auth = betterAuth({
 				 * guaranteed to be correct" and must never be used for
 				 * authorization, so this is not distrust of one provider: no
 				 * assertion verifies an address, whoever makes it.
+				 *
+				 * Two things undo this immediately afterwards, and both are proof
+				 * rather than assertion: the session hook below, for an address a
+				 * work or school tenant administers (ADR-0010), and the magic-link
+				 * plugin, for an address whose mail the person just read.
 				 */
 				before: async (user) => ({
 					data: { ...user, emailVerified: false },
@@ -228,11 +223,27 @@ export const auth = betterAuth({
 					const resolvedTenantId =
 						tenantIdFromToken ?? user?.microsoftTenantId ?? null;
 
-					if (tenantIdFromToken) {
-						// Persist the tenant ID on the user for future sessions.
+					// A work or school tenant has already done what a verification
+					// mail does: an administrator created the address and proved the
+					// domain to Microsoft (ADR-0010). Decided here rather than in the
+					// user-create hook because that hook runs before Better Auth has
+					// written the account row this id_token is read from.
+					//
+					// `resolvedTenantId` rather than the freshly read claim: the
+					// stored value has the same provenance — this code put it there,
+					// from a token Better Auth had verified — and a login where the
+					// id_token is unavailable should not un-verify anybody.
+					const verifiedByTenant =
+						user?.emailVerified === false && isWorkAccountTenant(resolvedTenantId);
+
+					if (tenantIdFromToken || verifiedByTenant) {
 						await db.user.update({
 							where: { id: session.userId },
-							data: { microsoftTenantId: tenantIdFromToken },
+							data: {
+								// Persist the tenant ID on the user for future sessions.
+								...(tenantIdFromToken && { microsoftTenantId: tenantIdFromToken }),
+								...(verifiedByTenant && { emailVerified: true }),
+							},
 						});
 					}
 
@@ -242,7 +253,7 @@ export const auth = betterAuth({
 						// asymmetry belongs in one place (ADR-0008).
 						await applyAutoJoins(db, session.userId, {
 							email: user.email,
-							emailVerified: user.emailVerified,
+							emailVerified: user.emailVerified || verifiedByTenant,
 							microsoftTenantId: resolvedTenantId,
 						});
 					}
@@ -291,6 +302,23 @@ export const auth = betterAuth({
 				owner: organizationAc.owner,
 			},
 		}),
+
+		/**
+		 * Signing in with an address and no password.
+		 *
+		 * The second way in, beside Microsoft. Opening the link proves the
+		 * mailbox, so the plugin marks the address verified — which is the same
+		 * proof `sendVerificationEmail` asks for, arriving one step earlier
+		 * (ADR-0008). Sign-up is left open: an initiative's treasurer with no
+		 * Microsoft account is exactly who self-serve onboarding is for.
+		 */
+		magicLink({
+			expiresIn: 60 * 15,
+			sendMagicLink: async ({ email, url }) => {
+				await sendMagicLinkEmail({ to: email, signInUrl: url });
+			},
+		}),
+
 		nextCookies(),
 	],
 });

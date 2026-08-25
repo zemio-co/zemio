@@ -7,6 +7,7 @@ export {
 	type Emailer,
 	type EmailerConfig,
 	type EmailVerificationInput,
+	type MagicLinkInput,
 	type OrgInvitationInput,
 	type ReportReceivedInput,
 	type ReportSubmittedInput,

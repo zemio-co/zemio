@@ -5,6 +5,7 @@ import {
 	type SendResult,
 } from "./client/scaleway";
 import EmailVerificationEmail from "./templates/email-verification";
+import MagicLinkEmail from "./templates/magic-link";
 import OrgInvitationEmail from "./templates/org-invitation";
 import ReportReceivedEmail from "./templates/report-received";
 import ReportSubmittedEmail from "./templates/report-submitted";
@@ -59,6 +60,12 @@ export interface EmailVerificationInput {
 	verifyUrl: string;
 }
 
+export interface MagicLinkInput {
+	to: string;
+	/** Absolute URL that signs the recipient in and verifies the address. */
+	signInUrl: string;
+}
+
 export interface TrialEndingInput {
 	to: string;
 	organizationName: string;
@@ -72,12 +79,13 @@ export interface Emailer {
 	sendStatusChanged(input: StatusChangedInput): Promise<SendResult>;
 	sendOrgInvitation(input: OrgInvitationInput): Promise<SendResult>;
 	sendEmailVerification(input: EmailVerificationInput): Promise<SendResult>;
+	sendMagicLink(input: MagicLinkInput): Promise<SendResult>;
 	sendTrialEnding(input: TrialEndingInput): Promise<SendResult>;
 }
 
 /**
  * The only way to send mail. Templates and the transport stay internal so a
- * caller cannot assemble a send of its own and drift from these six.
+ * caller cannot assemble a send of its own and drift from these seven.
  */
 export function createEmailer({
 	apiKey,
@@ -164,6 +172,15 @@ export function createEmailer({
 					"subject",
 				),
 				react: <EmailVerificationEmail logoUrl={logoUrl} verifyUrl={verifyUrl} />,
+			});
+		},
+
+		sendMagicLink({ to, signInUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.magicLink" })("subject"),
+				react: <MagicLinkEmail logoUrl={logoUrl} signInUrl={signInUrl} />,
 			});
 		},
 

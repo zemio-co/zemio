@@ -1174,7 +1174,15 @@
 				"continueWithMicrosoft": "Mit Microsoft fortfahren",
 				"signInError": "Ein Fehler ist aufgetreten",
 				"signInSuccessTitle": "Anmeldung erfolgreich",
-				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet"
+				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet",
+				"emailLabel": "Email address",
+				"emailPlaceholder": "you@university.edu",
+				"continueWithEmail": "Send sign-in link",
+				"orSeparator": "or",
+				"magicLinkSent": "We have sent a sign-in link to {email}.",
+				"magicLinkError": "The sign-in link could not be sent",
+				"emailRequired": "Please enter a valid email address",
+				"useAnotherAddress": "Use a different address"
 			}
 		},
 		"legal": {
@@ -1435,6 +1443,46 @@
 			"sendVerification": "Send confirmation email",
 			"verificationSent": "We have sent an email to {email}.",
 			"verificationFailed": "The confirmation email could not be sent"
+		},
+		"onboarding": {
+			"signOut": "Sign out",
+			"confirmEmail": {
+				"title": "Confirm your email address",
+				"subtitle": "We need to confirm that {email} belongs to you before you can continue.",
+				"sendButton": "Send confirmation email",
+				"sent": "We have sent an email to {email}.",
+				"sendFailed": "The confirmation email could not be sent",
+				"afterHint": "Open the link in the email, then return to this page."
+			},
+			"name": {
+				"title": "What should we call you?",
+				"subtitle": "Your name appears on the reports you submit and in the emails Zemio sends about them.",
+				"label": "Full name",
+				"placeholder": "e.g. Alex Braun",
+				"submit": "Continue",
+				"required": "Please enter your name",
+				"saveFailed": "Your name could not be saved"
+			},
+			"organization": {
+				"title": "Join an organization",
+				"subtitle": "You have been invited to the following organizations.",
+				"emptyTitle": "Create your organization",
+				"emptySubtitle": "Nothing has invited you yet. Create an organization for your initiative to get started.",
+				"join": "Join",
+				"joinFailed": "You could not be added to that organization",
+				"createInstead": "Create organization instead"
+			},
+			"create": {
+				"title": "Create your organization",
+				"subtitle": "You become its owner. Zemio is free for 30 days, with no payment details.",
+				"nameLabel": "Organization name",
+				"namePlaceholder": "e.g. Robotics Society",
+				"nameRequired": "Please enter a name",
+				"submit": "Create organization",
+				"createFailed": "The organization could not be created",
+				"needsVerification": "Confirm your email address ({email}) first to create an organization.",
+				"back": "Back to invitations"
+			}
 		}
 	},
 	"validation": {
@@ -1508,6 +1556,16 @@
 			"cta": "Confirm email address",
 			"expiry": "This link expires in 24 hours.",
 			"footer": "You are receiving this email because this address was used at zemio. If that was not you, you can ignore this email."
+		},
+		"magicLink": {
+			"subject": "Your sign-in link for zemio",
+			"preview": "Your sign-in link for zemio",
+			"heading": "Sign in to zemio",
+			"greeting": "Hello,",
+			"body": "Use the button below to sign in. Opening it also confirms that this email address belongs to you.",
+			"cta": "Sign in",
+			"expiry": "This link expires in 15 minutes and can only be used once.",
+			"footer": "You are receiving this email because a sign-in was requested for this address at zemio. If that was not you, you can ignore this email."
 		},
 		"trialEnding": {
 			"subject": "Your zemio trial ends in three days",

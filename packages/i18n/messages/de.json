@@ -1174,7 +1174,15 @@
 				"continueWithMicrosoft": "Mit Microsoft fortfahren",
 				"signInError": "Ein Fehler ist aufgetreten",
 				"signInSuccessTitle": "Anmeldung erfolgreich",
-				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet"
+				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet",
+				"emailLabel": "E-Mail-Adresse",
+				"emailPlaceholder": "du@hochschule.de",
+				"continueWithEmail": "Anmeldelink senden",
+				"orSeparator": "oder",
+				"magicLinkSent": "Wir haben einen Anmeldelink an {email} gesendet.",
+				"magicLinkError": "Der Anmeldelink konnte nicht gesendet werden",
+				"emailRequired": "Bitte gib eine gültige E-Mail-Adresse ein",
+				"useAnotherAddress": "Andere Adresse verwenden"
 			}
 		},
 		"legal": {
@@ -1435,6 +1443,46 @@
 			"sendVerification": "Bestätigungsmail senden",
 			"verificationSent": "Wir haben dir eine E-Mail an {email} geschickt.",
 			"verificationFailed": "Bestätigungsmail konnte nicht gesendet werden"
+		},
+		"onboarding": {
+			"signOut": "Abmelden",
+			"confirmEmail": {
+				"title": "Bestätige deine E-Mail-Adresse",
+				"subtitle": "Wir müssen bestätigen, dass {email} dir gehört, bevor es weitergeht.",
+				"sendButton": "Bestätigungsmail senden",
+				"sent": "Wir haben eine E-Mail an {email} gesendet.",
+				"sendFailed": "Die Bestätigungsmail konnte nicht gesendet werden",
+				"afterHint": "Öffne den Link in der E-Mail und kehre dann auf diese Seite zurück."
+			},
+			"name": {
+				"title": "Wie sollen wir dich nennen?",
+				"subtitle": "Dein Name erscheint auf den Abrechnungen, die du einreichst, und in den E-Mails, die zemio dazu versendet.",
+				"label": "Vollständiger Name",
+				"placeholder": "z. B. Alex Braun",
+				"submit": "Weiter",
+				"required": "Bitte gib deinen Namen ein",
+				"saveFailed": "Dein Name konnte nicht gespeichert werden"
+			},
+			"organization": {
+				"title": "Organisation beitreten",
+				"subtitle": "Du wurdest in die folgenden Organisationen eingeladen.",
+				"emptyTitle": "Erstelle deine Organisation",
+				"emptySubtitle": "Bisher liegt keine Einladung für dich vor. Erstelle eine Organisation für deine Initiative, um loszulegen.",
+				"join": "Beitreten",
+				"joinFailed": "Du konntest der Organisation nicht hinzugefügt werden",
+				"createInstead": "Stattdessen Organisation erstellen"
+			},
+			"create": {
+				"title": "Erstelle deine Organisation",
+				"subtitle": "Du wirst ihr Eigentümer. zemio ist 30 Tage kostenlos, ohne Zahlungsdaten.",
+				"nameLabel": "Name der Organisation",
+				"namePlaceholder": "z. B. Robotics Society",
+				"nameRequired": "Bitte gib einen Namen ein",
+				"submit": "Organisation erstellen",
+				"createFailed": "Die Organisation konnte nicht erstellt werden",
+				"needsVerification": "Bestätige zuerst deine E-Mail-Adresse ({email}), um eine Organisation zu erstellen.",
+				"back": "Zurück zu den Einladungen"
+			}
 		}
 	},
 	"validation": {
@@ -1508,6 +1556,16 @@
 			"cta": "E-Mail-Adresse bestätigen",
 			"expiry": "Dieser Link verfällt in 24 Stunden.",
 			"footer": "Du erhältst diese E-Mail, da diese Adresse bei zemio verwendet wurde. Solltest du das nicht gewesen sein, kannst du diese E-Mail ignorieren."
+		},
+		"magicLink": {
+			"subject": "Dein Anmeldelink für zemio",
+			"preview": "Dein Anmeldelink für zemio",
+			"heading": "Bei zemio anmelden",
+			"greeting": "Hallo,",
+			"body": "Melde dich über den folgenden Button an. Damit bestätigst du zugleich, dass dir diese E-Mail-Adresse gehört.",
+			"cta": "Anmelden",
+			"expiry": "Dieser Link verfällt in 15 Minuten und kann nur einmal verwendet werden.",
+			"footer": "Du erhältst diese E-Mail, da für diese Adresse eine Anmeldung bei zemio angefordert wurde. Solltest du das nicht gewesen sein, kannst du diese E-Mail ignorieren."
 		},
 		"trialEnding": {
 			"subject": "Dein zemio-Test endet in drei Tagen",
