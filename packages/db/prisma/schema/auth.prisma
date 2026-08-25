@@ -22,6 +22,14 @@ model User {
   // Microsoft Entra ID tenant ID captured from the OAuth id_token on first login
   microsoftTenantId String?
 
+  // When this person finished onboarding. The one fact about onboarding worth
+  // storing: every other step is derivable from the user row, but "has been
+  // through the flow" is not the same question as "belongs to an organization
+  // right now" — somebody removed from their last organization has answered
+  // the first and not the second, and must be shown the way back in rather
+  // than the way in.
+  onboardingCompletedAt DateTime?
+
   // The organization this person was last working in. Read when a session is
   // created so someone with several organizations returns to the one they were
   // using, rather than to whichever they joined first.

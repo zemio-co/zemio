@@ -26,6 +26,20 @@ export const ROUTES = {
 
 	AUTH: () => "/auth",
 
+	// ======= ONBOARDING =============================================
+	// The flow itself, plus the page for somebody who has already been
+	// through it and belongs to nothing right now. They show the same two
+	// things to two different populations, which is why they share a shell
+	// and not a guard.
+	ONBOARDING: () => "/onboarding",
+	ONBOARDING_VERIFY_EMAIL: () => "/onboarding/verify-email",
+	ONBOARDING_NAME: () => "/onboarding/name",
+	ONBOARDING_ORGANIZATION: () => "/onboarding/organization",
+	ONBOARDING_ORGANIZATION_NEW: () => "/onboarding/organization/new",
+	ONBOARDING_NO_ORG: () => "/onboarding/no-org",
+
+	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
+
 	LEGAL_TERMS_AND_CONDITIONS: () => "/legal/terms-and-conditions",
 	LEGAL_PRIVACY_POLICY: () => "/legal/privacy-policy",
 	LEGAL_PLATFORM_POLICIES: () => "/legal/platform-policies",

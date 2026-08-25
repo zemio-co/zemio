@@ -3,7 +3,6 @@ import type { CostUnitStatus } from "@zemio/db";
 export const ROUTES = {
 	USER_DASHBOARD: "/",
 	AUTH: "/auth",
-	NO_ORG: "/no-org",
 	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
 	REPORT_DETAIL: (id: string) => `/reports/${id}`,
 	ADMIN_DASHBOARD: "/admin",

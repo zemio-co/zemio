@@ -1,9 +1,7 @@
-import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { ROUTES } from "@/lib/consts";
 import { SettingsLayout } from "@/modules/settings";
 import { BillingBanner } from "@/modules/shared";
-import { getCurrentSession } from "@/server/better-auth";
+import { requireOnboarded } from "@/server/modules/onboarding";
 import { api, HydrateClient } from "@/trpc/server";
 
 export default async function ServerLayout({
@@ -11,12 +9,11 @@ export default async function ServerLayout({
 }: {
 	children: ReactNode;
 }) {
-	const session = await getCurrentSession();
-
-	// When the user is not logged in, redirect to the login page
-	if (!session) {
-		redirect(ROUTES.AUTH);
-	}
+	// Signed in and through onboarding. Membership is deliberately not required:
+	// the user groups here — a name, notifications, banking details — are the
+	// person's own, and belong to them whether or not they are in an
+	// organization today.
+	await requireOnboarded();
 
 	// Settings is a sibling route group, so it inherits nothing from the
 	// application layout — including the banner. Without this the explanation of

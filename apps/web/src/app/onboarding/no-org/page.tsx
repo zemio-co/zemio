@@ -1,33 +1,15 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { ROUTES } from "@/lib/consts";
-import { auth } from "@/server/better-auth";
+import { OnboardingNoOrgContent } from "@/modules/onboarding";
 import { db } from "@/server/db";
 import { resolveOpenings } from "@/server/modules/joining";
-import { NoOrgPageContent } from "./_components/no-org-page";
+import { requireOnboardedAndOrgless } from "@/server/modules/onboarding";
 
-export default async function NoOrgPage() {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
+/**
+ * Belonging to nothing is a state someone can act on, not a dead end: an
+ * invitation to accept, or an organization to create.
+ */
+export default async function OnboardingNoOrgPage() {
+	const session = await requireOnboardedAndOrgless();
 
-	if (!session) {
-		redirect(ROUTES.AUTH);
-	}
-
-	// If the user has since been added to an org (e.g. admin created one),
-	// send them straight to the app.
-	const memberCount = await db.member.count({
-		where: { userId: session.user.id },
-	});
-
-	if (memberCount > 0) {
-		redirect(ROUTES.USER_DASHBOARD);
-	}
-
-	// Belonging to nothing is a state someone can act on, not a dead end: an
-	// invitation to accept, or an organization to create.
-	//
 	// Nothing is listed for an address Zemio has not verified. Naming the
 	// organizations that invited someone is itself something the address
 	// grants, and an unproven address grants nothing (ADR-0008). It costs the
@@ -38,7 +20,7 @@ export default async function NoOrgPage() {
 		: { invitations: [] };
 
 	return (
-		<NoOrgPageContent
+		<OnboardingNoOrgContent
 			emailVerified={session.user.emailVerified}
 			invitations={openings.invitations.map((invitation) => ({
 				id: invitation.id,

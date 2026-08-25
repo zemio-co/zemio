@@ -1,32 +1,19 @@
 import { SidebarProvider } from "@zemio/ui";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { ROUTES } from "@/lib/consts";
+import { ROUTES } from "@/lib/routes";
 import { AppSidebar, BillingBanner } from "@/modules/shared";
-import { auth } from "@/server/better-auth";
-import { db } from "@/server/db";
+import { requireOnboarded } from "@/server/modules/onboarding";
 import { api, HydrateClient } from "@/trpc/server";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-	const requestHeaders = await headers();
-	const session = await auth.api.getSession({
-		headers: requestHeaders,
-	});
+	// Not signed in, or not through onboarding, and this is as far as anyone
+	// gets. The guard answers both, and the membership it read on the way is
+	// handed back rather than queried again.
+	const { hasMembership } = await requireOnboarded();
 
-	// When the user is not logged in, redirect to the login page
-	if (!session) {
-		redirect(ROUTES.AUTH);
-	}
-
-	const memberCount = await db.member.count({
-		where: {
-			userId: session.user.id,
-		},
-	});
-
-	if (memberCount === 0) {
-		redirect(ROUTES.NO_ORG);
+	if (!hasMembership) {
+		redirect(ROUTES.ONBOARDING_NO_ORG());
 	}
 
 	// Prefetched here rather than in the banner so every page under this layout
