@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 import { Button, Field, FieldContent, FieldError, Input } from "@zemio/ui";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ const formSchema = z.object({
 });
 
 export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
+	const router = useRouter();
 	const t = useTranslations("modules.auth.form");
 
 	// The address the link went to, once it has. A toast is the wrong shape for
@@ -66,7 +68,7 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 				return;
 			}
 
-			setSentTo(email);
+			router.push(ROUTES.AUTH_MAGIC_LINK_SENT(email));
 		},
 	});
 

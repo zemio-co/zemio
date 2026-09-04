@@ -1,6 +1,7 @@
 import "server-only";
 import type { PrismaClient } from "@zemio/db";
 import { logger } from "@/lib/logger";
+import { isOrganizationOwnerRole } from "@/lib/organization";
 import {
 	nextOnboardingStep,
 	type OnboardingFacts,
@@ -20,8 +21,13 @@ export type OnboardingState = {
 /**
  * Everything the decision needs, in one query.
  *
- * Read on every request that passes a guard, so it stays a single row with a
- * counted relation rather than a membership list nobody looks at.
+ * Read on every request that passes a guard, so it stays a single row. The
+ * memberships come back as a list of roles rather than a count because two
+ * facts are read from them now — whether there is any membership, and whether
+ * one of them is an ownership — and Prisma cannot alias a second filtered
+ * count over the same relation. A person belongs to a handful of
+ * organizations at most, so the list is the cheaper of the two shapes that
+ * would work.
  */
 async function readFacts(
 	db: PrismaClient,
@@ -33,7 +39,7 @@ async function readFacts(
 			name: true,
 			emailVerified: true,
 			onboardingCompletedAt: true,
-			_count: { select: { members: true } },
+			members: { select: { role: true } },
 		},
 	});
 
@@ -42,7 +48,8 @@ async function readFacts(
 	return {
 		emailVerified: user.emailVerified,
 		name: user.name,
-		hasMembership: user._count.members > 0,
+		hasMembership: user.members.length > 0,
+		isOwner: user.members.some((member) => isOrganizationOwnerRole(member.role)),
 		completedAt: user.onboardingCompletedAt,
 	};
 }
@@ -90,4 +97,28 @@ export async function resolveOnboarding(
 	}
 
 	return { step: "done", facts: { ...facts, completedAt } };
+}
+
+/**
+ * Records that a founder has walked the tail, which is what ends their flow.
+ *
+ * The step resolver holds an organization's creator in `invite`/`trial` while
+ * `onboardingCompletedAt` is null, so for that population the stamp cannot be
+ * recognised from the facts the way it is for everybody else — the last step
+ * is a page being read, and nothing else in the row changes when it has been.
+ * This is the report that {@link resolveOnboarding} has no way to infer.
+ *
+ * Guarded on the column still being null, so a double-submitted Continue
+ * cannot overwrite the first completion with a later timestamp.
+ */
+export async function completeOnboarding(
+	db: PrismaClient,
+	userId: string,
+): Promise<void> {
+	await db.user.updateMany({
+		where: { id: userId, onboardingCompletedAt: null },
+		data: { onboardingCompletedAt: new Date() },
+	});
+
+	logger.info("onboarding.completed", { userId });
 }

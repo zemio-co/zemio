@@ -17,6 +17,12 @@ export default async function OnboardingOrganizationPage() {
 	// is itself something the address grants (ADR-0008).
 	const openings = await resolveOpenings(db, session.user.email);
 
+	// With nothing to choose between, this page is a heading over a single
+	// button. The one move left is made for them.
+	if (openings.invitations.length === 0) {
+		redirect(ROUTES.ONBOARDING_ORGANIZATION_NEW());
+	}
+
 	return (
 		<OnboardingOrganizationContent
 			invitations={openings.invitations.map((invitation) => ({

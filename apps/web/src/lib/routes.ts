@@ -25,6 +25,8 @@ export const ROUTES = {
 	USER_DASHBOARD: () => "/",
 
 	AUTH: () => "/auth",
+	AUTH_MAGIC_LINK_SENT: (email?: string) =>
+		`/auth/magic-link-sent${email && `?email=${email}`}`,
 
 	// ======= ONBOARDING =============================================
 	// The flow itself, plus the page for somebody who has already been
@@ -36,6 +38,8 @@ export const ROUTES = {
 	ONBOARDING_NAME: () => "/onboarding/name",
 	ONBOARDING_ORGANIZATION: () => "/onboarding/organization",
 	ONBOARDING_ORGANIZATION_NEW: () => "/onboarding/organization/new",
+	ONBOARDING_INVITE: () => "/onboarding/invite",
+	ONBOARDING_TRIAL: () => "/onboarding/trial",
 	ONBOARDING_NO_ORG: () => "/onboarding/no-org",
 
 	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,

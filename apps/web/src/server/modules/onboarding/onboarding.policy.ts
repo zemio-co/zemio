@@ -11,6 +11,8 @@ export const ONBOARDING_STEPS = [
 	"verify-email",
 	"name",
 	"organization",
+	"invite",
+	"trial",
 ] as const;
 
 export type OnboardingStep = (typeof ONBOARDING_STEPS)[number] | "done";
@@ -23,6 +25,16 @@ export type OnboardingFacts = {
 	name: string;
 	/** Whether they belong to any organization at all. */
 	hasMembership: boolean;
+	/**
+	 * Whether they own one, which here means they created it.
+	 *
+	 * The two tail steps are addressed to the person who made an organization,
+	 * not to everybody who ends up in one: somebody who accepted an invitation
+	 * is joining a team that already has colleagues and a subscription, so
+	 * asking them to invite people and start a trial would be asking about
+	 * decisions that are not theirs.
+	 */
+	isOwner: boolean;
 	/** When they finished onboarding, if they have. */
 	completedAt: Date | null;
 };
@@ -52,7 +64,20 @@ export function nextOnboardingStep(facts: OnboardingFacts): OnboardingStep {
 	if (facts.name.trim() === "") return "name";
 	if (!facts.hasMembership) return "organization";
 
-	return "done";
+	// Past here the flow has everything it needs to let somebody in, and what
+	// remains is addressed to founders only. A member who joined an existing
+	// organization is finished at the line above, which is what keeps the
+	// completion stamp for that population exactly where it has always been.
+	if (!facts.isOwner) return "done";
+
+	// The tail is entered at `invite` and left by walking it. `trial` is
+	// deliberately not returned here: it is reached from the invite step rather
+	// than resolved into, because nothing in the facts distinguishes "has not
+	// invited anybody yet" from "chose not to" — the step is skippable, so no
+	// fact could. The consequence is that re-entering `/onboarding` mid-tail
+	// lands on `invite` again, which costs a founder one extra click and buys
+	// not having to store a cursor for a two-page tail.
+	return "invite";
 }
 
 /**

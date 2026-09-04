@@ -6,45 +6,36 @@ import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { AuthForm } from "./auth-form";
 
-function AuthContent() {
+function AuthContent({ className, ...props }: React.ComponentProps<"div">) {
 	const t = useTranslations("modules.auth.content");
 
 	return (
-		<main className="relative flex min-h-svh items-center justify-center overflow-hidden bg-base-50 py-32">
-			<div className="relative z-20 w-full max-w-sm">
-				<Image alt="" className="size-8" src={ZemioIcon} />
-				<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
-				<p className="mt-0.5 text-base-500 text-sm">
-					Sign up or log in to continue
-				</p>
+		<div className={cn("relative z-20 w-full max-w-sm", className)} {...props}>
+			<Image alt="" className="size-8" src={ZemioIcon} />
+			<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
+			<p className="mt-0.5 text-base-500 text-sm">Sign up or log in to continue</p>
 
-				<AuthForm className="mt-8" />
+			<AuthForm className="mt-8" />
 
-				<p
-					className={cn(
-						"mt-6 block text-slate-500 text-xs/4.5",
-						"[&_a]:font-medium [&_a]:text-base-600 [&_a]:transition-colors [&_a]:hover:text-accent-800",
-					)}
-				>
-					{t.rich("legal", {
-						terms: (chunks) => (
-							<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>{chunks}</Link>
-						),
-						privacy: (chunks) => (
-							<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{chunks}</Link>
-						),
-						platform: (chunks) => (
-							<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{chunks}</Link>
-						),
-					})}
-				</p>
-			</div>
-			<div className="absolute bottom-8 left-1/2 flex w-full -translate-x-1/2 items-center justify-center gap-8 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600">
-				<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>Privacy Policy</Link>
-				<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>Terms and Conditions</Link>
-				<Link href={ROUTES.LEGAL_IMPRINT()}>Imprint</Link>
-			</div>
-		</main>
+			<p
+				className={cn(
+					"mt-6 block text-slate-500 text-xs/4.5",
+					"[&_a]:font-medium [&_a]:text-base-600 [&_a]:transition-colors [&_a]:hover:text-accent-800",
+				)}
+			>
+				{t.rich("legal", {
+					terms: (chunks) => (
+						<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>{chunks}</Link>
+					),
+					privacy: (chunks) => (
+						<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{chunks}</Link>
+					),
+					platform: (chunks) => (
+						<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{chunks}</Link>
+					),
+				})}
+			</p>
+		</div>
 	);
 }
 

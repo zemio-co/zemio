@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@zemio/ui";
 import { MailIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
@@ -63,18 +63,19 @@ function OnboardingInvitationList({
 
 	return (
 		<ul
-			className={cn("flex flex-col gap-2", className)}
+			className={cn("flex flex-col gap-8", className)}
 			data-slot="onboarding-invitation-list"
 			{...props}
 		>
 			{invitations.map((invitation) => (
 				<li
-					className="flex items-center justify-between gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm"
+					className="flex items-center justify-between gap-3 text-sm"
 					key={invitation.id}
 				>
 					<span className="flex min-w-0 items-center gap-2">
-						<MailIcon className="size-4 shrink-0 text-zinc-500" />
-						<span className="truncate">{invitation.organizationName}</span>
+						<span className="truncate font-medium text-base-800">
+							{invitation.organizationName}
+						</span>
 					</span>
 					<Button
 						disabled={acceptingId !== null}

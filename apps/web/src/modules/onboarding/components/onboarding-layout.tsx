@@ -1,37 +1,36 @@
 import Image from "next/image";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import ZemioLogo from "public/assets/zemio-logo-dark.svg";
+import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { OnboardingSignOut } from "./onboarding-sign-out";
+import { OnboardingTopBar } from "./onboarding-top-bar";
 
-/**
- * The frame every onboarding page sits in.
- *
- * Rendered by `app/onboarding/layout.tsx`, which is deliberately the layout
- * *without* the completion guard: `/onboarding/no-org` shares this frame with
- * the flow and is shown to the opposite population, so the two cannot share a
- * guard.
- */
-function OnboardingLayout({
+async function OnboardingLayout({
 	className,
 	children,
 	...props
 }: React.ComponentProps<"main">) {
+	const t = await getTranslations("modules.legal.footer");
+
 	return (
 		<main
-			className={cn("bg-base-50", className)}
-			data-slot="onboarding-layout"
+			className={cn(
+				"relative flex min-h-svh items-center justify-center overflow-hidden bg-base-50 py-32",
+				className,
+			)}
+			data-slot="auth-layout"
 			{...props}
 		>
-			<div className="mx-auto w-full max-w-5xl md:px-8">
-				<div className="flex min-h-svh flex-col gap-8 border-zinc-200 border-x px-6 py-12 md:px-12">
-					<div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
-						<Image alt="Zemio Logo" className="h-5 w-fit" src={ZemioLogo} />
-					</div>
-					<div className="flex grow flex-col items-center justify-center">
-						<div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg ring-1 ring-zinc-700/10 ring-offset-0">
-							{children}
-						</div>
-					</div>
-				</div>
+			<OnboardingTopBar className="absolute top-8 left-0" />
+			{children}
+			<div className="absolute bottom-8 left-1/2 flex w-full -translate-x-1/2 items-center justify-center gap-8 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600">
+				<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{t("privacyPolicy")}</Link>
+				<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>
+					{t("termsAndConditions")}
+				</Link>
+				<Link href={ROUTES.LEGAL_IMPRINT()}>{t("imprint")}</Link>
 			</div>
 		</main>
 	);

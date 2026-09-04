@@ -12,4 +12,8 @@ export {
 	type OnboardingStep,
 	shouldStampCompletion,
 } from "./onboarding.policy";
-export { type OnboardingState, resolveOnboarding } from "./onboarding.service";
+export {
+	completeOnboarding,
+	type OnboardingState,
+	resolveOnboarding,
+} from "./onboarding.service";

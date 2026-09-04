@@ -12,6 +12,7 @@ function facts(overrides: Partial<OnboardingFacts> = {}): OnboardingFacts {
 		emailVerified: false,
 		name: "",
 		hasMembership: false,
+		isOwner: false,
 		completedAt: null,
 		...overrides,
 	};
@@ -32,12 +33,61 @@ describe("nextOnboardingStep", () => {
 		).toBe("organization");
 	});
 
-	it("is done once all three are answered", () => {
+	it("is done once all three are answered, for somebody who joined", () => {
+		// The population that walks no tail: an invitation was accepted, or a
+		// joining rule matched, and the organization was already somebody else's.
 		expect(
 			nextOnboardingStep(
 				facts({ emailVerified: true, name: "Alex Braun", hasMembership: true }),
 			),
 		).toBe("done");
+	});
+
+	describe("the founder tail", () => {
+		const founder = facts({
+			emailVerified: true,
+			name: "Alex Braun",
+			hasMembership: true,
+			isOwner: true,
+		});
+
+		it("asks an owner to invite colleagues once the organization exists", () => {
+			expect(nextOnboardingStep(founder)).toBe("invite");
+		});
+
+		it("holds the owner there until completion is recorded", () => {
+			// `trial` is walked to rather than resolved into: the invite step is
+			// skippable, so no fact separates "has not invited anybody" from
+			// "chose not to", and the tail is left by the last step reporting
+			// itself rather than by the resolver noticing.
+			expect(nextOnboardingStep(founder)).not.toBe("trial");
+			expect(nextOnboardingStep(founder)).not.toBe("done");
+		});
+
+		it("lets the owner through once completion is recorded", () => {
+			expect(nextOnboardingStep({ ...founder, completedAt: new Date() })).toBe(
+				"done",
+			);
+		});
+
+		it("does not start the tail before there is an organization", () => {
+			// Owning nothing yet, so the earlier step still stands.
+			expect(
+				nextOnboardingStep({
+					...founder,
+					hasMembership: false,
+					isOwner: false,
+				}),
+			).toBe("organization");
+		});
+
+		it("does not skip the earlier steps for an owner", () => {
+			// A platform administrator can make somebody an owner before they have
+			// confirmed anything. The order still holds.
+			expect(nextOnboardingStep({ ...founder, emailVerified: false })).toBe(
+				"verify-email",
+			);
+		});
 	});
 
 	it("treats whitespace as no name at all", () => {
@@ -93,6 +143,21 @@ describe("shouldStampCompletion", () => {
 				facts({ emailVerified: true, name: "Alex Braun", hasMembership: true }),
 			),
 		).toBe(true);
+	});
+
+	it("does not stamp an owner who still owes the tail", () => {
+		// The one population completion cannot be inferred for: the last step is
+		// a page being read, and `user.completeOnboarding` is what reports it.
+		expect(
+			shouldStampCompletion(
+				facts({
+					emailVerified: true,
+					name: "Alex Braun",
+					hasMembership: true,
+					isOwner: true,
+				}),
+			),
+		).toBe(false);
 	});
 
 	it("does not stamp an unfinished flow", () => {

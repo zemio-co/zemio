@@ -1191,7 +1191,8 @@
 			},
 			"footer": {
 				"privacyPolicy": "Datenschutzerklärung",
-				"termsAndConditions": "Nutzungsbedingungen"
+				"termsAndConditions": "Nutzungsbedingungen",
+				"imprint": "Impressum"
 			}
 		},
 		"shared": {
@@ -1470,7 +1471,8 @@
 				"emptySubtitle": "Bisher liegt keine Einladung für dich vor. Erstelle eine Organisation für deine Initiative, um loszulegen.",
 				"join": "Beitreten",
 				"joinFailed": "Du konntest der Organisation nicht hinzugefügt werden",
-				"createInstead": "Stattdessen Organisation erstellen"
+				"createInstead": "Stattdessen Organisation erstellen",
+				"or": "Oder"
 			},
 			"create": {
 				"title": "Erstelle deine Organisation",
@@ -1482,6 +1484,34 @@
 				"createFailed": "Die Organisation konnte nicht erstellt werden",
 				"needsVerification": "Bestätige zuerst deine E-Mail-Adresse ({email}), um eine Organisation zu erstellen.",
 				"back": "Zurück zu den Einladungen"
+			},
+			"progress": {
+				"stepOf": "Schritt {current} von {total}"
+			},
+			"invite": {
+				"title": "Lade deine Kolleg:innen ein",
+				"subtitle": "Sie erhalten eine E-Mail mit einem Link zu {organizationName}. Du kannst das auch später in den Einstellungen tun.",
+				"emailPlaceholder": "kollegin@hochschule.de",
+				"addAnother": "Weitere Adresse hinzufügen",
+				"submit": "Einladungen senden",
+				"skip": "Überspringen",
+				"invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
+				"inviteFailed": "Die Einladungen konnten nicht gesendet werden",
+				"inviteSent": "{count, plural, one {Eine Einladung wurde gesendet} other {# Einladungen wurden gesendet}}"
+			},
+			"trial": {
+				"title": "30 Tage kostenlos testen",
+				"subtitle": "Deine Organisation ist 30 Tage lang vollständig nutzbar – ohne Zahlungsdaten. Erst danach wählst du einen Tarif.",
+				"features": {
+					"reports": "Ausgaben sammeln einreichen",
+					"receipts": "Belege direkt an jede Ausgabe anhängen",
+					"review": "Abrechnungen prüfen, zurückgeben und freigeben",
+					"allowances": "Reise- und Verpflegungspauschalen inklusive",
+					"costUnits": "Ausgaben Kostenstellen zuordnen und auswerten",
+					"export": "Export zu verschiedenen Formaten"
+				},
+				"footnote": "Alle Tarife enthalten den gleichen Funktionsumfang und unterscheiden sich nur in der Zahl der enthaltenen Mitglieder.",
+				"continue": "Weiter"
 			}
 		}
 	},

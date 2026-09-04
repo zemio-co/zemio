@@ -1,17 +1,10 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { Button, Field, FieldError, Input } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import {
-	Field,
-	FieldContent,
-	FieldError,
-	FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { selfServeRefusalOf } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -46,7 +39,14 @@ function OnboardingCreateOrganizationForm({
 			// A full load rather than a push: the active organization is decided
 			// when the session is read, and this shell was rendered for somebody
 			// who belonged to nothing.
-			window.location.assign(ROUTES.USER_DASHBOARD());
+			//
+			// Handed to the dispatcher rather than to a step, because which one
+			// comes next depends on who this is: a founder walking the flow for
+			// the first time still owes the invite and trial steps, while
+			// somebody creating a replacement organization from
+			// `/onboarding/no-org` finished onboarding long ago and is sent
+			// straight on. That question is already answered in one place.
+			window.location.assign(ROUTES.ONBOARDING());
 		},
 		onError: (error) => {
 			// The procedure answers with a marker rather than a sentence, so the
@@ -86,21 +86,19 @@ function OnboardingCreateOrganizationForm({
 
 					return (
 						<Field data-invalid={isInvalid}>
-							<FieldContent>
-								<FieldLabel htmlFor={field.name}>{t("nameLabel")}</FieldLabel>
-								<Input
-									aria-invalid={isInvalid}
-									autoFocus
-									id={field.name}
-									maxLength={100}
-									name={field.name}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-									placeholder={t("namePlaceholder")}
-									value={state.value}
-								/>
-								{isInvalid && <FieldError>{t("nameRequired")}</FieldError>}
-							</FieldContent>
+							<Input
+								aria-invalid={isInvalid}
+								autoFocus
+								className={"bg-white"}
+								id={field.name}
+								maxLength={100}
+								name={field.name}
+								onBlur={field.handleBlur}
+								onChange={(e) => field.handleChange(e.target.value)}
+								placeholder={t("namePlaceholder")}
+								value={state.value}
+							/>
+							{isInvalid && <FieldError>{t("nameRequired")}</FieldError>}
 						</Field>
 					);
 				}}

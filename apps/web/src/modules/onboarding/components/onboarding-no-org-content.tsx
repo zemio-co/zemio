@@ -37,16 +37,17 @@ async function OnboardingNoOrgContent({
 
 	return (
 		<div
-			className={cn(className)}
+			className={cn("max-w-sm", className)}
 			data-slot="onboarding-no-org-content"
 			{...props}
 		>
 			<div className="mb-8 w-fit rounded-md bg-zinc-50 p-2 shadow-sm ring-1 ring-zinc-700/10">
 				<BuildingIcon className="size-5 text-zinc-600" />
 			</div>
-			<h1 className="font-semibold text-lg text-zinc-800">{t("title")}</h1>
-			<p className="mt-1.5 max-w-prose text-sm text-zinc-500">
-				{t("subtitle", { email: userEmail })}
+			<p className="mt-10 font-semibold text-base-800 text-lg">{t("title")}</p>
+			<p className="mt-0.5 text-base-500 text-sm">
+				Dein Konto gehört noch zu keiner Organisation. Lege einer an oder trete
+				einer bei um fortzuhfahren.
 			</p>
 
 			{invitations.length > 0 && (
@@ -59,10 +60,7 @@ async function OnboardingNoOrgContent({
 				</div>
 			)}
 
-			<div className="mt-8 border-zinc-200 border-t pt-8">
-				<h2 className="font-medium text-sm text-zinc-800">{t("createTitle")}</h2>
-				<p className="mt-1 text-sm text-zinc-500">{t("createHint")}</p>
-
+			<div className="mt-8 border-zinc-200 border-t">
 				{emailVerified ? (
 					<OnboardingCreateOrganizationForm className="mt-3" userEmail={userEmail} />
 				) : (
@@ -83,18 +81,6 @@ async function OnboardingNoOrgContent({
 					</div>
 				)}
 			</div>
-
-			<OnboardingSignOut className="mt-8 w-full" />
-
-			{isPlatformAdmin && (
-				<Link
-					className="mt-4 flex items-center justify-center gap-1.5 font-medium text-blue-600 text-sm"
-					href={ROUTES.SETTINGS_ADMIN_ORGS()}
-				>
-					{t("manageOrgs")}
-					<ArrowRightIcon className="size-3.5" />
-				</Link>
-			)}
 		</div>
 	);
 }

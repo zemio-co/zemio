@@ -1190,8 +1190,9 @@
 				"version": "Version {version}"
 			},
 			"footer": {
-				"privacyPolicy": "Datenschutzerklärung",
-				"termsAndConditions": "Nutzungsbedingungen"
+				"privacyPolicy": "Privacy Policy",
+				"termsAndConditions": "Terms and Conditions",
+				"imprint": "Imprint"
 			}
 		},
 		"shared": {
@@ -1470,7 +1471,8 @@
 				"emptySubtitle": "Nothing has invited you yet. Create an organization for your initiative to get started.",
 				"join": "Join",
 				"joinFailed": "You could not be added to that organization",
-				"createInstead": "Create organization instead"
+				"createInstead": "Create organization instead",
+				"or": "Or"
 			},
 			"create": {
 				"title": "Create your organization",
@@ -1482,6 +1484,34 @@
 				"createFailed": "The organization could not be created",
 				"needsVerification": "Confirm your email address ({email}) first to create an organization.",
 				"back": "Back to invitations"
+			},
+			"progress": {
+				"stepOf": "Step {current} of {total}"
+			},
+			"invite": {
+				"title": "Invite your colleagues",
+				"subtitle": "They get an email with a link to {organizationName}. You can also do this later in settings.",
+				"emailPlaceholder": "colleague@university.edu",
+				"addAnother": "Add another address",
+				"submit": "Send invitations",
+				"skip": "Skip for now",
+				"invalidEmail": "Please enter a valid email address",
+				"inviteFailed": "The invitations could not be sent",
+				"inviteSent": "{count, plural, one {One invitation sent} other {# invitations sent}}"
+			},
+			"trial": {
+				"title": "Try Zemio free for 30 days",
+				"subtitle": "Your organization is fully usable for 30 days, with no payment details. After that you choose a tier; without one, everything already recorded stays readable and exportable.",
+				"features": {
+					"reports": "Collect expenses into reports and submit them together",
+					"receipts": "Attach receipts directly to every expense",
+					"review": "Review reports, send them back, and approve them",
+					"allowances": "Travel and meal allowances at your organization's own rates",
+					"costUnits": "Assign expenses to cost units and report on them",
+					"export": "Export reports as PDF, including the banking details for the payout"
+				},
+				"footnote": "Every tier includes the same functionality and differs only in the number of members it includes.",
+				"continue": "Continue"
 			}
 		}
 	},

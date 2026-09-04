@@ -8,6 +8,8 @@ import {
 	type OnboardingInvitation,
 	OnboardingInvitationList,
 } from "./onboarding-invitation-list";
+import { OnboardingBox, OnboardingBoxHeader } from "./primtives/onboarding-box";
+import { OnboardingDesc, OnboardingTitle } from "./primtives/onboarding-text";
 
 /**
  * Step four: join something, or go and make one.
@@ -21,41 +23,43 @@ async function OnboardingOrganizationContent({
 	className,
 	invitations,
 	...props
-}: React.ComponentProps<"div"> & { invitations: OnboardingInvitation[] }) {
+}: React.ComponentProps<typeof OnboardingBox> & {
+	invitations: OnboardingInvitation[];
+}) {
 	const t = await getTranslations("modules.onboarding.organization");
 	const hasInvitations = invitations.length > 0;
 
 	return (
-		<div
+		<OnboardingBox
 			className={cn(className)}
 			data-slot="onboarding-organization-content"
 			{...props}
 		>
-			<div className="mb-8 w-fit rounded-md bg-zinc-50 p-2 shadow-sm ring-1 ring-zinc-700/10">
-				<BuildingIcon className="size-5 text-zinc-600" />
-			</div>
-			<h1 className="font-semibold text-lg text-zinc-800">
-				{hasInvitations ? t("title") : t("emptyTitle")}
-			</h1>
-			<p className="mt-1.5 max-w-prose text-sm text-zinc-500">
-				{hasInvitations ? t("subtitle") : t("emptySubtitle")}
-			</p>
+			<OnboardingBoxHeader>
+				<OnboardingTitle>{t("title")}</OnboardingTitle>
+				<OnboardingDesc>{t("subtitle")}</OnboardingDesc>
+			</OnboardingBoxHeader>
 
-			{hasInvitations && (
-				<OnboardingInvitationList className="mt-8" invitations={invitations} />
-			)}
+			{hasInvitations && <OnboardingInvitationList invitations={invitations} />}
+
+			<div className="my-4 flex items-center justify-center gap-2">
+				<div className="h-px grow bg-base-200" />
+				<span className="shrink-0 text-base-500 text-xs uppercase">{t("or")}</span>
+				<div className="h-px grow bg-base-200" />
+			</div>
 
 			<Button
-				className={"mt-8 w-full"}
+				className={"w-full"}
+				nativeButton={false}
 				render={
 					<Link href={ROUTES.ONBOARDING_ORGANIZATION_NEW()}>
 						{t("createInstead")}
 					</Link>
 				}
 				size={"lg"}
-				variant={hasInvitations ? "outline" : "default"}
+				variant={"outline"}
 			/>
-		</div>
+		</OnboardingBox>
 	);
 }
 

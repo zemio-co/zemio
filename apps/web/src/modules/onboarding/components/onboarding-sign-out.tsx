@@ -1,9 +1,9 @@
 "use client";
 
+import { Button } from "@zemio/ui";
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import { authClient } from "@/server/better-auth/client";
 
