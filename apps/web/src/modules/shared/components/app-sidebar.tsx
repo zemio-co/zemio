@@ -21,9 +21,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { isOrganizationAdminRole } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
-import { authClient } from "@/server/better-auth/client";
 import { AppSidebarMenu } from "./app-sidebar-menu";
 
 const t = createAppTranslator({ namespace: "modules.shared.sidebar" });
@@ -55,7 +53,15 @@ const sidebarItems = [
 	},
 ];
 
-function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+/**
+ * `isOrgAdmin` is decided by the layout rather than read here, so that the
+ * administration group is in the server's HTML or absent from it — asking the
+ * browser would put it in neither, and then in both.
+ */
+function AppSidebar({
+	isOrgAdmin,
+	...props
+}: React.ComponentProps<typeof Sidebar> & { isOrgAdmin: boolean }) {
 	const pathname = usePathname();
 
 	return (
@@ -81,7 +87,7 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						))}
 					</SidebarMenu>
 				</SidebarGroup>
-				<SidebarAdminMenu pathname={pathname} />
+				<SidebarAdminMenu isOrgAdmin={isOrgAdmin} pathname={pathname} />
 			</SidebarContent>
 		</Sidebar>
 	);
@@ -106,16 +112,13 @@ const sidebarAdminItems = [
 	},
 ];
 
-function SidebarAdminMenu({ pathname }: { pathname: string }) {
-	const { isPending: rolePending, data: roleData } =
-		authClient.useActiveMemberRole();
-
-	if (rolePending) return null;
-
-	const isOrgAdmin = roleData?.role
-		? isOrganizationAdminRole(roleData.role)
-		: false;
-
+function SidebarAdminMenu({
+	isOrgAdmin,
+	pathname,
+}: {
+	isOrgAdmin: boolean;
+	pathname: string;
+}) {
 	if (!isOrgAdmin) return null;
 
 	return (
