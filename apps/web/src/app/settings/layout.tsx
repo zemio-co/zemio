@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
+import { isOrganizationOwnerRole } from "@/lib/organization";
 import { SettingsLayout } from "@/modules/settings";
 import { BillingBanner } from "@/modules/shared";
+import { activeMemberRole } from "@/server/modules/membership";
 import { requireOnboarded } from "@/server/modules/onboarding";
 import { api, HydrateClient } from "@/trpc/server";
 
@@ -22,10 +24,17 @@ export default async function ServerLayout({
 	// layouts cannot disagree.
 	void api.billing.status.prefetch();
 
+	// Null for somebody in no organization, which reads as "not its owner" — the
+	// right answer, and the one the banner would reach anyway.
+	const role = await activeMemberRole();
+
 	return (
 		<SettingsLayout>
 			<HydrateClient>
-				<BillingBanner className="mx-6 mt-6" />
+				<BillingBanner
+					className="mx-6 mt-6"
+					isOwner={isOrganizationOwnerRole(role)}
+				/>
 			</HydrateClient>
 			{children}
 		</SettingsLayout>
