@@ -1,5 +1,4 @@
-import { ArrowRightIcon, BuildingIcon } from "lucide-react";
-import Link from "next/link";
+import { BuildingIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -9,7 +8,6 @@ import {
 	OnboardingInvitationList,
 } from "./onboarding-invitation-list";
 import { OnboardingSendVerificationButton } from "./onboarding-send-verification-button";
-import { OnboardingSignOut } from "./onboarding-sign-out";
 
 /**
  * Belonging to nothing, after having belonged to something.

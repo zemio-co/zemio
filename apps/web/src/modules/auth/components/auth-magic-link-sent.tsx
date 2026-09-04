@@ -3,7 +3,7 @@
 import { ArrowLeftIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";

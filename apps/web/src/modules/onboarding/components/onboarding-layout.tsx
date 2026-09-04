@@ -1,10 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import ZemioLogo from "public/assets/zemio-logo-dark.svg";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { OnboardingSignOut } from "./onboarding-sign-out";
 import { OnboardingTopBar } from "./onboarding-top-bar";
 
 async function OnboardingLayout({

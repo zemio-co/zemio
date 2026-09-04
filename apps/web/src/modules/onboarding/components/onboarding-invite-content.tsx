@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { Button, Field, FieldContent, FieldError, Input } from "@zemio/ui";
+import { Button, Field, FieldError, Input } from "@zemio/ui";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
