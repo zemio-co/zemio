@@ -1,15 +1,21 @@
-"use client";
-
-import { Skeleton } from "@zemio/ui";
+import { getTranslations } from "next-intl/server";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/server/better-auth/client";
 import { OnboardingSignOut } from "./onboarding-sign-out";
 
-function OnboardingTopBar({
+/**
+ * Which account this is, and the way out of it.
+ *
+ * The address arrives from the shell above rather than from
+ * `authClient.useSession()`: the layout that renders this has already resolved
+ * the session to guard itself, so asking the browser to fetch it again would
+ * buy a second round trip and a skeleton flash on every step of the flow.
+ */
+async function OnboardingTopBar({
 	className,
+	email,
 	...props
-}: React.ComponentProps<"div">) {
-	const { data, isPending } = authClient.useSession();
+}: React.ComponentProps<"div"> & { email: string }) {
+	const t = await getTranslations("modules.onboarding");
 
 	return (
 		<div
@@ -20,16 +26,9 @@ function OnboardingTopBar({
 			data-slot="onboarding-top-bar"
 			{...props}
 		>
-			{isPending ? (
-				<Skeleton className="h-4 w-32" />
-			) : data ? (
-				<span className="text-base-500 text-xs">
-					Signed in as{" "}
-					<span className="font-medium text-base-700">{data.user.email}</span>
-				</span>
-			) : (
-				<span className="text-base-500 text-xs">An unknown error ocurred</span>
-			)}
+			<span className="text-base-500 text-xs">
+				{t("signedInAs")} <span className="font-medium text-base-700">{email}</span>
+			</span>
 			<OnboardingSignOut />
 		</div>
 	);

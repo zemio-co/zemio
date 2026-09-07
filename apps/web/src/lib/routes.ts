@@ -25,8 +25,12 @@ export const ROUTES = {
 	USER_DASHBOARD: () => "/",
 
 	AUTH: () => "/auth",
+	// Encoded, because an address is not path-safe: a `+` in a query string
+	// reads back as a space, and the page names the address it sent to.
 	AUTH_MAGIC_LINK_SENT: (email?: string) =>
-		`/auth/magic-link-sent${email && `?email=${email}`}`,
+		email
+			? `/auth/magic-link-sent?email=${encodeURIComponent(email)}`
+			: "/auth/magic-link-sent",
 
 	// ======= ONBOARDING =============================================
 	// The flow itself, plus the page for somebody who has already been
@@ -47,5 +51,4 @@ export const ROUTES = {
 	LEGAL_TERMS_AND_CONDITIONS: () => "/legal/terms-and-conditions",
 	LEGAL_PRIVACY_POLICY: () => "/legal/privacy-policy",
 	LEGAL_PLATFORM_POLICIES: () => "/legal/platform-policies",
-	LEGAL_IMPRINT: () => "/legal/imprint",
 } as const;

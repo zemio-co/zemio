@@ -1,4 +1,5 @@
 import "server-only";
+import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
 import { logger } from "@/lib/logger";
 import { isOrganizationOwnerRole } from "@/lib/organization";
@@ -110,11 +111,34 @@ export async function resolveOnboarding(
  *
  * Guarded on the column still being null, so a double-submitted Continue
  * cannot overwrite the first completion with a later timestamp.
+ *
+ * Guarded on the step as well, because the stamp outranks every other fact:
+ * `nextOnboardingStep` answers `done` on a timestamp alone, so reporting the
+ * tail as walked from anywhere else would carry somebody past the address and
+ * the name — the two things the flow exists to guarantee — with one request.
+ * The founder tail is the only place this report can honestly come from.
  */
 export async function completeOnboarding(
 	db: PrismaClient,
 	userId: string,
 ): Promise<void> {
+	const facts = await readFacts(db, userId);
+
+	// A session with no user row behind it. Nothing to record, and nothing this
+	// function could report that would be true.
+	if (!facts) return;
+
+	// Already recorded. Idempotent rather than a refusal: a double-submitted
+	// Continue is not a mistake worth an error message.
+	if (facts.completedAt !== null) return;
+
+	if (nextOnboardingStep(facts) !== "invite") {
+		throw new TRPCError({
+			code: "FORBIDDEN",
+			message: "Onboarding is not finished.",
+		});
+	}
+
 	await db.user.updateMany({
 		where: { id: userId, onboardingCompletedAt: null },
 		data: { onboardingCompletedAt: new Date() },

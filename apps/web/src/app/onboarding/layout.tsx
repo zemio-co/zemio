@@ -15,7 +15,9 @@ export default async function ServerLayout({
 }: {
 	children: ReactNode;
 }) {
-	await requireOnboardingSession();
+	const session = await requireOnboardingSession();
 
-	return <OnboardingLayout>{children}</OnboardingLayout>;
+	return (
+		<OnboardingLayout email={session.user.email}>{children}</OnboardingLayout>
+	);
 }

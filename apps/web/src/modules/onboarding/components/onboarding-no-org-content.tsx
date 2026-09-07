@@ -1,4 +1,5 @@
-import { BuildingIcon } from "lucide-react";
+import { ArrowRightIcon, BuildingIcon } from "lucide-react";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -44,9 +45,21 @@ async function OnboardingNoOrgContent({
 			</div>
 			<p className="mt-10 font-semibold text-base-800 text-lg">{t("title")}</p>
 			<p className="mt-0.5 text-base-500 text-sm">
-				Dein Konto gehört noch zu keiner Organisation. Lege einer an oder trete
-				einer bei um fortzuhfahren.
+				{t("subtitle", { email: userEmail })}
 			</p>
+
+			{isPlatformAdmin && (
+				// A platform administrator belonging to nothing is how the system is
+				// bootstrapped. Without this link the one page they land on has no
+				// route to the organizations they are here to create.
+				<Link
+					className="mt-6 flex w-fit items-center gap-1.5 font-medium text-accent-600 text-sm"
+					href={ROUTES.SETTINGS_ADMIN_ORGS()}
+				>
+					{t("manageOrgs")}
+					<ArrowRightIcon className="size-3.5 shrink-0" />
+				</Link>
+			)}
 
 			{invitations.length > 0 && (
 				<div className="mt-8">

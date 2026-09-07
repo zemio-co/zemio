@@ -5,7 +5,6 @@ import { Button, Field, FieldContent, FieldError, Input } from "@zemio/ui";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ROUTES } from "@/lib/routes";
@@ -22,11 +21,6 @@ const formSchema = z.object({
 export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 	const router = useRouter();
 	const t = useTranslations("modules.auth.form");
-
-	// The address the link went to, once it has. A toast is the wrong shape for
-	// this: the next thing to do is leave for an inbox, and an instruction that
-	// disappears after four seconds is one somebody reads on the way out.
-	const [sentTo, setSentTo] = useState<string | null>(null);
 
 	const signInWithMicrosoft = async () => {
 		const res = await authClient.signIn.social({
@@ -68,27 +62,12 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 				return;
 			}
 
+			// A page rather than a toast: the next thing to do is leave for an
+			// inbox, and an instruction that disappears after four seconds is one
+			// somebody reads on the way out.
 			router.push(ROUTES.AUTH_MAGIC_LINK_SENT(email));
 		},
 	});
-
-	if (sentTo !== null) {
-		return (
-			<div className={cn("flex flex-col gap-3", className)} {...props}>
-				<p className="text-center text-slate-600 text-sm">
-					{t("magicLinkSent", { email: sentTo })}
-				</p>
-				<Button
-					onClick={() => setSentTo(null)}
-					size={"lg"}
-					type="button"
-					variant={"outline"}
-				>
-					{t("useAnotherAddress")}
-				</Button>
-			</div>
-		);
-	}
 
 	return (
 		<div className={cn("flex flex-col", className)} {...props}>

@@ -1167,7 +1167,7 @@
 		"auth": {
 			"content": {
 				"title": "Willkommen zurück!",
-				"subtitle": "Melde dich mit deinem Microsoft-Konto an um fortzufahren.",
+				"subtitle": "Melde dich an oder registriere dich, um fortzufahren.",
 				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
 			},
 			"form": {
@@ -1179,10 +1179,14 @@
 				"emailPlaceholder": "Deine Arbeits Email...",
 				"continueWithEmail": "Anmeldelink senden",
 				"orSeparator": "oder",
-				"magicLinkSent": "Wir haben einen Anmeldelink an {email} gesendet.",
 				"magicLinkError": "Der Anmeldelink konnte nicht gesendet werden",
-				"emailRequired": "Bitte gib eine gültige E-Mail-Adresse ein",
-				"useAnotherAddress": "Andere Adresse verwenden"
+				"emailRequired": "Bitte gib eine gültige E-Mail-Adresse ein"
+			},
+			"magicLinkSent": {
+				"title": "Bitte prüfe dein Postfach",
+				"body": "Wir haben einen Anmeldelink an <address>{email}</address> gesendet. Öffne ihn, um deine E-Mail-Adresse zu bestätigen.",
+				"bodyWithoutAddress": "Wir haben dir einen Anmeldelink gesendet. Öffne ihn, um deine E-Mail-Adresse zu bestätigen.",
+				"back": "Zurück"
 			}
 		},
 		"legal": {
@@ -1192,7 +1196,7 @@
 			"footer": {
 				"privacyPolicy": "Datenschutzerklärung",
 				"termsAndConditions": "Nutzungsbedingungen",
-				"imprint": "Impressum"
+				"platformPolicies": "Plattformrichtlinien"
 			}
 		},
 		"shared": {
@@ -1447,6 +1451,7 @@
 		},
 		"onboarding": {
 			"signOut": "Abmelden",
+			"signedInAs": "Angemeldet als",
 			"confirmEmail": {
 				"title": "Bestätige deine E-Mail-Adresse",
 				"subtitle": "Wir müssen bestätigen, dass {email} dir gehört, bevor es weitergeht.",

@@ -1,9 +1,9 @@
 "use client";
 
+import { Button } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { authClient } from "@/server/better-auth/client";
 
 /**
