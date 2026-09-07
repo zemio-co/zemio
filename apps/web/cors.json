@@ -2,8 +2,10 @@
 	"CORSRules": [
 		{
 			"AllowedOrigins": [
+				"https://app.zemio.co",
 				"https://staging.zemio.co",
-				"https://new.staging.zemio.co"
+				"https://new.staging.zemio.co",
+				"http://localhost:3000"
 			],
 			"AllowedMethods": ["GET", "PUT", "POST", "HEAD"],
 			"AllowedHeaders": ["*"],

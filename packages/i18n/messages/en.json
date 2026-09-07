@@ -1167,7 +1167,7 @@
 		"auth": {
 			"content": {
 				"title": "Willkommen zurück!",
-				"subtitle": "Melde dich mit deinem Microsoft-Konto an um fortzufahren.",
+				"subtitle": "Sign up or log in to continue.",
 				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
 			},
 			"form": {
@@ -1179,10 +1179,14 @@
 				"emailPlaceholder": "you@university.edu",
 				"continueWithEmail": "Send sign-in link",
 				"orSeparator": "or",
-				"magicLinkSent": "We have sent a sign-in link to {email}.",
 				"magicLinkError": "The sign-in link could not be sent",
-				"emailRequired": "Please enter a valid email address",
-				"useAnotherAddress": "Use a different address"
+				"emailRequired": "Please enter a valid email address"
+			},
+			"magicLinkSent": {
+				"title": "Please check your inbox",
+				"body": "We have sent a sign-in link to <address>{email}</address>. Open it to confirm your email address.",
+				"bodyWithoutAddress": "We have sent you a sign-in link. Open it to confirm your email address.",
+				"back": "Go back"
 			}
 		},
 		"legal": {
@@ -1192,7 +1196,7 @@
 			"footer": {
 				"privacyPolicy": "Privacy Policy",
 				"termsAndConditions": "Terms and Conditions",
-				"imprint": "Imprint"
+				"platformPolicies": "Platform Policies"
 			}
 		},
 		"shared": {
@@ -1447,6 +1451,7 @@
 		},
 		"onboarding": {
 			"signOut": "Sign out",
+			"signedInAs": "Signed in as",
 			"confirmEmail": {
 				"title": "Confirm your email address",
 				"subtitle": "We need to confirm that {email} belongs to you before you can continue.",

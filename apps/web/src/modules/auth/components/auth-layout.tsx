@@ -1,15 +1,11 @@
-import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { LegalFooter } from "@/modules/legal";
 
 async function AuthLayout({
 	className,
 	children,
 	...props
 }: React.ComponentProps<"main">) {
-	const t = await getTranslations("modules.legal.footer");
-
 	return (
 		<main
 			className={cn(
@@ -20,13 +16,7 @@ async function AuthLayout({
 			{...props}
 		>
 			{children}
-			<div className="absolute bottom-8 left-1/2 flex w-full -translate-x-1/2 items-center justify-center gap-8 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600">
-				<Link href={ROUTES.LEGAL_PRIVACY_POLICY()}>{t("privacyPolicy")}</Link>
-				<Link href={ROUTES.LEGAL_TERMS_AND_CONDITIONS()}>
-					{t("termsAndConditions")}
-				</Link>
-				<Link href={ROUTES.LEGAL_IMPRINT()}>{t("imprint")}</Link>
-			</div>
+			<LegalFooter className="absolute bottom-8 left-1/2 -translate-x-1/2" />
 		</main>
 	);
 }

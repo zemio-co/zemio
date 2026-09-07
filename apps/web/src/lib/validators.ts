@@ -88,8 +88,11 @@ export const createFoodExpenseSchema = baseCreateExpenseSchema.and(
 	}),
 );
 
+// Trimmed before the length is checked, because onboarding reads a name as
+// missing when it trims to nothing: a schema that accepted `"   "` would let
+// somebody past the name step and then bounce them back to it forever.
 export const updateUserNameSchema = z.object({
-	name: z.string().min(1),
+	name: z.string().trim().min(1).max(100),
 });
 
 export const updateUserProfileSchema = z.object({

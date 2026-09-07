@@ -1,6 +1,6 @@
+import { Button } from "@zemio/ui";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import {

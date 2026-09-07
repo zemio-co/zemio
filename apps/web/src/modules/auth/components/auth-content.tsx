@@ -12,8 +12,10 @@ function AuthContent({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div className={cn("relative z-20 w-full max-w-sm", className)} {...props}>
 			<Image alt="" className="size-8" src={ZemioIcon} />
+			{/* The product name, which is a name rather than copy — the sentence
+			    under it is the part that has a language. */}
 			<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
-			<p className="mt-0.5 text-base-500 text-sm">Sign up or log in to continue</p>
+			<p className="mt-0.5 text-base-500 text-sm">{t("subtitle")}</p>
 
 			<AuthForm className="mt-8" />
 

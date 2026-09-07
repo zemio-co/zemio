@@ -1,1 +1,1 @@
-export { LegalDocumentPage } from "./components";
+export { LegalDocumentPage, LegalFooter } from "./components";
