@@ -3,11 +3,13 @@
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { keepPreviousData } from "@tanstack/react-query";
+import type { InputTaxRate } from "@zemio/db/enums";
 import { DownloadIcon, ImageIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import z from "zod";
 import { DatePicker } from "@/components/date-picker";
+import { InputTaxRateField } from "@/components/forms/input-tax-rate-field";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -36,6 +38,7 @@ import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { formatCalendarDate, parseCalendarDate } from "@/lib/calendar-date";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { cn, formatBytes, renameFileWithHash } from "@/lib/utils";
+import { receiptInputTaxRateSchema } from "@/lib/validators";
 import type { ExpenseByIdDTO } from "@/server/modules/expense";
 import { api, type RouterOutputs } from "@/trpc/react";
 
@@ -155,6 +158,10 @@ const receiptUpdateFormSchema = z.object({
 		.refine((value) => parseCalendarDate(value) !== null, {
 			message: "expense.invalidEndDate",
 		}),
+	// Required here as it is on create. This form is the only window in which a
+	// wrong rate can still be corrected: once the report is paid it is immutable,
+	// and the rate it was exported with stands.
+	inputTaxRate: receiptInputTaxRateSchema,
 });
 
 function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
@@ -185,6 +192,9 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 			// as `28.02.2026` — and the submit below then writes that day back.
 			startDate: formatCalendarDate(expense.startDate),
 			endDate: formatCalendarDate(expense.endDate),
+			// Empty for a receipt written before the column existed, so the form
+			// asks rather than defaulting to a deduction nobody stated.
+			inputTaxRate: (expense.inputTaxRate ?? "") as InputTaxRate | "",
 		},
 		validators: { onSubmit: receiptUpdateFormSchema },
 		onSubmit: ({ value }) => {
@@ -201,6 +211,7 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				amount: value.amount,
 				startDate: startDate ?? undefined,
 				endDate: endDate ?? undefined,
+				inputTaxRate: value.inputTaxRate as InputTaxRate,
 			});
 		},
 	});
@@ -321,6 +332,20 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 								</NumberField.Group>
 							</NumberField.Root>
 						</Field>
+					)}
+				</form.Field>
+
+				<form.Field name="inputTaxRate">
+					{(field) => (
+						<div className="md:col-span-2">
+							<InputTaxRateField
+								errors={field.state.meta.errors}
+								isInvalid={field.state.meta.isTouched && !field.state.meta.isValid}
+								name={field.name}
+								onChange={(next) => field.handleChange(next ?? "")}
+								value={field.state.value}
+							/>
+						</div>
 					)}
 				</form.Field>
 

@@ -244,6 +244,7 @@ export function createExpenseService(deps: {
 				breakfastDeduction,
 				lunchDeduction,
 				dinnerDeduction,
+				inputTaxRate,
 				...baseData
 			} = input;
 
@@ -251,6 +252,22 @@ export function createExpenseService(deps: {
 
 			const before: Record<string, Prisma.InputJsonValue | null> = {};
 			const after: Record<string, Prisma.InputJsonValue | null> = {};
+
+			// Only a receipt carries one: the two allowances have no invoice that
+			// states a rate, and the exporter ignores the column for them. Held out
+			// of `baseData` so the column keeps meaning "what the receipt showed"
+			// instead of collecting values nothing reads.
+			//
+			// The correction is recorded because the rate decides the BU-Schlüssel
+			// and therefore a deduction claimed in the customer's name — and this
+			// is the last moment it can change, since paying the report freezes it.
+			if (inputTaxRate !== undefined && expense.type === ExpenseType.RECEIPT) {
+				updateData.inputTaxRate = inputTaxRate;
+				if (inputTaxRate !== expense.inputTaxRate) {
+					before.inputTaxRate = expense.inputTaxRate;
+					after.inputTaxRate = inputTaxRate;
+				}
+			}
 
 			if (expense.type === ExpenseType.TRAVEL) {
 				if (from !== undefined || to !== undefined || distance !== undefined) {
