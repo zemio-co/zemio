@@ -229,7 +229,8 @@
 					"date": "Datum",
 					"amount": "Betrag",
 					"actions": "Aktionen",
-					"total": "Summe"
+					"total": "Summe",
+					"inputTax": "Vorsteuer"
 				},
 				"csv": {
 					"title": "Titel",
@@ -527,7 +528,8 @@
 					"description": "Beschreibung",
 					"date": "Datum",
 					"amount": "Betrag",
-					"sum": "Summe"
+					"sum": "Summe",
+					"inputTax": "Vorsteuer"
 				},
 				"emptyTitle": "Du hast noch keine Ausgaben hinzugefügt.",
 				"emptyDescription": "Füge eine neue Ausgabe hinzu um diese erstatten zu lassen.",

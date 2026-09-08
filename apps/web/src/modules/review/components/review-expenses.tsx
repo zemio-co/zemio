@@ -5,6 +5,7 @@ import { format, isSameDay } from "date-fns";
 import { DownloadIcon, EllipsisIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
+import { InputTaxRateLabel } from "@/components/input-tax-rate-label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -163,6 +164,9 @@ function ExpensesTable({
 					<th className="py-3 text-left font-medium text-xs text-zinc-500">
 						{t("date")}
 					</th>
+					<th className="py-3 text-left font-medium text-xs text-zinc-500">
+						{t("inputTax")}
+					</th>
 					<th className="py-3 text-right font-medium text-xs text-zinc-500">
 						{t("amount")}
 					</th>
@@ -178,7 +182,7 @@ function ExpensesTable({
 				<tr className="border-t bg-muted">
 					<td
 						className="rounded-bl-md py-3 text-right font-medium text-muted-foreground text-sm"
-						colSpan={2}
+						colSpan={3}
 					>
 						{t("total")}
 					</td>
@@ -218,6 +222,13 @@ function ExpenseRow({
 							{format(toDisplayDate(expense.endDate), "dd.MM.yyyy")}
 						</span>
 					)}
+				</span>
+			</td>
+			<td className="py-3">
+				{/* What the submitter stated, next to the amount the export claims it
+				    on: paying the report makes both immutable. */}
+				<span className="text-sm text-zinc-500">
+					<InputTaxRateLabel value={expense.inputTaxRate} />
 				</span>
 			</td>
 			<td className="py-3 text-right font-medium text-sm text-zinc-800">

@@ -1,4 +1,10 @@
-import type { CostUnit, ExpenseType, Prisma, ReportStatus } from "@zemio/db";
+import type {
+	CostUnit,
+	ExpenseType,
+	InputTaxRate,
+	Prisma,
+	ReportStatus,
+} from "@zemio/db";
 import {
 	decryptBankingDetails,
 	type EncryptedBankingDetails,
@@ -75,6 +81,8 @@ type ReviewExpenseDTO = {
 	startDate: Date;
 	endDate: Date;
 	type: ExpenseType;
+	/** What the submitter stated; see ExpenseByIdDTO.inputTaxRate. */
+	inputTaxRate: InputTaxRate | null;
 	travelDetail: TravelExpenseDetailDTO | null;
 	foodDetail: FoodExpenseDetailDTO | null;
 	reportId: string;
@@ -115,6 +123,7 @@ export function toReviewDTO(detail: ReviewDetail): ReviewDTO {
 		startDate: expense.startDate,
 		endDate: expense.endDate,
 		type: expense.type,
+		inputTaxRate: expense.inputTaxRate,
 		travelDetail: resolveTravelDetailDTO(expense),
 		foodDetail: resolveFoodDetailDTO(expense),
 		reportId: expense.reportId,

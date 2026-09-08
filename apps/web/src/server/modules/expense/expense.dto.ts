@@ -1,4 +1,4 @@
-import type { ExpenseType, Prisma } from "@zemio/db";
+import type { ExpenseType, InputTaxRate, Prisma } from "@zemio/db";
 import { decimalToNumber } from "@/server/shared/money";
 import { foodDetailFromMeta, travelDetailFromMeta } from "./expense.meta";
 import type { ExpenseDetail, ExpenseListItem } from "./expense.repository";
@@ -91,6 +91,15 @@ export type ExpenseByIdDTO = {
 	description: string | null;
 	startDate: Date;
 	endDate: Date;
+	/**
+	 * The input tax the submitter stated, for receipts. Exposed because the
+	 * export turns it into a deduction claimed in the customer's name: the
+	 * submitter has to be able to check what they answered, and the admin who
+	 * pays the report — making it immutable — has to see what they are
+	 * approving. Null on an allowance, which carries none, and on a row written
+	 * before the column existed.
+	 */
+	inputTaxRate: InputTaxRate | null;
 	travelDetail: TravelExpenseDetailDTO | null;
 	foodDetail: FoodExpenseDetailDTO | null;
 };
@@ -104,6 +113,7 @@ export function toExpenseByIdDTO(expense: ExpenseDetail): ExpenseByIdDTO {
 		description: expense.description,
 		startDate: expense.startDate,
 		endDate: expense.endDate,
+		inputTaxRate: expense.inputTaxRate,
 		travelDetail: resolveTravelDetailDTO(expense),
 		foodDetail: resolveFoodDetailDTO(expense),
 	};
@@ -141,6 +151,8 @@ export type ExpenseListItemDTO = {
 	description: string | null;
 	startDate: Date;
 	endDate: Date;
+	/** See {@link ExpenseByIdDTO.inputTaxRate}. */
+	inputTaxRate: InputTaxRate | null;
 	travelDetail: TravelExpenseDetailDTO | null;
 	foodDetail: FoodExpenseDetailDTO | null;
 	attachments: AttachmentListItemDTO[];
@@ -157,6 +169,7 @@ export function toExpenseListItemDTO(
 		description: expense.description,
 		startDate: expense.startDate,
 		endDate: expense.endDate,
+		inputTaxRate: expense.inputTaxRate,
 		travelDetail: resolveTravelDetailDTO(expense),
 		foodDetail: resolveFoodDetailDTO(expense),
 		attachments: expense.attachments.map(toAttachmentListItemDTO),

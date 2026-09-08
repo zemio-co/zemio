@@ -25,6 +25,7 @@ const expenseDetailSelect = {
 	description: true,
 	startDate: true,
 	endDate: true,
+	inputTaxRate: true,
 	// Deprecated fallback source for rows whose typed detail row has not
 	// been backfilled yet (see expense.meta.ts).
 	meta: true,
@@ -47,6 +48,7 @@ const expenseListItemSelect = {
 	description: true,
 	startDate: true,
 	endDate: true,
+	inputTaxRate: true,
 	meta: true,
 	travelDetail: travelDetailSelect,
 	foodDetail: foodDetailSelect,

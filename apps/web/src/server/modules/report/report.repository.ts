@@ -63,6 +63,7 @@ const reviewDetailSelect = {
 			startDate: true,
 			endDate: true,
 			type: true,
+			inputTaxRate: true,
 			meta: true,
 			travelDetail: travelDetailSelect,
 			foodDetail: foodDetailSelect,

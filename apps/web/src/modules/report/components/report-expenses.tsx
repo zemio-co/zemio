@@ -16,6 +16,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
+import { InputTaxRateLabel } from "@/components/input-tax-rate-label";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -100,6 +101,9 @@ function ReportExpenses({
 							<th className="border-slate-200 border-b px-2 py-2 text-left font-semibold text-slate-800 text-xs">
 								{tExpenses("table.date")}
 							</th>
+							<th className="border-slate-200 border-b px-2 py-2 text-left font-semibold text-slate-800 text-xs">
+								{tExpenses("table.inputTax")}
+							</th>
 							<th className="border-slate-200 border-b px-2 py-2 text-right font-semibold text-slate-800 text-xs">
 								{tExpenses("table.amount")}
 							</th>
@@ -125,6 +129,12 @@ function ReportExpenses({
 										</>
 									)}
 								</td>
+								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
+									{/* The submitter's own statement, shown back to them: the export
+									    turns it into a deduction, and once the report is paid it can
+									    no longer be corrected. */}
+									<InputTaxRateLabel value={expense.inputTaxRate} />
+								</td>
 								<td className="whitespace-nowrap px-3 py-2.5 text-right font-semibold text-slate-700 text-sm">
 									{expense.amount.toFixed(2)} <span className="ml-1">€</span>
 								</td>
@@ -141,6 +151,7 @@ function ReportExpenses({
 							</tr>
 						))}
 						<tr>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td className="px-2 py-2.5 text-right font-semibold text-slate-800 text-sm">
