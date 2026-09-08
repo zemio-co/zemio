@@ -1,9 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { buchungsstapelFilename } from "@zemio/datev";
+import { buchungsstapelFilename, toKontenrahmen } from "@zemio/datev";
 import type { Prisma, PrismaClient, Settings } from "@zemio/db";
 import { env } from "@/env";
 import { decimalToNumber } from "@/server/shared/money";
-import { getPresignedDownloadUrl } from "@/server/storage";
+import {
+	deleteFilesFromStorage,
+	getPresignedDownloadUrl,
+} from "@/server/storage";
 import {
 	checkExportPreconditions,
 	countBookings,
@@ -65,6 +68,22 @@ const alreadyExported = () =>
 		message: "These reports were exported by another export",
 	});
 
+/**
+ * Drops the file apps/api has already stored, on the two paths that refuse to
+ * record it.
+ *
+ * Nothing will ever reference the object: `recordExport` rolled its row back,
+ * or was never reached. Left alone it would sit in storage for good holding a
+ * full copy of a period's bookings — and since the file is only ever served
+ * again from its row, not rebuilt, there is no path that could rediscover it.
+ *
+ * The conflict is what the admin has to see, so a failed delete must not
+ * replace it; `deleteFilesFromStorage` has already logged it.
+ */
+async function discardStoredFile(key: string): Promise<void> {
+	await deleteFilesFromStorage([key]).catch(() => undefined);
+}
+
 /** What apps/api returns once it has written the file. */
 type BuchungsstapelResponse = {
 	url: string;
@@ -85,7 +104,9 @@ function toConfiguration(settings: Settings | null): DatevConfiguration {
 		mandantennummer: settings?.datevMandantennummer ?? null,
 		wirtschaftsjahrBeginn: settings?.datevWirtschaftsjahrBeginn ?? null,
 		sachkontenlaenge: settings?.datevSachkontenlaenge ?? null,
-		kontenrahmen: settings?.datevKontenrahmen ?? null,
+		// An unexpected value reads as unconfigured, so the preflight names the
+		// field instead of the header carrying one DATEV refuses the file over.
+		kontenrahmen: toKontenrahmen(settings?.datevKontenrahmen),
 		expenseAccountReceipt: settings?.datevExpenseAccountReceipt ?? null,
 		expenseAccountTravel: settings?.datevExpenseAccountTravel ?? null,
 		expenseAccountFood: settings?.datevExpenseAccountFood ?? null,
@@ -94,14 +115,23 @@ function toConfiguration(settings: Settings | null): DatevConfiguration {
 }
 
 /**
- * The configuration as it stood when the file was written, stored alongside the
- * export. Without it an export stops being explainable the moment an
- * organization edits an account.
+ * The configuration this export was authorized against, stored alongside it.
+ * Without it an export stops being explainable the moment an organization edits
+ * an account.
  *
  * `festschreibung` rides along even though it is not part of the preflight: it
  * is written into the header as field 21, so leaving it out would make the
  * snapshot explain everything about the file except whether its bookings are
  * locked.
+ *
+ * Not quite the configuration the file was *written* from, and the difference
+ * is worth knowing: apps/api reads the settings row again before it serializes,
+ * so an account edited between the preflight above and that read reaches the
+ * Kanzlei while this snapshot still names the old one. apps/api's 409 catches
+ * only an edit that leaves the configuration incomplete — 4980 to 4985 passes
+ * both ends. Closing it means having apps/api return the configuration it used;
+ * until then the file itself, addressed by `checksum`, is the authority and this
+ * is what the export was approved with.
  */
 function toConfigurationSnapshot(
 	configuration: DatevConfiguration,
@@ -301,8 +331,11 @@ export function createDatevExportService(deps: {
 			const file = (await response.json()) as BuchungsstapelResponse;
 
 			// The whole selection was claimed while the file was being written, so
-			// what came back is a header with no bookings.
+			// what came back is a header with no bookings. Only an apps/api old
+			// enough to upload before re-querying can answer this way; it still has
+			// to be handled, and its file still has to be dropped.
 			if (file.reportIds.length === 0) {
+				await discardStoredFile(file.key);
 				throw alreadyExported();
 			}
 
@@ -319,12 +352,19 @@ export function createDatevExportService(deps: {
 					checksum: file.checksum,
 					reportIds: file.reportIds,
 				})
-				.catch((error: unknown) => {
+				.catch(async (error: unknown) => {
 					// Another export claimed part of this selection while the file was
 					// being written. The file repeats bookings that already went to the
 					// Kanzlei, so it is withheld rather than handed over; the admin
 					// retries and gets whatever is genuinely left.
+					//
+					// Only this error is known to have rolled the transaction back —
+					// `recordExport` raised it itself, from inside the callback. Any
+					// other failure leaves the outcome of the commit unknown, and an
+					// orphaned object is the lesser harm next to deleting a file a
+					// recorded export points at.
 					if (error instanceof ReportsAlreadyExportedError) {
+						await discardStoredFile(file.key);
 						throw alreadyExported();
 					}
 					throw error;

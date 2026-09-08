@@ -2,7 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
-import { InputTaxRate } from "@zemio/db/enums";
+import type { InputTaxRate } from "@zemio/db/enums";
 import { formatDate } from "date-fns";
 import { XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -28,7 +28,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { formatBytes, renameFileWithHash } from "@/lib/utils";
-import { baseCreateExpenseSchema } from "@/lib/validators";
+import {
+	baseCreateExpenseSchema,
+	receiptInputTaxRateSchema,
+} from "@/lib/validators";
 import { api } from "@/trpc/react";
 
 export function CreateReceiptExpenseForm({
@@ -75,9 +78,7 @@ export function CreateReceiptExpenseForm({
 			onSubmit: baseCreateExpenseSchema.and(
 				z.object({
 					files: z.file().array(),
-					inputTaxRate: z.enum(InputTaxRate, {
-						error: "expense.inputTaxRateRequired",
-					}),
+					inputTaxRate: receiptInputTaxRateSchema,
 				}),
 			),
 		},

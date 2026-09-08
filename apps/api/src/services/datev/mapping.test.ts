@@ -84,9 +84,14 @@ describe("toBookings", () => {
 	});
 
 	describe("Buchungstext", () => {
-		const textOf = (expense: Partial<ExportableExpense>) =>
-			toBookings([report({ expenses: [{ ...receipt, ...expense }] })], accounts)[0]
-				?.buchungstext;
+		const textOf = (
+			expense: Partial<ExportableExpense>,
+			overrides: Partial<ExportableReport> = {},
+		) =>
+			toBookings(
+				[report({ expenses: [{ ...receipt, ...expense }], ...overrides })],
+				accounts,
+			)[0]?.buchungstext;
 
 		it("names the route and distance on a travel allowance", () => {
 			// Without the route a Kilometerpauschale cannot be followed up later.
@@ -149,6 +154,45 @@ describe("toBookings", () => {
 				"Sommerfest der Fachs – 14.08.2026, Münster nach Köln, 124 km",
 			);
 			expect(booking?.buchungstext).toHaveLength(60);
+		});
+
+		it("does not double the space before the separator", () => {
+			// `Report.title` is validated as non-empty, not as non-blank, so it can
+			// arrive padded — and the cut that fits a long title into the field can
+			// land on a space of its own.
+			const [padded] = toBookings(
+				[report({ title: "Sommerfest  ", expenses: [receipt] })],
+				accounts,
+			);
+			expect(padded?.buchungstext).toBe("Sommerfest – 14.08.2026, Büromaterial");
+
+			const [cut] = toBookings(
+				[
+					report({
+						// 20 characters in, which is exactly the room the detail leaves,
+						// the title has a space.
+						title: "Sommerfest der Fach Wirtschaftswissenschaften",
+						expenses: [
+							{
+								...receipt,
+								type: "TRAVEL",
+								description: null,
+								travelDetail: { from: "Münster", to: "Köln", distance: 124 },
+							},
+						],
+					}),
+				],
+				accounts,
+			);
+			expect(cut?.buchungstext).toBe(
+				"Sommerfest der Fach – 14.08.2026, Münster nach Köln, 124 km",
+			);
+		});
+
+		it("writes the detail alone when the title is blank", () => {
+			// A bare separator with nothing in front of it reads as a truncation bug
+			// in the Kanzlei's ledger.
+			expect(textOf({}, { title: "   " })).toBe("14.08.2026, Büromaterial");
 		});
 
 		it("keeps the detail when it fills the field on its own", () => {

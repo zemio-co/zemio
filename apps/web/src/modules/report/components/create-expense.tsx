@@ -2,8 +2,8 @@
 
 import { Dialog, NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
-import { InputTaxRate } from "@zemio/db/enums";
-import { formatDate, isValid, parse } from "date-fns";
+import type { InputTaxRate } from "@zemio/db/enums";
+import { formatDate } from "date-fns";
 import { CarIcon, ReceiptIcon, UtensilsIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
@@ -43,6 +43,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { formatBytes, renameFileWithHash } from "@/lib/utils";
+import {
+	baseCreateExpenseSchema,
+	receiptInputTaxRateSchema,
+} from "@/lib/validators";
 import { useErrorDescription } from "@/modules/shared";
 import { api } from "@/trpc/react";
 
@@ -84,36 +88,16 @@ function CreateExpense({
 	);
 }
 
-const receiptExpenseFormSchema = z.object({
-	description: z.string(),
-	amount: z.number().min(0),
-	startDate: z
-		.string()
-		.min(1, "expense.startDateRequired")
-		.refine(
-			(val) => {
-				const date = parse(val, "dd.MM.yyyy", new Date());
-				return isValid(date);
-			},
-			{ message: "expense.invalidStartDate" },
-		)
-		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
-	endDate: z
-		.string()
-		.min(1, "expense.endDateRequired")
-		.refine(
-			(val) => {
-				const date = parse(val, "dd.MM.yyyy", new Date());
-				return isValid(date);
-			},
-			{ message: "expense.invalidEndDate" },
-		)
-		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
-	files: z.file().array(),
-	inputTaxRate: z.enum(InputTaxRate, {
-		error: "expense.inputTaxRateRequired",
+// Composed from the shared base rather than re-declared: the copy that used to
+// stand here read its dates with date-fns' `parse`, which accepts `01.03.26` as
+// the year 26 where the router's `parseCalendarDate` refuses it — so the form
+// passed and the mutation then failed with no field to point at.
+const receiptExpenseFormSchema = baseCreateExpenseSchema.and(
+	z.object({
+		files: z.file().array(),
+		inputTaxRate: receiptInputTaxRateSchema,
 	}),
-});
+);
 
 function ReceiptExpense({
 	reportId,
@@ -147,6 +131,8 @@ function ReceiptExpense({
 			amount: 0,
 			startDate: formatDate(new Date(), "dd.MM.yyyy"),
 			endDate: formatDate(new Date(), "dd.MM.yyyy"),
+			type: "RECEIPT",
+			reportId,
 			files: [] as File[],
 			inputTaxRate: "" as InputTaxRate | "",
 		},

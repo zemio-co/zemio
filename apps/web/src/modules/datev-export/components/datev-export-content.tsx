@@ -1,11 +1,9 @@
 "use client";
 
-import { format } from "date-fns";
-import { de } from "date-fns/locale";
 import { AlertTriangleIcon, DownloadIcon, InfoIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +23,37 @@ import type {
 	PreflightNotice,
 } from "@/server/modules/datev-export";
 import { api } from "@/trpc/react";
+
+/**
+ * Both formatters read the date in UTC, because every date on this page is a
+ * calendar day pinned to UTC midnight — the month options below, and the
+ * `periodFrom`/`periodTo` of a stored export.
+ *
+ * `date-fns` `format` reads the local components instead, so west of UTC it
+ * turns the 1st of March into the 28th of February: the picker would offer
+ * "Februar 2026" while sending March to the server, and a stored export would
+ * be listed a day short at both ends. Naming the timezone is what keeps the
+ * label and the period the same month for every viewer.
+ */
+const monthLabel = new Intl.DateTimeFormat("de-DE", {
+	month: "long",
+	year: "numeric",
+	timeZone: "UTC",
+});
+
+const dayLabel = new Intl.DateTimeFormat("de-DE", {
+	day: "2-digit",
+	month: "2-digit",
+	year: "numeric",
+	timeZone: "UTC",
+});
+
+/** For `createdAt`, which is a real instant and belongs in the viewer's zone. */
+const instantLabel = new Intl.DateTimeFormat("de-DE", {
+	day: "2-digit",
+	month: "2-digit",
+	year: "numeric",
+});
 
 /**
  * Selectable months, newest first, as whole UTC days.
@@ -51,19 +80,23 @@ function selectableMonths(count = 18) {
 
 		return {
 			value: `${from.getUTCFullYear()}-${String(from.getUTCMonth() + 1).padStart(2, "0")}`,
-			label: format(from, "LLLL yyyy", { locale: de }),
+			label: monthLabel.format(from),
 			periodFrom: from,
 			periodTo: to,
 		};
 	});
 }
 
+const PERIOD_FIELD_ID = "datev-export-period";
+
 function DatevExportContent({
 	className,
 	...props
 }: React.ComponentProps<"main">) {
 	const t = useTranslations("modules.datevExport");
-	const months = selectableMonths();
+	// Built once: every call mints eighteen fresh `Date` pairs, and the query key
+	// below is derived from the selected one.
+	const months = useMemo(() => selectableMonths(), []);
 	// Last month by default: the month just closed is the one a Kanzlei asks for.
 	const [selected, setSelected] = useState(months[1]?.value ?? months[0]?.value);
 	const month = months.find((option) => option.value === selected) ?? months[0];
@@ -82,9 +115,15 @@ function DatevExportContent({
 				<section className="container mt-8 space-y-6">
 					<div className="flex flex-wrap items-end gap-4">
 						<div className="space-y-1">
-							<span className="block font-medium text-slate-700 text-sm">
+							{/* A real label rather than a styled span: the trigger is a
+							    button, so without `htmlFor` a screen reader announces the
+							    selected month with no idea what it selects. */}
+							<label
+								className="block font-medium text-slate-700 text-sm"
+								htmlFor={PERIOD_FIELD_ID}
+							>
 								{t("period.label")}
-							</span>
+							</label>
 							<Select
 								items={months.map((option) => ({
 									value: option.value,
@@ -93,7 +132,7 @@ function DatevExportContent({
 								onValueChange={(value) => setSelected(value ?? undefined)}
 								value={month.value}
 							>
-								<SelectTrigger className="w-56">
+								<SelectTrigger className="w-56" id={PERIOD_FIELD_ID}>
 									<SelectValue placeholder={t("period.placeholder")} />
 								</SelectTrigger>
 								<SelectContent>
@@ -228,6 +267,10 @@ function BlockerMessage({ blocker }: { blocker: PreflightBlocker }) {
 			return (
 				<>
 					{t("blockers.costUnitNotExportable", {
+						// The message needs the count as well as the joined tags: it
+						// names the reports ("Antrag A-1, A-2"), and that noun has to
+						// agree with how many there are.
+						count: blocker.reportTags.length,
 						reports: blocker.reportTags.join(", "),
 						tag: blocker.costUnitTag,
 					})}
@@ -284,7 +327,11 @@ function CreateButton({
 		},
 		onError: (error) => {
 			toast.error(t("create.errorTitle"), {
-				description: error.message ?? t("create.errorFallback"),
+				// `||`, not `??`: a tRPC error's `message` is always a string, so a
+				// nullish check never fires and the fallback was unreachable. An
+				// empty message is the case worth catching — it would render a
+				// toast with a title and a blank body.
+				description: error.message || t("create.errorFallback"),
 			});
 		},
 	});
@@ -358,11 +405,10 @@ function ExportHistory() {
 							{query.data.map((row) => (
 								<tr key={row.id}>
 									<td className="px-3 py-3 text-sm">
-										{format(row.periodFrom, "dd.MM.yyyy")} –{" "}
-										{format(row.periodTo, "dd.MM.yyyy")}
+										{dayLabel.format(row.periodFrom)} – {dayLabel.format(row.periodTo)}
 									</td>
 									<td className="p-3 text-muted-foreground text-sm">
-										{format(row.createdAt, "dd.MM.yyyy")}
+										{instantLabel.format(row.createdAt)}
 									</td>
 									<td className="p-3 text-muted-foreground text-sm">
 										{row.createdByName}
@@ -372,7 +418,10 @@ function ExportHistory() {
 									</td>
 									<td className="p-3 text-right">
 										<Button
-											disabled={download.isPending}
+											// Only the row being fetched, not all of them: the
+											// mutation is shared across the table, so a bare
+											// `isPending` greys out every other download too.
+											disabled={download.isPending && download.variables?.id === row.id}
 											onClick={() => download.mutate({ id: row.id })}
 											size="sm"
 											variant="ghost"
@@ -391,6 +440,14 @@ function ExportHistory() {
 	);
 }
 
+/**
+ * Both tones are announced, because both appear only after the preview query
+ * resolves and both change when the month does — a sighted user sees the panel
+ * swap, a screen-reader user would otherwise be told nothing and reach a
+ * disabled button with no explanation. `alert` for a blocker, which stops the
+ * export; `status` for a notice, which does not. This mirrors the `role="alert"`
+ * that `FieldError` already carries.
+ */
 function Panel({
 	children,
 	tone,
@@ -406,6 +463,7 @@ function Panel({
 					? "border-red-200 bg-red-50 text-red-800"
 					: "border-yellow-200 bg-yellow-50 text-yellow-900",
 			)}
+			role={tone === "danger" ? "alert" : "status"}
 		>
 			{children}
 		</div>

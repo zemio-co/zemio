@@ -9,6 +9,10 @@ const requestSchema = z
 	.object({
 		periodFrom: z.coerce.date(),
 		periodTo: z.coerce.date(),
+		// At least one: an empty selection would fall through to the service's
+		// "already exported by another export" conflict, which is a caller bug
+		// wearing the message of a race. The service checks that the ids and the
+		// period actually agree; only their emptiness is decidable here.
 		reportIds: z.array(z.string()).min(1),
 	})
 	.refine((body) => body.periodFrom <= body.periodTo, {
@@ -18,9 +22,13 @@ const requestSchema = z
 
 datev.post("/buchungsstapel", serviceAuth, async (c) => {
 	const organizationId = c.req.header("X-Organization-Id");
-	const exportedBy = c.req.header("X-Exported-By") ?? "";
+	const exportedBy = c.req.header("X-Exported-By");
 
-	if (!organizationId) {
+	// Both, not just the organization. "Exportiert von" is header field 9, the
+	// one field that says who produced the file; DATEV accepts it blank, so a
+	// missing header would have been written as nothing at all and could not be
+	// reconstructed from the file afterwards.
+	if (!organizationId || !exportedBy) {
 		return c.json({ error: "Missing user context headers" }, 400);
 	}
 

@@ -2,12 +2,45 @@ import {
 	CostUnitColor,
 	CostUnitStatus,
 	ExpenseType,
+	InputTaxRate,
 	NotificationPreference,
 } from "@zemio/db/enums";
 
-import { isValid, parse } from "date-fns";
 import z from "zod";
 import { parseCalendarDate } from "./calendar-date";
+
+/**
+ * A day the user types as `dd.MM.yyyy`, read through `parseCalendarDate`.
+ *
+ * Deliberately the same reader the router uses in
+ * `server/modules/expense/expense.validators.ts`: these schemas only shape the
+ * forms — the value that reaches the database is parsed again server-side — so
+ * a client that accepted a string the server refuses would pass validation and
+ * then fail the mutation with no field to point at. date-fns' `parse` did
+ * exactly that, taking `01.03.26` for the year 26.
+ */
+const calendarDate = (requiredMessage: string, invalidMessage: string) =>
+	z
+		.string()
+		.min(1, requiredMessage)
+		.refine((value) => parseCalendarDate(value) !== null, {
+			message: invalidMessage,
+		})
+		.transform((value) => parseCalendarDate(value) as Date);
+
+/**
+ * The input tax a receipt carries, as the three receipt forms validate it.
+ *
+ * One declaration rather than the same enum and the same message key written
+ * out in each form: the key is what `FieldError` looks up, so a copy that fell
+ * out of step would render the raw key at the user instead of a message.
+ * Required and never defaulted — see `createReceiptExpenseSchema` in
+ * `server/modules/expense/expense.validators.ts` for why.
+ */
+export const receiptInputTaxRateSchema = z.enum(InputTaxRate, {
+	error: "expense.inputTaxRateRequired",
+});
+
 export const createReportSchema = z.object({
 	title: z.string().min(1, "report.titleRequired"),
 	description: z.string(),
@@ -28,28 +61,11 @@ export const unformattedIbanSchema = z.string().regex(/^DE\d{20}$/, {
 export const baseCreateExpenseSchema = z.object({
 	description: z.string(),
 	amount: z.number().min(0),
-	startDate: z
-		.string()
-		.min(1, "expense.startDateRequired")
-		.refine(
-			(val) => {
-				const date = parse(val, "dd.MM.yyyy", new Date());
-				return isValid(date);
-			},
-			{ message: "expense.invalidStartDate" },
-		)
-		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
-	endDate: z
-		.string()
-		.min(1, "expense.endDateRequired")
-		.refine(
-			(val) => {
-				const date = parse(val, "dd.MM.yyyy", new Date());
-				return isValid(date);
-			},
-			{ message: "expense.invalidEndDate" },
-		)
-		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
+	startDate: calendarDate(
+		"expense.startDateRequired",
+		"expense.invalidStartDate",
+	),
+	endDate: calendarDate("expense.endDateRequired", "expense.invalidEndDate"),
 	type: z.enum(ExpenseType),
 	reportId: z.string().min(1),
 });
@@ -162,7 +178,7 @@ export const deleteCostUnitSchema = z.object({
  */
 const datevAccountNumber = z
 	.string()
-	.regex(/^\d{1,9}$/)
+	.regex(/^\d{1,9}$/, "datev.accountNumber")
 	.nullable();
 
 /**
@@ -179,15 +195,41 @@ const datevAccountNumber = z
  * says nothing about which of thirty-one header fields was wrong.
  */
 export const updateDatevSettingsSchema = z.object({
-	datevBeraternummer: z.number().int().min(1001).max(9999999).nullable(),
-	datevMandantennummer: z.number().int().min(1).max(99999).nullable(),
+	datevBeraternummer: z
+		.number()
+		.int("datev.beraternummer")
+		.min(1001, "datev.beraternummer")
+		.max(9999999, "datev.beraternummer")
+		.nullable(),
+	datevMandantennummer: z
+		.number()
+		.int("datev.mandantennummer")
+		.min(1, "datev.mandantennummer")
+		.max(99999, "datev.mandantennummer")
+		.nullable(),
 	// The picker hands over `dd.MM.yyyy`, and an empty field means "not set".
 	// Parsed here so the form and the router share one schema: a client copy
 	// that transformed differently is exactly how the two drift apart.
+	// Checked before the transform rather than after it: `parseCalendarDate`
+	// answers null for a typo just as it does for an empty field, so
+	// transforming first would store `31.02.2026` as "not configured" and the
+	// export would then name the one field the admin had just filled in. The
+	// picker is a free text input that fires on every keystroke, so a
+	// half-written date reaching submit is the normal case, not the exotic one.
 	datevWirtschaftsjahrBeginn: z
 		.string()
+		.refine((value) => value === "" || parseCalendarDate(value) !== null, {
+			// A key, like every other message in this file: `FieldError` looks it
+			// up under `validation` and renders anything unregistered verbatim.
+			message: "datev.fiscalYearStart",
+		})
 		.transform((value) => (value === "" ? null : parseCalendarDate(value))),
-	datevSachkontenlaenge: z.number().int().min(4).max(8).nullable(),
+	datevSachkontenlaenge: z
+		.number()
+		.int("datev.sachkontenlaenge")
+		.min(4, "datev.sachkontenlaenge")
+		.max(8, "datev.sachkontenlaenge")
+		.nullable(),
 	// Header field 27. SKR49 exists for Vereine, but nothing downstream maps to
 	// it — accepting it here would promise support that is not there.
 	datevKontenrahmen: z.enum(["03", "04"]).nullable(),

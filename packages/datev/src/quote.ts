@@ -21,12 +21,19 @@
  */
 export function quoteText(value: string): string {
 	const escaped = value
-		// A run of control characters or separators becomes one space, so a
-		// description written across two lines reads as one sentence, and the
-		// space it leaves next to an existing one is squeezed back out — a field
-		// this narrow has no characters to spare.
-		.replace(/[\p{Cc};]+/gu, " ")
-		.replace(/\s{2,}/g, " ")
+		// A run of control characters or separators becomes one space, and any
+		// whitespace already beside it goes into the same space, so a description
+		// written across two lines reads as one sentence rather than carrying a
+		// double space where the break was.
+		//
+		// Deliberately scoped to that run instead of squeezing every `\s{2,}` in
+		// the value: a blanket squeeze also rewrites spacing nobody asked it to
+		// touch. A cost unit tag is cleared by `isValidKostenstelle`, whose
+		// pattern admits a space, so `IT  OPS` passes the preflight and would
+		// then reach DATEV as `IT OPS` — a different, and possibly unknown, cost
+		// centre. Not rewriting a tag is the whole reason the preflight blocks
+		// instead of normalizing.
+		.replace(/\s*[\p{Cc};]+\s*/gu, " ")
 		.replace(/"/g, '""');
 
 	return `"${escaped}"`;

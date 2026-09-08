@@ -35,6 +35,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toDisplayDate } from "@/lib/calendar-date";
 import { expenseTypeKeys } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -116,11 +117,11 @@ function ReportExpenses({
 								</td>
 								<td className="px-3 py-2.5 text-left text-slate-700 text-sm">
 									{isSameDay(expense.startDate, expense.endDate) ? (
-										formatDate(expense.startDate, "dd.MM.yyyy")
+										formatDate(toDisplayDate(expense.startDate), "dd.MM.yyyy")
 									) : (
 										<>
-											{formatDate(expense.startDate, "dd.MM.yyyy")} –{" "}
-											{formatDate(expense.endDate, "dd.MM.yyyy")}
+											{formatDate(toDisplayDate(expense.startDate), "dd.MM.yyyy")} –{" "}
+											{formatDate(toDisplayDate(expense.endDate), "dd.MM.yyyy")}
 										</>
 									)}
 								</td>

@@ -57,6 +57,11 @@ function distance(value: number): string {
 		: value.toFixed(2).replace(".", ",");
 }
 
+/** A blank title leaves the detail alone rather than behind a bare separator. */
+function withTitle(title: string, detail: string): string {
+	return title === "" ? detail : `${title}${SEPARATOR}${detail}`;
+}
+
 /**
  * What the Steuerberater reads next to the amount. The report title carries the
  * occasion, the detail says which expense within it.
@@ -85,7 +90,13 @@ function buchungstext(
 
 	const detail = parts.join(", ");
 
-	const full = `${report.title}${SEPARATOR}${detail}`;
+	// `Report.title` is validated as a non-empty string, which is not the same as
+	// a non-blank one: `"   "` passes, and so does a title with trailing spaces.
+	// Trimmed here rather than around the separator, so the short path below and
+	// the truncating one cannot disagree about what the title is.
+	const title = report.title.trim();
+
+	const full = withTitle(title, detail);
 	if (full.length <= BUCHUNGSTEXT_MAX) return full;
 
 	// The detail is what tells one row from the next, and on a travel allowance
@@ -93,11 +104,17 @@ function buchungstext(
 	// and the title gives way. Cutting the tail instead would leave every row of
 	// a long-titled report reading the same truncated occasion, with the route it
 	// has to be checked against gone.
+	//
+	// The cut lands mid-word either way; the second trim only keeps it from
+	// landing on a space, which would read as a doubled one before the separator.
 	const room = BUCHUNGSTEXT_MAX - SEPARATOR.length - detail.length;
+	const fitted = title.slice(0, Math.max(room, 0)).trimEnd();
 
-	return room > 0
-		? `${report.title.slice(0, room)}${SEPARATOR}${detail}`
-		: detail.slice(0, BUCHUNGSTEXT_MAX);
+	// Nothing of the title survived, so the detail is written on its own rather
+	// than behind a separator with nothing in front of it.
+	return fitted === ""
+		? detail.slice(0, BUCHUNGSTEXT_MAX)
+		: withTitle(fitted, detail);
 }
 
 function expenseAccount(type: ExpenseType, accounts: DatevAccounts): string {

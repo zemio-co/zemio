@@ -1,24 +1,18 @@
+import { type Kontenrahmen, toKontenrahmen } from "@zemio/datev";
 import { decimalToNumber } from "@/server/shared/money";
-
-/** The two chart-of-accounts values DATEV writes into header field 27. */
-type DatevKontenrahmen = "03" | "04";
-
-/**
- * The column is a plain string, so it can in principle hold something the
- * export cannot use. Anything but the two reads as unconfigured: the preflight
- * then names the field, rather than the serializer writing a value DATEV would
- * refuse the whole file over.
- */
-function toKontenrahmen(value: string | null): DatevKontenrahmen | null {
-	return value === "03" || value === "04" ? value : null;
-}
-
 import type { SettingsRow } from "./settings.repository";
 
 /**
  * Org settings with every monetary column converted once, here. Routers and
  * components never see a Decimal, so `Number(...)` cannot reappear at a call
  * site (docs/trpc-architecture.md, "DTOs + Decimal once").
+ *
+ * Deliberately without the DATEV configuration. `settings.get` is an
+ * `orgProcedure`, and the expense forms every member fills in call it — so
+ * anything in this shape is readable by the whole organization. The Kanzlei's
+ * Berater- and Mandantennummer and its ledger accounts are the organization's
+ * accounting setup and have no business on a submitter's expense form; they live
+ * in {@link DatevSettingsDTO}, behind an admin-only procedure.
  */
 export type SettingsDTO = {
 	id: string;
@@ -30,20 +24,6 @@ export type SettingsDTO = {
 	breakfastDeduction: number;
 	lunchDeduction: number;
 	dinnerDeduction: number;
-
-	// DATEV export configuration. No Decimals among them, so they pass
-	// straight through — the account numbers are strings because a ledger
-	// account is an identifier, not a quantity.
-	datevBeraternummer: number | null;
-	datevMandantennummer: number | null;
-	datevWirtschaftsjahrBeginn: Date | null;
-	datevSachkontenlaenge: number | null;
-	datevKontenrahmen: DatevKontenrahmen | null;
-	datevExpenseAccountReceipt: string | null;
-	datevExpenseAccountTravel: string | null;
-	datevExpenseAccountFood: string | null;
-	datevContraAccount: string | null;
-	datevFestschreibung: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 };
@@ -59,17 +39,44 @@ export function toSettingsDTO(row: SettingsRow): SettingsDTO {
 		breakfastDeduction: decimalToNumber(row.breakfastDeduction),
 		lunchDeduction: decimalToNumber(row.lunchDeduction),
 		dinnerDeduction: decimalToNumber(row.dinnerDeduction),
+		createdAt: row.createdAt,
+		updatedAt: row.updatedAt,
+	};
+}
+
+/**
+ * The DATEV export configuration, read and written by administrators only.
+ *
+ * No Decimals among them, so they pass straight through — the account numbers
+ * are strings because a ledger account is an identifier, not a quantity.
+ */
+export type DatevSettingsDTO = {
+	datevBeraternummer: number | null;
+	datevMandantennummer: number | null;
+	datevWirtschaftsjahrBeginn: Date | null;
+	datevSachkontenlaenge: number | null;
+	datevKontenrahmen: Kontenrahmen | null;
+	datevExpenseAccountReceipt: string | null;
+	datevExpenseAccountTravel: string | null;
+	datevExpenseAccountFood: string | null;
+	datevContraAccount: string | null;
+	datevFestschreibung: boolean;
+};
+
+export function toDatevSettingsDTO(row: SettingsRow): DatevSettingsDTO {
+	return {
 		datevBeraternummer: row.datevBeraternummer,
 		datevMandantennummer: row.datevMandantennummer,
 		datevWirtschaftsjahrBeginn: row.datevWirtschaftsjahrBeginn,
 		datevSachkontenlaenge: row.datevSachkontenlaenge,
+		// The column is a plain string; anything but the two reads as
+		// unconfigured, so the preflight names the field instead of the header
+		// carrying a value DATEV refuses the file over.
 		datevKontenrahmen: toKontenrahmen(row.datevKontenrahmen),
 		datevExpenseAccountReceipt: row.datevExpenseAccountReceipt,
 		datevExpenseAccountTravel: row.datevExpenseAccountTravel,
 		datevExpenseAccountFood: row.datevExpenseAccountFood,
 		datevContraAccount: row.datevContraAccount,
 		datevFestschreibung: row.datevFestschreibung,
-		createdAt: row.createdAt,
-		updatedAt: row.updatedAt,
 	};
 }

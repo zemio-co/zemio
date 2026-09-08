@@ -27,7 +27,10 @@ const GERMAN_DATE = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/;
  *
  * The components are checked back against the date they build, which is what
  * rejects a day that does not exist: `31.02.2026` would otherwise roll over to
- * 2 March, and `29.02.2026` to 1 March.
+ * 2 March, and `29.02.2026` to 1 March. It also catches `Date.UTC`'s two-digit
+ * year rule — a year below 100 is read as 1900 plus it, so `01.03.0026` builds
+ * 1926 — which is why the check has to stay even though the regex already
+ * demands four digits.
  */
 export function parseCalendarDate(value: string): Date | null {
 	const match = GERMAN_DATE.exec(value);
@@ -47,4 +50,33 @@ export function parseCalendarDate(value: string): Date | null {
 		date.getUTCDate() === day
 		? date
 		: null;
+}
+
+/**
+ * `dd.MM.yyyy` for a day stored at UTC midnight — the inverse of
+ * `parseCalendarDate`, and the only safe way to put such a day back into a
+ * field the user can edit.
+ *
+ * `date-fns`' `formatDate` reads local getters, so west of UTC it renders the
+ * day before: an expense stored as `2026-03-01` shows as `28.02.2026`, and
+ * saving the form back writes that wrong day into the `@db.Date` column for
+ * good. Reading with `getUTC*` keeps the round trip lossless in every zone.
+ */
+export function formatCalendarDate(date: Date): string {
+	const day = String(date.getUTCDate()).padStart(2, "0");
+	const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+
+	return `${day}.${month}.${date.getUTCFullYear()}`;
+}
+
+/**
+ * The same day as a local `Date`, so `date-fns` patterns can be used on it
+ * without its local getters shifting the day.
+ *
+ * Only for rendering. The result is *not* the instant that was stored — it is a
+ * local midnight carrying the stored calendar day — so it must never be written
+ * back or compared against a stored value.
+ */
+export function toDisplayDate(date: Date): Date {
+	return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }

@@ -3,15 +3,16 @@
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
 import { keepPreviousData } from "@tanstack/react-query";
-import { formatDate, isValid, parse } from "date-fns";
 import { DownloadIcon, ImageIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import z from "zod";
 import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
 	FieldDescription,
+	FieldError,
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
@@ -32,6 +33,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
+import { formatCalendarDate, parseCalendarDate } from "@/lib/calendar-date";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { cn, formatBytes, renameFileWithHash } from "@/lib/utils";
 import type { ExpenseByIdDTO } from "@/server/modules/expense";
@@ -128,6 +130,33 @@ function UpdateExpenseContent({
 	);
 }
 
+/**
+ * Validates the edit form before it submits.
+ *
+ * The dates stay strings here, so `parseCalendarDate` in `onSubmit` remains the
+ * one reader; this only refuses what that reader cannot answer. Without it an
+ * unreadable date was dropped from the mutation by `?? undefined`: the update
+ * reported success, the old day silently stayed, and nothing was shown. The
+ * messages are keys under next-intl's `validation` namespace, which `FieldError`
+ * resolves.
+ */
+const receiptUpdateFormSchema = z.object({
+	description: z.string(),
+	amount: z.number().min(0),
+	startDate: z
+		.string()
+		.min(1, "expense.startDateRequired")
+		.refine((value) => parseCalendarDate(value) !== null, {
+			message: "expense.invalidStartDate",
+		}),
+	endDate: z
+		.string()
+		.min(1, "expense.endDateRequired")
+		.refine((value) => parseCalendarDate(value) !== null, {
+			message: "expense.invalidEndDate",
+		}),
+});
+
 function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 	const t = useTranslations("modules.report.updateExpense");
 	const tCommon = useTranslations("modules.report.common");
@@ -151,19 +180,27 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 		defaultValues: {
 			description: expense.description ?? "",
 			amount: Number(expense.amount),
-			startDate: formatDate(expense.startDate, "dd.MM.yyyy"),
-			endDate: formatDate(expense.endDate, "dd.MM.yyyy"),
+			// Read with the UTC getters, like the value was written: `formatDate`
+			// reads local ones, so west of UTC a day stored as `2026-03-01` shows
+			// as `28.02.2026` — and the submit below then writes that day back.
+			startDate: formatCalendarDate(expense.startDate),
+			endDate: formatCalendarDate(expense.endDate),
 		},
+		validators: { onSubmit: receiptUpdateFormSchema },
 		onSubmit: ({ value }) => {
-			const startDate = parse(value.startDate, "dd.MM.yyyy", new Date());
-			const endDate = parse(value.endDate, "dd.MM.yyyy", new Date());
+			// The same reader the create path uses. date-fns' `parse` returns local
+			// midnight, and the columns are now `@db.Date`: east of UTC the 1st of
+			// March arrives as `2026-02-28T23:00Z` and Postgres keeps the UTC date
+			// part, so an edit silently moved every day one back.
+			const startDate = parseCalendarDate(value.startDate);
+			const endDate = parseCalendarDate(value.endDate);
 
 			updateExpense.mutate({
 				id: expense.id,
 				description: value.description,
 				amount: value.amount,
-				startDate: isValid(startDate) ? startDate : undefined,
-				endDate: isValid(endDate) ? endDate : undefined,
+				startDate: startDate ?? undefined,
+				endDate: endDate ?? undefined,
 			});
 		},
 	});
@@ -200,37 +237,51 @@ function ReceiptUpdateForm({ expense }: { expense: ExpenseByIdDTO }) {
 				</form.Field>
 
 				<form.Field name="startDate">
-					{(field) => (
-						<Field>
-							<FieldLabel htmlFor={field.name}>
-								{tCommon("fields.startDate")}
-							</FieldLabel>
-							<DatePicker
-								id={field.name}
-								name={field.name}
-								onBlur={field.handleBlur}
-								onChange={(date) => field.handleChange(date.target.value)}
-								placeholder={tCommon("fields.datePlaceholder")}
-								value={field.state.value}
-							/>
-						</Field>
-					)}
+					{(field) => {
+						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+						return (
+							<Field data-invalid={isInvalid}>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.startDate")}
+								</FieldLabel>
+								<DatePicker
+									aria-invalid={isInvalid}
+									id={field.name}
+									name={field.name}
+									onBlur={field.handleBlur}
+									onChange={(date) => field.handleChange(date.target.value)}
+									placeholder={tCommon("fields.datePlaceholder")}
+									value={field.state.value}
+								/>
+								{isInvalid && <FieldError errors={field.state.meta.errors} />}
+							</Field>
+						);
+					}}
 				</form.Field>
 
 				<form.Field name="endDate">
-					{(field) => (
-						<Field>
-							<FieldLabel htmlFor={field.name}>{tCommon("fields.endDate")}</FieldLabel>
-							<DatePicker
-								id={field.name}
-								name={field.name}
-								onBlur={field.handleBlur}
-								onChange={(date) => field.handleChange(date.target.value)}
-								placeholder={tCommon("fields.datePlaceholder")}
-								value={field.state.value}
-							/>
-						</Field>
-					)}
+					{(field) => {
+						const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+						return (
+							<Field data-invalid={isInvalid}>
+								<FieldLabel htmlFor={field.name}>
+									{tCommon("fields.endDate")}
+								</FieldLabel>
+								<DatePicker
+									aria-invalid={isInvalid}
+									id={field.name}
+									name={field.name}
+									onBlur={field.handleBlur}
+									onChange={(date) => field.handleChange(date.target.value)}
+									placeholder={tCommon("fields.datePlaceholder")}
+									value={field.state.value}
+								/>
+								{isInvalid && <FieldError errors={field.state.meta.errors} />}
+							</Field>
+						);
+					}}
 				</form.Field>
 
 				<form.Field name="amount">

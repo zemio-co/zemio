@@ -13,7 +13,6 @@ import {
 	Skeleton,
 	Switch,
 } from "@zemio/ui";
-import { formatDate } from "date-fns";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/date-picker";
@@ -26,6 +25,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { formatCalendarDate } from "@/lib/calendar-date";
 import { cn } from "@/lib/utils";
 import { updateDatevSettingsSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
@@ -73,9 +73,18 @@ function OrgSettingsDatev({
 	);
 }
 
-/** `dd.MM.yyyy` for the picker; empty when nothing is configured yet. */
+/**
+ * `dd.MM.yyyy` for the picker; empty when nothing is configured yet.
+ *
+ * Read in UTC, because that is how `parseCalendarDate` wrote it: the stored
+ * value is UTC midnight of the day that was typed. `date-fns` `formatDate`
+ * reads the local components, so west of UTC a saved 01.01.2026 came back into
+ * the field as 31.12.2025 — and the next save would then persist the shift.
+ * This is the inverse of the schema's transform, so it has to use the same
+ * calendar.
+ */
 const toDateInput = (value: Date | null) =>
-	value ? formatDate(value, "dd.MM.yyyy") : "";
+	value ? formatCalendarDate(value) : "";
 
 type DatevFormValues = {
 	datevBeraternummer: number | null;
@@ -120,7 +129,7 @@ function toFormValues(data: {
 function DatevSection({ className, ...props }: React.ComponentProps<"div">) {
 	const t = useTranslations("modules.settings.datev");
 	const tShared = useTranslations("modules.settings.shared");
-	const query = api.settings.get.useQuery();
+	const query = api.settings.datevSettings.useQuery();
 
 	if (query.isPending) {
 		return <Skeleton className={cn("h-96 w-full", className)} {...props} />;
@@ -160,12 +169,15 @@ function DatevForm({
 
 	const updateMutation = api.settings.updateDatevSettings.useMutation({
 		onSuccess: (updated) => {
-			utils.settings.get.setData(undefined, updated);
-			void utils.settings.get.invalidate();
+			utils.settings.datevSettings.setData(undefined, updated);
+			void utils.settings.datevSettings.invalidate();
 		},
 		onError: (error) => {
 			toast.error(t("saveErrorTitle"), {
-				description: error.message ?? t("saveErrorFallback"),
+				// `||`, not `??`: a tRPC error's `message` is always a string, so
+				// the nullish fallback was unreachable. An empty message is the
+				// case that leaves the toast with a blank body.
+				description: error.message || t("saveErrorFallback"),
 			});
 		},
 	});

@@ -1,15 +1,7 @@
 import { TRPCError } from "@trpc/server";
-import {
-	ExpenseType,
-	type InputTaxRate,
-	type Prisma,
-	type PrismaClient,
-} from "@zemio/db";
+import { ExpenseType, type Prisma, type PrismaClient } from "@zemio/db";
 import type { z } from "zod";
 import { roundToCents } from "@/lib/utils";
-// Typed from the schemas the router actually validates with, not from the
-// identical copies in `@/lib/validators` that shape the forms: those can drift,
-// and this service's input types would then describe a shape it never receives.
 import { type AuditRepository, auditRepository } from "@/server/modules/audit";
 import { mapPrismaError } from "@/server/shared/errors";
 import { decimalToNumber } from "@/server/shared/money";
@@ -27,10 +19,14 @@ import {
 	type ExpenseRepository,
 	expenseRepository,
 } from "./expense.repository";
+// Typed from the schemas the router actually validates with, not from the
+// identical copies in `@/lib/validators` that shape the forms: those can drift,
+// and this service's input types would then describe a shape it never receives.
 import type {
 	createFoodExpenseSchema,
 	createReceiptExpenseSchema,
 	createTravelExpenseSchema,
+	updateExpenseSchema,
 } from "./expense.validators";
 
 async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
@@ -63,20 +59,7 @@ type CreateReceiptInput = z.infer<typeof createReceiptExpenseSchema>;
 type CreateTravelInput = z.infer<typeof createTravelExpenseSchema>;
 type CreateFoodInput = z.infer<typeof createFoodExpenseSchema>;
 
-type UpdateExpenseInput = {
-	description?: string;
-	amount?: number;
-	startDate?: Date;
-	endDate?: Date;
-	from?: string;
-	to?: string;
-	distance?: number;
-	days?: number;
-	breakfastDeduction?: number;
-	lunchDeduction?: number;
-	dinnerDeduction?: number;
-	inputTaxRate?: InputTaxRate;
-};
+type UpdateExpenseInput = z.infer<typeof updateExpenseSchema>;
 
 export function createExpenseService(deps: {
 	repo: ExpenseRepository;

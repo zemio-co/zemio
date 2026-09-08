@@ -8,7 +8,6 @@ import {
 	BuildingIcon,
 	CreditCardIcon,
 	EuroIcon,
-	FileSpreadsheetIcon,
 	FolderTreeIcon,
 	type LucideIcon,
 	SettingsIcon,
@@ -151,12 +150,6 @@ const organizationMenuItems: MenuItem[] = [
 		label: tNav("items.orgAllowances.label"),
 		href: ROUTES.SETTINGS_ORG_ALLOWANCES(),
 		icon: EuroIcon,
-	},
-	{
-		key: "datev",
-		label: tNav("items.orgDatev.label"),
-		href: ROUTES.SETTINGS_ORG_DATEV(),
-		icon: FileSpreadsheetIcon,
 	},
 	{
 		key: "cost_units",

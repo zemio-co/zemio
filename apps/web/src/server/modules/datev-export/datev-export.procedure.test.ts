@@ -5,9 +5,25 @@ import {
 	createMockOrgContext,
 	expectTRPCErrorCode,
 } from "@zemio/test-utils";
-import { describe, expect, it } from "vitest";
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	type Mock,
+	vi,
+} from "vitest";
 import { datevExportRouter } from "@/server/api/routers/datev-export";
 import { createCallerFactory } from "@/server/api/trpc";
+
+const { storageMock } = vi.hoisted(() => ({
+	storageMock: {
+		getPresignedDownloadUrl: vi.fn(),
+		deleteFilesFromStorage: vi.fn(),
+	},
+}));
+vi.mock("@/server/storage", () => storageMock);
 
 const createCaller = createCallerFactory(datevExportRouter);
 
@@ -35,6 +51,66 @@ function adminContext() {
 	ctx.db.report.findMany.mockResolvedValue([] as never);
 	return ctx;
 }
+
+/** Two reports that between them write two bookings. */
+const bookableReports = [
+	{
+		id: "report_1",
+		tag: 42,
+		costUnit: { tag: "MARKETING" },
+		expenses: [{ amount: new Prisma.Decimal("24.90") }],
+	},
+	{
+		id: "report_2",
+		tag: 43,
+		costUnit: { tag: "MARKETING" },
+		expenses: [{ amount: new Prisma.Decimal("10.00") }],
+	},
+];
+
+/** What apps/api answers once it has written and stored the file. */
+const storedFile = {
+	url: "https://storage.test/datev/org_1/file.csv?signature",
+	filename: "EXTF_Buchungsstapel_20260801-20260831.csv",
+	key: "datev/org_1/2f6c.csv",
+	checksum: "b8f1",
+	reportIds: ["report_1", "report_2"],
+};
+
+/**
+ * A context whose period holds two bookable reports and whose `$transaction`
+ * runs its callback, so `recordExport` reaches the two writes it makes.
+ */
+function exportingContext() {
+	const ctx = adminContext();
+	ctx.db.report.findMany.mockResolvedValue(bookableReports as never);
+	(ctx.db.$transaction as unknown as Mock).mockImplementation(
+		async (run: (tx: unknown) => unknown) => run(ctx.db),
+	);
+	ctx.db.datevExport.create.mockResolvedValue({ id: "dx_1" } as never);
+	ctx.db.report.updateMany.mockResolvedValue({ count: 2 } as never);
+	return ctx;
+}
+
+/** Stubs the call to apps/api that produces the file. */
+function apiResponds(body: unknown, status = 200) {
+	return vi.spyOn(globalThis, "fetch").mockResolvedValue(
+		new Response(JSON.stringify(body), {
+			status,
+			headers: { "content-type": "application/json" },
+		}),
+	);
+}
+
+beforeEach(() => {
+	storageMock.getPresignedDownloadUrl.mockReset();
+	storageMock.deleteFilesFromStorage.mockReset();
+	storageMock.deleteFilesFromStorage.mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+	vi.restoreAllMocks();
+});
 
 describe("datevExport.preview", () => {
 	it("is closed to members who are not admins", async () => {
@@ -191,6 +267,54 @@ describe("datevExport.list", () => {
 			}),
 		);
 	});
+
+	it("reports who exported the period, and how many reports it took", async () => {
+		// The two values the history row is for. Both are read out of nested
+		// shapes — `createdBy.name` and `_count.reports` — so a select that stopped
+		// asking for either would leave the column blank rather than fail, and the
+		// list is the only place a past export can still be recognized.
+		const ctx = adminContext();
+		ctx.db.datevExport.findMany.mockResolvedValue([
+			{
+				id: "dx_1",
+				createdAt: new Date(Date.UTC(2026, 8, 2, 9, 30)),
+				periodFrom: period.periodFrom,
+				periodTo: period.periodTo,
+				checksum: "b8f1",
+				createdBy: { name: "Alex Admin" },
+				_count: { reports: 7 },
+			},
+		] as never);
+
+		const exports = await createCaller(asTRPCContext(ctx)).list();
+
+		expect(exports).toEqual([
+			{
+				id: "dx_1",
+				createdAt: new Date(Date.UTC(2026, 8, 2, 9, 30)),
+				periodFrom: period.periodFrom,
+				periodTo: period.periodTo,
+				createdByName: "Alex Admin",
+				reportCount: 7,
+				checksum: "b8f1",
+			},
+		]);
+	});
+
+	it("does not carry the storage key out to the client", async () => {
+		// The row holds one, and a history list has no use for it: the client asks
+		// `download` for a fresh signed URL by export id instead.
+		const ctx = adminContext();
+		ctx.db.datevExport.findMany.mockResolvedValue([] as never);
+
+		await createCaller(asTRPCContext(ctx)).list();
+
+		const { select } = ctx.db.datevExport.findMany.mock.calls[0]?.[0] as {
+			select: Record<string, unknown>;
+		};
+
+		expect(select).not.toHaveProperty("fileKey");
+	});
 });
 
 describe("datevExport.download", () => {
@@ -219,6 +343,60 @@ describe("datevExport.download", () => {
 				where: { id: "dx_other_org", organizationId: "org_1" },
 			}),
 		);
+	});
+
+	it("signs the stored file, and names it after the period it covers", async () => {
+		// The file is served again rather than rebuilt: rebuilding would run
+		// today's serializer over reports that are already claimed. The download
+		// name therefore comes from the stored period and not from the key, so a
+		// file the Kanzlei has already filed away cannot reappear under another
+		// name. A part-month period is used here because it names both ends —
+		// a whole month collapses to `202608` and would not show that.
+		const ctx = adminContext();
+		ctx.db.datevExport.findFirst.mockResolvedValue({
+			id: "dx_1",
+			fileKey: "datev/org_1/2f6c.csv",
+			periodFrom: new Date(Date.UTC(2026, 7, 1)),
+			periodTo: new Date(Date.UTC(2026, 7, 15)),
+		} as never);
+		storageMock.getPresignedDownloadUrl.mockResolvedValue(
+			"https://storage.test/signed",
+		);
+
+		const result = await createCaller(asTRPCContext(ctx)).download({
+			id: "dx_1",
+		});
+
+		expect(result).toEqual({
+			url: "https://storage.test/signed",
+			filename: "EXTF_Buchungsstapel_20260801-20260815.csv",
+		});
+		expect(storageMock.getPresignedDownloadUrl).toHaveBeenCalledWith(
+			"datev/org_1/2f6c.csv",
+			"EXTF_Buchungsstapel_20260801-20260815.csv",
+		);
+	});
+
+	it("does not rebuild the file, and claims nothing further", async () => {
+		// A second export of a period that is already closed out would claim
+		// nothing and produce nothing; `download` must stay a read.
+		const ctx = adminContext();
+		ctx.db.datevExport.findFirst.mockResolvedValue({
+			id: "dx_1",
+			fileKey: "datev/org_1/2f6c.csv",
+			periodFrom: period.periodFrom,
+			periodTo: period.periodTo,
+		} as never);
+		storageMock.getPresignedDownloadUrl.mockResolvedValue(
+			"https://storage.test/signed",
+		);
+		const fetchMock = vi.spyOn(globalThis, "fetch");
+
+		await createCaller(asTRPCContext(ctx)).download({ id: "dx_1" });
+
+		expect(fetchMock).not.toHaveBeenCalled();
+		expect(ctx.db.report.updateMany).not.toHaveBeenCalled();
+		expect(ctx.db.datevExport.create).not.toHaveBeenCalled();
 	});
 });
 
@@ -281,5 +459,237 @@ describe("datevExport.create", () => {
 
 		expect(result.status).toBe("empty");
 		expect(ctx.db.datevExport.create).not.toHaveBeenCalled();
+	});
+
+	it("records the export and claims exactly the reports the file covered", async () => {
+		const ctx = exportingContext();
+		apiResponds(storedFile);
+
+		const result = await createCaller(asTRPCContext(ctx)).create(period);
+
+		expect(result).toEqual({
+			status: "created",
+			url: storedFile.url,
+			filename: storedFile.filename,
+			reportCount: 2,
+			notices: [],
+		});
+		// The ids come from apps/api's answer, not from a second query over the
+		// period: a report that turned PAID in between is in neither the file nor
+		// the claim.
+		expect(ctx.db.report.updateMany).toHaveBeenCalledWith({
+			where: {
+				id: { in: storedFile.reportIds },
+				organizationId: "org_1",
+				datevExportId: null,
+			},
+			data: { datevExportId: "dx_1" },
+		});
+	});
+
+	it("names the preflighted selection to apps/api rather than the period alone", async () => {
+		const ctx = exportingContext();
+		const fetchMock = apiResponds(storedFile);
+
+		await createCaller(asTRPCContext(ctx)).create(period);
+
+		const [, init] = fetchMock.mock.calls[0] ?? [];
+		expect(JSON.parse(String(init?.body))).toEqual({
+			periodFrom: period.periodFrom.toISOString(),
+			periodTo: period.periodTo.toISOString(),
+			reportIds: ["report_1", "report_2"],
+		});
+	});
+
+	it("stores the configuration the export was approved with", async () => {
+		// Without it an export stops being explainable the moment an organization
+		// edits an account. `festschreibung` rides along because it is written into
+		// the header, and the fiscal-year start as an ISO string because JSON has
+		// no date.
+		const ctx = exportingContext();
+		apiResponds(storedFile);
+
+		await createCaller(asTRPCContext(ctx)).create(period);
+
+		const { data } = ctx.db.datevExport.create.mock.calls[0]?.[0] as {
+			data: Record<string, unknown>;
+		};
+
+		expect(data.configuration).toEqual({
+			beraternummer: 29098,
+			mandantennummer: 55003,
+			wirtschaftsjahrBeginn: "2026-01-01T00:00:00.000Z",
+			sachkontenlaenge: 4,
+			kontenrahmen: "03",
+			expenseAccountReceipt: "4980",
+			expenseAccountTravel: "4670",
+			expenseAccountFood: "4664",
+			contraAccount: "1200",
+			festschreibung: true,
+		});
+		expect(data.fileKey).toBe(storedFile.key);
+		expect(data.checksum).toBe(storedFile.checksum);
+	});
+
+	it("refuses the file when another export claimed part of the selection", async () => {
+		// `recordExport` is all-or-nothing: the file was written for the whole
+		// selection, so handing it over after claiming only part of it would repeat
+		// bookings the Kanzlei already has.
+		const ctx = exportingContext();
+		ctx.db.report.updateMany.mockResolvedValue({ count: 1 } as never);
+		apiResponds(storedFile);
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"CONFLICT",
+		);
+	});
+
+	it("drops the stored file when it refuses to record the export", async () => {
+		// The object is in storage and no row will point at it — `recordExport`
+		// rolled back — and the file is only ever served again from its row, so
+		// nothing could rediscover it. Left alone it would hold a full copy of a
+		// period's bookings for good.
+		const ctx = exportingContext();
+		ctx.db.report.updateMany.mockResolvedValue({ count: 1 } as never);
+		apiResponds(storedFile);
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"CONFLICT",
+		);
+
+		expect(storageMock.deleteFilesFromStorage).toHaveBeenCalledWith([
+			storedFile.key,
+		]);
+	});
+
+	it("keeps the conflict when the stored file cannot be dropped", async () => {
+		// A storage failure must not replace the conflict: the admin retries and
+		// gets whatever is genuinely left, and the orphan is already logged.
+		const ctx = exportingContext();
+		ctx.db.report.updateMany.mockResolvedValue({ count: 1 } as never);
+		storageMock.deleteFilesFromStorage.mockRejectedValue(new Error("S3 down"));
+		apiResponds(storedFile);
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"CONFLICT",
+		);
+	});
+
+	it("leaves the stored file alone when the failure is not a claim conflict", async () => {
+		// Any other failure leaves the outcome of the commit unknown, and an
+		// orphaned object is the lesser harm next to deleting a file a recorded
+		// export points at.
+		const ctx = exportingContext();
+		(ctx.db.$transaction as unknown as Mock).mockRejectedValue(
+			new Error("connection lost"),
+		);
+		apiResponds(storedFile);
+
+		await expect(
+			createCaller(asTRPCContext(ctx)).create(period),
+		).rejects.toThrow();
+
+		expect(storageMock.deleteFilesFromStorage).not.toHaveBeenCalled();
+	});
+
+	it("refuses a file whose whole selection was claimed while it was written", async () => {
+		// Only an apps/api old enough to upload before re-querying answers this
+		// way, with a header and no bookings. Its file has to go too.
+		const ctx = exportingContext();
+		apiResponds({ ...storedFile, reportIds: [] });
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"CONFLICT",
+		);
+
+		expect(ctx.db.datevExport.create).not.toHaveBeenCalled();
+		expect(storageMock.deleteFilesFromStorage).toHaveBeenCalledWith([
+			storedFile.key,
+		]);
+	});
+
+	it("reads apps/api's 409 as a conflict, not as a fault of ours", async () => {
+		// The one failure apps/api reports that is not a bug: it found the
+		// configuration incomplete after the preflight had passed it, so the
+		// settings changed in between.
+		const ctx = exportingContext();
+		apiResponds({ error: "DATEV configuration incomplete" }, 409);
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"CONFLICT",
+		);
+
+		expect(ctx.db.datevExport.create).not.toHaveBeenCalled();
+	});
+
+	it("reads any other apps/api failure as ours", async () => {
+		const ctx = exportingContext();
+		apiResponds({ error: "boom" }, 500);
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).create(period),
+			"INTERNAL_SERVER_ERROR",
+		);
+
+		expect(ctx.db.datevExport.create).not.toHaveBeenCalled();
+	});
+});
+
+describe("the period a DATEV export is addressed by", () => {
+	it("takes a single UTC day", async () => {
+		// `periodFrom === periodTo` is a legitimate period: the query widens
+		// `periodTo` to the end of its UTC day, so it selects exactly that day.
+		const ctx = adminContext();
+		const day = new Date(Date.UTC(2026, 7, 14));
+
+		await createCaller(asTRPCContext(ctx)).preview({
+			periodFrom: day,
+			periodTo: day,
+		});
+
+		const { where } = ctx.db.report.findMany.mock.calls[0]?.[0] as {
+			where: { paidAt: { gte: Date; lt: Date } };
+		};
+
+		expect(where.paidAt.gte).toEqual(day);
+		expect(where.paidAt.lt).toEqual(new Date(Date.UTC(2026, 7, 15)));
+	});
+
+	it("refuses a period that runs backwards", async () => {
+		const ctx = adminContext();
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).preview({
+				periodFrom: period.periodTo,
+				periodTo: period.periodFrom,
+			}),
+			"BAD_REQUEST",
+		);
+
+		expect(ctx.db.report.findMany).not.toHaveBeenCalled();
+	});
+
+	it("refuses a day that is not a UTC midnight", async () => {
+		// A `Date` carrying a time of day is almost always a local midnight, and
+		// west of UTC that names the previous day — silently shifting the
+		// selection, the header's `Datum von`/`Datum bis` and every `TTMM`
+		// Belegdatum with it. Nothing downstream can tell it from a deliberate
+		// period, so it is refused where it arrives.
+		const ctx = adminContext();
+
+		await expectTRPCErrorCode(
+			createCaller(asTRPCContext(ctx)).preview({
+				periodFrom: new Date(Date.UTC(2026, 7, 1, 22, 0)),
+				periodTo: period.periodTo,
+			}),
+			"BAD_REQUEST",
+		);
+
+		expect(ctx.db.report.findMany).not.toHaveBeenCalled();
 	});
 });

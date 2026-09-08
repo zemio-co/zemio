@@ -31,6 +31,11 @@ export const settingsRouter = createTRPCRouter({
 			settingsService.updateMealAllowances(toSettingsServiceContext(ctx), input),
 		),
 
+	/** Admin-only: `get` is org-wide and must not carry the Kanzlei's accounts. */
+	datevSettings: orgAdminProcedure.query(({ ctx }) =>
+		settingsService.getDatevSettings(toSettingsServiceContext(ctx)),
+	),
+
 	updateDatevSettings: orgAdminProcedure
 		.input(updateDatevSettingsSchema)
 		.mutation(({ ctx, input }) =>

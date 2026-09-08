@@ -106,10 +106,41 @@ function isMissing(
 	return value === null || (typeof value === "string" && value.trim() === "");
 }
 
+/** The four fields that hold a ledger account number. */
+const ACCOUNT_FIELDS = new Set<DatevConfigurationField>([
+	"expenseAccountReceipt",
+	"expenseAccountTravel",
+	"expenseAccountFood",
+	"contraAccount",
+]);
+
+/**
+ * DATEV's Konto and Gegenkonto are numeric fields of nine digits, and the
+ * serializer writes them unquoted — so it can only refuse a separator or a line
+ * break, not a letter or a space. `123 4` therefore reaches the Kanzlei looking
+ * like a real account and the whole file is refused on import.
+ *
+ * The settings form already holds a typed value to this shape; this is for the
+ * ones it cannot vouch for — a row written before that validator existed, or
+ * straight into the database. Reported as an unusable configuration field so
+ * the admin is pointed at the account rather than at a rejected file.
+ */
+const LEDGER_ACCOUNT = /^\d{1,9}$/;
+
+function isUnusable(
+	field: DatevConfigurationField,
+	value: DatevConfiguration[DatevConfigurationField],
+): boolean {
+	if (isMissing(value)) return true;
+	return ACCOUNT_FIELDS.has(field) && !LEDGER_ACCOUNT.test(value as string);
+}
+
 function missingConfiguration(
 	configuration: DatevConfiguration,
 ): DatevConfigurationField[] {
-	return REQUIRED_FIELDS.filter((field) => isMissing(configuration[field]));
+	return REQUIRED_FIELDS.filter((field) =>
+		isUnusable(field, configuration[field]),
+	);
 }
 
 /**

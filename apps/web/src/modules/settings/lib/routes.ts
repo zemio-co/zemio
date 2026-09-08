@@ -7,6 +7,7 @@ import {
 	BuildingIcon,
 	CreditCardIcon,
 	EuroIcon,
+	FileSpreadsheetIcon,
 	FolderTreeIcon,
 	SettingsIcon,
 	Users2Icon,
@@ -80,6 +81,12 @@ const settingsRoutes: SettingsGroup[] = [
 				href: ROUTES.SETTINGS_ORG_COST_UNITS(),
 				icon: FolderTreeIcon,
 				description: t("items.orgCostUnits.description"),
+			},
+			{
+				label: t("items.orgDatev.label"),
+				href: ROUTES.SETTINGS_ORG_DATEV(),
+				icon: FileSpreadsheetIcon,
+				description: t("items.orgDatev.description"),
 			},
 			{
 				label: t("items.orgBilling.label"),

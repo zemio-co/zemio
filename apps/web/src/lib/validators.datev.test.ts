@@ -42,6 +42,62 @@ describe("updateDatevSettingsSchema", () => {
 		expect(parsed.datevWirtschaftsjahrBeginn).toBeNull();
 	});
 
+	it("refuses a fiscal year date it cannot read rather than storing absence", () => {
+		// The distinction the empty case above depends on. `parseCalendarDate`
+		// answers null for a typo exactly as it does for "", so a schema that
+		// transformed before checking would save `31.02.2026` as "not configured":
+		// the save succeeds, the field comes back empty, and the export then blocks
+		// naming the one field the admin had just filled in.
+		expect(accepts({ datevWirtschaftsjahrBeginn: "31.02.2026" })).toBe(false);
+		expect(accepts({ datevWirtschaftsjahrBeginn: "01.01.26" })).toBe(false);
+		expect(accepts({ datevWirtschaftsjahrBeginn: "2026-01-01" })).toBe(false);
+		// The picker is a free text input that fires on every keystroke, so a
+		// half-written date reaching submit is the ordinary case.
+		expect(accepts({ datevWirtschaftsjahrBeginn: "1.1.202" })).toBe(false);
+	});
+
+	describe("what reaches the upsert", () => {
+		// `settingsRepository.upsert` writes `data` straight into the update
+		// branch, so whatever this schema lets through is exactly what is written
+		// and everything else on the row is left alone
+		// (settings.repository.test.ts). Two properties follow from that.
+
+		it("refuses a partial save rather than writing one", () => {
+			// Nothing here is `.optional()`, so a request that omits a field is
+			// rejected instead of arriving as a partial update. Clearing a value is
+			// expressed by sending null, never by leaving the key out — which is
+			// what keeps a form that forgot a field from silently emptying it.
+			const { datevContraAccount, ...missingOneField } = complete;
+
+			expect(updateDatevSettingsSchema.safeParse(missingOneField).success).toBe(
+				false,
+			);
+		});
+
+		it("requires the Festschreibung, which has no null to fall back on", () => {
+			// The only non-nullable field of the ten: the column defaults to true
+			// and DATEV writes it into header field 21, so an absent value has no
+			// meaning the way an absent account does.
+			const { datevFestschreibung, ...missingFestschreibung } = complete;
+
+			expect(
+				updateDatevSettingsSchema.safeParse(missingFestschreibung).success,
+			).toBe(false);
+		});
+
+		it("drops a column it was not asked about", () => {
+			// The parsed object becomes the update payload verbatim, so an unknown
+			// key that survived parsing would write a Settings column this endpoint
+			// has no business touching — the allowances or the kilometer rate.
+			const parsed = updateDatevSettingsSchema.parse({
+				...complete,
+				kilometerRate: 99,
+			});
+
+			expect(parsed).not.toHaveProperty("kilometerRate");
+		});
+	});
+
 	it("lets every field be cleared again", () => {
 		// The preflight treats an absent field as unconfigured and names it, so an
 		// admin has to be able to save a half-filled form and come back to it after

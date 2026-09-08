@@ -8,6 +8,7 @@ import type React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toDisplayDate } from "@/lib/calendar-date";
 import { expenseTypeLabel, useExpenseTypeLabel } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import type { ReviewExpense, ReviewLoadState } from "./review-types";
@@ -58,8 +59,8 @@ function buildExpensesCsv(expenses: ReviewExpense[]): string {
 	];
 	const rows = expenses.map((expense) => [
 		expenseTypeLabel(expense.type),
-		format(expense.startDate, "yyyy-MM-dd"),
-		format(expense.endDate, "yyyy-MM-dd"),
+		format(toDisplayDate(expense.startDate), "yyyy-MM-dd"),
+		format(toDisplayDate(expense.endDate), "yyyy-MM-dd"),
 		expense.amount.toFixed(2),
 		expense.description ?? "",
 		formatExpenseDetails(t, expense),
@@ -210,11 +211,11 @@ function ExpenseRow({
 			<td className="py-3">
 				<span className="text-sm text-zinc-500">
 					{isSameDay(expense.endDate, expense.startDate) ? (
-						<span>{format(expense.endDate, "dd.MM.yyyy")}</span>
+						<span>{format(toDisplayDate(expense.endDate), "dd.MM.yyyy")}</span>
 					) : (
 						<span>
-							{format(expense.startDate, "dd.MM.")} -{" "}
-							{format(expense.endDate, "dd.MM.yyyy")}
+							{format(toDisplayDate(expense.startDate), "dd.MM.")} -{" "}
+							{format(toDisplayDate(expense.endDate), "dd.MM.yyyy")}
 						</span>
 					)}
 				</span>

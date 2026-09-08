@@ -9,10 +9,13 @@ import {
 /**
  * A day the client sends as `dd.MM.yyyy`, carried on as UTC midnight.
  *
- * This is the only place an expense date enters the database — the identical
+ * On the create path this is where the date enters the database: the parallel
  * schemas in `lib/validators.ts` and `report/components/create-expense.tsx`
- * shape the forms, but their parsed values never reach a write, because this
- * one takes the string and parses it again server-side.
+ * shape the forms, but their parsed values never reach a write, because the
+ * forms submit the raw string and this one parses it again server-side.
+ *
+ * `updateExpenseSchema` below does **not** go through here yet — see the note
+ * on its `startDate`/`endDate`.
  */
 const calendarDate = (requiredMessage: string, invalidMessage: string) =>
 	z
@@ -74,6 +77,17 @@ export const createFoodExpenseSchema = baseCreateExpenseSchema.and(
 export const updateExpenseSchema = z.object({
 	description: z.string().optional(),
 	amount: z.number().min(0).multipleOf(0.01).optional(),
+	// Unlike the create path these take an instant, not a `dd.MM.yyyy` string, so
+	// which day gets stored is decided on the client: Prisma writes a `@db.Date`
+	// column from the Date's UTC components, so anything but UTC midnight loses a
+	// day east of UTC. `report/components/report-update-expense.tsx` builds these
+	// with `parseCalendarDate` for that reason — and because the edit form
+	// resubmits both dates on every save, a client that used date-fns' `parse`
+	// instead would walk them a day back each time the description was edited.
+	//
+	// The invariant is therefore the caller's, which is the weak spot: it would be
+	// enforced here if the update carried the string and used `calendarDate(...)`
+	// like `baseCreateExpenseSchema` does.
 	startDate: z.date().optional(),
 	endDate: z.date().optional(),
 	from: z.string().min(1).optional(),

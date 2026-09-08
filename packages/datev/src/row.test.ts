@@ -112,6 +112,16 @@ describe("serializeRow", () => {
 			expect(row.split(";")).toHaveLength(125);
 		});
 
+		it("leaves a cost unit tag exactly as the organisation keeps it", () => {
+			// `isValidKostenstelle` admits a space, so a two-space tag clears the
+			// preflight. Folding it to one space here would book against a cost
+			// centre the Kanzlei's KOST program does not have — the same silent
+			// rename the preflight refuses to do.
+			const row = serializeRow({ ...receiptBooking, kostenstelle: "IT  OPS" });
+
+			expect(field(row, "KOST1 - Kostenstelle")).toBe('"IT  OPS"');
+		});
+
 		it("writes 125 fields whatever a text field holds", () => {
 			const row = serializeRow({
 				...receiptBooking,

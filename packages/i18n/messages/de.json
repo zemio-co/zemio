@@ -727,7 +727,8 @@
 						"description": "Verwalte den Tarif deiner Organisation"
 					},
 					"orgDatev": {
-						"label": "DATEV-Export"
+						"label": "DATEV-Export",
+						"description": "Beraternummer, Kontenrahmen und Sachkonten für den Buchungsstapel"
 					}
 				},
 				"sidebarOrgHeading": "Organisation",
@@ -1483,12 +1484,12 @@
 				"title": "Der Export kann noch nicht laufen",
 				"missingConfiguration": "In den DATEV-Einstellungen fehlt noch: {fields}",
 				"settingsLink": "Zu den DATEV-Einstellungen",
-				"costUnitNotExportable": "Die Kostenstelle „{tag}“ enthält Zeichen, die DATEV nicht annimmt. Erlaubt sind Buchstaben, Ziffern, Unterstrich und Leerzeichen. Betroffen: Antrag {reports}. Ändere das Kürzel so, wie die Kanzlei die Kostenstelle führt — automatisch umbenennen würde gegen eine Kostenstelle buchen, die es dort nicht gibt.",
+				"costUnitNotExportable": "Die Kostenstelle „{tag}“ enthält Zeichen, die DATEV nicht annimmt. Erlaubt sind Buchstaben, Ziffern, Unterstrich und Leerzeichen. Betroffen: {count, plural, =1 {Antrag} other {Anträge}} {reports}. Ändere das Kürzel so, wie die Kanzlei die Kostenstelle führt — automatisch umbenennen würde gegen eine Kostenstelle buchen, die es dort nicht gibt.",
 				"periodCrossesFiscalYear": "Der Zeitraum überschreitet die Grenze des Wirtschaftsjahres. Ein Buchungsstapel trägt nur ein Jahr — exportiere die Monate getrennt."
 			},
 			"notices": {
 				"title": "Hinweise",
-				"zeroAmountSkipped": "Antrag {tag}: {count, plural, =1 {eine Ausgabe} other {# Ausgaben}} über 0,00 € wurden nicht übernommen — DATEV nimmt keine Nullbuchung an.",
+				"zeroAmountSkipped": "Antrag {tag}: {count, plural, =1 {eine Ausgabe über 0,00 € wurde} other {# Ausgaben über 0,00 € wurden}} nicht übernommen — DATEV nimmt keine Nullbuchung an.",
 				"reportWithoutBookings": "Antrag {tag} erzeugt keine Buchung und erscheint in keiner Datei. Er gilt danach trotzdem als exportiert."
 			},
 			"fields": {
@@ -1538,7 +1539,8 @@
 			"startDateRequired": "Startdatum ist erforderlich",
 			"invalidStartDate": "Ungültiges Startdatum",
 			"endDateRequired": "Enddatum ist erforderlich",
-			"invalidEndDate": "Ungültiges Enddatum"
+			"invalidEndDate": "Ungültiges Enddatum",
+			"inputTaxRateRequired": "Vorsteuersatz ist erforderlich"
 		},
 		"organization": {
 			"nameRequired": "Name ist erforderlich",
@@ -1546,6 +1548,13 @@
 			"slugFormat": "Nur Kleinbuchstaben, Zahlen und \"-\" erlaubt",
 			"logoInvalid": "Bitte gib eine gültige Logo-URL ein",
 			"tenantIdInvalid": "Microsoft Tenant ID muss eine gültige UUID sein"
+		},
+		"datev": {
+			"beraternummer": "Beraternummer muss zwischen 1001 und 9999999 liegen",
+			"mandantennummer": "Mandantennummer muss zwischen 1 und 99999 liegen",
+			"sachkontenlaenge": "Sachkontenlänge muss zwischen 4 und 8 liegen",
+			"accountNumber": "Kontonummer: bis zu neun Ziffern, keine Buchstaben",
+			"fiscalYearStart": "Kein gültiges Datum (TT.MM.JJJJ)"
 		}
 	},
 	"emails": {

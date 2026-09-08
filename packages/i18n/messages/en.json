@@ -727,7 +727,8 @@
 						"description": "Manage your organization's subscription"
 					},
 					"orgDatev": {
-						"label": "DATEV export"
+						"label": "DATEV export",
+						"description": "Consultant number, chart of accounts and ledger accounts for the Buchungsstapel"
 					}
 				},
 				"sidebarOrgHeading": "Organisation",
@@ -1483,12 +1484,12 @@
 				"title": "The export cannot run yet",
 				"missingConfiguration": "Still missing in the DATEV settings: {fields}",
 				"settingsLink": "Go to the DATEV settings",
-				"costUnitNotExportable": "The cost unit “{tag}” contains characters DATEV will not take. Letters, digits, underscore and space are allowed. Affected: report {reports}. Change the tag to match how the practice keeps the cost centre — renaming it automatically would book against one that does not exist there.",
+				"costUnitNotExportable": "The cost unit “{tag}” contains characters DATEV will not take. Letters, digits, underscore and space are allowed. Affected: {count, plural, =1 {report} other {reports}} {reports}. Change the tag to match how the practice keeps the cost centre — renaming it automatically would book against one that does not exist there.",
 				"periodCrossesFiscalYear": "The period crosses the fiscal year boundary. A Buchungsstapel carries one year only — export the months separately."
 			},
 			"notices": {
 				"title": "Worth knowing",
-				"zeroAmountSkipped": "Report {tag}: {count, plural, =1 {one expense} other {# expenses}} of 0.00 € were left out — DATEV does not accept a zero booking.",
+				"zeroAmountSkipped": "Report {tag}: {count, plural, =1 {one expense of 0.00 € was} other {# expenses of 0.00 € were}} left out — DATEV does not accept a zero booking.",
 				"reportWithoutBookings": "Report {tag} produces no booking and appears in no file. It still counts as exported afterwards."
 			},
 			"fields": {
@@ -1538,7 +1539,8 @@
 			"startDateRequired": "Startdatum ist erforderlich",
 			"invalidStartDate": "Ungültiges Startdatum",
 			"endDateRequired": "Enddatum ist erforderlich",
-			"invalidEndDate": "Ungültiges Enddatum"
+			"invalidEndDate": "Ungültiges Enddatum",
+			"inputTaxRateRequired": "Input tax rate is required"
 		},
 		"organization": {
 			"nameRequired": "Name ist erforderlich",
@@ -1546,6 +1548,13 @@
 			"slugFormat": "Nur Kleinbuchstaben, Zahlen und \"-\" erlaubt",
 			"logoInvalid": "Bitte gib eine gültige Logo-URL ein",
 			"tenantIdInvalid": "Microsoft Tenant ID muss eine gültige UUID sein"
+		},
+		"datev": {
+			"beraternummer": "Consultant number must be between 1001 and 9999999",
+			"mandantennummer": "Client number must be between 1 and 99999",
+			"sachkontenlaenge": "Account number length must be between 4 and 8",
+			"accountNumber": "Account number: up to nine digits, no letters",
+			"fiscalYearStart": "Not a valid date (DD.MM.YYYY)"
 		}
 	},
 	"emails": {
