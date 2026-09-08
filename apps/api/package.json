@@ -17,6 +17,7 @@
 		"@aws-sdk/s3-request-presigner": "^3.1029.0",
 		"@prisma/adapter-pg": "^7.2.0",
 		"@prisma/client": "^7.2.0",
+		"@zemio/datev": "workspace:*",
 		"@zemio/db": "workspace:*",
 		"@zemio/encryption": "workspace:*",
 		"@zemio/i18n": "workspace:*",

@@ -1,0 +1,30 @@
+---
+"@zemio/web": minor
+"@zemio/api": minor
+---
+
+Export paid reports as a DATEV Buchungsstapel (EXTF-CSV, format version 13), so
+a tax advisor can import a month's bookings instead of retyping them.
+
+An organization configures what only its Kanzlei can supply — Berater- and
+Mandantennummer, the start of the fiscal year, the Sachkontenlänge, SKR03 or
+SKR04, and one expense account per expense type plus the contra account — under
+Settings › DATEV export. Nothing is defaulted: a made-up Sachkonto reaches the
+Kanzlei looking like a deliberate one. The export refuses to run while anything
+is missing and names the fields rather than writing placeholders.
+
+Receipts now state the input tax they carry (19 %, 7 %, or none). It is required
+and deliberately not preselected, because 19 % assumed on a reduced-rate receipt
+is a wrong deduction claimed in the customer's name — and a paid report can
+never be corrected. Travel and meal allowances are not asked: a Pauschale has no
+invoice behind it and carries no input tax.
+
+Admins pick a month under Admin › DATEV export, see what it would contain, and
+build the file. A report enters exactly one export; every file stays downloadable
+afterwards, since the reports it covered can never be exported again.
+
+Expense dates become calendar days (`@db.Date`). They were written as local
+midnight and read back with UTC getters in one place and local ones in another,
+so on a host east of UTC the PDF and the export disagreed by a day. Existing
+rows are rounded to the nearest midnight, which recovers the intended day
+whatever timezone wrote them.

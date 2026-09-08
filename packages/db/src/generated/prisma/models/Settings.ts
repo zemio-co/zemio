@@ -32,6 +32,9 @@ export type SettingsAvgAggregateOutputType = {
   breakfastDeduction: runtime.Decimal | null
   lunchDeduction: runtime.Decimal | null
   dinnerDeduction: runtime.Decimal | null
+  datevBeraternummer: number | null
+  datevMandantennummer: number | null
+  datevSachkontenlaenge: number | null
 }
 
 export type SettingsSumAggregateOutputType = {
@@ -40,6 +43,9 @@ export type SettingsSumAggregateOutputType = {
   breakfastDeduction: runtime.Decimal | null
   lunchDeduction: runtime.Decimal | null
   dinnerDeduction: runtime.Decimal | null
+  datevBeraternummer: number | null
+  datevMandantennummer: number | null
+  datevSachkontenlaenge: number | null
 }
 
 export type SettingsMinAggregateOutputType = {
@@ -54,6 +60,16 @@ export type SettingsMinAggregateOutputType = {
   breakfastDeduction: runtime.Decimal | null
   lunchDeduction: runtime.Decimal | null
   dinnerDeduction: runtime.Decimal | null
+  datevBeraternummer: number | null
+  datevMandantennummer: number | null
+  datevWirtschaftsjahrBeginn: Date | null
+  datevSachkontenlaenge: number | null
+  datevKontenrahmen: string | null
+  datevExpenseAccountReceipt: string | null
+  datevExpenseAccountTravel: string | null
+  datevExpenseAccountFood: string | null
+  datevContraAccount: string | null
+  datevFestschreibung: boolean | null
 }
 
 export type SettingsMaxAggregateOutputType = {
@@ -68,6 +84,16 @@ export type SettingsMaxAggregateOutputType = {
   breakfastDeduction: runtime.Decimal | null
   lunchDeduction: runtime.Decimal | null
   dinnerDeduction: runtime.Decimal | null
+  datevBeraternummer: number | null
+  datevMandantennummer: number | null
+  datevWirtschaftsjahrBeginn: Date | null
+  datevSachkontenlaenge: number | null
+  datevKontenrahmen: string | null
+  datevExpenseAccountReceipt: string | null
+  datevExpenseAccountTravel: string | null
+  datevExpenseAccountFood: string | null
+  datevContraAccount: string | null
+  datevFestschreibung: boolean | null
 }
 
 export type SettingsCountAggregateOutputType = {
@@ -82,6 +108,16 @@ export type SettingsCountAggregateOutputType = {
   breakfastDeduction: number
   lunchDeduction: number
   dinnerDeduction: number
+  datevBeraternummer: number
+  datevMandantennummer: number
+  datevWirtschaftsjahrBeginn: number
+  datevSachkontenlaenge: number
+  datevKontenrahmen: number
+  datevExpenseAccountReceipt: number
+  datevExpenseAccountTravel: number
+  datevExpenseAccountFood: number
+  datevContraAccount: number
+  datevFestschreibung: number
   _all: number
 }
 
@@ -92,6 +128,9 @@ export type SettingsAvgAggregateInputType = {
   breakfastDeduction?: true
   lunchDeduction?: true
   dinnerDeduction?: true
+  datevBeraternummer?: true
+  datevMandantennummer?: true
+  datevSachkontenlaenge?: true
 }
 
 export type SettingsSumAggregateInputType = {
@@ -100,6 +139,9 @@ export type SettingsSumAggregateInputType = {
   breakfastDeduction?: true
   lunchDeduction?: true
   dinnerDeduction?: true
+  datevBeraternummer?: true
+  datevMandantennummer?: true
+  datevSachkontenlaenge?: true
 }
 
 export type SettingsMinAggregateInputType = {
@@ -114,6 +156,16 @@ export type SettingsMinAggregateInputType = {
   breakfastDeduction?: true
   lunchDeduction?: true
   dinnerDeduction?: true
+  datevBeraternummer?: true
+  datevMandantennummer?: true
+  datevWirtschaftsjahrBeginn?: true
+  datevSachkontenlaenge?: true
+  datevKontenrahmen?: true
+  datevExpenseAccountReceipt?: true
+  datevExpenseAccountTravel?: true
+  datevExpenseAccountFood?: true
+  datevContraAccount?: true
+  datevFestschreibung?: true
 }
 
 export type SettingsMaxAggregateInputType = {
@@ -128,6 +180,16 @@ export type SettingsMaxAggregateInputType = {
   breakfastDeduction?: true
   lunchDeduction?: true
   dinnerDeduction?: true
+  datevBeraternummer?: true
+  datevMandantennummer?: true
+  datevWirtschaftsjahrBeginn?: true
+  datevSachkontenlaenge?: true
+  datevKontenrahmen?: true
+  datevExpenseAccountReceipt?: true
+  datevExpenseAccountTravel?: true
+  datevExpenseAccountFood?: true
+  datevContraAccount?: true
+  datevFestschreibung?: true
 }
 
 export type SettingsCountAggregateInputType = {
@@ -142,6 +204,16 @@ export type SettingsCountAggregateInputType = {
   breakfastDeduction?: true
   lunchDeduction?: true
   dinnerDeduction?: true
+  datevBeraternummer?: true
+  datevMandantennummer?: true
+  datevWirtschaftsjahrBeginn?: true
+  datevSachkontenlaenge?: true
+  datevKontenrahmen?: true
+  datevExpenseAccountReceipt?: true
+  datevExpenseAccountTravel?: true
+  datevExpenseAccountFood?: true
+  datevContraAccount?: true
+  datevFestschreibung?: true
   _all?: true
 }
 
@@ -243,6 +315,16 @@ export type SettingsGroupByOutputType = {
   breakfastDeduction: runtime.Decimal
   lunchDeduction: runtime.Decimal
   dinnerDeduction: runtime.Decimal
+  datevBeraternummer: number | null
+  datevMandantennummer: number | null
+  datevWirtschaftsjahrBeginn: Date | null
+  datevSachkontenlaenge: number | null
+  datevKontenrahmen: string | null
+  datevExpenseAccountReceipt: string | null
+  datevExpenseAccountTravel: string | null
+  datevExpenseAccountFood: string | null
+  datevContraAccount: string | null
+  datevFestschreibung: boolean
   _count: SettingsCountAggregateOutputType | null
   _avg: SettingsAvgAggregateOutputType | null
   _sum: SettingsSumAggregateOutputType | null
@@ -280,6 +362,16 @@ export type SettingsWhereInput = {
   breakfastDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevMandantennummer?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.DateTimeNullableFilter<"Settings"> | Date | string | null
+  datevSachkontenlaenge?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevKontenrahmen?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountReceipt?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountTravel?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountFood?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevContraAccount?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevFestschreibung?: Prisma.BoolFilter<"Settings"> | boolean
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
 }
 
@@ -295,6 +387,16 @@ export type SettingsOrderByWithRelationInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevWirtschaftsjahrBeginn?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevKontenrahmen?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountReceipt?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountTravel?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountFood?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevContraAccount?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevFestschreibung?: Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
 }
 
@@ -313,6 +415,16 @@ export type SettingsWhereUniqueInput = Prisma.AtLeast<{
   breakfastDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevMandantennummer?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.DateTimeNullableFilter<"Settings"> | Date | string | null
+  datevSachkontenlaenge?: Prisma.IntNullableFilter<"Settings"> | number | null
+  datevKontenrahmen?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountReceipt?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountTravel?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevExpenseAccountFood?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevContraAccount?: Prisma.StringNullableFilter<"Settings"> | string | null
+  datevFestschreibung?: Prisma.BoolFilter<"Settings"> | boolean
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
 }, "id" | "organizationId">
 
@@ -328,6 +440,16 @@ export type SettingsOrderByWithAggregationInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevWirtschaftsjahrBeginn?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevKontenrahmen?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountReceipt?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountTravel?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevExpenseAccountFood?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevContraAccount?: Prisma.SortOrderInput | Prisma.SortOrder
+  datevFestschreibung?: Prisma.SortOrder
   _count?: Prisma.SettingsCountOrderByAggregateInput
   _avg?: Prisma.SettingsAvgOrderByAggregateInput
   _max?: Prisma.SettingsMaxOrderByAggregateInput
@@ -350,6 +472,16 @@ export type SettingsScalarWhereWithAggregatesInput = {
   breakfastDeduction?: Prisma.DecimalWithAggregatesFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalWithAggregatesFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalWithAggregatesFilter<"Settings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.IntNullableWithAggregatesFilter<"Settings"> | number | null
+  datevMandantennummer?: Prisma.IntNullableWithAggregatesFilter<"Settings"> | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.DateTimeNullableWithAggregatesFilter<"Settings"> | Date | string | null
+  datevSachkontenlaenge?: Prisma.IntNullableWithAggregatesFilter<"Settings"> | number | null
+  datevKontenrahmen?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
+  datevExpenseAccountReceipt?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
+  datevExpenseAccountTravel?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
+  datevExpenseAccountFood?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
+  datevContraAccount?: Prisma.StringNullableWithAggregatesFilter<"Settings"> | string | null
+  datevFestschreibung?: Prisma.BoolWithAggregatesFilter<"Settings"> | boolean
 }
 
 export type SettingsCreateInput = {
@@ -363,6 +495,16 @@ export type SettingsCreateInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: number | null
+  datevMandantennummer?: number | null
+  datevWirtschaftsjahrBeginn?: Date | string | null
+  datevSachkontenlaenge?: number | null
+  datevKontenrahmen?: string | null
+  datevExpenseAccountReceipt?: string | null
+  datevExpenseAccountTravel?: string | null
+  datevExpenseAccountFood?: string | null
+  datevContraAccount?: string | null
+  datevFestschreibung?: boolean
   organization: Prisma.OrganizationCreateNestedOneWithoutSettingsInput
 }
 
@@ -378,6 +520,16 @@ export type SettingsUncheckedCreateInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: number | null
+  datevMandantennummer?: number | null
+  datevWirtschaftsjahrBeginn?: Date | string | null
+  datevSachkontenlaenge?: number | null
+  datevKontenrahmen?: string | null
+  datevExpenseAccountReceipt?: string | null
+  datevExpenseAccountTravel?: string | null
+  datevExpenseAccountFood?: string | null
+  datevContraAccount?: string | null
+  datevFestschreibung?: boolean
 }
 
 export type SettingsUpdateInput = {
@@ -391,6 +543,16 @@ export type SettingsUpdateInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutSettingsNestedInput
 }
 
@@ -406,6 +568,16 @@ export type SettingsUncheckedUpdateInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SettingsCreateManyInput = {
@@ -420,6 +592,16 @@ export type SettingsCreateManyInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: number | null
+  datevMandantennummer?: number | null
+  datevWirtschaftsjahrBeginn?: Date | string | null
+  datevSachkontenlaenge?: number | null
+  datevKontenrahmen?: string | null
+  datevExpenseAccountReceipt?: string | null
+  datevExpenseAccountTravel?: string | null
+  datevExpenseAccountFood?: string | null
+  datevContraAccount?: string | null
+  datevFestschreibung?: boolean
 }
 
 export type SettingsUpdateManyMutationInput = {
@@ -433,6 +615,16 @@ export type SettingsUpdateManyMutationInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SettingsUncheckedUpdateManyInput = {
@@ -447,6 +639,16 @@ export type SettingsUncheckedUpdateManyInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SettingsNullableScalarRelationFilter = {
@@ -466,6 +668,16 @@ export type SettingsCountOrderByAggregateInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrder
+  datevWirtschaftsjahrBeginn?: Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrder
+  datevKontenrahmen?: Prisma.SortOrder
+  datevExpenseAccountReceipt?: Prisma.SortOrder
+  datevExpenseAccountTravel?: Prisma.SortOrder
+  datevExpenseAccountFood?: Prisma.SortOrder
+  datevContraAccount?: Prisma.SortOrder
+  datevFestschreibung?: Prisma.SortOrder
 }
 
 export type SettingsAvgOrderByAggregateInput = {
@@ -474,6 +686,9 @@ export type SettingsAvgOrderByAggregateInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrder
 }
 
 export type SettingsMaxOrderByAggregateInput = {
@@ -488,6 +703,16 @@ export type SettingsMaxOrderByAggregateInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrder
+  datevWirtschaftsjahrBeginn?: Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrder
+  datevKontenrahmen?: Prisma.SortOrder
+  datevExpenseAccountReceipt?: Prisma.SortOrder
+  datevExpenseAccountTravel?: Prisma.SortOrder
+  datevExpenseAccountFood?: Prisma.SortOrder
+  datevContraAccount?: Prisma.SortOrder
+  datevFestschreibung?: Prisma.SortOrder
 }
 
 export type SettingsMinOrderByAggregateInput = {
@@ -502,6 +727,16 @@ export type SettingsMinOrderByAggregateInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrder
+  datevWirtschaftsjahrBeginn?: Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrder
+  datevKontenrahmen?: Prisma.SortOrder
+  datevExpenseAccountReceipt?: Prisma.SortOrder
+  datevExpenseAccountTravel?: Prisma.SortOrder
+  datevExpenseAccountFood?: Prisma.SortOrder
+  datevContraAccount?: Prisma.SortOrder
+  datevFestschreibung?: Prisma.SortOrder
 }
 
 export type SettingsSumOrderByAggregateInput = {
@@ -510,6 +745,9 @@ export type SettingsSumOrderByAggregateInput = {
   breakfastDeduction?: Prisma.SortOrder
   lunchDeduction?: Prisma.SortOrder
   dinnerDeduction?: Prisma.SortOrder
+  datevBeraternummer?: Prisma.SortOrder
+  datevMandantennummer?: Prisma.SortOrder
+  datevSachkontenlaenge?: Prisma.SortOrder
 }
 
 export type SettingsCreateNestedOneWithoutOrganizationInput = {
@@ -544,6 +782,14 @@ export type SettingsUncheckedUpdateOneWithoutOrganizationNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettingsUpdateToOneWithWhereWithoutOrganizationInput, Prisma.SettingsUpdateWithoutOrganizationInput>, Prisma.SettingsUncheckedUpdateWithoutOrganizationInput>
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type SettingsCreateWithoutOrganizationInput = {
   id?: string
   kilometerRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -555,6 +801,16 @@ export type SettingsCreateWithoutOrganizationInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: number | null
+  datevMandantennummer?: number | null
+  datevWirtschaftsjahrBeginn?: Date | string | null
+  datevSachkontenlaenge?: number | null
+  datevKontenrahmen?: string | null
+  datevExpenseAccountReceipt?: string | null
+  datevExpenseAccountTravel?: string | null
+  datevExpenseAccountFood?: string | null
+  datevContraAccount?: string | null
+  datevFestschreibung?: boolean
 }
 
 export type SettingsUncheckedCreateWithoutOrganizationInput = {
@@ -568,6 +824,16 @@ export type SettingsUncheckedCreateWithoutOrganizationInput = {
   breakfastDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: number | null
+  datevMandantennummer?: number | null
+  datevWirtschaftsjahrBeginn?: Date | string | null
+  datevSachkontenlaenge?: number | null
+  datevKontenrahmen?: string | null
+  datevExpenseAccountReceipt?: string | null
+  datevExpenseAccountTravel?: string | null
+  datevExpenseAccountFood?: string | null
+  datevContraAccount?: string | null
+  datevFestschreibung?: boolean
 }
 
 export type SettingsCreateOrConnectWithoutOrganizationInput = {
@@ -597,6 +863,16 @@ export type SettingsUpdateWithoutOrganizationInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SettingsUncheckedUpdateWithoutOrganizationInput = {
@@ -610,6 +886,16 @@ export type SettingsUncheckedUpdateWithoutOrganizationInput = {
   breakfastDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   lunchDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   dinnerDeduction?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  datevBeraternummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevMandantennummer?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevWirtschaftsjahrBeginn?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  datevSachkontenlaenge?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  datevKontenrahmen?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountReceipt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountTravel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevExpenseAccountFood?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevContraAccount?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  datevFestschreibung?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -626,6 +912,16 @@ export type SettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  datevBeraternummer?: boolean
+  datevMandantennummer?: boolean
+  datevWirtschaftsjahrBeginn?: boolean
+  datevSachkontenlaenge?: boolean
+  datevKontenrahmen?: boolean
+  datevExpenseAccountReceipt?: boolean
+  datevExpenseAccountTravel?: boolean
+  datevExpenseAccountFood?: boolean
+  datevContraAccount?: boolean
+  datevFestschreibung?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
@@ -641,6 +937,16 @@ export type SettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  datevBeraternummer?: boolean
+  datevMandantennummer?: boolean
+  datevWirtschaftsjahrBeginn?: boolean
+  datevSachkontenlaenge?: boolean
+  datevKontenrahmen?: boolean
+  datevExpenseAccountReceipt?: boolean
+  datevExpenseAccountTravel?: boolean
+  datevExpenseAccountFood?: boolean
+  datevContraAccount?: boolean
+  datevFestschreibung?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
@@ -656,6 +962,16 @@ export type SettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  datevBeraternummer?: boolean
+  datevMandantennummer?: boolean
+  datevWirtschaftsjahrBeginn?: boolean
+  datevSachkontenlaenge?: boolean
+  datevKontenrahmen?: boolean
+  datevExpenseAccountReceipt?: boolean
+  datevExpenseAccountTravel?: boolean
+  datevExpenseAccountFood?: boolean
+  datevContraAccount?: boolean
+  datevFestschreibung?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settings"]>
 
@@ -671,9 +987,19 @@ export type SettingsSelectScalar = {
   breakfastDeduction?: boolean
   lunchDeduction?: boolean
   dinnerDeduction?: boolean
+  datevBeraternummer?: boolean
+  datevMandantennummer?: boolean
+  datevWirtschaftsjahrBeginn?: boolean
+  datevSachkontenlaenge?: boolean
+  datevKontenrahmen?: boolean
+  datevExpenseAccountReceipt?: boolean
+  datevExpenseAccountTravel?: boolean
+  datevExpenseAccountFood?: boolean
+  datevContraAccount?: boolean
+  datevFestschreibung?: boolean
 }
 
-export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "kilometerRate" | "reviewerEmail" | "costUnitInfoUrl" | "createdAt" | "updatedAt" | "dailyFoodAllowance" | "breakfastDeduction" | "lunchDeduction" | "dinnerDeduction", ExtArgs["result"]["settings"]>
+export type SettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "kilometerRate" | "reviewerEmail" | "costUnitInfoUrl" | "createdAt" | "updatedAt" | "dailyFoodAllowance" | "breakfastDeduction" | "lunchDeduction" | "dinnerDeduction" | "datevBeraternummer" | "datevMandantennummer" | "datevWirtschaftsjahrBeginn" | "datevSachkontenlaenge" | "datevKontenrahmen" | "datevExpenseAccountReceipt" | "datevExpenseAccountTravel" | "datevExpenseAccountFood" | "datevContraAccount" | "datevFestschreibung", ExtArgs["result"]["settings"]>
 export type SettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -701,6 +1027,16 @@ export type $SettingsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     breakfastDeduction: runtime.Decimal
     lunchDeduction: runtime.Decimal
     dinnerDeduction: runtime.Decimal
+    datevBeraternummer: number | null
+    datevMandantennummer: number | null
+    datevWirtschaftsjahrBeginn: Date | null
+    datevSachkontenlaenge: number | null
+    datevKontenrahmen: string | null
+    datevExpenseAccountReceipt: string | null
+    datevExpenseAccountTravel: string | null
+    datevExpenseAccountFood: string | null
+    datevContraAccount: string | null
+    datevFestschreibung: boolean
   }, ExtArgs["result"]["settings"]>
   composites: {}
 }
@@ -1136,6 +1472,16 @@ export interface SettingsFieldRefs {
   readonly breakfastDeduction: Prisma.FieldRef<"Settings", 'Decimal'>
   readonly lunchDeduction: Prisma.FieldRef<"Settings", 'Decimal'>
   readonly dinnerDeduction: Prisma.FieldRef<"Settings", 'Decimal'>
+  readonly datevBeraternummer: Prisma.FieldRef<"Settings", 'Int'>
+  readonly datevMandantennummer: Prisma.FieldRef<"Settings", 'Int'>
+  readonly datevWirtschaftsjahrBeginn: Prisma.FieldRef<"Settings", 'DateTime'>
+  readonly datevSachkontenlaenge: Prisma.FieldRef<"Settings", 'Int'>
+  readonly datevKontenrahmen: Prisma.FieldRef<"Settings", 'String'>
+  readonly datevExpenseAccountReceipt: Prisma.FieldRef<"Settings", 'String'>
+  readonly datevExpenseAccountTravel: Prisma.FieldRef<"Settings", 'String'>
+  readonly datevExpenseAccountFood: Prisma.FieldRef<"Settings", 'String'>
+  readonly datevContraAccount: Prisma.FieldRef<"Settings", 'String'>
+  readonly datevFestschreibung: Prisma.FieldRef<"Settings", 'Boolean'>
 }
     
 

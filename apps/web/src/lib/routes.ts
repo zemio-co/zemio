@@ -11,11 +11,13 @@ export const ROUTES = {
 	SETTINGS_ORG_ALLOWANCES: () => "/settings/org/allowances",
 	SETTINGS_ORG_COST_UNITS: () => "/settings/org/cost-units",
 	SETTINGS_ORG_BILLING: () => "/settings/org/billing",
+	SETTINGS_ORG_DATEV: () => "/settings/org/datev",
 	// ======= ADMIN SETTINGS =========================================
 	SETTINGS_ADMIN_ORGS: () => "/settings/admin/orgs",
 	SETTINGS_ADMIN_ORG_DETAILS: (id: string) => `/settings/admin/orgs/${id}`,
 
 	ADMIN_REPORTING: () => "/admin/reporting",
+	ADMIN_DATEV_EXPORT: () => "/admin/datev",
 
 	ADMIN_REVIEW_REPORT: (reportId: string) => `/admin/reports/${reportId}`,
 	ADMIN_REVIEW_OVERVIEW: () => "/admin/reports",

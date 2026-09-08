@@ -73,6 +73,11 @@ export type CostUnitGroup = Prisma.CostUnitGroupModel
  */
 export type CostUnit = Prisma.CostUnitModel
 /**
+ * Model DatevExport
+ * 
+ */
+export type DatevExport = Prisma.DatevExportModel
+/**
  * Model LegalAcceptance
  * 
  */

@@ -2,6 +2,7 @@ import { auditRouter } from "@/server/api/routers/audit";
 import { billingRouter } from "@/server/api/routers/billing";
 import { costUnitRouter } from "@/server/api/routers/cost-unit";
 import { dashboardRouter } from "@/server/api/routers/dashboard";
+import { datevExportRouter } from "@/server/api/routers/datev-export";
 import { expenseRouter } from "@/server/api/routers/expense";
 import { membershipRouter } from "@/server/api/routers/membership";
 import { organizationRouter } from "@/server/api/routers/organization";
@@ -27,6 +28,7 @@ export const appRouter = createTRPCRouter({
 	report: reportRouter,
 	reportFilters: reportFiltersRouter,
 	reporting: reportingRouter,
+	datevExport: datevExportRouter,
 	expense: expenseRouter,
 	settings: settingsRouter,
 	preferences: preferencesRouter,

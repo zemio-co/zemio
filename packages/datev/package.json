@@ -1,0 +1,25 @@
+{
+	"name": "@zemio/datev",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"clean": "rm -rf tsconfig.tsbuildinfo",
+		"typecheck": "tsc --noEmit",
+		"check": "biome check .",
+		"test": "vitest run"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@types/node": "^22",
+		"@zemio/typescript-config": "workspace:*",
+		"typescript": "^5.8.2",
+		"vitest": "^3.0.4"
+	},
+	"dependencies": {
+		"iconv-lite": "^0.7.3"
+	}
+}

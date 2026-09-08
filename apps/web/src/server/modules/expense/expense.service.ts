@@ -1,12 +1,15 @@
 import { TRPCError } from "@trpc/server";
-import { ExpenseType, type Prisma, type PrismaClient } from "@zemio/db";
+import {
+	ExpenseType,
+	type InputTaxRate,
+	type Prisma,
+	type PrismaClient,
+} from "@zemio/db";
 import type { z } from "zod";
 import { roundToCents } from "@/lib/utils";
-import type {
-	createFoodExpenseSchema,
-	createReceiptExpenseSchema,
-	createTravelExpenseSchema,
-} from "@/lib/validators";
+// Typed from the schemas the router actually validates with, not from the
+// identical copies in `@/lib/validators` that shape the forms: those can drift,
+// and this service's input types would then describe a shape it never receives.
 import { type AuditRepository, auditRepository } from "@/server/modules/audit";
 import { mapPrismaError } from "@/server/shared/errors";
 import { decimalToNumber } from "@/server/shared/money";
@@ -24,6 +27,11 @@ import {
 	type ExpenseRepository,
 	expenseRepository,
 } from "./expense.repository";
+import type {
+	createFoodExpenseSchema,
+	createReceiptExpenseSchema,
+	createTravelExpenseSchema,
+} from "./expense.validators";
 
 async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
 	try {
@@ -67,6 +75,7 @@ type UpdateExpenseInput = {
 	breakfastDeduction?: number;
 	lunchDeduction?: number;
 	dinnerDeduction?: number;
+	inputTaxRate?: InputTaxRate;
 };
 
 export function createExpenseService(deps: {
@@ -131,6 +140,8 @@ export function createExpenseService(deps: {
 					startDate: input.startDate,
 					endDate: input.endDate,
 					description: input.description,
+					// Only a receipt carries one; the two allowances leave it null.
+					inputTaxRate: input.inputTaxRate,
 					attachments: {
 						createMany: {
 							data: input.attachments.map((a) => ({

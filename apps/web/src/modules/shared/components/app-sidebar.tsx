@@ -14,6 +14,7 @@ import {
 import {
 	ChartPieIcon,
 	FileIcon,
+	FileSpreadsheetIcon,
 	HomeIcon,
 	ListIcon,
 	SettingsIcon,
@@ -94,6 +95,14 @@ const sidebarAdminItems = [
 		icon: ChartPieIcon,
 		active: (pathname: string) => {
 			return pathname.startsWith(ROUTES.ADMIN_REPORTING());
+		},
+	},
+	{
+		label: t("admin.datevExport"),
+		href: ROUTES.ADMIN_DATEV_EXPORT(),
+		icon: FileSpreadsheetIcon,
+		active: (pathname: string) => {
+			return pathname.startsWith(ROUTES.ADMIN_DATEV_EXPORT());
 		},
 	},
 	{

@@ -1,0 +1,36 @@
+// DATEV export: one row per Buchungsstapel handed to a Kanzlei (DEV-21)
+
+model DatevExport {
+  id String @id @default(cuid())
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Restrict rather than Cascade: an export records an accounting act, so it
+  // must not disappear when the admin who ran it is removed. Matches AuditEvent.
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime @default(now())
+
+  // The paidAt window this export covers. Together with the organization it is
+  // the entire selection — every PAID report paid inside it that had not been
+  // exported yet — which is what makes the selection reproducible from two
+  // dates instead of a stored list of ids.
+  periodFrom DateTime
+  periodTo   DateTime
+
+  // The DATEV settings as they stood when the file was written. Without this an
+  // export stops being explainable the moment an organization edits an account.
+  configuration Json
+
+  // The stored file. Kept rather than regenerated on demand: a later change to
+  // the serializer, or to DATEV's yearly format version, would otherwise
+  // silently produce a different file for the same selection.
+  fileKey  String
+  checksum String
+
+  reports Report[]
+
+  @@index([organizationId, createdAt])
+  @@map("datev_export")
+}

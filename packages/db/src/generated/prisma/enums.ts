@@ -70,6 +70,15 @@ export const ExpenseType = {
 export type ExpenseType = (typeof ExpenseType)[keyof typeof ExpenseType]
 
 
+export const InputTaxRate = {
+  STANDARD: 'STANDARD',
+  REDUCED: 'REDUCED',
+  NONE: 'NONE'
+} as const
+
+export type InputTaxRate = (typeof InputTaxRate)[keyof typeof InputTaxRate]
+
+
 export const NotificationPreference = {
   ALL: 'ALL',
   STATUS_CHANGES: 'STATUS_CHANGES',

@@ -15,6 +15,33 @@ model Settings {
   lunchDeduction     Decimal @default(0.00) @db.Decimal(12, 2)
   dinnerDeduction    Decimal @default(0.00) @db.Decimal(12, 2)
 
+  // DATEV export configuration (DEV-21). Null until a Kanzlei supplies the
+  // values — the export refuses to run while any of them is missing rather than
+  // writing a placeholder, because a placeholder Sachkonto is exactly the
+  // manual rework the export exists to remove.
+  //
+  // These five are dictated by the Steuerberater and cannot be guessed. They
+  // keep DATEV's German names because that is how the Kanzlei hands them over.
+  datevBeraternummer         Int?
+  datevMandantennummer       Int?
+  // Supplies the year for every Belegdatum, so one export cannot span two of them.
+  datevWirtschaftsjahrBeginn DateTime?
+  datevSachkontenlaenge      Int?
+  datevKontenrahmen          String? // "03" for SKR03, "04" for SKR04
+
+  // Which expense account each expense type books against, and the contra
+  // account the payment is booked from. Plain ledger account numbers — there is
+  // no bank connection anywhere in this.
+  datevExpenseAccountReceipt String?
+  datevExpenseAccountTravel  String?
+  datevExpenseAccountFood    String?
+  datevContraAccount         String?
+
+  // Whether exported bookings are locked in DATEV. On by default because PAID
+  // reports are immutable here too; worth turning off while the account mapping
+  // is still being agreed with the Kanzlei.
+  datevFestschreibung Boolean @default(true)
+
   @@map("settings")
 }
 

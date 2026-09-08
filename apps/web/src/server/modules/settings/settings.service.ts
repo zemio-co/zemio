@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@zemio/db";
 import type { z } from "zod";
 import type {
+	updateDatevSettingsSchema,
 	updateMealAllowancesSchema,
 	updateTravelAllowancesSchema,
 } from "@/lib/validators";
@@ -20,6 +21,7 @@ export type SettingsServiceContext = {
 
 type MealAllowancesInput = z.infer<typeof updateMealAllowancesSchema>;
 type TravelAllowancesInput = z.infer<typeof updateTravelAllowancesSchema>;
+type DatevSettingsInput = z.infer<typeof updateDatevSettingsSchema>;
 
 export function createSettingsService(deps: { repo: SettingsRepository }) {
 	const { repo } = deps;
@@ -55,6 +57,14 @@ export function createSettingsService(deps: { repo: SettingsRepository }) {
 		updateMealAllowances(
 			ctx: SettingsServiceContext,
 			input: MealAllowancesInput,
+		): Promise<SettingsDTO> {
+			return upsert(ctx, input);
+		},
+
+		/** The DATEV export configuration (DEV-21). */
+		updateDatevSettings(
+			ctx: SettingsServiceContext,
+			input: DatevSettingsInput,
 		): Promise<SettingsDTO> {
 			return upsert(ctx, input);
 		},

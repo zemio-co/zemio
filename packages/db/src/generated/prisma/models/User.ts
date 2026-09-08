@@ -247,6 +247,7 @@ export type UserWhereInput = {
   bankingDetails?: Prisma.BankingDetailsListRelationFilter
   legalAcceptances?: Prisma.LegalAcceptanceListRelationFilter
   auditEvents?: Prisma.AuditEventListRelationFilter
+  datevExports?: Prisma.DatevExportListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -271,6 +272,7 @@ export type UserOrderByWithRelationInput = {
   bankingDetails?: Prisma.BankingDetailsOrderByRelationAggregateInput
   legalAcceptances?: Prisma.LegalAcceptanceOrderByRelationAggregateInput
   auditEvents?: Prisma.AuditEventOrderByRelationAggregateInput
+  datevExports?: Prisma.DatevExportOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -298,6 +300,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   bankingDetails?: Prisma.BankingDetailsListRelationFilter
   legalAcceptances?: Prisma.LegalAcceptanceListRelationFilter
   auditEvents?: Prisma.AuditEventListRelationFilter
+  datevExports?: Prisma.DatevExportListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -358,6 +361,7 @@ export type UserCreateInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -382,6 +386,7 @@ export type UserUncheckedCreateInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUpdateInput = {
@@ -406,6 +411,7 @@ export type UserUpdateInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -430,6 +436,7 @@ export type UserUncheckedUpdateInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -599,6 +606,20 @@ export type UserUpdateOneRequiredWithoutBankingDetailsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutBankingDetailsInput, Prisma.UserUpdateWithoutBankingDetailsInput>, Prisma.UserUncheckedUpdateWithoutBankingDetailsInput>
 }
 
+export type UserCreateNestedOneWithoutDatevExportsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDatevExportsInput, Prisma.UserUncheckedCreateWithoutDatevExportsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDatevExportsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDatevExportsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDatevExportsInput, Prisma.UserUncheckedCreateWithoutDatevExportsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDatevExportsInput
+  upsert?: Prisma.UserUpsertWithoutDatevExportsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDatevExportsInput, Prisma.UserUpdateWithoutDatevExportsInput>, Prisma.UserUncheckedUpdateWithoutDatevExportsInput>
+}
+
 export type UserCreateNestedOneWithoutLegalAcceptancesInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutLegalAcceptancesInput, Prisma.UserUncheckedCreateWithoutLegalAcceptancesInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutLegalAcceptancesInput
@@ -690,6 +711,7 @@ export type UserCreateWithoutAuditEventsInput = {
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutAuditEventsInput = {
@@ -713,6 +735,7 @@ export type UserUncheckedCreateWithoutAuditEventsInput = {
   preferences?: Prisma.PreferencesUncheckedCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutAuditEventsInput = {
@@ -752,6 +775,7 @@ export type UserUpdateWithoutAuditEventsInput = {
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditEventsInput = {
@@ -775,6 +799,7 @@ export type UserUncheckedUpdateWithoutAuditEventsInput = {
   preferences?: Prisma.PreferencesUncheckedUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -798,6 +823,7 @@ export type UserCreateWithoutSessionsInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -821,6 +847,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -860,6 +887,7 @@ export type UserUpdateWithoutSessionsInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -883,6 +911,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -906,6 +935,7 @@ export type UserCreateWithoutAccountsInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -929,6 +959,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -968,6 +999,7 @@ export type UserUpdateWithoutAccountsInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -991,6 +1023,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutBankingDetailsInput = {
@@ -1014,6 +1047,7 @@ export type UserCreateWithoutBankingDetailsInput = {
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutBankingDetailsInput = {
@@ -1037,6 +1071,7 @@ export type UserUncheckedCreateWithoutBankingDetailsInput = {
   preferences?: Prisma.PreferencesUncheckedCreateNestedOneWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutBankingDetailsInput = {
@@ -1076,6 +1111,7 @@ export type UserUpdateWithoutBankingDetailsInput = {
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBankingDetailsInput = {
@@ -1097,6 +1133,119 @@ export type UserUncheckedUpdateWithoutBankingDetailsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUncheckedUpdateManyWithoutOwnerNestedInput
   preferences?: Prisma.PreferencesUncheckedUpdateOneWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserCreateWithoutDatevExportsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: string
+  microsoftTenantId?: string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
+  members?: Prisma.MemberCreateNestedManyWithoutUserInput
+  ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
+  bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutDatevExportsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: string
+  microsoftTenantId?: string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  invitationsSent?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
+  ownReports?: Prisma.ReportUncheckedCreateNestedManyWithoutOwnerInput
+  preferences?: Prisma.PreferencesUncheckedCreateNestedOneWithoutUserInput
+  bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutDatevExportsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDatevExportsInput, Prisma.UserUncheckedCreateWithoutDatevExportsInput>
+}
+
+export type UserUpsertWithoutDatevExportsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDatevExportsInput, Prisma.UserUncheckedUpdateWithoutDatevExportsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDatevExportsInput, Prisma.UserUncheckedCreateWithoutDatevExportsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDatevExportsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDatevExportsInput, Prisma.UserUncheckedUpdateWithoutDatevExportsInput>
+}
+
+export type UserUpdateWithoutDatevExportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
+  members?: Prisma.MemberUpdateManyWithoutUserNestedInput
+  ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
+  bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDatevExportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  invitationsSent?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
+  ownReports?: Prisma.ReportUncheckedUpdateManyWithoutOwnerNestedInput
+  preferences?: Prisma.PreferencesUncheckedUpdateOneWithoutUserNestedInput
+  bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
 }
@@ -1122,6 +1271,7 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
@@ -1145,6 +1295,7 @@ export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
   preferences?: Prisma.PreferencesUncheckedCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutLegalAcceptancesInput = {
@@ -1184,6 +1335,7 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
@@ -1207,6 +1359,7 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   preferences?: Prisma.PreferencesUncheckedUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutMembersInput = {
@@ -1230,6 +1383,7 @@ export type UserCreateWithoutMembersInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutMembersInput = {
@@ -1253,6 +1407,7 @@ export type UserUncheckedCreateWithoutMembersInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutMembersInput = {
@@ -1292,6 +1447,7 @@ export type UserUpdateWithoutMembersInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMembersInput = {
@@ -1315,6 +1471,7 @@ export type UserUncheckedUpdateWithoutMembersInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutInvitationsSentInput = {
@@ -1338,6 +1495,7 @@ export type UserCreateWithoutInvitationsSentInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutInvitationsSentInput = {
@@ -1361,6 +1519,7 @@ export type UserUncheckedCreateWithoutInvitationsSentInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutInvitationsSentInput = {
@@ -1400,6 +1559,7 @@ export type UserUpdateWithoutInvitationsSentInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInvitationsSentInput = {
@@ -1423,6 +1583,7 @@ export type UserUncheckedUpdateWithoutInvitationsSentInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutOwnReportsInput = {
@@ -1446,6 +1607,7 @@ export type UserCreateWithoutOwnReportsInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutOwnReportsInput = {
@@ -1469,6 +1631,7 @@ export type UserUncheckedCreateWithoutOwnReportsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutOwnReportsInput = {
@@ -1508,6 +1671,7 @@ export type UserUpdateWithoutOwnReportsInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnReportsInput = {
@@ -1531,6 +1695,7 @@ export type UserUncheckedUpdateWithoutOwnReportsInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserCreateWithoutPreferencesInput = {
@@ -1554,6 +1719,7 @@ export type UserCreateWithoutPreferencesInput = {
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
@@ -1577,6 +1743,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type UserCreateOrConnectWithoutPreferencesInput = {
@@ -1616,6 +1783,7 @@ export type UserUpdateWithoutPreferencesInput = {
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutCreatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
@@ -1639,6 +1807,7 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 
@@ -1655,6 +1824,7 @@ export type UserCountOutputType = {
   bankingDetails: number
   legalAcceptances: number
   auditEvents: number
+  datevExports: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1666,6 +1836,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   bankingDetails?: boolean | UserCountOutputTypeCountBankingDetailsArgs
   legalAcceptances?: boolean | UserCountOutputTypeCountLegalAcceptancesArgs
   auditEvents?: boolean | UserCountOutputTypeCountAuditEventsArgs
+  datevExports?: boolean | UserCountOutputTypeCountDatevExportsArgs
 }
 
 /**
@@ -1734,6 +1905,13 @@ export type UserCountOutputTypeCountAuditEventsArgs<ExtArgs extends runtime.Type
   where?: Prisma.AuditEventWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDatevExportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DatevExportWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1757,6 +1935,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   bankingDetails?: boolean | Prisma.User$bankingDetailsArgs<ExtArgs>
   legalAcceptances?: boolean | Prisma.User$legalAcceptancesArgs<ExtArgs>
   auditEvents?: boolean | Prisma.User$auditEventsArgs<ExtArgs>
+  datevExports?: boolean | Prisma.User$datevExportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1816,6 +1995,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   bankingDetails?: boolean | Prisma.User$bankingDetailsArgs<ExtArgs>
   legalAcceptances?: boolean | Prisma.User$legalAcceptancesArgs<ExtArgs>
   auditEvents?: boolean | Prisma.User$auditEventsArgs<ExtArgs>
+  datevExports?: boolean | Prisma.User$datevExportsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1833,6 +2013,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     bankingDetails: Prisma.$BankingDetailsPayload<ExtArgs>[]
     legalAcceptances: Prisma.$LegalAcceptancePayload<ExtArgs>[]
     auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
+    datevExports: Prisma.$DatevExportPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2250,6 +2431,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   bankingDetails<T extends Prisma.User$bankingDetailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankingDetailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankingDetailsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   legalAcceptances<T extends Prisma.User$legalAcceptancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$legalAcceptancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditEvents<T extends Prisma.User$auditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  datevExports<T extends Prisma.User$datevExportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$datevExportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DatevExportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2892,6 +3074,30 @@ export type User$auditEventsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AuditEventScalarFieldEnum | Prisma.AuditEventScalarFieldEnum[]
+}
+
+/**
+ * User.datevExports
+ */
+export type User$datevExportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DatevExport
+   */
+  select?: Prisma.DatevExportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DatevExport
+   */
+  omit?: Prisma.DatevExportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DatevExportInclude<ExtArgs> | null
+  where?: Prisma.DatevExportWhereInput
+  orderBy?: Prisma.DatevExportOrderByWithRelationInput | Prisma.DatevExportOrderByWithRelationInput[]
+  cursor?: Prisma.DatevExportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DatevExportScalarFieldEnum | Prisma.DatevExportScalarFieldEnum[]
 }
 
 /**

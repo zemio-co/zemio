@@ -2,6 +2,7 @@
 
 import { Dialog, NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { InputTaxRate } from "@zemio/db/enums";
 import { formatDate, isValid, parse } from "date-fns";
 import { CarIcon, ReceiptIcon, UtensilsIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -10,6 +11,7 @@ import { useRef } from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { DatePicker } from "@/components/date-picker";
+import { InputTaxRateField } from "@/components/forms/input-tax-rate-field";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -108,6 +110,9 @@ const receiptExpenseFormSchema = z.object({
 		)
 		.transform((val) => parse(val, "dd.MM.yyyy", new Date())),
 	files: z.file().array(),
+	inputTaxRate: z.enum(InputTaxRate, {
+		error: "expense.inputTaxRateRequired",
+	}),
 });
 
 function ReceiptExpense({
@@ -143,6 +148,7 @@ function ReceiptExpense({
 			startDate: formatDate(new Date(), "dd.MM.yyyy"),
 			endDate: formatDate(new Date(), "dd.MM.yyyy"),
 			files: [] as File[],
+			inputTaxRate: "" as InputTaxRate | "",
 		},
 		validators: {
 			onSubmit: receiptExpenseFormSchema,
@@ -201,6 +207,7 @@ function ReceiptExpense({
 				type: "RECEIPT",
 				reportId,
 				attachments,
+				inputTaxRate: value.inputTaxRate as InputTaxRate,
 			});
 
 			form.reset();
@@ -356,6 +363,18 @@ function ReceiptExpense({
 									);
 								}}
 								name="amount"
+							/>
+							<form.Field
+								children={(field) => (
+									<InputTaxRateField
+										errors={field.state.meta.errors}
+										isInvalid={field.state.meta.isTouched && !field.state.meta.isValid}
+										name={field.name}
+										onChange={(next) => field.handleChange(next ?? "")}
+										value={field.state.value}
+									/>
+								)}
+								name="inputTaxRate"
 							/>
 							<form.Field
 								children={(field) => {

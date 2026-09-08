@@ -1,7 +1,8 @@
-import type { CostUnit, Report as ReportPrimitive, User } from "@zemio/db";
+import type { ReportListItemDTO } from "@/server/modules/report/report.dto";
 
-export type ListReport = ReportPrimitive & {
-	sum: number;
-	owner: Pick<User, "name" | "image" | "email">;
-	costUnit: Pick<CostUnit, "tag">;
-};
+/**
+ * The list rows as the server actually sends them. Typed against the DTO rather
+ * than the Prisma model so a new column on `report` does not become a type error
+ * in the table.
+ */
+export type ListReport = ReportListItemDTO;

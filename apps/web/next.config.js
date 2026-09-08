@@ -23,8 +23,9 @@ const config = {
 	productionBrowserSourceMaps: true,
 	// @appsignal/nodejs loads a native agent; it must stay unbundled.
 	serverExternalPackages: ["pdfkit", "@appsignal/nodejs"],
-	// @zemio/ui exports raw .ts/.tsx source rather than a prebuilt dist.
-	transpilePackages: ["@zemio/email", "@zemio/ui"],
+	// These export raw .ts/.tsx source rather than a prebuilt dist, so Next has
+	// to compile them instead of leaving them as runtime requires.
+	transpilePackages: ["@zemio/datev", "@zemio/email", "@zemio/ui"],
 	// Required for standalone output to correctly trace workspace package files
 	// (packages/db, packages/encryption) in the monorepo.
 	outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),

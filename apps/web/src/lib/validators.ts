@@ -7,6 +7,7 @@ import {
 
 import { isValid, parse } from "date-fns";
 import z from "zod";
+import { parseCalendarDate } from "./calendar-date";
 export const createReportSchema = z.object({
 	title: z.string().min(1, "report.titleRequired"),
 	description: z.string(),
@@ -153,3 +154,50 @@ export const updateCostUnitSchema = z.object({
 export const deleteCostUnitSchema = z.object({
 	id: z.string().min(1),
 });
+
+/**
+ * A plain ledger account number. DATEV's Konto field is numeric and holds nine
+ * digits, so a stray space or letter would be written into the file and refused
+ * on import.
+ */
+const datevAccountNumber = z
+	.string()
+	.regex(/^\d{1,9}$/)
+	.nullable();
+
+/**
+ * The DATEV export configuration of one Mandant (DEV-21).
+ *
+ * Every field is nullable so a half-filled form can be saved: the values come
+ * from the Kanzlei, an admin rarely has all nine at once, and the export's
+ * preflight already names the ones still missing. Shared by the router and the
+ * settings form, so there is one schema rather than two that can drift.
+ *
+ * The ranges are DATEV's own, from its header description — Beraternummer four
+ * to seven digits, Mandantennummer one to five, Sachkontenlänge a single digit
+ * from 4 to 8. Checked here, where a value is typed: a file refused on import
+ * says nothing about which of thirty-one header fields was wrong.
+ */
+export const updateDatevSettingsSchema = z.object({
+	datevBeraternummer: z.number().int().min(1001).max(9999999).nullable(),
+	datevMandantennummer: z.number().int().min(1).max(99999).nullable(),
+	// The picker hands over `dd.MM.yyyy`, and an empty field means "not set".
+	// Parsed here so the form and the router share one schema: a client copy
+	// that transformed differently is exactly how the two drift apart.
+	datevWirtschaftsjahrBeginn: z
+		.string()
+		.transform((value) => (value === "" ? null : parseCalendarDate(value))),
+	datevSachkontenlaenge: z.number().int().min(4).max(8).nullable(),
+	// Header field 27. SKR49 exists for Vereine, but nothing downstream maps to
+	// it — accepting it here would promise support that is not there.
+	datevKontenrahmen: z.enum(["03", "04"]).nullable(),
+	datevExpenseAccountReceipt: datevAccountNumber,
+	datevExpenseAccountTravel: datevAccountNumber,
+	datevExpenseAccountFood: datevAccountNumber,
+	datevContraAccount: datevAccountNumber,
+	datevFestschreibung: z.boolean(),
+});
+
+export type UpdateDatevSettingsInput = z.infer<
+	typeof updateDatevSettingsSchema
+>;

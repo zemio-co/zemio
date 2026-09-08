@@ -62,6 +62,7 @@ export const ModelName = {
   ProcessedStripeEvent: 'ProcessedStripeEvent',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
+  DatevExport: 'DatevExport',
   LegalAcceptance: 'LegalAcceptance',
   Organization: 'Organization',
   Member: 'Member',
@@ -250,6 +251,21 @@ export const CostUnitScalarFieldEnum = {
 export type CostUnitScalarFieldEnum = (typeof CostUnitScalarFieldEnum)[keyof typeof CostUnitScalarFieldEnum]
 
 
+export const DatevExportScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  periodFrom: 'periodFrom',
+  periodTo: 'periodTo',
+  configuration: 'configuration',
+  fileKey: 'fileKey',
+  checksum: 'checksum'
+} as const
+
+export type DatevExportScalarFieldEnum = (typeof DatevExportScalarFieldEnum)[keyof typeof DatevExportScalarFieldEnum]
+
+
 export const LegalAcceptanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -314,6 +330,7 @@ export const ReportScalarFieldEnum = {
   costUnitId: 'costUnitId',
   ownerId: 'ownerId',
   bankingDetailsId: 'bankingDetailsId',
+  datevExportId: 'datevExportId',
   createdAt: 'createdAt',
   lastUpdatedAt: 'lastUpdatedAt'
 } as const
@@ -328,6 +345,7 @@ export const ExpenseScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   type: 'type',
+  inputTaxRate: 'inputTaxRate',
   meta: 'meta',
   reportId: 'reportId'
 } as const
@@ -382,7 +400,17 @@ export const SettingsScalarFieldEnum = {
   dailyFoodAllowance: 'dailyFoodAllowance',
   breakfastDeduction: 'breakfastDeduction',
   lunchDeduction: 'lunchDeduction',
-  dinnerDeduction: 'dinnerDeduction'
+  dinnerDeduction: 'dinnerDeduction',
+  datevBeraternummer: 'datevBeraternummer',
+  datevMandantennummer: 'datevMandantennummer',
+  datevWirtschaftsjahrBeginn: 'datevWirtschaftsjahrBeginn',
+  datevSachkontenlaenge: 'datevSachkontenlaenge',
+  datevKontenrahmen: 'datevKontenrahmen',
+  datevExpenseAccountReceipt: 'datevExpenseAccountReceipt',
+  datevExpenseAccountTravel: 'datevExpenseAccountTravel',
+  datevExpenseAccountFood: 'datevExpenseAccountFood',
+  datevContraAccount: 'datevContraAccount',
+  datevFestschreibung: 'datevFestschreibung'
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]

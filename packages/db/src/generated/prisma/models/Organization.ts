@@ -264,6 +264,7 @@ export type OrganizationWhereInput = {
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
   auditEvents?: Prisma.AuditEventListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  datevExports?: Prisma.DatevExportListRelationFilter
 }
 
 export type OrganizationOrderByWithRelationInput = {
@@ -285,6 +286,7 @@ export type OrganizationOrderByWithRelationInput = {
   settings?: Prisma.SettingsOrderByWithRelationInput
   auditEvents?: Prisma.AuditEventOrderByRelationAggregateInput
   subscription?: Prisma.SubscriptionOrderByWithRelationInput
+  datevExports?: Prisma.DatevExportOrderByRelationAggregateInput
 }
 
 export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
@@ -309,6 +311,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   settings?: Prisma.XOR<Prisma.SettingsNullableScalarRelationFilter, Prisma.SettingsWhereInput> | null
   auditEvents?: Prisma.AuditEventListRelationFilter
   subscription?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null
+  datevExports?: Prisma.DatevExportListRelationFilter
 }, "id" | "slug" | "stripeCustomerId">
 
 export type OrganizationOrderByWithAggregationInput = {
@@ -364,6 +367,7 @@ export type OrganizationCreateInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateInput = {
@@ -385,6 +389,7 @@ export type OrganizationUncheckedCreateInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUpdateInput = {
@@ -406,6 +411,7 @@ export type OrganizationUpdateInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateInput = {
@@ -427,6 +433,7 @@ export type OrganizationUncheckedUpdateInput = {
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateManyInput = {
@@ -576,6 +583,20 @@ export type OrganizationUpdateOneRequiredWithoutCostUnitsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutCostUnitsInput, Prisma.OrganizationUpdateWithoutCostUnitsInput>, Prisma.OrganizationUncheckedUpdateWithoutCostUnitsInput>
 }
 
+export type OrganizationCreateNestedOneWithoutDatevExportsInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutDatevExportsInput, Prisma.OrganizationUncheckedCreateWithoutDatevExportsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutDatevExportsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+}
+
+export type OrganizationUpdateOneRequiredWithoutDatevExportsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrganizationCreateWithoutDatevExportsInput, Prisma.OrganizationUncheckedCreateWithoutDatevExportsInput>
+  connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutDatevExportsInput
+  upsert?: Prisma.OrganizationUpsertWithoutDatevExportsInput
+  connect?: Prisma.OrganizationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrganizationUpdateToOneWithWhereWithoutDatevExportsInput, Prisma.OrganizationUpdateWithoutDatevExportsInput>, Prisma.OrganizationUncheckedUpdateWithoutDatevExportsInput>
+}
+
 export type OrganizationCreateNestedOneWithoutMembersInput = {
   create?: Prisma.XOR<Prisma.OrganizationCreateWithoutMembersInput, Prisma.OrganizationUncheckedCreateWithoutMembersInput>
   connectOrCreate?: Prisma.OrganizationCreateOrConnectWithoutMembersInput
@@ -650,6 +671,7 @@ export type OrganizationCreateWithoutAuditEventsInput = {
   costUnitGroups?: Prisma.CostUnitGroupCreateNestedManyWithoutOrganizationInput
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutAuditEventsInput = {
@@ -670,6 +692,7 @@ export type OrganizationUncheckedCreateWithoutAuditEventsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedCreateNestedManyWithoutOrganizationInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutAuditEventsInput = {
@@ -706,6 +729,7 @@ export type OrganizationUpdateWithoutAuditEventsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUpdateManyWithoutOrganizationNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutAuditEventsInput = {
@@ -726,6 +750,7 @@ export type OrganizationUncheckedUpdateWithoutAuditEventsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSubscriptionInput = {
@@ -746,6 +771,7 @@ export type OrganizationCreateWithoutSubscriptionInput = {
   costUnitGroups?: Prisma.CostUnitGroupCreateNestedManyWithoutOrganizationInput
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSubscriptionInput = {
@@ -766,6 +792,7 @@ export type OrganizationUncheckedCreateWithoutSubscriptionInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedCreateNestedManyWithoutOrganizationInput
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSubscriptionInput = {
@@ -802,6 +829,7 @@ export type OrganizationUpdateWithoutSubscriptionInput = {
   costUnitGroups?: Prisma.CostUnitGroupUpdateManyWithoutOrganizationNestedInput
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSubscriptionInput = {
@@ -822,6 +850,7 @@ export type OrganizationUncheckedUpdateWithoutSubscriptionInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCostUnitGroupsInput = {
@@ -842,6 +871,7 @@ export type OrganizationCreateWithoutCostUnitGroupsInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCostUnitGroupsInput = {
@@ -862,6 +892,7 @@ export type OrganizationUncheckedCreateWithoutCostUnitGroupsInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCostUnitGroupsInput = {
@@ -898,6 +929,7 @@ export type OrganizationUpdateWithoutCostUnitGroupsInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCostUnitGroupsInput = {
@@ -918,6 +950,7 @@ export type OrganizationUncheckedUpdateWithoutCostUnitGroupsInput = {
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutCostUnitsInput = {
@@ -938,6 +971,7 @@ export type OrganizationCreateWithoutCostUnitsInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutCostUnitsInput = {
@@ -958,6 +992,7 @@ export type OrganizationUncheckedCreateWithoutCostUnitsInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutCostUnitsInput = {
@@ -994,6 +1029,7 @@ export type OrganizationUpdateWithoutCostUnitsInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutCostUnitsInput = {
@@ -1010,6 +1046,107 @@ export type OrganizationUncheckedUpdateWithoutCostUnitsInput = {
   members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
   reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  costUnitGroups?: Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
+}
+
+export type OrganizationCreateWithoutDatevExportsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  metadata?: string | null
+  createdAt: Date | string
+  microsoftTenantId?: string | null
+  reportCounter?: number
+  stripeCustomerId?: string | null
+  billingEnforced?: boolean
+  members?: Prisma.MemberCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportCreateNestedManyWithoutOrganizationInput
+  costUnits?: Prisma.CostUnitCreateNestedManyWithoutOrganizationInput
+  costUnitGroups?: Prisma.CostUnitGroupCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationUncheckedCreateWithoutDatevExportsInput = {
+  id: string
+  name: string
+  slug: string
+  logo?: string | null
+  metadata?: string | null
+  createdAt: Date | string
+  microsoftTenantId?: string | null
+  reportCounter?: number
+  stripeCustomerId?: string | null
+  billingEnforced?: boolean
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutOrganizationInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutOrganizationInput
+  reports?: Prisma.ReportUncheckedCreateNestedManyWithoutOrganizationInput
+  costUnits?: Prisma.CostUnitUncheckedCreateNestedManyWithoutOrganizationInput
+  costUnitGroups?: Prisma.CostUnitGroupUncheckedCreateNestedManyWithoutOrganizationInput
+  settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
+  subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+}
+
+export type OrganizationCreateOrConnectWithoutDatevExportsInput = {
+  where: Prisma.OrganizationWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutDatevExportsInput, Prisma.OrganizationUncheckedCreateWithoutDatevExportsInput>
+}
+
+export type OrganizationUpsertWithoutDatevExportsInput = {
+  update: Prisma.XOR<Prisma.OrganizationUpdateWithoutDatevExportsInput, Prisma.OrganizationUncheckedUpdateWithoutDatevExportsInput>
+  create: Prisma.XOR<Prisma.OrganizationCreateWithoutDatevExportsInput, Prisma.OrganizationUncheckedCreateWithoutDatevExportsInput>
+  where?: Prisma.OrganizationWhereInput
+}
+
+export type OrganizationUpdateToOneWithWhereWithoutDatevExportsInput = {
+  where?: Prisma.OrganizationWhereInput
+  data: Prisma.XOR<Prisma.OrganizationUpdateWithoutDatevExportsInput, Prisma.OrganizationUncheckedUpdateWithoutDatevExportsInput>
+}
+
+export type OrganizationUpdateWithoutDatevExportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reportCounter?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingEnforced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  members?: Prisma.MemberUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUpdateManyWithoutOrganizationNestedInput
+  costUnits?: Prisma.CostUnitUpdateManyWithoutOrganizationNestedInput
+  costUnitGroups?: Prisma.CostUnitGroupUpdateManyWithoutOrganizationNestedInput
+  settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
+  subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+}
+
+export type OrganizationUncheckedUpdateWithoutDatevExportsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reportCounter?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  billingEnforced?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  members?: Prisma.MemberUncheckedUpdateManyWithoutOrganizationNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutOrganizationNestedInput
+  reports?: Prisma.ReportUncheckedUpdateManyWithoutOrganizationNestedInput
+  costUnits?: Prisma.CostUnitUncheckedUpdateManyWithoutOrganizationNestedInput
   costUnitGroups?: Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
@@ -1034,6 +1171,7 @@ export type OrganizationCreateWithoutMembersInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutMembersInput = {
@@ -1054,6 +1192,7 @@ export type OrganizationUncheckedCreateWithoutMembersInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutMembersInput = {
@@ -1090,6 +1229,7 @@ export type OrganizationUpdateWithoutMembersInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutMembersInput = {
@@ -1110,6 +1250,7 @@ export type OrganizationUncheckedUpdateWithoutMembersInput = {
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutInvitationsInput = {
@@ -1130,6 +1271,7 @@ export type OrganizationCreateWithoutInvitationsInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutInvitationsInput = {
@@ -1150,6 +1292,7 @@ export type OrganizationUncheckedCreateWithoutInvitationsInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutInvitationsInput = {
@@ -1186,6 +1329,7 @@ export type OrganizationUpdateWithoutInvitationsInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
@@ -1206,6 +1350,7 @@ export type OrganizationUncheckedUpdateWithoutInvitationsInput = {
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutReportsInput = {
@@ -1226,6 +1371,7 @@ export type OrganizationCreateWithoutReportsInput = {
   settings?: Prisma.SettingsCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutReportsInput = {
@@ -1246,6 +1392,7 @@ export type OrganizationUncheckedCreateWithoutReportsInput = {
   settings?: Prisma.SettingsUncheckedCreateNestedOneWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutReportsInput = {
@@ -1282,6 +1429,7 @@ export type OrganizationUpdateWithoutReportsInput = {
   settings?: Prisma.SettingsUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutReportsInput = {
@@ -1302,6 +1450,7 @@ export type OrganizationUncheckedUpdateWithoutReportsInput = {
   settings?: Prisma.SettingsUncheckedUpdateOneWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationCreateWithoutSettingsInput = {
@@ -1322,6 +1471,7 @@ export type OrganizationCreateWithoutSettingsInput = {
   costUnitGroups?: Prisma.CostUnitGroupCreateNestedManyWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationUncheckedCreateWithoutSettingsInput = {
@@ -1342,6 +1492,7 @@ export type OrganizationUncheckedCreateWithoutSettingsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedCreateNestedManyWithoutOrganizationInput
   auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutOrganizationInput
   subscription?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutOrganizationInput
+  datevExports?: Prisma.DatevExportUncheckedCreateNestedManyWithoutOrganizationInput
 }
 
 export type OrganizationCreateOrConnectWithoutSettingsInput = {
@@ -1378,6 +1529,7 @@ export type OrganizationUpdateWithoutSettingsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUpdateManyWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUpdateManyWithoutOrganizationNestedInput
 }
 
 export type OrganizationUncheckedUpdateWithoutSettingsInput = {
@@ -1398,6 +1550,7 @@ export type OrganizationUncheckedUpdateWithoutSettingsInput = {
   costUnitGroups?: Prisma.CostUnitGroupUncheckedUpdateManyWithoutOrganizationNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutOrganizationNestedInput
   subscription?: Prisma.SubscriptionUncheckedUpdateOneWithoutOrganizationNestedInput
+  datevExports?: Prisma.DatevExportUncheckedUpdateManyWithoutOrganizationNestedInput
 }
 
 
@@ -1412,6 +1565,7 @@ export type OrganizationCountOutputType = {
   costUnits: number
   costUnitGroups: number
   auditEvents: number
+  datevExports: number
 }
 
 export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1421,6 +1575,7 @@ export type OrganizationCountOutputTypeSelect<ExtArgs extends runtime.Types.Exte
   costUnits?: boolean | OrganizationCountOutputTypeCountCostUnitsArgs
   costUnitGroups?: boolean | OrganizationCountOutputTypeCountCostUnitGroupsArgs
   auditEvents?: boolean | OrganizationCountOutputTypeCountAuditEventsArgs
+  datevExports?: boolean | OrganizationCountOutputTypeCountDatevExportsArgs
 }
 
 /**
@@ -1475,6 +1630,13 @@ export type OrganizationCountOutputTypeCountAuditEventsArgs<ExtArgs extends runt
   where?: Prisma.AuditEventWhereInput
 }
 
+/**
+ * OrganizationCountOutputType without action
+ */
+export type OrganizationCountOutputTypeCountDatevExportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DatevExportWhereInput
+}
+
 
 export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1495,6 +1657,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   settings?: boolean | Prisma.Organization$settingsArgs<ExtArgs>
   auditEvents?: boolean | Prisma.Organization$auditEventsArgs<ExtArgs>
   subscription?: boolean | Prisma.Organization$subscriptionArgs<ExtArgs>
+  datevExports?: boolean | Prisma.Organization$datevExportsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organization"]>
 
@@ -1547,6 +1710,7 @@ export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.Interna
   settings?: boolean | Prisma.Organization$settingsArgs<ExtArgs>
   auditEvents?: boolean | Prisma.Organization$auditEventsArgs<ExtArgs>
   subscription?: boolean | Prisma.Organization$subscriptionArgs<ExtArgs>
+  datevExports?: boolean | Prisma.Organization$datevExportsArgs<ExtArgs>
   _count?: boolean | Prisma.OrganizationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrganizationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1563,6 +1727,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     settings: Prisma.$SettingsPayload<ExtArgs> | null
     auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
     subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+    datevExports: Prisma.$DatevExportPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1977,6 +2142,7 @@ export interface Prisma__OrganizationClient<T, Null = never, ExtArgs extends run
   settings<T extends Prisma.Organization$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$settingsArgs<ExtArgs>>): Prisma.Prisma__SettingsClient<runtime.Types.Result.GetResult<Prisma.$SettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   auditEvents<T extends Prisma.Organization$auditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subscription<T extends Prisma.Organization$subscriptionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$subscriptionArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  datevExports<T extends Prisma.Organization$datevExportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Organization$datevExportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DatevExportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2588,6 +2754,30 @@ export type Organization$subscriptionArgs<ExtArgs extends runtime.Types.Extensio
    */
   include?: Prisma.SubscriptionInclude<ExtArgs> | null
   where?: Prisma.SubscriptionWhereInput
+}
+
+/**
+ * Organization.datevExports
+ */
+export type Organization$datevExportsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DatevExport
+   */
+  select?: Prisma.DatevExportSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DatevExport
+   */
+  omit?: Prisma.DatevExportOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DatevExportInclude<ExtArgs> | null
+  where?: Prisma.DatevExportWhereInput
+  orderBy?: Prisma.DatevExportOrderByWithRelationInput | Prisma.DatevExportOrderByWithRelationInput[]
+  cursor?: Prisma.DatevExportWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DatevExportScalarFieldEnum | Prisma.DatevExportScalarFieldEnum[]
 }
 
 /**

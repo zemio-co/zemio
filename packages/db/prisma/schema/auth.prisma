@@ -32,6 +32,7 @@ model User {
   bankingDetails   BankingDetails[]
   legalAcceptances LegalAcceptance[]
   auditEvents      AuditEvent[]
+  datevExports     DatevExport[]
 
   @@unique([email])
   @@map("user")

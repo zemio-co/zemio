@@ -29,6 +29,12 @@ model Report {
 
   bankingSnapshot ReportBankingSnapshot?
 
+  // Set once the report has been written into a DATEV export. Null means it is
+  // still available for the next one, which is what prevents a double export.
+  // Cleared when an export is deleted so its reports become available again.
+  datevExportId String?
+  datevExport   DatevExport? @relation(fields: [datevExportId], references: [id], onDelete: SetNull)
+
   createdAt     DateTime @default(now())
   lastUpdatedAt DateTime @updatedAt
 
@@ -42,6 +48,7 @@ model Report {
   @@index([createdAt])
   @@index([lastUpdatedAt])
   @@index([paidAt])
+  @@index([datevExportId])
   @@map("report")
 }
 
@@ -58,9 +65,22 @@ model Expense {
   id          String      @id @default(cuid())
   description String?
   amount      Decimal     @db.Decimal(12, 2)
-  startDate   DateTime
-  endDate     DateTime
+  // A calendar day, not an instant: an expense happened on the 1st of March,
+  // never at an o'clock. Stored as `date` so no time component is left for a
+  // reader to misinterpret — the DATEV export reads these with getUTC*, the PDF
+  // formats them locally, and with a timestamp the two disagreed by a day
+  // wherever the server ran east of UTC. Written through
+  // `server/shared/calendar-date.ts`.
+  startDate   DateTime @db.Date
+  endDate     DateTime @db.Date
   type        ExpenseType
+
+  // Which input tax the receipt carries, for the DATEV export (DEV-21).
+  // Required for new RECEIPT expenses and meaningless for TRAVEL and FOOD,
+  // which are Pauschalen and carry no input tax at all. Null on every row
+  // written before the column existed; the export treats those as NONE rather
+  // than inventing a deduction nobody entered.
+  inputTaxRate InputTaxRate?
 
   // Deprecated: replaced by the typed travelDetail/foodDetail relations.
   // Kept until the contract migration drops it (see docs/schema-audit.md).
@@ -81,6 +101,16 @@ enum ExpenseType {
   RECEIPT
   TRAVEL
   FOOD
+}
+
+// Input tax shown on a receipt, mapped to a DATEV BU-Schlüssel on export.
+// STANDARD and REDUCED are the two German rates; NONE covers both a zero-rated
+// purchase and a receipt with no deductible input tax, because DATEV books them
+// the same way — an empty BU-Schlüssel.
+enum InputTaxRate {
+  STANDARD
+  REDUCED
+  NONE
 }
 
 // Type-specific expense data, one row per TRAVEL expense

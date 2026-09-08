@@ -2,7 +2,7 @@
 
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
-import type { Report, ReportStatus } from "@zemio/db";
+import type { ReportStatus } from "@zemio/db";
 import { cva } from "class-variance-authority";
 import { formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
@@ -54,6 +54,7 @@ import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { useErrorDescription } from "@/modules/shared";
+import type { ReportDetailDTO } from "@/server/modules/report/report.dto";
 import { api } from "@/trpc/react";
 
 function ReportHeader({
@@ -276,7 +277,7 @@ function ReportHeaderActions({
 	report,
 	...props
 }: React.ComponentProps<"div"> & {
-	report: Report;
+	report: ReportDetailDTO;
 }) {
 	const t = useTranslations("modules.report.header.actions");
 
@@ -315,7 +316,7 @@ function ReportHeaderCopyAction({
 	report,
 	...props
 }: React.ComponentProps<typeof Button> & {
-	report: Report;
+	report: ReportDetailDTO;
 }) {
 	const t = useTranslations("modules.report.header.copyAction");
 	const financialQuery = api.report.financialSummary.useQuery({
@@ -394,7 +395,7 @@ function ReportHeaderEditAction({
 	disabled,
 	...props
 }: React.ComponentProps<typeof Button> & {
-	report: Report;
+	report: ReportDetailDTO;
 }) {
 	const t = useTranslations("modules.report.header.editMenu");
 	const editTitleHandleRef = React.useRef<ReturnType<
@@ -610,7 +611,7 @@ function ReportHeaderSubmitAction({
 	disabled,
 	...props
 }: React.ComponentProps<typeof Button> & {
-	report: Report;
+	report: ReportDetailDTO;
 }) {
 	const t = useTranslations("modules.report.header.submitDialog");
 	const tToasts = useTranslations("modules.report.header.toasts");

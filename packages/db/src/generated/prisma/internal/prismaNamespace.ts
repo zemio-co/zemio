@@ -395,6 +395,7 @@ export const ModelName = {
   ProcessedStripeEvent: 'ProcessedStripeEvent',
   CostUnitGroup: 'CostUnitGroup',
   CostUnit: 'CostUnit',
+  DatevExport: 'DatevExport',
   LegalAcceptance: 'LegalAcceptance',
   Organization: 'Organization',
   Member: 'Member',
@@ -421,7 +422,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "auditEvent" | "user" | "session" | "account" | "verification" | "bankingDetails" | "reportBankingSnapshot" | "subscription" | "processedStripeEvent" | "costUnitGroup" | "costUnit" | "legalAcceptance" | "organization" | "member" | "invitation" | "report" | "expense" | "travelExpenseDetail" | "foodExpenseDetail" | "attachment" | "settings" | "preferences"
+    modelProps: "auditEvent" | "user" | "session" | "account" | "verification" | "bankingDetails" | "reportBankingSnapshot" | "subscription" | "processedStripeEvent" | "costUnitGroup" | "costUnit" | "datevExport" | "legalAcceptance" | "organization" | "member" | "invitation" | "report" | "expense" | "travelExpenseDetail" | "foodExpenseDetail" | "attachment" | "settings" | "preferences"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1236,6 +1237,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CostUnitCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CostUnitCountAggregateOutputType> | number
+        }
+      }
+    }
+    DatevExport: {
+      payload: Prisma.$DatevExportPayload<ExtArgs>
+      fields: Prisma.DatevExportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DatevExportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DatevExportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        findFirst: {
+          args: Prisma.DatevExportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DatevExportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        findMany: {
+          args: Prisma.DatevExportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>[]
+        }
+        create: {
+          args: Prisma.DatevExportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        createMany: {
+          args: Prisma.DatevExportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.DatevExportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>[]
+        }
+        delete: {
+          args: Prisma.DatevExportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        update: {
+          args: Prisma.DatevExportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        deleteMany: {
+          args: Prisma.DatevExportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DatevExportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.DatevExportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>[]
+        }
+        upsert: {
+          args: Prisma.DatevExportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DatevExportPayload>
+        }
+        aggregate: {
+          args: Prisma.DatevExportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDatevExport>
+        }
+        groupBy: {
+          args: Prisma.DatevExportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DatevExportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DatevExportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DatevExportCountAggregateOutputType> | number
         }
       }
     }
@@ -2251,6 +2326,21 @@ export const CostUnitScalarFieldEnum = {
 export type CostUnitScalarFieldEnum = (typeof CostUnitScalarFieldEnum)[keyof typeof CostUnitScalarFieldEnum]
 
 
+export const DatevExportScalarFieldEnum = {
+  id: 'id',
+  organizationId: 'organizationId',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  periodFrom: 'periodFrom',
+  periodTo: 'periodTo',
+  configuration: 'configuration',
+  fileKey: 'fileKey',
+  checksum: 'checksum'
+} as const
+
+export type DatevExportScalarFieldEnum = (typeof DatevExportScalarFieldEnum)[keyof typeof DatevExportScalarFieldEnum]
+
+
 export const LegalAcceptanceScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2315,6 +2405,7 @@ export const ReportScalarFieldEnum = {
   costUnitId: 'costUnitId',
   ownerId: 'ownerId',
   bankingDetailsId: 'bankingDetailsId',
+  datevExportId: 'datevExportId',
   createdAt: 'createdAt',
   lastUpdatedAt: 'lastUpdatedAt'
 } as const
@@ -2329,6 +2420,7 @@ export const ExpenseScalarFieldEnum = {
   startDate: 'startDate',
   endDate: 'endDate',
   type: 'type',
+  inputTaxRate: 'inputTaxRate',
   meta: 'meta',
   reportId: 'reportId'
 } as const
@@ -2383,7 +2475,17 @@ export const SettingsScalarFieldEnum = {
   dailyFoodAllowance: 'dailyFoodAllowance',
   breakfastDeduction: 'breakfastDeduction',
   lunchDeduction: 'lunchDeduction',
-  dinnerDeduction: 'dinnerDeduction'
+  dinnerDeduction: 'dinnerDeduction',
+  datevBeraternummer: 'datevBeraternummer',
+  datevMandantennummer: 'datevMandantennummer',
+  datevWirtschaftsjahrBeginn: 'datevWirtschaftsjahrBeginn',
+  datevSachkontenlaenge: 'datevSachkontenlaenge',
+  datevKontenrahmen: 'datevKontenrahmen',
+  datevExpenseAccountReceipt: 'datevExpenseAccountReceipt',
+  datevExpenseAccountTravel: 'datevExpenseAccountTravel',
+  datevExpenseAccountFood: 'datevExpenseAccountFood',
+  datevContraAccount: 'datevContraAccount',
+  datevFestschreibung: 'datevFestschreibung'
 } as const
 
 export type SettingsScalarFieldEnum = (typeof SettingsScalarFieldEnum)[keyof typeof SettingsScalarFieldEnum]
@@ -2601,6 +2703,20 @@ export type ListEnumExpenseTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$
 
 
 /**
+ * Reference to a field of type 'InputTaxRate'
+ */
+export type EnumInputTaxRateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InputTaxRate'>
+    
+
+
+/**
+ * Reference to a field of type 'InputTaxRate[]'
+ */
+export type ListEnumInputTaxRateFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InputTaxRate[]'>
+    
+
+
+/**
  * Reference to a field of type 'BigInt'
  */
 export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt'>
@@ -2762,6 +2878,7 @@ export type GlobalOmitConfig = {
   processedStripeEvent?: Prisma.ProcessedStripeEventOmit
   costUnitGroup?: Prisma.CostUnitGroupOmit
   costUnit?: Prisma.CostUnitOmit
+  datevExport?: Prisma.DatevExportOmit
   legalAcceptance?: Prisma.LegalAcceptanceOmit
   organization?: Prisma.OrganizationOmit
   member?: Prisma.MemberOmit

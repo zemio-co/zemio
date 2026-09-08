@@ -33,6 +33,7 @@ model Organization {
   settings       Settings?
   auditEvents    AuditEvent[]
   subscription   Subscription?
+  datevExports   DatevExport[]
 
   @@map("organization")
 }

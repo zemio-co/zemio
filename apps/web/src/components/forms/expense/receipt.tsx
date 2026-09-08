@@ -2,6 +2,7 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import { InputTaxRate } from "@zemio/db/enums";
 import { formatDate } from "date-fns";
 import { XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -9,6 +10,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import z from "zod";
 import { DatePicker } from "@/components/date-picker";
+import { InputTaxRateField } from "@/components/forms/input-tax-rate-field";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -64,12 +66,20 @@ export function CreateReceiptExpenseForm({
 			type: "RECEIPT",
 			reportId,
 			files: [] as File[],
+			inputTaxRate: "" as InputTaxRate | "",
 		},
 		validators: {
 			// Only validates fields that are tracked in the form.
 			// The attachments payload is built imperatively in onSubmit after upload
 			// and is validated server-side by the TRPC router.
-			onSubmit: baseCreateExpenseSchema.and(z.object({ files: z.file().array() })),
+			onSubmit: baseCreateExpenseSchema.and(
+				z.object({
+					files: z.file().array(),
+					inputTaxRate: z.enum(InputTaxRate, {
+						error: "expense.inputTaxRateRequired",
+					}),
+				}),
+			),
 		},
 		onSubmit: async ({ value }) => {
 			// Rename files with unique hash before upload
@@ -125,6 +135,7 @@ export function CreateReceiptExpenseForm({
 				type: "RECEIPT",
 				reportId,
 				attachments,
+				inputTaxRate: value.inputTaxRate as InputTaxRate,
 			});
 
 			// TODO: Invalidate expense list for report
@@ -256,6 +267,18 @@ export function CreateReceiptExpenseForm({
 						);
 					}}
 					name="amount"
+				/>
+				<form.Field
+					children={(field) => (
+						<InputTaxRateField
+							errors={field.state.meta.errors}
+							isInvalid={field.state.meta.isTouched && !field.state.meta.isValid}
+							name={field.name}
+							onChange={(next) => field.handleChange(next ?? "")}
+							value={field.state.value}
+						/>
+					)}
+					name="inputTaxRate"
 				/>
 				<form.Field
 					children={(field) => {

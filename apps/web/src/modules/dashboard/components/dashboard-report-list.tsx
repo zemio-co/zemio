@@ -1,6 +1,5 @@
 "use client";
 
-import type { Report as ReportPrimitive } from "@zemio/db";
 import { format } from "date-fns";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
@@ -11,11 +10,12 @@ import { reportStatusKeys } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import type { ReportListItemDTO } from "@/server/modules/report/report.dto";
 import { api } from "@/trpc/react";
 
-type Report = ReportPrimitive & {
-	sum: number;
-};
+// Typed against the DTO the server sends rather than the Prisma model, so a new
+// column on `report` does not become a type error here.
+type Report = ReportListItemDTO;
 
 function DashboardReportList({
 	className,

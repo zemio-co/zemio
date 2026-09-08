@@ -1,4 +1,5 @@
 import {
+	updateDatevSettingsSchema,
 	updateMealAllowancesSchema,
 	updateTravelAllowancesSchema,
 } from "@/lib/validators";
@@ -28,6 +29,12 @@ export const settingsRouter = createTRPCRouter({
 		.input(updateMealAllowancesSchema)
 		.mutation(({ ctx, input }) =>
 			settingsService.updateMealAllowances(toSettingsServiceContext(ctx), input),
+		),
+
+	updateDatevSettings: orgAdminProcedure
+		.input(updateDatevSettingsSchema)
+		.mutation(({ ctx, input }) =>
+			settingsService.updateDatevSettings(toSettingsServiceContext(ctx), input),
 		),
 
 	updateTravelAllowances: orgAdminProcedure

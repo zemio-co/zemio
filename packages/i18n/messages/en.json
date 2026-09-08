@@ -358,6 +358,16 @@
 					"uploadPartialFailureDescription": "Nicht alle Dateien konnten hochgeladen werden",
 					"downloadPreparing": "Download wird vorbereitet…",
 					"downloadStarted": "Download gestartet"
+				},
+				"inputTaxRate": {
+					"label": "Input tax",
+					"placeholder": "Select a rate",
+					"helper": "The tax rate shown on the receipt. Your entry is passed on to accounting as given — Zemio does not check it.",
+					"options": {
+						"standard": "19 % input tax",
+						"reduced": "7 % input tax",
+						"none": "No input tax"
+					}
 				}
 			},
 			"createExpense": {
@@ -715,6 +725,9 @@
 					"orgBilling": {
 						"label": "Billing",
 						"description": "Manage your organization's subscription"
+					},
+					"orgDatev": {
+						"label": "DATEV export"
 					}
 				},
 				"sidebarOrgHeading": "Organisation",
@@ -1162,6 +1175,58 @@
 					"label": "Checkout cancelled",
 					"description": "Nothing was charged and nothing about your organization changed."
 				}
+			},
+			"datev": {
+				"title": "DATEV export",
+				"description": "What your tax advisor needs for the Buchungsstapel. None of it can be guessed — ask the practice. You can save the form incomplete; the export will name whatever is still missing.",
+				"sections": {
+					"mandant": "Client and accounts"
+				},
+				"saveErrorTitle": "Could not save",
+				"saveErrorFallback": "Unexpected error",
+				"consultant": {
+					"label": "Consultant number",
+					"description": "The practice's DATEV number, four to seven digits."
+				},
+				"client": {
+					"label": "Client number",
+					"description": "Your number at the practice, one to five digits."
+				},
+				"fiscalYear": {
+					"label": "Start of the fiscal year",
+					"description": "Its month and day give every export its year. A period must not cross the boundary."
+				},
+				"accountLength": {
+					"label": "Account number length",
+					"description": "Must match the client's setting in DATEV, or the file is refused on import."
+				},
+				"chartOfAccounts": {
+					"label": "Chart of accounts",
+					"description": "SKR03 or SKR04 — whichever the practice uses. The account numbers differ between them.",
+					"placeholder": "Select a chart of accounts",
+					"skr03": "SKR03",
+					"skr04": "SKR04"
+				},
+				"accountReceipt": {
+					"label": "Expense account for receipts",
+					"description": "Where receipt expenses are booked. It has to be an account without an Automatik function."
+				},
+				"accountTravel": {
+					"label": "Expense account for travel",
+					"description": "Where mileage allowances are booked."
+				},
+				"accountFood": {
+					"label": "Expense account for meals",
+					"description": "Where meal allowances are booked."
+				},
+				"contraAccount": {
+					"label": "Contra account",
+					"description": "The bank account in the chart of accounts the payment came from — usually 1200 under SKR03, 1800 under SKR04. The number only; Zemio never accesses a bank account."
+				},
+				"festschreibung": {
+					"label": "Lock bookings",
+					"description": "Locked bookings can no longer be changed in DATEV. Off is sensible while the account mapping is still being agreed."
+				}
 			}
 		},
 		"auth": {
@@ -1210,7 +1275,8 @@
 				"admin": {
 					"label": "Administration",
 					"reporting": "Reporting",
-					"reports": "Anträge"
+					"reports": "Anträge",
+					"datevExport": "DATEV export"
 				}
 			},
 			"datePicker": {
@@ -1399,6 +1465,63 @@
 			"acceptButton": "Einladung annehmen",
 			"acceptError": "Einladung konnte nicht angenommen werden",
 			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+		},
+		"datevExport": {
+			"title": "DATEV export",
+			"description": "Builds a Buchungsstapel from one month's paid reports. Each report goes into one export only.",
+			"period": {
+				"label": "Month",
+				"placeholder": "Pick a month"
+			},
+			"preview": {
+				"reports": "{count, plural, =0 {No reports} =1 {1 report} other {# reports}}",
+				"bookings": "{count, plural, =0 {no bookings} =1 {1 booking} other {# bookings}}",
+				"empty": "Nothing to export in this month.",
+				"summary": "{reports}, {bookings}"
+			},
+			"blockers": {
+				"title": "The export cannot run yet",
+				"missingConfiguration": "Still missing in the DATEV settings: {fields}",
+				"settingsLink": "Go to the DATEV settings",
+				"costUnitNotExportable": "The cost unit “{tag}” contains characters DATEV will not take. Letters, digits, underscore and space are allowed. Affected: report {reports}. Change the tag to match how the practice keeps the cost centre — renaming it automatically would book against one that does not exist there.",
+				"periodCrossesFiscalYear": "The period crosses the fiscal year boundary. A Buchungsstapel carries one year only — export the months separately."
+			},
+			"notices": {
+				"title": "Worth knowing",
+				"zeroAmountSkipped": "Report {tag}: {count, plural, =1 {one expense} other {# expenses}} of 0.00 € were left out — DATEV does not accept a zero booking.",
+				"reportWithoutBookings": "Report {tag} produces no booking and appears in no file. It still counts as exported afterwards."
+			},
+			"fields": {
+				"beraternummer": "Consultant number",
+				"mandantennummer": "Client number",
+				"wirtschaftsjahrBeginn": "Start of the fiscal year",
+				"sachkontenlaenge": "Account number length",
+				"kontenrahmen": "Chart of accounts",
+				"expenseAccountReceipt": "Expense account for receipts",
+				"expenseAccountTravel": "Expense account for travel",
+				"expenseAccountFood": "Expense account for meals",
+				"contraAccount": "Contra account"
+			},
+			"create": {
+				"button": "Build Buchungsstapel",
+				"pending": "Building …",
+				"successTitle": "Buchungsstapel created",
+				"successDescription": "The download is starting. You will find the file in the history.",
+				"errorTitle": "Export failed",
+				"errorFallback": "Unexpected error"
+			},
+			"history": {
+				"title": "Past exports",
+				"description": "Every file stays retrievable. A report listed here goes into no further export.",
+				"empty": "No export created yet.",
+				"columnPeriod": "Period",
+				"columnCreated": "Created",
+				"columnCreatedBy": "By",
+				"columnReports": "Reports",
+				"download": "Download",
+				"downloadErrorTitle": "Download failed"
+			},
+			"loadErrorTitle": "Could not be loaded"
 		}
 	},
 	"validation": {

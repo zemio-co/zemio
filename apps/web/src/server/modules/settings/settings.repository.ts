@@ -15,6 +15,16 @@ const settingsSelect = {
 	breakfastDeduction: true,
 	lunchDeduction: true,
 	dinnerDeduction: true,
+	datevBeraternummer: true,
+	datevMandantennummer: true,
+	datevWirtschaftsjahrBeginn: true,
+	datevSachkontenlaenge: true,
+	datevKontenrahmen: true,
+	datevExpenseAccountReceipt: true,
+	datevExpenseAccountTravel: true,
+	datevExpenseAccountFood: true,
+	datevContraAccount: true,
+	datevFestschreibung: true,
 	createdAt: true,
 	updatedAt: true,
 } satisfies Prisma.SettingsSelect;
@@ -35,6 +45,16 @@ export type SettingsWriteData = {
 	breakfastDeduction?: number;
 	lunchDeduction?: number;
 	dinnerDeduction?: number;
+	datevBeraternummer?: number | null;
+	datevMandantennummer?: number | null;
+	datevWirtschaftsjahrBeginn?: Date | null;
+	datevSachkontenlaenge?: number | null;
+	datevKontenrahmen?: "03" | "04" | null;
+	datevExpenseAccountReceipt?: string | null;
+	datevExpenseAccountTravel?: string | null;
+	datevExpenseAccountFood?: string | null;
+	datevContraAccount?: string | null;
+	datevFestschreibung?: boolean;
 };
 
 /**

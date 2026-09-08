@@ -41,6 +41,7 @@ export type ExpenseMinAggregateOutputType = {
   startDate: Date | null
   endDate: Date | null
   type: $Enums.ExpenseType | null
+  inputTaxRate: $Enums.InputTaxRate | null
   reportId: string | null
 }
 
@@ -51,6 +52,7 @@ export type ExpenseMaxAggregateOutputType = {
   startDate: Date | null
   endDate: Date | null
   type: $Enums.ExpenseType | null
+  inputTaxRate: $Enums.InputTaxRate | null
   reportId: string | null
 }
 
@@ -61,6 +63,7 @@ export type ExpenseCountAggregateOutputType = {
   startDate: number
   endDate: number
   type: number
+  inputTaxRate: number
   meta: number
   reportId: number
   _all: number
@@ -82,6 +85,7 @@ export type ExpenseMinAggregateInputType = {
   startDate?: true
   endDate?: true
   type?: true
+  inputTaxRate?: true
   reportId?: true
 }
 
@@ -92,6 +96,7 @@ export type ExpenseMaxAggregateInputType = {
   startDate?: true
   endDate?: true
   type?: true
+  inputTaxRate?: true
   reportId?: true
 }
 
@@ -102,6 +107,7 @@ export type ExpenseCountAggregateInputType = {
   startDate?: true
   endDate?: true
   type?: true
+  inputTaxRate?: true
   meta?: true
   reportId?: true
   _all?: true
@@ -200,6 +206,7 @@ export type ExpenseGroupByOutputType = {
   startDate: Date
   endDate: Date
   type: $Enums.ExpenseType
+  inputTaxRate: $Enums.InputTaxRate | null
   meta: runtime.JsonValue | null
   reportId: string
   _count: ExpenseCountAggregateOutputType | null
@@ -234,6 +241,7 @@ export type ExpenseWhereInput = {
   startDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   type?: Prisma.EnumExpenseTypeFilter<"Expense"> | $Enums.ExpenseType
+  inputTaxRate?: Prisma.EnumInputTaxRateNullableFilter<"Expense"> | $Enums.InputTaxRate | null
   meta?: Prisma.JsonNullableFilter<"Expense">
   reportId?: Prisma.StringFilter<"Expense"> | string
   travelDetail?: Prisma.XOR<Prisma.TravelExpenseDetailNullableScalarRelationFilter, Prisma.TravelExpenseDetailWhereInput> | null
@@ -249,6 +257,7 @@ export type ExpenseOrderByWithRelationInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  inputTaxRate?: Prisma.SortOrderInput | Prisma.SortOrder
   meta?: Prisma.SortOrderInput | Prisma.SortOrder
   reportId?: Prisma.SortOrder
   travelDetail?: Prisma.TravelExpenseDetailOrderByWithRelationInput
@@ -267,6 +276,7 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<{
   startDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   type?: Prisma.EnumExpenseTypeFilter<"Expense"> | $Enums.ExpenseType
+  inputTaxRate?: Prisma.EnumInputTaxRateNullableFilter<"Expense"> | $Enums.InputTaxRate | null
   meta?: Prisma.JsonNullableFilter<"Expense">
   reportId?: Prisma.StringFilter<"Expense"> | string
   travelDetail?: Prisma.XOR<Prisma.TravelExpenseDetailNullableScalarRelationFilter, Prisma.TravelExpenseDetailWhereInput> | null
@@ -282,6 +292,7 @@ export type ExpenseOrderByWithAggregationInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  inputTaxRate?: Prisma.SortOrderInput | Prisma.SortOrder
   meta?: Prisma.SortOrderInput | Prisma.SortOrder
   reportId?: Prisma.SortOrder
   _count?: Prisma.ExpenseCountOrderByAggregateInput
@@ -301,6 +312,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   startDate?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
   endDate?: Prisma.DateTimeWithAggregatesFilter<"Expense"> | Date | string
   type?: Prisma.EnumExpenseTypeWithAggregatesFilter<"Expense"> | $Enums.ExpenseType
+  inputTaxRate?: Prisma.EnumInputTaxRateNullableWithAggregatesFilter<"Expense"> | $Enums.InputTaxRate | null
   meta?: Prisma.JsonNullableWithAggregatesFilter<"Expense">
   reportId?: Prisma.StringWithAggregatesFilter<"Expense"> | string
 }
@@ -312,6 +324,7 @@ export type ExpenseCreateInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailCreateNestedOneWithoutExpenseInput
   foodDetail?: Prisma.FoodExpenseDetailCreateNestedOneWithoutExpenseInput
@@ -326,6 +339,7 @@ export type ExpenseUncheckedCreateInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId: string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
@@ -340,6 +354,7 @@ export type ExpenseUpdateInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUpdateOneWithoutExpenseNestedInput
   foodDetail?: Prisma.FoodExpenseDetailUpdateOneWithoutExpenseNestedInput
@@ -354,6 +369,7 @@ export type ExpenseUncheckedUpdateInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
@@ -368,6 +384,7 @@ export type ExpenseCreateManyInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId: string
 }
@@ -379,6 +396,7 @@ export type ExpenseUpdateManyMutationInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -389,6 +407,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -410,6 +429,7 @@ export type ExpenseCountOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  inputTaxRate?: Prisma.SortOrder
   meta?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
 }
@@ -425,6 +445,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  inputTaxRate?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
 }
 
@@ -435,6 +456,7 @@ export type ExpenseMinOrderByAggregateInput = {
   startDate?: Prisma.SortOrder
   endDate?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  inputTaxRate?: Prisma.SortOrder
   reportId?: Prisma.SortOrder
 }
 
@@ -501,6 +523,10 @@ export type EnumExpenseTypeFieldUpdateOperationsInput = {
   set?: $Enums.ExpenseType
 }
 
+export type NullableEnumInputTaxRateFieldUpdateOperationsInput = {
+  set?: $Enums.InputTaxRate | null
+}
+
 export type ExpenseCreateNestedOneWithoutTravelDetailInput = {
   create?: Prisma.XOR<Prisma.ExpenseCreateWithoutTravelDetailInput, Prisma.ExpenseUncheckedCreateWithoutTravelDetailInput>
   connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutTravelDetailInput
@@ -550,6 +576,7 @@ export type ExpenseCreateWithoutReportInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailCreateNestedOneWithoutExpenseInput
   foodDetail?: Prisma.FoodExpenseDetailCreateNestedOneWithoutExpenseInput
@@ -563,6 +590,7 @@ export type ExpenseUncheckedCreateWithoutReportInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
   foodDetail?: Prisma.FoodExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
@@ -605,6 +633,7 @@ export type ExpenseScalarWhereInput = {
   startDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   endDate?: Prisma.DateTimeFilter<"Expense"> | Date | string
   type?: Prisma.EnumExpenseTypeFilter<"Expense"> | $Enums.ExpenseType
+  inputTaxRate?: Prisma.EnumInputTaxRateNullableFilter<"Expense"> | $Enums.InputTaxRate | null
   meta?: Prisma.JsonNullableFilter<"Expense">
   reportId?: Prisma.StringFilter<"Expense"> | string
 }
@@ -616,6 +645,7 @@ export type ExpenseCreateWithoutTravelDetailInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   foodDetail?: Prisma.FoodExpenseDetailCreateNestedOneWithoutExpenseInput
   report: Prisma.ReportCreateNestedOneWithoutExpensesInput
@@ -629,6 +659,7 @@ export type ExpenseUncheckedCreateWithoutTravelDetailInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId: string
   foodDetail?: Prisma.FoodExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
@@ -658,6 +689,7 @@ export type ExpenseUpdateWithoutTravelDetailInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   foodDetail?: Prisma.FoodExpenseDetailUpdateOneWithoutExpenseNestedInput
   report?: Prisma.ReportUpdateOneRequiredWithoutExpensesNestedInput
@@ -671,6 +703,7 @@ export type ExpenseUncheckedUpdateWithoutTravelDetailInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
   foodDetail?: Prisma.FoodExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
@@ -684,6 +717,7 @@ export type ExpenseCreateWithoutFoodDetailInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailCreateNestedOneWithoutExpenseInput
   report: Prisma.ReportCreateNestedOneWithoutExpensesInput
@@ -697,6 +731,7 @@ export type ExpenseUncheckedCreateWithoutFoodDetailInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId: string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
@@ -726,6 +761,7 @@ export type ExpenseUpdateWithoutFoodDetailInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUpdateOneWithoutExpenseNestedInput
   report?: Prisma.ReportUpdateOneRequiredWithoutExpensesNestedInput
@@ -739,6 +775,7 @@ export type ExpenseUncheckedUpdateWithoutFoodDetailInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
@@ -752,6 +789,7 @@ export type ExpenseCreateWithoutAttachmentsInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailCreateNestedOneWithoutExpenseInput
   foodDetail?: Prisma.FoodExpenseDetailCreateNestedOneWithoutExpenseInput
@@ -765,6 +803,7 @@ export type ExpenseUncheckedCreateWithoutAttachmentsInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId: string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedCreateNestedOneWithoutExpenseInput
@@ -794,6 +833,7 @@ export type ExpenseUpdateWithoutAttachmentsInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUpdateOneWithoutExpenseNestedInput
   foodDetail?: Prisma.FoodExpenseDetailUpdateOneWithoutExpenseNestedInput
@@ -807,6 +847,7 @@ export type ExpenseUncheckedUpdateWithoutAttachmentsInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reportId?: Prisma.StringFieldUpdateOperationsInput | string
   travelDetail?: Prisma.TravelExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
@@ -820,6 +861,7 @@ export type ExpenseCreateManyReportInput = {
   startDate: Date | string
   endDate: Date | string
   type: $Enums.ExpenseType
+  inputTaxRate?: $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -830,6 +872,7 @@ export type ExpenseUpdateWithoutReportInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUpdateOneWithoutExpenseNestedInput
   foodDetail?: Prisma.FoodExpenseDetailUpdateOneWithoutExpenseNestedInput
@@ -843,6 +886,7 @@ export type ExpenseUncheckedUpdateWithoutReportInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   travelDetail?: Prisma.TravelExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
   foodDetail?: Prisma.FoodExpenseDetailUncheckedUpdateOneWithoutExpenseNestedInput
@@ -856,6 +900,7 @@ export type ExpenseUncheckedUpdateManyWithoutReportInput = {
   startDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   type?: Prisma.EnumExpenseTypeFieldUpdateOperationsInput | $Enums.ExpenseType
+  inputTaxRate?: Prisma.NullableEnumInputTaxRateFieldUpdateOperationsInput | $Enums.InputTaxRate | null
   meta?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 }
 
@@ -897,6 +942,7 @@ export type ExpenseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   startDate?: boolean
   endDate?: boolean
   type?: boolean
+  inputTaxRate?: boolean
   meta?: boolean
   reportId?: boolean
   travelDetail?: boolean | Prisma.Expense$travelDetailArgs<ExtArgs>
@@ -913,6 +959,7 @@ export type ExpenseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   startDate?: boolean
   endDate?: boolean
   type?: boolean
+  inputTaxRate?: boolean
   meta?: boolean
   reportId?: boolean
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
@@ -925,6 +972,7 @@ export type ExpenseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   startDate?: boolean
   endDate?: boolean
   type?: boolean
+  inputTaxRate?: boolean
   meta?: boolean
   reportId?: boolean
   report?: boolean | Prisma.ReportDefaultArgs<ExtArgs>
@@ -937,11 +985,12 @@ export type ExpenseSelectScalar = {
   startDate?: boolean
   endDate?: boolean
   type?: boolean
+  inputTaxRate?: boolean
   meta?: boolean
   reportId?: boolean
 }
 
-export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "description" | "amount" | "startDate" | "endDate" | "type" | "meta" | "reportId", ExtArgs["result"]["expense"]>
+export type ExpenseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "description" | "amount" | "startDate" | "endDate" | "type" | "inputTaxRate" | "meta" | "reportId", ExtArgs["result"]["expense"]>
 export type ExpenseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   travelDetail?: boolean | Prisma.Expense$travelDetailArgs<ExtArgs>
   foodDetail?: boolean | Prisma.Expense$foodDetailArgs<ExtArgs>
@@ -971,6 +1020,7 @@ export type $ExpensePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     startDate: Date
     endDate: Date
     type: $Enums.ExpenseType
+    inputTaxRate: $Enums.InputTaxRate | null
     meta: runtime.JsonValue | null
     reportId: string
   }, ExtArgs["result"]["expense"]>
@@ -1406,6 +1456,7 @@ export interface ExpenseFieldRefs {
   readonly startDate: Prisma.FieldRef<"Expense", 'DateTime'>
   readonly endDate: Prisma.FieldRef<"Expense", 'DateTime'>
   readonly type: Prisma.FieldRef<"Expense", 'ExpenseType'>
+  readonly inputTaxRate: Prisma.FieldRef<"Expense", 'InputTaxRate'>
   readonly meta: Prisma.FieldRef<"Expense", 'Json'>
   readonly reportId: Prisma.FieldRef<"Expense", 'String'>
 }

@@ -358,6 +358,16 @@
 					"uploadPartialFailureDescription": "Nicht alle Dateien konnten hochgeladen werden",
 					"downloadPreparing": "Download wird vorbereitet…",
 					"downloadStarted": "Download gestartet"
+				},
+				"inputTaxRate": {
+					"label": "Vorsteuer",
+					"placeholder": "Steuersatz auswählen",
+					"helper": "Der Steuersatz, der auf dem Beleg ausgewiesen ist. Deine Angabe wird so in die Buchhaltung übernommen — Zemio prüft sie nicht.",
+					"options": {
+						"standard": "19 % Vorsteuer",
+						"reduced": "7 % Vorsteuer",
+						"none": "Kein Vorsteuerabzug"
+					}
 				}
 			},
 			"createExpense": {
@@ -715,6 +725,9 @@
 					"orgBilling": {
 						"label": "Abrechnung",
 						"description": "Verwalte den Tarif deiner Organisation"
+					},
+					"orgDatev": {
+						"label": "DATEV-Export"
 					}
 				},
 				"sidebarOrgHeading": "Organisation",
@@ -1162,6 +1175,58 @@
 					"label": "Bezahlvorgang abgebrochen",
 					"description": "Es wurde nichts berechnet und an deiner Organisation hat sich nichts geändert."
 				}
+			},
+			"datev": {
+				"title": "DATEV-Export",
+				"description": "Die Angaben, die dein Steuerberater für den Buchungsstapel braucht. Keine davon lässt sich erraten — frag sie in der Kanzlei ab. Du kannst das Formular unvollständig speichern; der Export benennt dann selbst, was noch fehlt.",
+				"sections": {
+					"mandant": "Mandant und Konten"
+				},
+				"saveErrorTitle": "Speichern fehlgeschlagen",
+				"saveErrorFallback": "Unerwarteter Fehler",
+				"consultant": {
+					"label": "Beraternummer",
+					"description": "Die Nummer der Kanzlei bei DATEV, vier- bis siebenstellig."
+				},
+				"client": {
+					"label": "Mandantennummer",
+					"description": "Deine Nummer bei der Kanzlei, ein- bis fünfstellig."
+				},
+				"fiscalYear": {
+					"label": "Beginn des Wirtschaftsjahres",
+					"description": "Aus Monat und Tag wird das Jahr jedes Exports abgeleitet. Ein Zeitraum darf die Jahresgrenze nicht überschreiten."
+				},
+				"accountLength": {
+					"label": "Sachkontenlänge",
+					"description": "Muss mit der Einstellung des Mandats in DATEV übereinstimmen, sonst wird die Datei beim Import abgelehnt."
+				},
+				"chartOfAccounts": {
+					"label": "Kontenrahmen",
+					"description": "SKR03 oder SKR04 — welchen die Kanzlei führt. Die Kontonummern unterscheiden sich zwischen beiden.",
+					"placeholder": "Kontenrahmen auswählen",
+					"skr03": "SKR03",
+					"skr04": "SKR04"
+				},
+				"accountReceipt": {
+					"label": "Aufwandskonto Belege",
+					"description": "Konto, auf das Belegausgaben gebucht werden. Es muss ein Konto ohne Automatik-Funktion sein."
+				},
+				"accountTravel": {
+					"label": "Aufwandskonto Fahrten",
+					"description": "Konto für Kilometerpauschalen."
+				},
+				"accountFood": {
+					"label": "Aufwandskonto Verpflegung",
+					"description": "Konto für Verpflegungspauschalen."
+				},
+				"contraAccount": {
+					"label": "Gegenkonto",
+					"description": "Das Bankkonto im Kontenrahmen, aus dem ausgezahlt wurde — bei SKR03 meist 1200, bei SKR04 meist 1800. Nur die Kontonummer; Zemio greift auf kein Bankkonto zu."
+				},
+				"festschreibung": {
+					"label": "Buchungen festschreiben",
+					"description": "Festgeschriebene Buchungen sind in DATEV nicht mehr änderbar. Während die Kontenzuordnung noch abgestimmt wird, ist Aus sinnvoll."
+				}
 			}
 		},
 		"auth": {
@@ -1210,7 +1275,8 @@
 				"admin": {
 					"label": "Administration",
 					"reporting": "Reporting",
-					"reports": "Anträge"
+					"reports": "Anträge",
+					"datevExport": "DATEV-Export"
 				}
 			},
 			"datePicker": {
@@ -1399,6 +1465,63 @@
 			"acceptButton": "Einladung annehmen",
 			"acceptError": "Einladung konnte nicht angenommen werden",
 			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+		},
+		"datevExport": {
+			"title": "DATEV-Export",
+			"description": "Erzeugt einen Buchungsstapel aus den ausgezahlten Anträgen eines Monats. Jeder Antrag geht nur in einen Export ein.",
+			"period": {
+				"label": "Monat",
+				"placeholder": "Monat wählen"
+			},
+			"preview": {
+				"reports": "{count, plural, =0 {Kein Antrag} =1 {1 Antrag} other {# Anträge}}",
+				"bookings": "{count, plural, =0 {keine Buchung} =1 {1 Buchung} other {# Buchungen}}",
+				"empty": "In diesem Monat gibt es nichts zu exportieren.",
+				"summary": "{reports}, {bookings}"
+			},
+			"blockers": {
+				"title": "Der Export kann noch nicht laufen",
+				"missingConfiguration": "In den DATEV-Einstellungen fehlt noch: {fields}",
+				"settingsLink": "Zu den DATEV-Einstellungen",
+				"costUnitNotExportable": "Die Kostenstelle „{tag}“ enthält Zeichen, die DATEV nicht annimmt. Erlaubt sind Buchstaben, Ziffern, Unterstrich und Leerzeichen. Betroffen: Antrag {reports}. Ändere das Kürzel so, wie die Kanzlei die Kostenstelle führt — automatisch umbenennen würde gegen eine Kostenstelle buchen, die es dort nicht gibt.",
+				"periodCrossesFiscalYear": "Der Zeitraum überschreitet die Grenze des Wirtschaftsjahres. Ein Buchungsstapel trägt nur ein Jahr — exportiere die Monate getrennt."
+			},
+			"notices": {
+				"title": "Hinweise",
+				"zeroAmountSkipped": "Antrag {tag}: {count, plural, =1 {eine Ausgabe} other {# Ausgaben}} über 0,00 € wurden nicht übernommen — DATEV nimmt keine Nullbuchung an.",
+				"reportWithoutBookings": "Antrag {tag} erzeugt keine Buchung und erscheint in keiner Datei. Er gilt danach trotzdem als exportiert."
+			},
+			"fields": {
+				"beraternummer": "Beraternummer",
+				"mandantennummer": "Mandantennummer",
+				"wirtschaftsjahrBeginn": "Beginn des Wirtschaftsjahres",
+				"sachkontenlaenge": "Sachkontenlänge",
+				"kontenrahmen": "Kontenrahmen",
+				"expenseAccountReceipt": "Aufwandskonto Belege",
+				"expenseAccountTravel": "Aufwandskonto Fahrten",
+				"expenseAccountFood": "Aufwandskonto Verpflegung",
+				"contraAccount": "Gegenkonto"
+			},
+			"create": {
+				"button": "Buchungsstapel erzeugen",
+				"pending": "Wird erzeugt …",
+				"successTitle": "Buchungsstapel erzeugt",
+				"successDescription": "Der Download startet. Du findest die Datei danach in der Historie.",
+				"errorTitle": "Export fehlgeschlagen",
+				"errorFallback": "Unerwarteter Fehler"
+			},
+			"history": {
+				"title": "Bisherige Exporte",
+				"description": "Jede Datei bleibt abrufbar. Ein Antrag, der hier auftaucht, geht in keinen weiteren Export ein.",
+				"empty": "Noch kein Export erzeugt.",
+				"columnPeriod": "Zeitraum",
+				"columnCreated": "Erzeugt",
+				"columnCreatedBy": "Von",
+				"columnReports": "Anträge",
+				"download": "Herunterladen",
+				"downloadErrorTitle": "Download fehlgeschlagen"
+			},
+			"loadErrorTitle": "Konnte nicht geladen werden"
 		}
 	},
 	"validation": {
