@@ -8,6 +8,8 @@ import { createMockDb, type MockPrismaClient } from "./prisma-mock";
  */
 export interface MockSessionUser {
 	id: string;
+	/** Better Auth always has one; the DATEV export writes it into the file. */
+	name: string;
 	role?: string | null;
 }
 
@@ -46,7 +48,7 @@ export function createMockProtectedContext(overrides?: {
 	return {
 		db: overrides?.db ?? createMockDb(),
 		session: {
-			user: { id: "user_1", role: "user", ...overrides?.user },
+			user: { id: "user_1", name: "Test User", role: "user", ...overrides?.user },
 			session: { activeOrganizationId: overrides?.activeOrganizationId ?? null },
 		},
 		headers: overrides?.headers ?? new Headers(),

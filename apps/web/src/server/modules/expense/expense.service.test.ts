@@ -74,6 +74,46 @@ describe("expenseService.update", () => {
 		);
 	});
 
+	it("records a changed day as a calendar day", async () => {
+		// A date was recorded nowhere at all, and since the audit gate asks whether
+		// `before` holds anything, an edit that moved only a day wrote no event —
+		// the report's history simply had a gap where the change was.
+		//
+		// Written as a calendar day, not as an instant: the column is a `@db.Date`
+		// and a timestamp in the log would invite the reader to ask which timezone
+		// it is in, which is the confusion these columns were changed to end.
+		const service = createExpenseService({ repo, audit });
+
+		await service.update(ctx(), expenseDetail(), {
+			startDate: new Date(Date.UTC(2026, 7, 1)),
+			endDate: new Date(Date.UTC(2026, 7, 2)),
+		});
+
+		expect(audit.append).toHaveBeenCalledWith(
+			db,
+			expect.objectContaining({
+				diff: {
+					before: { startDate: "2026-08-03", endDate: "2026-08-03" },
+					after: { startDate: "2026-08-01", endDate: "2026-08-02" },
+				},
+			}),
+		);
+	});
+
+	it("says nothing about a day that was resubmitted unchanged", async () => {
+		// The edit form resubmits both dates on every save, so a description-only
+		// change arrives carrying them. Compared by instant rather than by
+		// identity, or every save would claim the dates had moved.
+		const service = createExpenseService({ repo, audit });
+
+		await service.update(ctx(), expenseDetail(), {
+			startDate: new Date(Date.UTC(2026, 7, 3)),
+			endDate: new Date(Date.UTC(2026, 7, 3)),
+		});
+
+		expect(audit.append).not.toHaveBeenCalled();
+	});
+
 	it("leaves an allowance without an input tax rate", async () => {
 		// Only a receipt carries an invoice that states one. The exporter ignores
 		// the column for the two allowances, so a value written here would be a

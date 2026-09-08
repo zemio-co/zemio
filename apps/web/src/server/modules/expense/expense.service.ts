@@ -29,6 +29,17 @@ import type {
 	updateExpenseSchema,
 } from "./expense.validators";
 
+/**
+ * A `@db.Date` value as the day it holds, for the audit log.
+ *
+ * Not an instant: the column stores a calendar day, and a timestamp in the log
+ * would invite the reader to ask which timezone it is in — the question those
+ * columns were changed to stop raising.
+ */
+function calendarDay(date: Date): string {
+	return date.toISOString().slice(0, 10);
+}
+
 async function runWrite<T>(operation: () => Promise<T>): Promise<T> {
 	try {
 		return await operation();
@@ -343,6 +354,22 @@ export function createExpenseService(deps: {
 					before.amount = prevAmount;
 					after.amount = nextAmount;
 				}
+			}
+
+			// Compared by instant, not by identity: the edit form resubmits both days
+			// on every save, so a description-only change arrives carrying them and
+			// would otherwise read as a move.
+			//
+			// Recording them at all is what makes the gate below correct. It asks
+			// whether `before` holds anything, and because a day never landed there,
+			// an edit that moved only a date wrote no event — the report's history
+			// had a gap exactly where the change was.
+			for (const field of ["startDate", "endDate"] as const) {
+				const next = updateData[field];
+				if (!(next instanceof Date)) continue;
+				if (next.getTime() === expense[field].getTime()) continue;
+				before[field] = calendarDay(expense[field]);
+				after[field] = calendarDay(next);
 			}
 
 			if (Object.keys(before).length === 0) {

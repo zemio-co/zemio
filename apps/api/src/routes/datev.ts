@@ -14,6 +14,10 @@ const requestSchema = z
 		// wearing the message of a race. The service checks that the ids and the
 		// period actually agree; only their emptiness is decidable here.
 		reportIds: z.array(z.string()).min(1),
+		// Already folded to header field 9's charset by the caller, which is the
+		// side that knows the person. Empty is valid and means the name had
+		// nothing writable in it.
+		exportiertVon: z.string().max(25),
 	})
 	.refine((body) => body.periodFrom <= body.periodTo, {
 		message: "periodFrom must not be after periodTo",
@@ -21,15 +25,13 @@ const requestSchema = z
 	});
 
 datev.post("/buchungsstapel", serviceAuth, async (c) => {
+	// Whose books these are. Everything else the file needs travels in the body,
+	// "Exportiert von" included: that field may legally be empty, and an empty
+	// header value is the kind of thing a proxy drops on the way.
 	const organizationId = c.req.header("X-Organization-Id");
-	const exportedBy = c.req.header("X-Exported-By");
 
-	// Both, not just the organization. "Exportiert von" is header field 9, the
-	// one field that says who produced the file; DATEV accepts it blank, so a
-	// missing header would have been written as nothing at all and could not be
-	// reconstructed from the file afterwards.
-	if (!organizationId || !exportedBy) {
-		return c.json({ error: "Missing user context headers" }, 400);
+	if (!organizationId) {
+		return c.json({ error: "Missing organization context header" }, 400);
 	}
 
 	const parsed = requestSchema.safeParse(await c.req.json().catch(() => null));
@@ -44,7 +46,7 @@ datev.post("/buchungsstapel", serviceAuth, async (c) => {
 				periodFrom: parsed.data.periodFrom,
 				periodTo: parsed.data.periodTo,
 				reportIds: parsed.data.reportIds,
-				exportedBy,
+				exportiertVon: parsed.data.exportiertVon,
 			}),
 		);
 	} catch (err) {

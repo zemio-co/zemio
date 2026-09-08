@@ -24,8 +24,12 @@ export type BuchungsstapelRequest = {
 	 * had its cost unit and expense dates checked by nobody.
 	 */
 	reportIds: string[];
-	/** Written into the header as "Exportiert von". */
-	exportedBy: string;
+	/**
+	 * Written into the header as "Exportiert von", field 9. Arrives folded to
+	 * `[A-Za-z0-9_]{0,25}` — apps/web does it, since that is the side that knows
+	 * the person and can show what the Kanzlei will read.
+	 */
+	exportiertVon: string;
 };
 
 export type BuchungsstapelResult = {
@@ -219,7 +223,7 @@ export async function generateBuchungsstapel(
 		{
 			erzeugtAm: new Date(),
 			herkunft: "ZE",
-			exportiertVon: request.exportedBy,
+			exportiertVon: request.exportiertVon,
 			beraternummer: settings.datevBeraternummer,
 			mandantennummer: settings.datevMandantennummer,
 			// The caller's preflight blocks a period that crosses a boundary, and

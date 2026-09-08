@@ -1,5 +1,9 @@
 import { TRPCError } from "@trpc/server";
-import { buchungsstapelFilename, toKontenrahmen } from "@zemio/datev";
+import {
+	buchungsstapelFilename,
+	toExportiertVon,
+	toKontenrahmen,
+} from "@zemio/datev";
 import type { Prisma, PrismaClient, Settings } from "@zemio/db";
 import { env } from "@/env";
 import { decimalToNumber } from "@/server/shared/money";
@@ -32,6 +36,8 @@ export type DatevExportServiceContext = {
 	db: PrismaClient;
 	organizationId: string;
 	userId: string;
+	/** Folded into "Exportiert von" before it travels; see `create`. */
+	userName: string;
 };
 
 /** What a period would export, and what stands in the way. */
@@ -299,7 +305,6 @@ export function createDatevExportService(deps: {
 					"Content-Type": "application/json",
 					"X-Service-Key": env.INTERNAL_API_SECRET,
 					"X-Organization-Id": ctx.organizationId,
-					"X-Exported-By": ctx.userId,
 				},
 				body: JSON.stringify({
 					periodFrom: input.periodFrom.toISOString(),
@@ -309,6 +314,13 @@ export function createDatevExportService(deps: {
 					// PAID since, and nothing would have checked its cost unit or its
 					// expense dates.
 					reportIds: reports.map((report) => report.id),
+					// Header field 9, folded here rather than in apps/api: this is the
+					// side that knows the person, and the field takes only
+					// `[A-Za-z0-9_]{0,25}` — so what the Kanzlei will read is decided
+					// where it can be seen. Travels in the body because it may legally
+					// be empty, and an empty header value is the kind of thing a proxy
+					// drops.
+					exportiertVon: toExportiertVon(ctx.userName),
 				}),
 			});
 

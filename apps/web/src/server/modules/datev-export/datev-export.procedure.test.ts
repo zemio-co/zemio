@@ -45,8 +45,8 @@ const configuredSettings = {
 	datevFestschreibung: true,
 };
 
-function adminContext() {
-	const ctx = createMockOrgAdminContext();
+function adminContext(user?: { name: string }) {
+	const ctx = createMockOrgAdminContext({ user });
 	ctx.db.settings.findUnique.mockResolvedValue(configuredSettings as never);
 	ctx.db.report.findMany.mockResolvedValue([] as never);
 	return ctx;
@@ -81,8 +81,8 @@ const storedFile = {
  * A context whose period holds two bookable reports and whose `$transaction`
  * runs its callback, so `recordExport` reaches the two writes it makes.
  */
-function exportingContext() {
-	const ctx = adminContext();
+function exportingContext(user?: { name: string }) {
+	const ctx = adminContext(user);
 	ctx.db.report.findMany.mockResolvedValue(bookableReports as never);
 	(ctx.db.$transaction as unknown as Mock).mockImplementation(
 		async (run: (tx: unknown) => unknown) => run(ctx.db),
@@ -498,7 +498,23 @@ describe("datevExport.create", () => {
 			periodFrom: period.periodFrom.toISOString(),
 			periodTo: period.periodTo.toISOString(),
 			reportIds: ["report_1", "report_2"],
+			exportiertVon: "TestUser",
 		});
+	});
+
+	it("writes the exporter's name into the file, not their id", async () => {
+		// Header field 9 is where the Kanzlei reads who produced a file. A cuid
+		// there answers nobody's question, and the field takes only
+		// `[A-Za-z0-9_]{0,25}` — so the name is folded before it travels.
+		const ctx = exportingContext({ name: "Jürgen Müller-Weiß" });
+		const fetchMock = apiResponds(storedFile);
+
+		await createCaller(asTRPCContext(ctx)).create(period);
+
+		const [, init] = fetchMock.mock.calls[0] ?? [];
+		expect(JSON.parse(String(init?.body)).exportiertVon).toBe(
+			"JuergenMuellerWeiss",
+		);
 	});
 
 	it("stores the configuration the export was approved with", async () => {
