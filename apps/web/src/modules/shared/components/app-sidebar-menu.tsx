@@ -1,6 +1,19 @@
 "use client";
 
 import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuPortal,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
+	DropdownMenuTrigger,
+	Skeleton,
+} from "@zemio/ui";
+import {
 	Building2Icon,
 	ChevronDownIcon,
 	LogOutIcon,
@@ -14,19 +27,6 @@ import { useTranslations } from "next-intl";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuPortal,
-	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
@@ -34,13 +34,19 @@ import { authClient } from "@/server/better-auth/client";
 type ActiveOrgQuery = ReturnType<typeof authClient.useActiveOrganization>;
 
 function AppSidebarMenu({
+	triggerClassName,
 	...props
-}: React.ComponentProps<typeof DropdownMenu>) {
+}: React.ComponentProps<typeof DropdownMenu> & {
+	triggerClassName?: string;
+}) {
 	const activeOrgQuery = authClient.useActiveOrganization();
 
 	return (
 		<DropdownMenu data-slot="app-sidebar-menu" {...props}>
-			<SidebarMenuTrigger activeOrgQuery={activeOrgQuery} />
+			<SidebarMenuTrigger
+				activeOrgQuery={activeOrgQuery}
+				className={triggerClassName}
+			/>
 			<SidebarMenuContent activeOrgQuery={activeOrgQuery} />
 		</DropdownMenu>
 	);
@@ -126,32 +132,31 @@ function SidebarMenuContent({
 	return (
 		<DropdownMenuContent
 			align="start"
-			className={cn("w-80 gap-0 p-0", className)}
+			className={cn("", className)}
 			data-slot="sidebar-menu-content"
 			{...props}
 		>
-			<SidebarMenuContentHeader activeOrgQuery={activeOrgQuery} />
-			<DropdownMenuGroup className={"p-1"}>
+			{/* <SidebarMenuContentHeader activeOrgQuery={activeOrgQuery} /> */}
+			<DropdownMenuGroup>
 				<DropdownMenuItem
-					className="flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700"
 					render={
 						<Link href={ROUTES.SETTINGS_USER_GENERAL()}>
-							<SettingsIcon className="size-4 shrink-0 text-slate-500!" />
+							<SettingsIcon />
 							<span className="truncate">{t("settings")}</span>
 						</Link>
 					}
 				/>
 				<SidebarMenuOrgsButton />
 			</DropdownMenuGroup>
-			<DropdownMenuSeparator className={"my-0"} />
-			<DropdownMenuGroup className={"p-1"}>
+			<DropdownMenuSeparator />
+			<DropdownMenuGroup>
 				<SidebarMenuUserButton />
 				<DropdownMenuItem
-					className="flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700"
 					disabled={pending}
 					onClick={handleSignOut}
+					variant="destructive"
 				>
-					<LogOutIcon className="size-4 shrink-0 text-slate-500!" />
+					<LogOutIcon />
 					<span className="truncate">{t("signOut")}</span>
 				</DropdownMenuItem>
 			</DropdownMenuGroup>
@@ -167,28 +172,16 @@ function SidebarMenuUserButton({
 
 	if (session.isPending) {
 		return (
-			<DropdownMenuItem
-				className={cn(
-					"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700",
-					className,
-				)}
-				{...props}
-			>
-				<UserIcon className="size-4 shrink-0 text-slate-500!" />
+			<DropdownMenuItem {...props}>
+				<UserIcon />
 				<Skeleton className="h-6 w-20" />
 			</DropdownMenuItem>
 		);
 	}
 
 	return (
-		<DropdownMenuItem
-			className={cn(
-				"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700",
-				className,
-			)}
-			{...props}
-		>
-			<UserIcon className="size-4 shrink-0 text-slate-500!" />
+		<DropdownMenuItem className={cn(className)} {...props}>
+			<UserIcon />
 			<span className="truncate">{session.data?.user.email}</span>
 		</DropdownMenuItem>
 	);
@@ -210,15 +203,8 @@ function SidebarMenuOrgsButton({
 
 	if (organizations.isPending) {
 		return (
-			<DropdownMenuItem
-				className={cn(
-					"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700",
-					className,
-				)}
-				disabled
-				{...props}
-			>
-				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
+			<DropdownMenuItem className={cn(className)} disabled {...props}>
+				<Building2Icon />
 				<Skeleton className="h-6 w-20" />
 			</DropdownMenuItem>
 		);
@@ -227,124 +213,42 @@ function SidebarMenuOrgsButton({
 	if (!organizations.data) {
 		return (
 			<DropdownMenuItem
-				className={cn(
-					"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm",
-					className,
-				)}
+				className={cn(className)}
 				disabled
+				variant="destructive"
 				{...props}
 			>
-				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
-				<span className="text-destructive text-xs">{t("orgsLoadError")}</span>
+				<Building2Icon />
+				<span>{t("orgsLoadError")}</span>
 			</DropdownMenuItem>
 		);
 	}
 
 	return (
 		<DropdownMenuSub>
-			<DropdownMenuSubTrigger
-				className={cn(
-					"flex h-9 items-center justify-start gap-2 rounded-md px-3 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700",
-					className,
-				)}
-			>
-				<Building2Icon className="size-4 shrink-0 text-slate-500!" />
+			<DropdownMenuSubTrigger className={cn(className)}>
+				<Building2Icon />
 				<span className="truncate">{t("yourOrganizations")}</span>
 			</DropdownMenuSubTrigger>
 			<DropdownMenuPortal>
-				<DropdownMenuSubContent className={"w-72"}>
-					{organizations.data.map((org) => (
-						<DropdownMenuItem
-							className={cn(
-								"flex h-9 items-center justify-start gap-4 rounded-md px-3 pl-2 font-normal text-slate-700 text-sm focus:bg-slate-100 not-data-[variant=destructive]:focus:**:text-slate-700",
-								className,
-							)}
-							key={org.id}
-							onClick={() => handleOrgChange(org.id)}
-						>
-							<span className="flex size-6 items-center justify-center rounded-xs bg-slate-100 font-medium text-slate-600 text-xs leading-none">
-								{org.name.charAt(0).toUpperCase()}
-							</span>
-							<span className="truncate">{org.name}</span>
-						</DropdownMenuItem>
-					))}
+				<DropdownMenuSubContent>
+					<DropdownMenuGroup>
+						{organizations.data.map((org) => (
+							<DropdownMenuItem
+								className={cn(className)}
+								key={org.id}
+								onClick={() => handleOrgChange(org.id)}
+							>
+								<span className="flex size-6 items-center justify-center rounded-xs bg-slate-100 font-medium text-slate-600 text-xs leading-none">
+									{org.name.charAt(0).toUpperCase()}
+								</span>
+								<span className="truncate">{org.name}</span>
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuGroup>
 				</DropdownMenuSubContent>
 			</DropdownMenuPortal>
 		</DropdownMenuSub>
-	);
-}
-
-function SidebarMenuContentHeader({
-	className,
-	activeOrgQuery,
-	...props
-}: React.ComponentProps<"div"> & {
-	activeOrgQuery: ActiveOrgQuery;
-}) {
-	const t = useTranslations("modules.shared.sidebarMenu");
-	const { data, error, isPending } = activeOrgQuery;
-
-	if (isPending) {
-		return (
-			<div
-				className={cn(
-					"flex min-h-28 flex-col items-center justify-center text-center",
-					className,
-				)}
-				data-slot="sidebar-menu-content-header"
-				{...props}
-			>
-				<Skeleton className="size-8" />
-				<Skeleton className="mt-3 h-5 w-12" />
-			</div>
-		);
-	}
-
-	if (!data || error) {
-		return (
-			<div
-				className={cn(
-					"flex min-h-28 flex-col items-center justify-center border border-dashed text-center",
-					className,
-				)}
-				data-slot="sidebar-menu-content-header"
-				{...props}
-			>
-				<span className="font-medium text-destructive text-xs">
-					{t("headerLoadError")}
-				</span>
-			</div>
-		);
-	}
-
-	return (
-		<div
-			className={cn(
-				"flex min-h-28 flex-col items-center justify-center px-8 text-center",
-				className,
-			)}
-			data-slot="sidebar-menu-content-header"
-			{...props}
-		>
-			{data.logo ? (
-				<span className="flex size-8 overflow-hidden rounded-sm">
-					<Image
-						alt={data.name}
-						className="object-cover"
-						height={32}
-						src={data.logo}
-						width={32}
-					/>
-				</span>
-			) : (
-				<span className="flex size-8 items-center justify-center rounded-sm bg-slate-100 py-4 font-medium text-slate-600 text-sm leading-none">
-					{data.name.charAt(0).toUpperCase()}
-				</span>
-			)}
-			<span className="mt-3 w-full truncate font-semibold text-base text-slate-800">
-				{data.name}
-			</span>
-		</div>
 	);
 }
 
