@@ -60,8 +60,8 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	return (
 		<Sidebar {...props}>
-			<SidebarHeader className="h-16 px-2 py-4">
-				<AppSidebarMenu />
+			<SidebarHeader className="flex h-11 items-center justify-center border-base-200 border-b p-0">
+				<AppSidebarMenu triggerClassName="h-11 hover:bg-base-100 px-4  rounded-none w-full" />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
