@@ -17,10 +17,11 @@ const NAME_FORM_ID = "onboarding-name-form";
 /**
  * The name everything else addresses this person by.
  *
- * Prefilled for a Microsoft sign-in, where the provider supplied one, and
- * empty for a magic link, where nothing did. The step is shown either way —
- * a name worth using is one its owner has looked at — but only an empty one
- * is enforced by the step resolver.
+ * Reached by somebody with no name yet — a magic-link sign-up, where nothing
+ * supplied one — and required of them: the step resolver does not move on
+ * while the name is empty. Somebody who arrived with a name, as every
+ * Microsoft sign-in does, skips the step. The field is still prefilled with
+ * whatever the record holds, so opening the page directly shows it.
  */
 function OnboardingNameContent({
 	className,

@@ -27,8 +27,8 @@ organization today, and the reason a person removed from their last one is
 offered a way back in rather than the flow again. Nobody reaches the
 application without finishing it, and nobody who has finished it sees it again.
 
-The name step is prefilled from Microsoft where the provider supplied a name,
-and enforced where nothing did, so no one reaches the application nameless.
+The name step is skipped where Microsoft supplied a name and required where
+nothing did, so nobody who walks the flow reaches the application nameless.
 
 `/no-org` moves to `/onboarding/no-org`, keeping the invitations and the
 create-organization form it gained with self-serve onboarding, and now sharing

@@ -50,12 +50,16 @@ export type OnboardingFacts = {
  * they did not cause.
  *
  * The name is read from the user record rather than from a marker of its own.
- * The consequence is deliberate: an address that arrived with a name (every
- * Microsoft sign-in does) is never *forced* onto the name step, it is only
- * walked through it by the flow, prefilled. An address that arrived without
- * one (every magic-link sign-up) cannot get past it. Which is the guarantee
- * worth having — nobody reaches the application nameless — at the cost of one
- * that is not: that everybody sees the page exactly once.
+ * The consequence is deliberate: somebody who arrived with a name (every
+ * Microsoft sign-in does) skips the name step, and somebody who arrived
+ * without one (every magic-link sign-up) cannot get past it. Which is the
+ * guarantee worth having — nobody who walks this flow reaches the application
+ * nameless — at the cost of one that is not: that everybody sees the page.
+ *
+ * Accounts that predate the flow were stamped complete when it arrived, so
+ * `completedAt` answers for them before the name is looked at. A blank name
+ * on such an account is not sent back through onboarding; that is the price
+ * of never sending a working person back to the start.
  */
 export function nextOnboardingStep(facts: OnboardingFacts): OnboardingStep {
 	if (facts.completedAt !== null) return "done";
