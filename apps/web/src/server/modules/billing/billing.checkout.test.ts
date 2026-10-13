@@ -190,6 +190,68 @@ describe("startCheckout customer creation", () => {
 		);
 	});
 
+	it("deletes the customer and reports the failure when recording it failed", async () => {
+		// Nothing was stored. Kept, the customer would be joined by a second one
+		// on the retry this error invites, both carrying the organization.
+		const d = deps({ stripeCustomerId: null });
+		d.db.organization.updateMany.mockRejectedValue(new Error("connection reset"));
+
+		await expect(startCheckout(d, actor, TIER_PRICE)).rejects.toThrow(
+			"connection reset",
+		);
+		expect(d.customersDel).toHaveBeenCalledWith("cus_new");
+	});
+
+	it("uses the customer when its claim landed although the write reported failure", async () => {
+		// A timeout on the reply after the commit: the organization already
+		// pays as this customer, and deleting it would be the worse mistake.
+		const d = deps({ stripeCustomerId: null });
+		d.db.organization.updateMany.mockRejectedValue(new Error("timeout"));
+		d.db.organization.findUnique
+			.mockResolvedValueOnce({
+				billingEnforced: true,
+				subscription: null,
+			} as never)
+			.mockResolvedValueOnce({
+				id: "org_1",
+				name: "Robotics Society",
+				stripeCustomerId: null,
+			} as never)
+			.mockResolvedValueOnce({
+				id: "org_1",
+				name: "Robotics Society",
+				stripeCustomerId: "cus_new",
+			} as never);
+
+		await startCheckout(d, actor, TIER_PRICE);
+
+		expect(d.customersDel).not.toHaveBeenCalled();
+		expect(d.sessionsCreate).toHaveBeenCalledWith(
+			expect.objectContaining({ customer: "cus_new" }),
+		);
+	});
+
+	it("keeps the customer when it cannot tell whether the claim landed", async () => {
+		const d = deps({ stripeCustomerId: null });
+		d.db.organization.updateMany.mockRejectedValue(new Error("connection reset"));
+		d.db.organization.findUnique
+			.mockResolvedValueOnce({
+				billingEnforced: true,
+				subscription: null,
+			} as never)
+			.mockResolvedValueOnce({
+				id: "org_1",
+				name: "Robotics Society",
+				stripeCustomerId: null,
+			} as never)
+			.mockRejectedValueOnce(new Error("database is down"));
+
+		await expect(startCheckout(d, actor, TIER_PRICE)).rejects.toThrow(
+			"connection reset",
+		);
+		expect(d.customersDel).not.toHaveBeenCalled();
+	});
+
 	it("keeps the customer whose claim succeeded", async () => {
 		// The claimed customer is the organization's own. Deleting it would take
 		// the subscription about to be bought against it with it.

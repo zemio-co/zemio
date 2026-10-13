@@ -25,7 +25,8 @@ export type CustomerDependencies = {
 };
 
 /**
- * Removes a customer created for a checkout that then lost the claim race.
+ * Removes a customer created for a checkout that then did not claim it — lost
+ * the race, or failed to record it.
  *
  * Left behind, it would carry the same `organizationId` metadata as the real
  * one — turning the single question that metadata exists to answer, "whose
@@ -52,6 +53,54 @@ async function discardUnclaimedCustomer(
 			error: error instanceof Error ? error.message : String(error),
 		});
 	}
+}
+
+/**
+ * Decides what a customer is for after the write claiming it failed.
+ *
+ * A failed claim is not a lost one: the write may have landed before the
+ * error — a timeout on the reply, a connection dropped after the commit — so
+ * the stored value is read back rather than assumed. Ours stored means the
+ * claim held. Another stored means a concurrent checkout won, and ours is
+ * discarded as in a lost race. Nothing stored means the claim never happened:
+ * ours is discarded, so the retry this error invites does not leave a second
+ * customer carrying the same organization, and the error stands.
+ *
+ * If the read-back fails too, nothing can be known, and the customer is kept
+ * rather than deleted — deleting one the organization may already pay as is
+ * the worse mistake. It is logged with both ids so it can be swept by hand.
+ */
+async function settleAfterFailedClaim(
+	deps: CustomerDependencies,
+	organizationId: string,
+	customerId: string,
+	claimError: unknown,
+): Promise<string> {
+	let current: Awaited<
+		ReturnType<typeof billingRepository.findOrganizationCustomer>
+	>;
+
+	try {
+		current = await billingRepository.findOrganizationCustomer(
+			deps.db,
+			organizationId,
+		);
+	} catch (readError) {
+		logger.error("Could not tell whether a new Stripe customer was claimed", {
+			organizationId,
+			customerId,
+			error: readError instanceof Error ? readError.message : String(readError),
+		});
+		throw claimError;
+	}
+
+	if (current?.stripeCustomerId === customerId) return customerId;
+
+	await discardUnclaimedCustomer(deps, organizationId, customerId);
+
+	if (current?.stripeCustomerId) return current.stripeCustomerId;
+
+	throw claimError;
 }
 
 /**
@@ -89,11 +138,17 @@ export async function resolveCustomerId(
 		}),
 	);
 
-	const claimed = await billingRepository.claimStripeCustomer(
-		deps.db,
-		organizationId,
-		customer.id,
-	);
+	let claimed: boolean;
+
+	try {
+		claimed = await billingRepository.claimStripeCustomer(
+			deps.db,
+			organizationId,
+			customer.id,
+		);
+	} catch (error) {
+		return settleAfterFailedClaim(deps, organizationId, customer.id, error);
+	}
 
 	if (claimed) return customer.id;
 
