@@ -5,11 +5,13 @@ import { useRender } from "@base-ui/react/use-render";
 import {
 	Button,
 	Input,
+	Separator,
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
+	Skeleton,
 	Tooltip,
 	TooltipContent,
 	TooltipTrigger,
@@ -17,8 +19,6 @@ import {
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
 import * as React from "react";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 

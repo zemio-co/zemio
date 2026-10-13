@@ -1,10 +1,9 @@
 "use client";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "@zemio/ui";
+import { Separator, Tooltip, TooltipContent, TooltipTrigger } from "@zemio/ui";
 import { InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 function ReportingCard({ className, ...props }: React.ComponentProps<"div">) {

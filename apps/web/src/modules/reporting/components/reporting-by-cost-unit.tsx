@@ -1,10 +1,10 @@
 "use client";
 
 import { keepPreviousData } from "@tanstack/react-query";
+import { Skeleton } from "@zemio/ui";
 import { TagIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { useUpdateTimer } from "../hooks/use-update-timer";

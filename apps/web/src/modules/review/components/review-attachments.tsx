@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@zemio/ui";
+import { Badge, Button, Skeleton } from "@zemio/ui";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
@@ -14,8 +14,6 @@ import {
 	BoxItemIcon,
 	BoxItemTitle,
 } from "@/components/box";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatBytes } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import type { ReviewAttachment, ReviewLoadState } from "./review-types";

@@ -24,6 +24,7 @@ import {
 	FieldError,
 	FieldLabel,
 	Input,
+	Skeleton,
 } from "@zemio/ui";
 import { cva } from "class-variance-authority";
 import { formatDistanceToNow } from "date-fns";
@@ -45,7 +46,6 @@ import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";

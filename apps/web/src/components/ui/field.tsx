@@ -1,10 +1,9 @@
 "use client";
 
-import { Label } from "@zemio/ui";
+import { Label, Separator } from "@zemio/ui";
 import { cva, type VariantProps } from "class-variance-authority";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {

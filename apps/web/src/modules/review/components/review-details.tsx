@@ -1,11 +1,10 @@
 "use client";
 
-import { Button } from "@zemio/ui";
+import { Button, Skeleton } from "@zemio/ui";
 import { CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { ReviewLoadState, ReviewReadModel } from "./review-types";
 

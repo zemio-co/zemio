@@ -7,6 +7,7 @@ import {
 	FieldError,
 	FieldLabel,
 	Input,
+	Skeleton,
 } from "@zemio/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -14,7 +15,6 @@ import { useTranslations } from "next-intl";
 import type React from "react";
 import { toast } from "sonner";
 import z from "zod";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

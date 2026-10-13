@@ -12,12 +12,14 @@ import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
+	Separator,
 	Sheet,
 	SheetBody,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 	SheetTrigger,
+	Skeleton,
 	Textarea,
 } from "@zemio/ui";
 import { formatDate, isValid, parse } from "date-fns";
@@ -25,8 +27,6 @@ import { DownloadIcon, ImageIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DatePicker } from "@/components/date-picker";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { UploadDropzone } from "@/components/ui/upload-dropzone";
 import { usePresignedUpload } from "@/lib/use-presigned-upload";
 import { cn, formatBytes, renameFileWithHash } from "@/lib/utils";

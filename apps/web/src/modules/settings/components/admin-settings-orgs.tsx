@@ -14,6 +14,7 @@ import {
 	FieldGroup,
 	FieldLabel,
 	Input,
+	Skeleton,
 } from "@zemio/ui";
 import { ChevronRightIcon, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -29,7 +30,6 @@ import {
 	BoxItemLink,
 	BoxItemTitle,
 } from "@/components/box";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { api } from "@/trpc/react";
 

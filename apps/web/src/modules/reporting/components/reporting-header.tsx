@@ -7,12 +7,12 @@ import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
+	Separator,
 } from "@zemio/ui";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type * as React from "react";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useReportingStore } from "../state/reporting.store";
 

@@ -3,24 +3,22 @@
 import { Select as SelectPrimitive } from "@base-ui/react";
 import {
 	Button,
+	type ChartConfig,
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
 	Select,
 	SelectContent,
 	SelectGroup,
 	SelectItem,
 	SelectValue,
+	Separator,
+	Skeleton,
 } from "@zemio/ui";
 import { format, subDays } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import {
-	type ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 

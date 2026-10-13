@@ -20,6 +20,7 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	Skeleton,
 } from "@zemio/ui";
 import { formatDate, isSameDay } from "date-fns";
 import {
@@ -32,7 +33,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
 import { expenseTypeKeys } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

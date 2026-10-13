@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	Badge,
 	Button,
 	Field,
 	FieldContent,
@@ -13,7 +14,6 @@ import { useSearchParams } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { CHECKOUT_RESULT, CHECKOUT_RESULT_PARAM } from "@/lib/billing";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
