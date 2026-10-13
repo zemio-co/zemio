@@ -14,11 +14,14 @@ import { authClient } from "@/server/better-auth/client";
  * their two accounts cannot verify their way forward — the mail would go to
  * an address that is not the one they meant — and without this the only
  * remaining move is clearing cookies.
+ *
+ * Signing out is what the button does, so `onClick` and `type` are not the
+ * caller's to replace.
  */
 function OnboardingSignOut({
 	className,
 	...props
-}: React.ComponentProps<"button">) {
+}: Omit<React.ComponentProps<"button">, "onClick" | "type">) {
 	const t = useTranslations("modules.onboarding");
 	const router = useRouter();
 
@@ -29,11 +32,12 @@ function OnboardingSignOut({
 
 	return (
 		<Button
+			variant={"outline"}
+			{...props}
 			className={className}
 			data-slot="onboarding-sign-out"
 			onClick={handleSignOut}
-			variant={"outline"}
-			{...props}
+			type="button"
 		>
 			<LogOutIcon />
 			{t("signOut")}
