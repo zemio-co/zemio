@@ -5,7 +5,33 @@ import {
 	isBillingRefusal,
 	resolveBillingBanner,
 	trialDaysRemaining,
+	trialPageVariant,
 } from "./billing";
+
+describe("trialPageVariant", () => {
+	it("promises the trial only while there is one", () => {
+		expect(
+			trialPageVariant({ enabled: true, entitled: true, trialing: true }),
+		).toBe("trial");
+	});
+
+	it("asks for a subscription when the person's trial is spent", () => {
+		// Enforced and unentitled from the start (ADR-0009).
+		expect(
+			trialPageVariant({ enabled: true, entitled: false, trialing: false }),
+		).toBe("subscribe");
+	});
+
+	it("claims nothing when there is nothing to pay for yet", () => {
+		// A trial that could not start leaves the organization unenforced,
+		// entitled, and without a trial.
+		expect(
+			trialPageVariant({ enabled: true, entitled: true, trialing: false }),
+		).toBe("ready");
+		// A deployment that does not bill.
+		expect(trialPageVariant({ enabled: false, entitled: true })).toBe("ready");
+	});
+});
 
 /** A healthy, enforced organization well inside its tier. */
 const healthy: BannerStatus = {

@@ -1527,7 +1527,16 @@
 					"export": "Export reports as PDF, including the banking details for the payout"
 				},
 				"footnote": "Every tier includes the same functionality and differs only in the number of members it includes.",
-				"continue": "Continue"
+				"continue": "Continue",
+				"subscribe": {
+					"title": "Choose a tier",
+					"subtitle": "You have already used your free trial, so this organization starts read-only. Choose a tier to work in it — until then, everything recorded stays readable.",
+					"continue": "Choose a tier"
+				},
+				"ready": {
+					"title": "Your organization is ready",
+					"subtitle": "Here is what you can do with Zemio."
+				}
 			}
 		}
 	},

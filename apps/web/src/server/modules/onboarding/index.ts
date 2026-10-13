@@ -14,6 +14,7 @@ export {
 } from "./onboarding.policy";
 export {
 	completeOnboarding,
+	findFoundedOrganization,
 	type OnboardingState,
 	resolveOnboarding,
 } from "./onboarding.service";

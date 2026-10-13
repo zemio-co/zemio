@@ -1527,7 +1527,16 @@
 					"export": "Export zu verschiedenen Formaten"
 				},
 				"footnote": "Alle Tarife enthalten den gleichen Funktionsumfang und unterscheiden sich nur in der Zahl der enthaltenen Mitglieder.",
-				"continue": "Weiter"
+				"continue": "Weiter",
+				"subscribe": {
+					"title": "Wähle einen Tarif",
+					"subtitle": "Du hast deinen kostenlosen Testzeitraum bereits genutzt, deshalb startet diese Organisation schreibgeschützt. Wähle einen Tarif, um darin zu arbeiten – bis dahin bleibt alles Erfasste lesbar.",
+					"continue": "Tarif wählen"
+				},
+				"ready": {
+					"title": "Deine Organisation ist bereit",
+					"subtitle": "Das kannst du mit Zemio erledigen."
+				}
 			}
 		}
 	},

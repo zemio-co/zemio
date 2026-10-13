@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import type { TrialPageVariant } from "@/lib/billing";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
@@ -32,18 +33,31 @@ import { OnboardingDesc, OnboardingTitle } from "./primtives/onboarding-text";
  * time it changed in Stripe. What the page promises instead is what is true
  * without asking Stripe anything: thirty days, no card, and — because
  * read-only means what ADR-0006 says it means — nothing lost afterwards.
+ *
+ * And it promises that only when it is so. `variant` says what the founder
+ * actually got: a running trial, an organization that must subscribe because
+ * their one trial is spent, or one with nothing to pay for yet. The last two
+ * make no trial claim; the second sends Continue to the billing page, which is
+ * the one thing the new organization needs.
  */
 function OnboardingTrialContent({
 	className,
+	variant,
 	...props
-}: React.ComponentProps<typeof OnboardingBox>) {
+}: React.ComponentProps<typeof OnboardingBox> & {
+	variant: TrialPageVariant;
+}) {
 	const t = useTranslations("modules.onboarding.trial");
 
 	const complete = api.user.completeOnboarding.useMutation({
 		onSuccess: () => {
 			// A full load rather than a push: every guard in the application reads
 			// the onboarding state, and the row it is read from has just changed.
-			window.location.assign(ROUTES.USER_DASHBOARD());
+			window.location.assign(
+				variant === "subscribe"
+					? ROUTES.SETTINGS_ORG_BILLING()
+					: ROUTES.USER_DASHBOARD(),
+			);
 		},
 		onError: (error) => {
 			toast.error(error.message);
@@ -68,8 +82,12 @@ function OnboardingTrialContent({
 			{...props}
 		>
 			<OnboardingBoxHeader>
-				<OnboardingTitle>{t("title")}</OnboardingTitle>
-				<OnboardingDesc>{t("subtitle")}</OnboardingDesc>
+				<OnboardingTitle>
+					{variant === "trial" ? t("title") : t(`${variant}.title`)}
+				</OnboardingTitle>
+				<OnboardingDesc>
+					{variant === "trial" ? t("subtitle") : t(`${variant}.subtitle`)}
+				</OnboardingDesc>
 			</OnboardingBoxHeader>
 
 			<ul className="rounded-lg border border-base-200 bg-white">
@@ -93,9 +111,13 @@ function OnboardingTrialContent({
 					onClick={() => complete.mutate()}
 					type="button"
 				>
-					{t("continue")} <ArrowRightIcon />
+					{variant === "subscribe" ? t("subscribe.continue") : t("continue")}{" "}
+					<ArrowRightIcon />
 				</Button>
-				<span className="mt-4 block text-base-500 text-xs">{t("footnote")}</span>
+				{/* About choosing a tier, which only the first two face. */}
+				{variant !== "ready" && (
+					<span className="mt-4 block text-base-500 text-xs">{t("footnote")}</span>
+				)}
 			</div>
 		</OnboardingBox>
 	);

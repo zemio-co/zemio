@@ -146,3 +146,25 @@ export async function completeOnboarding(
 
 	logger.info("onboarding.completed", { userId });
 }
+
+/**
+ * The organization a founder created, which the last two onboarding steps are
+ * about.
+ *
+ * Named explicitly rather than read from the session's active organization:
+ * these pages render in the same request the organization was created in, and
+ * the session was written before it existed. The newest one they own, since
+ * that is the one the flow just made.
+ */
+export async function findFoundedOrganization(
+	db: PrismaClient,
+	userId: string,
+): Promise<{ id: string; name: string } | null> {
+	const membership = await db.member.findFirst({
+		where: { userId, role: "owner" },
+		select: { organization: { select: { id: true, name: true } } },
+		orderBy: { createdAt: "desc" },
+	});
+
+	return membership?.organization ?? null;
+}

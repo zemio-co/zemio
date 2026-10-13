@@ -98,6 +98,30 @@ export function resolveBillingBanner(
 }
 
 /**
+ * What the last onboarding page can truthfully say about the founder's new
+ * organization.
+ *
+ * - `trial` — it is trialing: the thirty days, no card.
+ * - `subscribe` — billing applies and it is not entitled, because the person
+ *   has had their one trial (ADR-0009). It starts read-only, and saying
+ *   otherwise would be the first thing Zemio tells them that is untrue.
+ * - `ready` — nothing to pay for yet: billing switched off, or a trial that
+ *   could not start and left the organization working without one.
+ */
+export type TrialPageVariant = "trial" | "subscribe" | "ready";
+
+export function trialPageVariant(status: {
+	enabled: boolean;
+	entitled: boolean;
+	trialing?: boolean;
+}): TrialPageVariant {
+	if (!status.enabled) return "ready";
+	if (status.trialing) return "trial";
+	if (!status.entitled) return "subscribe";
+	return "ready";
+}
+
+/**
  * Whole days left of a trial, never negative.
  *
  * Rounded up, so the last partial day still reads as "1 day left" rather than
