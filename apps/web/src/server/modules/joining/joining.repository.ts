@@ -77,18 +77,18 @@ export async function findMembershipOrganizationIds(
  * here, and the unique constraint on (userId, organizationId) is the only real
  * guard against a duplicate member.
  *
- * Returns how many rows were actually inserted, which is not the same as how
- * many were asked for — the concurrent login that lost the race skips them all
- * and must not then report them as joined.
+ * Returns the organizations whose rows were actually inserted, which is not
+ * the same as the ones asked for — a concurrent login can have inserted some
+ * or all of them first, and this call must not then report those as joined.
  */
 export async function createMemberships(
 	db: PrismaClient,
 	userId: string,
 	organizationIds: readonly string[],
-): Promise<number> {
-	if (organizationIds.length === 0) return 0;
+): Promise<string[]> {
+	if (organizationIds.length === 0) return [];
 
-	const { count } = await db.member.createMany({
+	const inserted = await db.member.createManyAndReturn({
 		data: organizationIds.map((organizationId) => ({
 			id: crypto.randomUUID(),
 			userId,
@@ -97,9 +97,10 @@ export async function createMemberships(
 			createdAt: new Date(),
 		})),
 		skipDuplicates: true,
+		select: { organizationId: true },
 	});
 
-	return count;
+	return inserted.map((member) => member.organizationId);
 }
 
 /**
