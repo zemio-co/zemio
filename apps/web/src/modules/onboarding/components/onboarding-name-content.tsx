@@ -99,6 +99,7 @@ function OnboardingNameForm({
 							<FieldContent>
 								<Input
 									aria-invalid={isInvalid}
+									aria-label={t("label")}
 									autoComplete="name"
 									autoFocus
 									className={"bg-white"}

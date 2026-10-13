@@ -109,6 +109,7 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 								<FieldContent>
 									<Input
 										aria-invalid={isInvalid}
+										aria-label={t("emailLabel")}
 										autoComplete="email"
 										className="bg-white"
 										id={field.name}

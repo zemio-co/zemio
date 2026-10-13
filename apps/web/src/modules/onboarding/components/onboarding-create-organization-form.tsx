@@ -88,6 +88,7 @@ function OnboardingCreateOrganizationForm({
 						<Field data-invalid={isInvalid}>
 							<Input
 								aria-invalid={isInvalid}
+								aria-label={t("nameLabel")}
 								autoFocus
 								className={"bg-white"}
 								id={field.name}

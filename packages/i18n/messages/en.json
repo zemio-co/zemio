@@ -1514,6 +1514,7 @@
 				"title": "Invite your colleagues",
 				"subtitle": "They get an email with a link to {organizationName}. You can also do this later in settings.",
 				"emailPlaceholder": "colleague@university.edu",
+				"emailLabel": "Email address {number}",
 				"addAnother": "Add another address",
 				"submit": "Send invitations",
 				"skip": "Skip for now",

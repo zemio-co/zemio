@@ -152,6 +152,7 @@ function OnboardingInviteForm({
 										<Field data-invalid={isInvalid}>
 											<Input
 												aria-invalid={isInvalid}
+												aria-label={t("emailLabel", { number: index + 1 })}
 												autoComplete="off"
 												autoFocus={index === 0}
 												className={"bg-white"}
