@@ -1,4 +1,5 @@
 import { prismaAdapter } from "@better-auth/prisma-adapter";
+import { createAuthMiddleware } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
 import { nextCookies } from "better-auth/next-js";
 import {
@@ -8,12 +9,14 @@ import {
 } from "better-auth/plugins";
 import { env } from "@/env";
 import { logger } from "@/lib/logger";
+import { ROUTES } from "@/lib/routes";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
 import { sendMagicLinkEmail } from "@/server/better-auth/magic-link";
 import {
-	extractMicrosoftTenantId,
-	isWorkAccountTenant,
+	decodeMicrosoftIdToken,
+	isDomainVerifiedWorkAccount,
 } from "@/server/better-auth/microsoft";
+import { isHeldByUnprovenAccount } from "@/server/better-auth/unproven-account";
 import { sendEmailVerification } from "@/server/better-auth/verification";
 import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
@@ -137,7 +140,78 @@ export const auth = betterAuth({
 			clientSecret: env.MICROSOFT_CLIENT_SECRET,
 			authority: "https://login.microsoftonline.com",
 			prompt: "select_account",
+
+			/**
+			 * What Microsoft's word on an address is worth: proof when the tenant
+			 * verified the domain, nothing otherwise (ADR-0010).
+			 *
+			 * Replaces the provider's own reading of `email_verified` and
+			 * `verified_primary_email`. Better Auth reads this when deciding
+			 * whether a Microsoft sign-in may link to an existing user with the
+			 * same address, so it is what keeps somebody with a tenant of their
+			 * own from signing in to a victim's account (see `accountLinking`).
+			 */
+			mapProfileToUser: (profile) => ({
+				emailVerified: isDomainVerifiedWorkAccount(profile, profile.email ?? ""),
+			}),
 		},
+	},
+
+	/**
+	 * A Microsoft sign-in joins an existing user with the same address only on
+	 * proof from both sides: Zemio verified the user's address, and the token
+	 * proves its own (`mapProfileToUser` above). Anything less is refused with
+	 * `account_not_linked`, which the sign-in page explains.
+	 *
+	 * Microsoft is deliberately not a trusted provider. Trusting it skips the
+	 * token-side proof, and the `email` claim is set by the tenant, so anybody
+	 * with a tenant could sign in to anybody's account.
+	 */
+	account: {
+		accountLinking: {
+			enabled: true,
+			requireLocalEmailVerified: true,
+		},
+	},
+
+	hooks: {
+		/**
+		 * Refuses a magic link to an address held by an unverified user with a
+		 * sign-in already attached (see `isHeldByUnprovenAccount`), before the
+		 * plugin would verify that user and sign the mailbox owner into it.
+		 *
+		 * Decided when the link is opened, not when it is requested: refusing
+		 * the request would tell anybody who types an address whether such a
+		 * user exists, while whoever opens the link has proved the mailbox. The
+		 * token is read, not consumed, so a refused link stays refused.
+		 *
+		 * Always back to `/auth`, never to the link's `errorCallbackURL`: this
+		 * runs before the plugin checks that URL's origin.
+		 */
+		before: createAuthMiddleware(async (ctx) => {
+			if (ctx.path !== "/magic-link/verify") return;
+
+			const token = ctx.query?.token;
+			if (typeof token !== "string") return;
+
+			// Missing or expired tokens are the plugin's to answer.
+			const verification =
+				await ctx.context.internalAdapter.findVerificationValue(token);
+			if (!verification) return;
+
+			let email: unknown;
+			try {
+				email = (JSON.parse(verification.value) as { email?: unknown }).email;
+			} catch {
+				return;
+			}
+			if (typeof email !== "string") return;
+			if (!(await isHeldByUnprovenAccount(db, email))) return;
+
+			const errorURL = new URL(ROUTES.AUTH(), ctx.context.baseURL);
+			errorURL.searchParams.set("error", "account_pending_verification");
+			throw ctx.redirect(errorURL.toString());
+		}),
 	},
 
 	databaseHooks: {
@@ -160,9 +234,10 @@ export const auth = betterAuth({
 				 * assertion verifies an address, whoever makes it.
 				 *
 				 * Two things undo this immediately afterwards, and both are proof
-				 * rather than assertion: the session hook below, for an address a
-				 * work or school tenant administers (ADR-0010), and the magic-link
-				 * plugin, for an address whose mail the person just read.
+				 * rather than assertion: the session hook below, for an address on
+				 * a domain the person's work or school tenant has verified
+				 * (ADR-0010), and the magic-link plugin, for an address whose mail
+				 * the person just read.
 				 */
 				before: async (user) => ({
 					data: { ...user, emailVerified: false },
@@ -202,6 +277,7 @@ export const auth = betterAuth({
 					const [msAccount, user] = await Promise.all([
 						db.account.findFirst({
 							where: { userId: session.userId, providerId: "microsoft" },
+							orderBy: { updatedAt: "desc" },
 							select: { idToken: true },
 						}),
 						db.user.findUnique({
@@ -214,27 +290,31 @@ export const auth = betterAuth({
 						}),
 					]);
 
-					const tenantIdFromToken = msAccount?.idToken
-						? extractMicrosoftTenantId(msAccount.idToken)
+					const claims = msAccount?.idToken
+						? decodeMicrosoftIdToken(msAccount.idToken)
 						: null;
+					const tenantIdFromToken =
+						typeof claims?.tid === "string" ? claims.tid : null;
 
 					// Fall back to the value stored on the user record from a
 					// previous login (covers sessions where the idToken is unavailable).
 					const resolvedTenantId =
 						tenantIdFromToken ?? user?.microsoftTenantId ?? null;
 
-					// A work or school tenant has already done what a verification
-					// mail does: an administrator created the address and proved the
-					// domain to Microsoft (ADR-0010). Decided here rather than in the
-					// user-create hook because that hook runs before Better Auth has
-					// written the account row this id_token is read from.
+					// A tenant that verified the address's domain has already done
+					// what a verification mail does (ADR-0010). Decided here rather
+					// than in the user-create hook because that hook runs before
+					// Better Auth has written the account row this id_token is read
+					// from.
 					//
-					// `resolvedTenantId` rather than the freshly read claim: the
-					// stored value has the same provenance — this code put it there,
-					// from a token Better Auth had verified — and a login where the
-					// id_token is unavailable should not un-verify anybody.
+					// Read from the token only, never from the stored tenant: a tenant
+					// is not proof of an address, and the claim that is proof is not
+					// kept anywhere else. Nobody is un-verified when the token is
+					// unavailable — this only ever sets the flag.
 					const verifiedByTenant =
-						user?.emailVerified === false && isWorkAccountTenant(resolvedTenantId);
+						user?.emailVerified === false &&
+						claims !== null &&
+						isDomainVerifiedWorkAccount(claims, user.email);
 
 					if (tenantIdFromToken || verifiedByTenant) {
 						await db.user.update({

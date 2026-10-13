@@ -26,6 +26,9 @@ export function AuthForm({ className, ...props }: React.ComponentProps<"div">) {
 		const res = await authClient.signIn.social({
 			provider: "microsoft",
 			callbackURL: ROUTES.USER_DASHBOARD(),
+			// Back here rather than to Better Auth's own error page, so a refused
+			// link can say what to do instead.
+			errorCallbackURL: ROUTES.AUTH(),
 		});
 
 		if (res.error) {

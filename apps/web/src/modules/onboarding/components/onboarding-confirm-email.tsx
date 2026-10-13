@@ -7,11 +7,12 @@ import { OnboardingSendVerificationButton } from "./onboarding-send-verification
 /**
  * "Please confirm your email address", and the button that sends the link.
  *
- * Both ways in verify an address on their own — a magic link is proof that the
- * mailbox was read, and a work or school tenant has already proved the address
- * it administers (ADR-0008, ADR-0010) — so in practice nobody arrives here.
- * It exists for the case those two do not cover: a personal Microsoft account,
- * whose address Zemio has been told about and has not confirmed.
+ * Both ways in can verify an address on their own — a magic link is proof that
+ * the mailbox was read, and a work or school tenant that proved the address's
+ * domain says so in the token (ADR-0008, ADR-0010). This is for the cases those
+ * do not cover: a personal Microsoft account, or a work account on a domain its
+ * tenant has not proved, whose address Zemio has been told about and has not
+ * confirmed.
  */
 async function OnboardingConfirmEmail({
 	className,

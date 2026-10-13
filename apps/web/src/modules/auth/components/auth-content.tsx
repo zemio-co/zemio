@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import ZemioIcon from "public/assets/zemio-icon-light.svg";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { AuthError } from "./auth-error";
 import { AuthForm } from "./auth-form";
 
 function AuthContent({ className, ...props }: React.ComponentProps<"div">) {
@@ -17,6 +18,7 @@ function AuthContent({ className, ...props }: React.ComponentProps<"div">) {
 			<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
 			<p className="mt-0.5 text-base-500 text-sm">{t("subtitle")}</p>
 
+			<AuthError className="mt-8" />
 			<AuthForm className="mt-8" />
 
 			<p

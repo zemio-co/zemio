@@ -1187,6 +1187,11 @@
 				"body": "We have sent a sign-in link to <address>{email}</address>. Open it to confirm your email address.",
 				"bodyWithoutAddress": "We have sent you a sign-in link. Open it to confirm your email address.",
 				"back": "Go back"
+			},
+			"error": {
+				"accountNotLinked": "An account with this email address already exists and could not be connected to this Microsoft account. Sign in with a sign-in link to that address instead.",
+				"accountPendingVerification": "An account for this email address was created with a Microsoft account and has not been confirmed yet. Sign in with that Microsoft account and confirm your address there. If it isn't yours, please contact Zemio support.",
+				"generic": "Sign-in could not be completed. Please try again."
 			}
 		},
 		"legal": {

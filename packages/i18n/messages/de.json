@@ -1187,6 +1187,11 @@
 				"body": "Wir haben einen Anmeldelink an <address>{email}</address> gesendet. Öffne ihn, um deine E-Mail-Adresse zu bestätigen.",
 				"bodyWithoutAddress": "Wir haben dir einen Anmeldelink gesendet. Öffne ihn, um deine E-Mail-Adresse zu bestätigen.",
 				"back": "Zurück"
+			},
+			"error": {
+				"accountNotLinked": "Zu dieser E-Mail-Adresse gibt es bereits ein Konto, das nicht mit diesem Microsoft-Konto verbunden werden konnte. Melde dich stattdessen mit einem Anmeldelink an diese Adresse an.",
+				"accountPendingVerification": "Zu dieser E-Mail-Adresse gibt es bereits ein Konto, das mit einem Microsoft-Konto angelegt, aber noch nicht bestätigt wurde. Melde dich mit diesem Microsoft-Konto an und bestätige dort deine Adresse. Ist das nicht dein Konto, wende dich bitte an den Zemio-Support.",
+				"generic": "Die Anmeldung konnte nicht abgeschlossen werden. Bitte versuche es erneut."
 			}
 		},
 		"legal": {

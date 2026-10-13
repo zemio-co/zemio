@@ -19,7 +19,7 @@ export type OnboardingStep = (typeof ONBOARDING_STEPS)[number] | "done";
 
 /** What onboarding reads about a person. Nothing here is asked of them twice. */
 export type OnboardingFacts = {
-	/** Verified by Zemio, or by a tenant Zemio can name (ADR-0008, ADR-0010). */
+	/** Verified by Zemio, or by a tenant that proved the domain (ADR-0008, ADR-0010). */
 	emailVerified: boolean;
 	/** The display name on the user record. Empty until somebody supplies one. */
 	name: string;
