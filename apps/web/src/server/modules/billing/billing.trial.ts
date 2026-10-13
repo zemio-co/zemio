@@ -40,6 +40,26 @@ export type TrialStarted = {
 };
 
 /**
+ * Whether a subscription is the trial {@link startTrial} began for this
+ * organization.
+ *
+ * Read by the webhook, which switches enforcement on for such a subscription.
+ * That is what repairs a trial whose row could not be recorded when it
+ * started: Stripe's own report of the subscription finishes the job. Both
+ * keys must agree, so a subscription somebody tagged by hand, or one moved to
+ * another customer, cannot put an unrelated organization under enforcement.
+ */
+export function isTrialStartedFor(
+	subscription: Pick<Stripe.Subscription, "metadata">,
+	organizationId: string,
+): boolean {
+	const metadata = subscription.metadata ?? {};
+	return (
+		metadata.zemio_trial === "true" && metadata.organizationId === organizationId
+	);
+}
+
+/**
  * Starts a card-less trial for an organization and puts it under enforcement,
  * or reports that it could not.
  *
@@ -67,21 +87,28 @@ export async function startTrial(
 	const customerId = await resolveCustomerId(deps, args.organizationId);
 
 	const subscription = await withStripe("subscriptions.create", () =>
-		deps.stripe.subscriptions.create({
-			customer: customerId,
-			items: [{ price: tier.priceId, quantity: 1 }],
-			trial_period_days: TRIAL_PERIOD_DAYS,
-			// The whole decision, in one field. `cancel` lands on `canceled`,
-			// which Zemio already maps to read-only and already receives as
-			// `customer.subscription.deleted`; `pause` would leave the
-			// organization entitled forever (ADR-0009).
-			trial_settings: {
-				end_behavior: { missing_payment_method: "cancel" },
+		deps.stripe.subscriptions.create(
+			{
+				customer: customerId,
+				items: [{ price: tier.priceId, quantity: 1 }],
+				trial_period_days: TRIAL_PERIOD_DAYS,
+				// The whole decision, in one field. `cancel` lands on `canceled`,
+				// which Zemio already maps to read-only and already receives as
+				// `customer.subscription.deleted`; `pause` would leave the
+				// organization entitled forever (ADR-0009).
+				trial_settings: {
+					end_behavior: { missing_payment_method: "cancel" },
+				},
+				// The organization so support can answer "whose is this?" without
+				// following it to its customer, and the trial tag so the webhook
+				// can recognise it (see `isTrialStartedFor`).
+				metadata: { organizationId: args.organizationId, zemio_trial: "true" },
 			},
-			// Also on the subscription itself, so support can answer "whose is
-			// this?" without following it to its customer.
-			metadata: { organizationId: args.organizationId },
-		}),
+			// One trial per organization, whatever retries: a request that timed
+			// out after Stripe created the subscription returns that subscription
+			// when asked again, rather than a second trial.
+			{ idempotencyKey: `trial:${args.organizationId}` },
+		),
 	);
 
 	// Recorded from the API response rather than left to the webhook. Enforcement
@@ -108,24 +135,38 @@ export async function startTrial(
 	// They are two halves of one fact: Stripe is now billing this organization.
 	// Written apart, a failure between them leaves either an organization that
 	// is read-only on arrival (enforced, no row) or one that is free forever
-	// (a real trial, never enforced, still entitled when Stripe cancels it) —
-	// and nothing later repairs the second, because the webhook writes the row
-	// and never touches enforcement.
-	await deps.db.$transaction(async (tx) => {
-		const db = tx as unknown as PrismaClient;
+	// (a real trial, never enforced, still entitled when Stripe cancels it).
+	//
+	// If the transaction itself fails, the trial still exists in Stripe, so it
+	// is reported as started rather than thrown — a throw would read to the
+	// caller as "no trial" and hand the person's one trial back while Stripe
+	// runs this one. The organization is entitled meanwhile either way, since
+	// unenforced is entitled and so is trialing. What finishes the job is
+	// `customer.subscription.created`: the webhook records the row and, for a
+	// subscription tagged as this organization's trial, switches enforcement on.
+	try {
+		await deps.db.$transaction(async (tx) => {
+			const db = tx as unknown as PrismaClient;
 
-		await billingRepository.upsertSubscription(db, args.organizationId, {
-			stripeSubscriptionId: subscription.id,
-			stripePriceId: item.price.id,
-			status: subscription.status,
-			currentPeriodEnd: new Date(item.current_period_end * 1000),
-			cancelAtPeriodEnd: subscription.cancel_at_period_end,
-			tier: tier.name,
-			seatLimit: tier.seatLimit,
+			await billingRepository.upsertSubscription(db, args.organizationId, {
+				stripeSubscriptionId: subscription.id,
+				stripePriceId: item.price.id,
+				status: subscription.status,
+				currentPeriodEnd: new Date(item.current_period_end * 1000),
+				cancelAtPeriodEnd: subscription.cancel_at_period_end,
+				tier: tier.name,
+				seatLimit: tier.seatLimit,
+			});
+
+			await billingRepository.setBillingEnforced(db, args.organizationId, true);
 		});
-
-		await billingRepository.setBillingEnforced(db, args.organizationId, true);
-	});
+	} catch (error) {
+		logger.error("billing.trial_unrecorded", {
+			organizationId: args.organizationId,
+			subscriptionId: subscription.id,
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
 
 	logger.info("billing.trial_started", {
 		organizationId: args.organizationId,

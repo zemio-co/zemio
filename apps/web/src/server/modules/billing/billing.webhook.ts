@@ -6,7 +6,7 @@ import { isUniqueConstraintError } from "@/server/shared/errors";
 import { tierFromPrice } from "./billing.catalogue";
 import { entitlementFromStripeStatus, isEntitled } from "./billing.policy";
 import { billingRepository } from "./billing.repository";
-import { notifyTrialEnding } from "./billing.trial";
+import { isTrialStartedFor, notifyTrialEnding } from "./billing.trial";
 
 /**
  * Keeping Zemio's copy of a subscription in step with Stripe.
@@ -273,6 +273,17 @@ async function applyEvent(
 		tier: tier.name,
 		seatLimit: tier.seatLimit,
 	});
+
+	// A trial Zemio started is enforced from the moment it exists, and this is
+	// Stripe confirming that it does. `startTrial` normally got there first; when
+	// its own write failed after Stripe had created the subscription, this is
+	// what keeps a card-less trial from staying entitled after Stripe cancels it.
+	// Only a subscription tagged as *this* organization's trial: switching
+	// enforcement on for anything else would override an organization that is
+	// exempt on purpose (ADR-0001).
+	if (isTrialStartedFor(subscription, organizationId)) {
+		await billingRepository.setBillingEnforced(db, organizationId, true);
+	}
 
 	return "processed";
 }

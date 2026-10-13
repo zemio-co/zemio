@@ -79,6 +79,7 @@ describe("startTrial", () => {
 				items: [{ price: TRIAL_PRICE, quantity: 1 }],
 				trial_period_days: TRIAL_PERIOD_DAYS,
 			}),
+			expect.anything(),
 		);
 	});
 
@@ -96,17 +97,44 @@ describe("startTrial", () => {
 					end_behavior: { missing_payment_method: "cancel" },
 				},
 			}),
+			expect.anything(),
 		);
 	});
 
-	it("names the organization on the subscription", async () => {
+	it("names the organization on the subscription and tags it as its trial", async () => {
+		// The tag is what lets the webhook recognise the trial and switch
+		// enforcement on if this call could not.
 		const d = deps();
 
 		await startTrial(d as never, { organizationId: "org_1" });
 
 		expect(d.subscriptionsCreate).toHaveBeenCalledWith(
-			expect.objectContaining({ metadata: { organizationId: "org_1" } }),
+			expect.objectContaining({
+				metadata: { organizationId: "org_1", zemio_trial: "true" },
+			}),
+			expect.anything(),
 		);
+	});
+
+	it("asks Stripe for one trial per organization, however often it is retried", async () => {
+		const d = deps();
+
+		await startTrial(d as never, { organizationId: "org_1" });
+
+		expect(d.subscriptionsCreate).toHaveBeenCalledWith(expect.anything(), {
+			idempotencyKey: "trial:org_1",
+		});
+	});
+
+	it("reports the trial as started when recording it fails after Stripe created it", async () => {
+		// The trial exists in Stripe. Throwing would tell the caller there is
+		// none; the webhook records it and switches enforcement on instead.
+		const d = deps();
+		d.db.$transaction.mockRejectedValue(new Error("connection reset"));
+
+		await expect(
+			startTrial(d as never, { organizationId: "org_1" }),
+		).resolves.toEqual({ subscriptionId: "sub_1", status: "trialing" });
 	});
 
 	it("records the subscription rather than waiting for the webhook", async () => {

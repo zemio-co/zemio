@@ -517,6 +517,60 @@ describe("handleStripeEvent unrecognised subjects", () => {
 	});
 });
 
+describe("handleStripeEvent: a trial Zemio started", () => {
+	const ENFORCE = {
+		where: { id: "org_1" },
+		data: { billingEnforced: true },
+	};
+
+	it("switches enforcement on for the organization's own trial", async () => {
+		// The repair for a trial whose row `startTrial` could not record: left
+		// unenforced, the organization would stay entitled after Stripe cancels
+		// the card-less trial.
+		const d = deps({
+			subscription: {
+				status: "trialing",
+				metadata: { organizationId: "org_1", zemio_trial: "true" },
+			},
+		});
+
+		await expect(
+			handleStripeEvent(d, subscriptionEvent("customer.subscription.created")),
+		).resolves.toBe("processed");
+
+		expect(d.db.organization.updateMany).toHaveBeenCalledWith(ENFORCE);
+	});
+
+	it("leaves enforcement alone for a subscription that is not a Zemio trial", async () => {
+		// An organization can be exempt on purpose (ADR-0001); an ordinary
+		// subscription must not override that.
+		const d = deps({ subscription: { metadata: { organizationId: "org_1" } } });
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.created"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("leaves enforcement alone for a trial tagged for another organization", async () => {
+		const d = deps({
+			subscription: {
+				status: "trialing",
+				metadata: { organizationId: "org_other", zemio_trial: "true" },
+			},
+		});
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.created"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+});
+
 describe("handleStripeEvent: a trial about to end", () => {
 	function trialDeps() {
 		const d = deps({ subscription: { status: "trialing" } });
