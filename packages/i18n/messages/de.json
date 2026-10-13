@@ -1523,14 +1523,14 @@
 			},
 			"trial": {
 				"title": "30 Tage kostenlos testen",
-				"subtitle": "Deine Organisation ist 30 Tage lang vollständig nutzbar – ohne Zahlungsdaten. Erst danach wählst du einen Tarif.",
+				"subtitle": "Deine Organisation ist 30 Tage lang vollständig nutzbar – ohne Zahlungsdaten. Danach wählst du einen Tarif. Ohne Tarif bleibt alles bereits Erfasste lesbar und exportierbar.",
 				"features": {
-					"reports": "Ausgaben sammeln einreichen",
+					"reports": "Ausgaben zu Abrechnungen bündeln und gemeinsam einreichen",
 					"receipts": "Belege direkt an jede Ausgabe anhängen",
 					"review": "Abrechnungen prüfen, zurückgeben und freigeben",
-					"allowances": "Reise- und Verpflegungspauschalen inklusive",
+					"allowances": "Reise- und Verpflegungspauschalen zu euren eigenen Sätzen",
 					"costUnits": "Ausgaben Kostenstellen zuordnen und auswerten",
-					"export": "Export zu verschiedenen Formaten"
+					"export": "Abrechnungen als PDF exportieren – inklusive Bankverbindung für die Auszahlung"
 				},
 				"footnote": "Alle Tarife enthalten den gleichen Funktionsumfang und unterscheiden sich nur in der Zahl der enthaltenen Mitglieder.",
 				"continue": "Weiter",
