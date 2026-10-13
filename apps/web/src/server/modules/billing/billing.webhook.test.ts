@@ -558,6 +558,24 @@ describe("handleStripeEvent: a trial Zemio started", () => {
 		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
 	});
 
+	it("leaves enforcement alone on later events for the trial", async () => {
+		// The trial metadata outlives the trial, so an exemption set by hand
+		// after it started must survive the next update.
+		const d = deps({
+			subscription: {
+				status: "active",
+				metadata: { organizationId: "org_1", zemio_trial: "true" },
+			},
+		});
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.updated"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+
 	it("leaves enforcement alone for a trial tagged for another organization", async () => {
 		const d = deps({
 			subscription: {

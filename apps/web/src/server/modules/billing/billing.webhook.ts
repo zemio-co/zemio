@@ -292,8 +292,13 @@ async function applyEvent(
 	// what keeps a card-less trial from staying entitled after Stripe cancels it.
 	// Only a subscription tagged as *this* organization's trial: switching
 	// enforcement on for anything else would override an organization that is
-	// exempt on purpose (ADR-0001).
-	if (isTrialStartedFor(subscription, organizationId)) {
+	// exempt on purpose (ADR-0001). Only on `created`, the event that confirms
+	// the trial exists: the metadata outlives the trial, and acting on every
+	// later update would undo an exemption set by hand after it started.
+	if (
+		event.type === "customer.subscription.created" &&
+		isTrialStartedFor(subscription, organizationId)
+	) {
 		await billingRepository.setBillingEnforced(db, organizationId, true);
 	}
 
