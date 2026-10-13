@@ -1371,7 +1371,8 @@
 				"trial": {
 					"title": "Testzeitraum läuft",
 					"description": "Du testest zemio noch {days, plural, one {einen Tag} other {# Tage}}. Hinterlege Zahlungsdaten, damit deine Organisation danach weiterarbeiten kann.",
-					"descriptionLastDay": "Dein Testzeitraum endet heute. Ohne Zahlungsdaten wird deine Organisation danach schreibgeschützt."
+					"descriptionEnded": "Dein Testzeitraum ist abgelaufen. Ohne Zahlungsdaten wird deine Organisation in Kürze schreibgeschützt.",
+					"descriptionNoDate": "Du testest zemio gerade. Hinterlege Zahlungsdaten, damit deine Organisation nach dem Testzeitraum weiterarbeiten kann."
 				}
 			}
 		},

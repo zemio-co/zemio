@@ -4,14 +4,11 @@ import { InfoIcon, TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-	type BillingBannerKind,
-	resolveBillingBanner,
-	trialDaysRemaining,
-} from "@/lib/billing";
+import { type BillingBannerKind, resolveBillingBanner } from "@/lib/billing";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import { useTrialDaysRemaining } from "../hooks";
 
 /**
  * How each banner looks. Read-only is the only one that reports something
@@ -73,6 +70,14 @@ function BillingBanner({
 
 	const data = status.data;
 
+	// Read before any return, as hooks must be. During a trial the period end
+	// is when the trial ends rather than when a payment is due.
+	const trialDays = useTrialDaysRemaining(
+		data?.enabled && data.trialing && data.currentPeriodEnd
+			? new Date(data.currentPeriodEnd)
+			: null,
+	);
+
 	// Nothing to say on a deployment that does not bill, and nothing to read
 	// off the disabled branch of the status either.
 	if (!data?.enabled) return null;
@@ -96,20 +101,18 @@ function BillingBanner({
 			title = t("paymentFailing.title");
 			description = t("paymentFailing.description");
 			break;
-		case "trial": {
-			// Counted from the period end, which during a trial is when the trial
-			// ends rather than when a payment is due.
-			const days = trialDaysRemaining(
-				data.currentPeriodEnd ? new Date(data.currentPeriodEnd) : null,
-				new Date(),
-			);
+		case "trial":
 			title = t("trial.title");
+			// Zero means the end has passed and Stripe has not yet said so: the
+			// trial is over, not ending today. No end date at all is a trial
+			// whose length Zemio cannot state, so it states none.
 			description =
-				days && days > 0
-					? t("trial.description", { days })
-					: t("trial.descriptionLastDay");
+				trialDays === null
+					? t("trial.descriptionNoDate")
+					: trialDays === 0
+						? t("trial.descriptionEnded")
+						: t("trial.description", { days: trialDays });
 			break;
-		}
 		case "over_seat_limit":
 			title = t("overSeatLimit.title");
 			description = t("overSeatLimit.description", {

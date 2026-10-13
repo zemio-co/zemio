@@ -1371,7 +1371,8 @@
 				"trial": {
 					"title": "Trial in progress",
 					"description": "You have {days, plural, one {one day} other {# days}} left of your zemio trial. Add payment details so your organization can keep working afterwards.",
-					"descriptionLastDay": "Your trial ends today. Without payment details your organization becomes read-only afterwards."
+					"descriptionEnded": "Your trial has ended. Without payment details your organization becomes read-only shortly.",
+					"descriptionNoDate": "You are trying zemio. Add payment details so your organization can keep working after the trial."
 				}
 			}
 		},

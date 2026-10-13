@@ -121,6 +121,8 @@ export function trialPageVariant(status: {
 	return "ready";
 }
 
+const DAY_MS = 86_400_000;
+
 /**
  * Whole days left of a trial, never negative.
  *
@@ -131,6 +133,24 @@ export function trialPageVariant(status: {
 export function trialDaysRemaining(end: Date | null, now: Date): number | null {
 	if (!end) return null;
 
-	const days = Math.ceil((end.getTime() - now.getTime()) / 86_400_000);
+	const days = Math.ceil((end.getTime() - now.getTime()) / DAY_MS);
 	return Math.max(days, 0);
+}
+
+/**
+ * How long until {@link trialDaysRemaining} next gives a different answer, or
+ * `null` once it never will.
+ *
+ * The count drops at fixed instants counted back from the trial's end, not at
+ * midnight — so a countdown left open re-renders exactly when it would change,
+ * whatever the viewer's timezone. Never more than a day away.
+ */
+export function msUntilTrialDaysChange(
+	end: Date | null,
+	now: Date,
+): number | null {
+	const days = trialDaysRemaining(end, now);
+	if (end === null || days === null || days === 0) return null;
+
+	return end.getTime() - now.getTime() - (days - 1) * DAY_MS;
 }

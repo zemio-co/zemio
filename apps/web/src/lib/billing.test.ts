@@ -3,10 +3,40 @@ import {
 	type BannerStatus,
 	BILLING_NOT_ENTITLED,
 	isBillingRefusal,
+	msUntilTrialDaysChange,
 	resolveBillingBanner,
 	trialDaysRemaining,
 	trialPageVariant,
 } from "./billing";
+
+describe("msUntilTrialDaysChange", () => {
+	const end = new Date("2027-01-15T12:00:00Z");
+	const DAY = 86_400_000;
+
+	it("lands exactly when the day count drops", () => {
+		const now = new Date(end.getTime() - 2.5 * DAY);
+		const ms = msUntilTrialDaysChange(end, now) ?? 0;
+
+		expect(trialDaysRemaining(end, now)).toBe(3);
+		expect(trialDaysRemaining(end, new Date(now.getTime() + ms - 1))).toBe(3);
+		expect(trialDaysRemaining(end, new Date(now.getTime() + ms))).toBe(2);
+	});
+
+	it("is never more than a day away", () => {
+		const now = new Date(end.getTime() - 10 * DAY);
+		expect(msUntilTrialDaysChange(end, now)).toBe(DAY);
+	});
+
+	it("reaches the last change, down to zero", () => {
+		const now = new Date(end.getTime() - 1000);
+		expect(msUntilTrialDaysChange(end, now)).toBe(1000);
+	});
+
+	it("schedules nothing once the trial has ended or has no end", () => {
+		expect(msUntilTrialDaysChange(end, end)).toBeNull();
+		expect(msUntilTrialDaysChange(null, end)).toBeNull();
+	});
+});
 
 describe("trialPageVariant", () => {
 	it("promises the trial only while there is one", () => {
