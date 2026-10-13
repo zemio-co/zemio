@@ -2,20 +2,21 @@
 
 import { useForm } from "@tanstack/react-form";
 import { NotificationPreference } from "@zemio/db/enums";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
-import { updatePreferencesSchema } from "@/lib/validators";
-import { api } from "@/trpc/react";
-import { Button } from "../ui/button";
 import {
+	Button,
 	Field,
 	FieldContent,
 	FieldDescription,
 	FieldGroup,
 	FieldLabel,
-} from "../ui/field";
-import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+	Label,
+	RadioGroup,
+	RadioGroupItem,
+} from "@zemio/ui";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { updatePreferencesSchema } from "@/lib/validators";
+import { api } from "@/trpc/react";
 
 export function PreferencesForm() {
 	const t = useTranslations("modules.shared.preferencesForm");

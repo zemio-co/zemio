@@ -1,11 +1,11 @@
 "use client";
 
 import type { ReportStatus } from "@zemio/db";
+import { Badge } from "@zemio/ui";
 import { CircleIcon } from "lucide-react";
 import type React from "react";
 import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
-import { Badge } from "./ui/badge";
 
 export function ReportStatusBadge({
 	status,
