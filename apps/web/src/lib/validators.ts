@@ -95,8 +95,10 @@ export const updateUserNameSchema = z.object({
 	name: z.string().trim().min(1).max(100),
 });
 
-export const updateUserProfileSchema = z.object({
-	name: z.string().min(1),
+// The name rule is the one `user.updateName` enforces, extended rather than
+// restated: the settings form submits to that procedure, and a form that
+// accepted what the server refuses would fail only after submitting.
+export const updateUserProfileSchema = updateUserNameSchema.extend({
 	image: z.string().nullable(),
 	email: z.email(),
 });

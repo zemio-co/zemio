@@ -5,9 +5,9 @@ import { Button, Field, FieldContent, FieldError, Input } from "@zemio/ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { z } from "zod";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { updateUserNameSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";
 import { OnboardingBox, OnboardingBoxHeader } from "./primtives/onboarding-box";
 import { OnboardingDesc, OnboardingTitle } from "./primtives/onboarding-text";
@@ -43,10 +43,6 @@ function OnboardingNameContent({
 	);
 }
 
-const formSchema = z.object({
-	name: z.string().trim().min(1).max(100),
-});
-
 function OnboardingNameForm({
 	className,
 	defaultName = "",
@@ -72,7 +68,9 @@ function OnboardingNameForm({
 	const form = useForm({
 		defaultValues: { name: defaultName },
 		validators: {
-			onSubmit: formSchema,
+			// The procedure's own schema, so the step accepts exactly what saving
+			// the name will.
+			onSubmit: updateUserNameSchema,
 		},
 		onSubmit: async ({ value }) => {
 			await updateName.mutateAsync({ name: value.name.trim() });
