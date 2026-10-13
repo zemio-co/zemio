@@ -4,6 +4,7 @@ import { Button } from "@zemio/ui";
 import { LogOutIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { ROUTES } from "@/lib/routes";
 import { authClient } from "@/server/better-auth/client";
 
@@ -26,7 +27,16 @@ function OnboardingSignOut({
 	const router = useRouter();
 
 	async function handleSignOut() {
-		await authClient.signOut();
+		// The client resolves with an error rather than rejecting, so the result
+		// is checked: moving on to sign-in with the session still in place would
+		// only bounce the person straight back here, none the wiser.
+		const result = await authClient.signOut().catch(() => null);
+
+		if (!result || result.error) {
+			toast.error(t("signOutFailed"));
+			return;
+		}
+
 		router.push(ROUTES.AUTH());
 	}
 

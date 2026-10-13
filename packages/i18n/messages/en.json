@@ -1430,6 +1430,7 @@
 		},
 		"acceptInvitation": {
 			"title": "Accept invitation",
+			"signOutFailed": "You could not be signed out. Please try again.",
 			"description": "You have been invited to an organization. Confirm to join.",
 			"acceptButton": "Accept invitation",
 			"acceptError": "The invitation could not be accepted",
@@ -1468,6 +1469,7 @@
 		},
 		"onboarding": {
 			"signOut": "Sign out",
+			"signOutFailed": "You could not be signed out. Please try again.",
 			"signedInAs": "Signed in as",
 			"confirmEmail": {
 				"title": "Confirm your email address",

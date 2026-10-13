@@ -1430,6 +1430,7 @@
 		},
 		"acceptInvitation": {
 			"title": "Einladung annehmen",
+			"signOutFailed": "Du konntest nicht abgemeldet werden. Bitte versuche es erneut.",
 			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
 			"acceptButton": "Einladung annehmen",
 			"acceptError": "Einladung konnte nicht angenommen werden",
@@ -1468,6 +1469,7 @@
 		},
 		"onboarding": {
 			"signOut": "Abmelden",
+			"signOutFailed": "Du konntest nicht abgemeldet werden. Bitte versuche es erneut.",
 			"signedInAs": "Angemeldet als",
 			"confirmEmail": {
 				"title": "Bestätige deine E-Mail-Adresse",

@@ -33,7 +33,15 @@ export function InvitationBlocked({
 	const [sending, setSending] = useState(false);
 
 	async function handleSignOut() {
-		await authClient.signOut();
+		// Checked, not assumed: with the session still in place, sign-in would
+		// send the person straight back to this same wrong account.
+		const result = await authClient.signOut().catch(() => null);
+
+		if (!result || result.error) {
+			toast.error(t("signOutFailed"));
+			return;
+		}
+
 		router.push(ROUTES.AUTH);
 	}
 
