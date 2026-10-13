@@ -221,7 +221,15 @@ describe("organizationRepository.update", () => {
 			microsoftTenantId: "TENANT_2",
 		});
 
-		expect(db.$queryRaw).toHaveBeenCalled();
+		// A lock, not merely a read — and taken before the rules are read, or
+		// the second change would decide on what the first is about to replace.
+		const [strings] = db.$queryRaw.mock.calls[0] as unknown as [
+			TemplateStringsArray,
+		];
+		expect(strings.join("?")).toMatch(/\bFOR UPDATE\b/);
+		expect(db.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(
+			db.joiningRule.findMany.mock.invocationCallOrder[0] ?? 0,
+		);
 	});
 
 	it("leaves the rules alone for an organization that does not exist", async () => {
