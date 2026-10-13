@@ -67,9 +67,17 @@ function BillingBanner({
 	if (!data?.enabled) return null;
 
 	// A trial is not a problem to report above the page; the sidebar keeps its
-	// countdown in view instead (`TrialSidebarNotice`).
-	const kind = resolveBillingBanner(data);
-	if (!kind || kind === "trial") return null;
+	// countdown in view instead (`TrialSidebarNotice`). The trial outranks the
+	// seat warning in the shared resolver, so that warning is recovered here
+	// rather than lost for the whole trial.
+	const resolved = resolveBillingBanner(data);
+	const kind =
+		resolved === "trial"
+			? data.overSeatLimit
+				? "over_seat_limit"
+				: null
+			: resolved;
+	if (!kind) return null;
 
 	const tone = TONE[kind];
 
