@@ -10,6 +10,7 @@ import { z } from "zod";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
+import { invitationAddresses } from "../invitation-addresses";
 import { OnboardingBox, OnboardingBoxHeader } from "./primtives/onboarding-box";
 import { OnboardingDesc, OnboardingTitle } from "./primtives/onboarding-text";
 
@@ -56,8 +57,20 @@ function OnboardingInviteContent({
 	);
 }
 
+// A blank row is a spare one, not an invalid address: rows can be added but
+// not removed, so requiring every row to be filled would make one extra click
+// on "add another" block the whole form.
 const formSchema = z.object({
-	emails: z.array(z.object({ value: z.string().trim().email() })).min(1),
+	emails: z
+		.array(
+			z.object({
+				value: z
+					.string()
+					.trim()
+					.pipe(z.union([z.literal(""), z.email()])),
+			}),
+		)
+		.min(1),
 });
 
 function OnboardingInviteForm({
@@ -79,14 +92,14 @@ function OnboardingInviteForm({
 		defaultValues: { emails: [{ value: "" }] },
 		validators: { onSubmit: formSchema },
 		onSubmit: async ({ value }) => {
-			const emails = value.emails
-				.map((entry) => entry.value.trim())
-				.filter((email) => email !== "");
+			const emails = invitationAddresses(value.emails);
+			if (emails.length === 0) return;
 
-			// Sent one at a time rather than as a batch because the plugin invites
-			// one address per call. `allSettled`, so one refusal — an address that
-			// is already a member, a duplicate pending invitation — does not
-			// discard the invitations that did go out.
+			// One call per address, because the plugin invites one at a time, sent
+			// concurrently — which is why the addresses are deduplicated first.
+			// `allSettled`, so one refusal — an address that is already a member, a
+			// duplicate pending invitation — does not discard the invitations that
+			// did go out.
 			const results = await Promise.allSettled(
 				emails.map((email) =>
 					authClient.organization.inviteMember({
@@ -97,13 +110,15 @@ function OnboardingInviteForm({
 				),
 			);
 
-			const sent = results.filter(
-				(result) => result.status === "fulfilled" && !result.value.error,
-			).length;
+			const failed = emails.filter((_, index) => {
+				const result = results[index];
+				return result?.status === "rejected" || Boolean(result?.value.error);
+			});
+			const sent = emails.length - failed.length;
 
 			if (sent > 0) toast.success(t("inviteSent", { count: sent }));
 
-			if (sent < emails.length) {
+			if (failed.length > 0) {
 				const firstRefusal = results.find(
 					(result) => result.status === "rejected" || result.value.error,
 				);
@@ -116,9 +131,15 @@ function OnboardingInviteForm({
 
 				toast.error(t("inviteFailed"), { description });
 
-				// Held on the step so the addresses that failed can be corrected,
-				// rather than advancing and losing them.
-				if (sent === 0) return;
+				// Held on the step with only the addresses that failed, so they can
+				// be corrected or retried — advancing would lose them, and keeping
+				// the ones that went out would invite those people twice. Skip is
+				// still the way on.
+				form.setFieldValue(
+					"emails",
+					failed.map((address) => ({ value: address })),
+				);
+				return;
 			}
 
 			goToTrial();
@@ -184,10 +205,20 @@ function OnboardingInviteForm({
 				)}
 			</form.Field>
 
-			<form.Subscribe selector={(state) => state.isSubmitting}>
-				{(isSubmitting) => (
+			<form.Subscribe
+				selector={(state) => ({
+					isSubmitting: state.isSubmitting,
+					// Nothing to send while every row is blank; Skip is the way on.
+					isEmpty: invitationAddresses(state.values.emails).length === 0,
+				})}
+			>
+				{({ isSubmitting, isEmpty }) => (
 					<div className="mt-8 flex flex-col gap-2">
-						<Button disabled={isSubmitting} form={INVITE_FORM_ID} type="submit">
+						<Button
+							disabled={isSubmitting || isEmpty}
+							form={INVITE_FORM_ID}
+							type="submit"
+						>
 							{t("submit")}
 						</Button>
 						<Button
