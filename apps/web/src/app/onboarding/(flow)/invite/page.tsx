@@ -7,16 +7,16 @@ import { requireOnboarding } from "@/server/modules/onboarding";
 /**
  * The first of the two steps only a founder walks.
  *
- * Reached once the organization exists, so the guards here are about who is
- * asking rather than what they still owe: somebody who joined an organization
- * they were invited to has no colleagues of their own to invite, and the step
- * resolver never sends them here.
+ * Only for somebody whose step is `invite`, which already means verified,
+ * named, in an organization and its owner. Checking ownership alone would let
+ * in an owner who still owes an earlier step — one made owner outside the flow,
+ * say — who would then be stopped at the end, since finishing onboarding
+ * accepts only this step. Everybody else is sent to wherever they are.
  */
 export default async function OnboardingInvitePage() {
 	const { session, state } = await requireOnboarding();
 
-	if (!state.facts.hasMembership) redirect(ROUTES.ONBOARDING());
-	if (!state.facts.isOwner) redirect(ROUTES.ONBOARDING());
+	if (state.step !== "invite") redirect(ROUTES.ONBOARDING());
 
 	// The organization they own, which is the one the invitations are for. Named
 	// explicitly rather than read from the session's active organization: this

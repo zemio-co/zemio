@@ -8,14 +8,15 @@ import { requireOnboarding } from "@/server/modules/onboarding";
  *
  * `nextOnboardingStep` holds a founder on `invite` for as long as the flow is
  * unfinished — there is no fact that separates "has not invited anybody" from
- * "chose not to" — so this page is entered by walking to it, and its guards
- * are what make that safe to allow.
+ * "chose not to" — so this page is entered by walking to it, and admits
+ * exactly the people who could have: those whose step is `invite`. That is
+ * also the only step finishing onboarding accepts, so nobody can reach a
+ * Continue here that would then refuse them.
  */
 export default async function OnboardingTrialPage() {
 	const { state } = await requireOnboarding();
 
-	if (!state.facts.hasMembership) redirect(ROUTES.ONBOARDING());
-	if (!state.facts.isOwner) redirect(ROUTES.ONBOARDING());
+	if (state.step !== "invite") redirect(ROUTES.ONBOARDING());
 
 	return <OnboardingTrialContent />;
 }
