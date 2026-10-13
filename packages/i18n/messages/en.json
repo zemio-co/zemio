@@ -1442,9 +1442,6 @@
 			"switchAccount": "Sign in with a different account",
 			"needsVerificationTitle": "Confirm your email address first",
 			"needsVerificationBody": "Before you can accept an invitation, you need to confirm that {email} belongs to you.",
-			"sendVerification": "Send confirmation email",
-			"verificationSent": "We have sent an email to {email}.",
-			"verificationFailed": "The confirmation email could not be sent",
 			"unavailableTitle": "This invitation is no longer valid",
 			"unavailableBody": "It has already been accepted or has expired. Ask your organization for a new invitation."
 		},
@@ -1475,7 +1472,7 @@
 				"title": "Confirm your email address",
 				"subtitle": "We need to confirm that {email} belongs to you before you can continue.",
 				"sendButton": "Send confirmation email",
-				"sent": "We have sent an email to {email}.",
+				"sent": "A confirmation email to {email} is on its way. If it has not arrived within a few minutes, check your spam folder or ask for another.",
 				"sendFailed": "The confirmation email could not be sent",
 				"afterHint": "Open the link in the email, then return to this page."
 			},

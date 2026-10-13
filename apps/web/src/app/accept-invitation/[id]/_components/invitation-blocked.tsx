@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/consts";
+import { OnboardingSendVerificationButton } from "@/modules/onboarding";
 import { authClient } from "@/server/better-auth/client";
 import type { InvitationGate } from "@/server/modules/joining";
 
@@ -30,7 +30,6 @@ export function InvitationBlocked({
 }) {
 	const t = useTranslations("modules.acceptInvitation");
 	const router = useRouter();
-	const [sending, setSending] = useState(false);
 
 	async function handleSignOut() {
 		// Checked, not assumed: with the session still in place, sign-in would
@@ -43,26 +42,6 @@ export function InvitationBlocked({
 		}
 
 		router.push(ROUTES.AUTH);
-	}
-
-	async function handleSendVerification() {
-		setSending(true);
-		const result = await authClient.sendVerificationEmail({
-			email: currentEmail,
-			// Back to this invitation, not to the route it lives under: the
-			// whole point of verifying here is to carry on accepting it.
-			callbackURL: ROUTES.ACCEPT_INVITATION(invitationId),
-		});
-		setSending(false);
-
-		if (result.error) {
-			toast.error(t("verificationFailed"), {
-				description: result.error.message ?? t("unexpectedError"),
-			});
-			return;
-		}
-
-		toast.success(t("verificationSent", { email: currentEmail }));
 	}
 
 	return (
@@ -95,13 +74,15 @@ export function InvitationBlocked({
 						<p className="mt-2 text-muted-foreground text-sm">
 							{t("needsVerificationBody", { email: currentEmail })}
 						</p>
-						<Button
+						{/* The shared button, which recovers from a rejected request
+						    rather than staying disabled. Back to this invitation, not
+						    to the route it lives under: the whole point of verifying
+						    here is to carry on accepting it. */}
+						<OnboardingSendVerificationButton
+							callbackURL={ROUTES.ACCEPT_INVITATION(invitationId)}
 							className="mt-8 w-full"
-							disabled={sending}
-							onClick={handleSendVerification}
-						>
-							{t("sendVerification")}
-						</Button>
+							email={currentEmail}
+						/>
 					</>
 				)}
 

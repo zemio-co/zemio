@@ -1442,9 +1442,6 @@
 			"switchAccount": "Mit anderem Konto anmelden",
 			"needsVerificationTitle": "Bestätige zuerst deine E-Mail-Adresse",
 			"needsVerificationBody": "Bevor du eine Einladung annehmen kannst, musst du bestätigen, dass dir {email} gehört.",
-			"sendVerification": "Bestätigungsmail senden",
-			"verificationSent": "Wir haben dir eine E-Mail an {email} geschickt.",
-			"verificationFailed": "Bestätigungsmail konnte nicht gesendet werden",
 			"unavailableTitle": "Diese Einladung ist nicht mehr gültig",
 			"unavailableBody": "Sie wurde bereits angenommen oder ist abgelaufen. Bitte deine Organisation um eine neue Einladung."
 		},
@@ -1475,7 +1472,7 @@
 				"title": "Bestätige deine E-Mail-Adresse",
 				"subtitle": "Wir müssen bestätigen, dass {email} dir gehört, bevor es weitergeht.",
 				"sendButton": "Bestätigungsmail senden",
-				"sent": "Wir haben eine E-Mail an {email} gesendet.",
+				"sent": "Die Bestätigungsmail an {email} ist unterwegs. Falls sie in ein paar Minuten nicht ankommt, sieh im Spam-Ordner nach oder fordere sie erneut an.",
 				"sendFailed": "Die Bestätigungsmail konnte nicht gesendet werden",
 				"afterHint": "Öffne den Link in der E-Mail und kehre dann auf diese Seite zurück."
 			},
