@@ -26,6 +26,16 @@ const SEATS_KEY = "zemio_seats";
  */
 const ORG_KEY = "zemio_org";
 
+/**
+ * Marks the one price a trial runs on.
+ *
+ * Explicit rather than inferred. "The lowest tier" is ambiguous between fewest
+ * seats and cheapest, the two diverge across billing intervals, and any
+ * inference would break the first time a promotional price is added
+ * (ADR-0009).
+ */
+const TRIAL_KEY = "zemio_trial";
+
 /** A tier as the product displays it. Every field comes from Stripe. */
 export type Tier = {
 	priceId: string;
@@ -122,9 +132,31 @@ export const TIER_CACHE_TTL_MS = 5 * 60 * 1000;
  * `offeredTo` never leaves this module: which organization a negotiated deal
  * belongs to is nobody else's business, least of all the browser's.
  */
-type CatalogueEntry = { tier: Tier; offeredTo: string | null };
+type CatalogueEntry = {
+	tier: Tier;
+	offeredTo: string | null;
+};
 
-let cached: { entries: CatalogueEntry[]; expiresAt: number } | null = null;
+/**
+ * A price tagged as the trial tier, kept whether or not it is a valid tier.
+ *
+ * Read before {@link tierFromPrice} decides anything, because a tagged price
+ * that fails it is the operator saying "trial on this" about a price Zemio
+ * cannot use. Dropped silently like any other half-tagged price, it would read
+ * as "no price is tagged" — pointing whoever reads the log at the wrong fault.
+ */
+type TrialTagged = {
+	priceId: string;
+	tier: Tier | null;
+	offeredTo: string | null;
+};
+
+type Catalogue = {
+	entries: CatalogueEntry[];
+	trialTagged: TrialTagged[];
+};
+
+let cached: { catalogue: Catalogue; expiresAt: number } | null = null;
 
 /**
  * The read already running, if one is.
@@ -135,7 +167,7 @@ let cached: { entries: CatalogueEntry[]; expiresAt: number } | null = null;
  * A read that fails is forgotten rather than kept, so the caller after an
  * outage retries rather than being handed the rejection the outage produced.
  */
-let inFlight: Promise<CatalogueEntry[]> | null = null;
+let inFlight: Promise<Catalogue> | null = null;
 
 /** Drops the cached catalogue, so one test's read cannot serve the next. */
 export function clearTierCatalogue(): void {
@@ -143,10 +175,9 @@ export function clearTierCatalogue(): void {
 	inFlight = null;
 }
 
-async function fetchCatalogue(
-	stripe: TierPriceSource,
-): Promise<CatalogueEntry[]> {
+async function fetchCatalogue(stripe: TierPriceSource): Promise<Catalogue> {
 	const entries: CatalogueEntry[] = [];
+	const trialTagged: TrialTagged[] = [];
 	let startingAfter: string | undefined;
 
 	// Paged rather than capped: every negotiated XL deal adds a price, so the
@@ -163,11 +194,12 @@ async function fetchCatalogue(
 
 		for (const price of page.data) {
 			const tier = tierFromPrice(price);
-			if (tier) {
-				entries.push({
-					tier,
-					offeredTo: price.metadata?.[ORG_KEY]?.trim() || null,
-				});
+			const offeredTo = price.metadata?.[ORG_KEY]?.trim() || null;
+
+			if (tier) entries.push({ tier, offeredTo });
+
+			if (price.metadata?.[TRIAL_KEY]?.trim() === "true") {
+				trialTagged.push({ priceId: price.id, tier, offeredTo });
 			}
 		}
 
@@ -178,18 +210,20 @@ async function fetchCatalogue(
 
 	// Cheapest first, so a tier added in the dashboard lands in its place
 	// without anything in Zemio knowing the order tiers are meant to come in.
-	return entries.sort((a, b) => a.tier.amount - b.tier.amount);
+	entries.sort((a, b) => a.tier.amount - b.tier.amount);
+
+	return { entries, trialTagged };
 }
 
-function readCatalogue(stripe: TierPriceSource): Promise<CatalogueEntry[]> {
+function readCatalogue(stripe: TierPriceSource): Promise<Catalogue> {
 	if (cached && cached.expiresAt > Date.now()) {
-		return Promise.resolve(cached.entries);
+		return Promise.resolve(cached.catalogue);
 	}
 
 	inFlight ??= fetchCatalogue(stripe)
-		.then((entries) => {
-			cached = { entries, expiresAt: Date.now() + TIER_CACHE_TTL_MS };
-			return entries;
+		.then((catalogue) => {
+			cached = { catalogue, expiresAt: Date.now() + TIER_CACHE_TTL_MS };
+			return catalogue;
 		})
 		.finally(() => {
 			inFlight = null;
@@ -213,7 +247,7 @@ export async function listTiers(
 	stripe: TierPriceSource,
 	organizationId: string,
 ): Promise<Tier[]> {
-	const entries = await readCatalogue(stripe);
+	const { entries } = await readCatalogue(stripe);
 
 	// Copied down to the tier, not just the array: a caller adjusting a tier it
 	// was handed must not rewrite the price every later caller reads.
@@ -222,4 +256,50 @@ export async function listTiers(
 			(entry) => entry.offeredTo === null || entry.offeredTo === organizationId,
 		)
 		.map((entry) => ({ ...entry.tier }));
+}
+
+/**
+ * The tier a trial runs on, or why there is none.
+ *
+ * Exactly one active price tagged `zemio_trial`, and it must be a published
+ * tier (ADR-0009). Anything else is the operator's to fix, and each case says
+ * which mistake it is:
+ *
+ * - `none` — nothing is tagged.
+ * - `ambiguous` — more than one is, counting tagged prices that are not valid
+ *   tiers, since the operator's intent is unclear either way. Not resolved by
+ *   picking one: tagged prices can differ in interval and currency, so "the
+ *   cheapest" is not a comparison that means anything, and the trial is billed
+ *   on whichever is chosen once it ends.
+ * - `invalid` — the one tagged price is not a tier Zemio can sell (missing or
+ *   bad seats, no recurring amount).
+ * - `negotiated` — the one tagged price is a deal for a single organization,
+ *   which is not something to hand everyone who signs up.
+ *
+ * Every refusal fails open: the organization is created and stays entitled, as
+ * with no tag at all.
+ */
+export type TrialTierResult =
+	| { ok: true; tier: Tier }
+	| {
+			ok: false;
+			reason: "none" | "ambiguous" | "invalid" | "negotiated";
+			priceIds: string[];
+	  };
+
+export async function findTrialTier(
+	stripe: TierPriceSource,
+): Promise<TrialTierResult> {
+	const { trialTagged } = await readCatalogue(stripe);
+	const priceIds = trialTagged.map((price) => price.priceId);
+
+	const [only, ...others] = trialTagged;
+	if (!only) return { ok: false, reason: "none", priceIds };
+	if (others.length > 0) return { ok: false, reason: "ambiguous", priceIds };
+	if (!only.tier) return { ok: false, reason: "invalid", priceIds };
+	if (only.offeredTo !== null) {
+		return { ok: false, reason: "negotiated", priceIds };
+	}
+
+	return { ok: true, tier: { ...only.tier } };
 }

@@ -51,6 +51,7 @@ export type CheckoutResult = keyof typeof CHECKOUT_RESULT;
 export type BillingBannerKind =
 	| "read_only"
 	| "payment_failing"
+	| "trial"
 	| "over_seat_limit";
 
 /**
@@ -66,6 +67,7 @@ export type BannerStatus =
 			enforced: boolean;
 			state: "entitled" | "payment_failing" | "read_only";
 			overSeatLimit: boolean;
+			trialing: boolean;
 	  };
 
 export function resolveBillingBanner(
@@ -84,7 +86,71 @@ export function resolveBillingBanner(
 	if (status.state === "read_only") return "read_only";
 	if (status.state === "payment_failing") return "payment_failing";
 
+	// A trial is entitled, so nothing else would ever mention it. Shown from
+	// the first day rather than near the end: the deadline is what makes a
+	// card-less trial fair, and it should never arrive as a surprise
+	// (ADR-0009).
+	if (status.trialing) return "trial";
+
 	// Advisory only, and deliberately last: nothing is refused over seats
 	// (ADR-0005).
 	return status.overSeatLimit ? "over_seat_limit" : null;
+}
+
+/**
+ * What the last onboarding page can truthfully say about the founder's new
+ * organization.
+ *
+ * - `trial` — it is trialing: the thirty days, no card.
+ * - `subscribe` — billing applies and it is not entitled, because the person
+ *   has had their one trial (ADR-0009). It starts read-only, and saying
+ *   otherwise would be the first thing Zemio tells them that is untrue.
+ * - `ready` — nothing to pay for yet: billing switched off, or a trial that
+ *   could not start and left the organization working without one.
+ */
+export type TrialPageVariant = "trial" | "subscribe" | "ready";
+
+export function trialPageVariant(status: {
+	enabled: boolean;
+	entitled: boolean;
+	trialing?: boolean;
+}): TrialPageVariant {
+	if (!status.enabled) return "ready";
+	if (status.trialing) return "trial";
+	if (!status.entitled) return "subscribe";
+	return "ready";
+}
+
+const DAY_MS = 86_400_000;
+
+/**
+ * Whole days left of a trial, never negative.
+ *
+ * Rounded up, so the last partial day still reads as "1 day left" rather than
+ * as none — a countdown that reaches zero while the organization is still
+ * working would be telling people something untrue.
+ */
+export function trialDaysRemaining(end: Date | null, now: Date): number | null {
+	if (!end) return null;
+
+	const days = Math.ceil((end.getTime() - now.getTime()) / DAY_MS);
+	return Math.max(days, 0);
+}
+
+/**
+ * How long until {@link trialDaysRemaining} next gives a different answer, or
+ * `null` once it never will.
+ *
+ * The count drops at fixed instants counted back from the trial's end, not at
+ * midnight — so a countdown left open re-renders exactly when it would change,
+ * whatever the viewer's timezone. Never more than a day away.
+ */
+export function msUntilTrialDaysChange(
+	end: Date | null,
+	now: Date,
+): number | null {
+	const days = trialDaysRemaining(end, now);
+	if (end === null || days === null || days === 0) return null;
+
+	return end.getTime() - now.getTime() - (days - 1) * DAY_MS;
 }

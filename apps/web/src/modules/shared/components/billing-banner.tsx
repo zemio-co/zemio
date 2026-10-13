@@ -5,10 +5,8 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { type BillingBannerKind, resolveBillingBanner } from "@/lib/billing";
-import { isOrganizationOwnerRole } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/server/better-auth/client";
 import { api } from "@/trpc/react";
 
 /**
@@ -38,7 +36,7 @@ const TONE = {
 		title: "text-blue-800",
 		body: "text-blue-700",
 	},
-} as const satisfies Record<BillingBannerKind, unknown>;
+} as const satisfies Record<Exclude<BillingBannerKind, "trial">, unknown>;
 
 /**
  * Tells every member of an organization when something is wrong with its
@@ -50,12 +48,17 @@ const TONE = {
  *
  * State comes from the status query the application layout prefetches — the
  * same one the billing page reads — so the two cannot disagree about what
- * state an organization is in.
+ * state an organization is in. `isOwner` arrives the same way, resolved by the
+ * layout: the banner is in the prefetched half of the tree and so is rendered
+ * on the server, and a role read in the browser is not known there.
  */
-function BillingBanner({ className, ...props }: React.ComponentProps<"div">) {
+function BillingBanner({
+	className,
+	isOwner,
+	...props
+}: React.ComponentProps<"div"> & { isOwner: boolean }) {
 	const t = useTranslations("modules.shared.billingBanner");
 	const status = api.billing.status.useQuery();
-	const role = authClient.useActiveMemberRole();
 
 	const data = status.data;
 
@@ -63,11 +66,20 @@ function BillingBanner({ className, ...props }: React.ComponentProps<"div">) {
 	// off the disabled branch of the status either.
 	if (!data?.enabled) return null;
 
-	const kind = resolveBillingBanner(data);
+	// A trial is not a problem to report above the page; the sidebar keeps its
+	// countdown in view instead (`TrialSidebarNotice`). The trial outranks the
+	// seat warning in the shared resolver, so that warning is recovered here
+	// rather than lost for the whole trial.
+	const resolved = resolveBillingBanner(data);
+	const kind =
+		resolved === "trial"
+			? data.overSeatLimit
+				? "over_seat_limit"
+				: null
+			: resolved;
 	if (!kind) return null;
 
 	const tone = TONE[kind];
-	const isOwner = isOrganizationOwnerRole(role.data?.role);
 
 	// Flat rather than a helper: `data` is narrowed to the branch that has a
 	// seat count, and that narrowing does not survive into a nested function.
@@ -108,15 +120,13 @@ function BillingBanner({ className, ...props }: React.ComponentProps<"div">) {
 			<div className="min-w-0 flex-1">
 				<p className={cn("font-semibold text-sm", tone.title)}>{title}</p>
 				<p className={cn("mt-1 max-w-4xl text-sm", tone.body)}>{description}</p>
-				{/* Withheld until the role is known — pending or failed — so an owner
-				    is never told to go and find themselves. */}
-				{role.data && !isOwner && (
+				{!isOwner && (
 					<p className={cn("mt-1 max-w-4xl text-sm", tone.body)}>
 						{t("memberHint")}
 					</p>
 				)}
 			</div>
-			{!role.isPending && isOwner && (
+			{isOwner && (
 				<Button
 					render={<Link href={ROUTES.SETTINGS_ORG_BILLING()}>{t("action")}</Link>}
 					size="sm"

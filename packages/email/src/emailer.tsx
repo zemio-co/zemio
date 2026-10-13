@@ -4,10 +4,13 @@ import {
 	type EmailAddress,
 	type SendResult,
 } from "./client/scaleway";
+import EmailVerificationEmail from "./templates/email-verification";
+import MagicLinkEmail from "./templates/magic-link";
 import OrgInvitationEmail from "./templates/org-invitation";
 import ReportReceivedEmail from "./templates/report-received";
 import ReportSubmittedEmail from "./templates/report-submitted";
 import StatusChangedEmail from "./templates/status-changed";
+import TrialEndingEmail from "./templates/trial-ending";
 
 export interface EmailerConfig {
 	/** Scaleway IAM secret key, sent as `X-Auth-Token`. */
@@ -51,16 +54,38 @@ export interface OrgInvitationInput {
 	acceptUrl: string;
 }
 
+export interface EmailVerificationInput {
+	to: string;
+	/** Absolute URL that marks the address verified. */
+	verifyUrl: string;
+}
+
+export interface MagicLinkInput {
+	to: string;
+	/** Absolute URL that signs the recipient in and verifies the address. */
+	signInUrl: string;
+}
+
+export interface TrialEndingInput {
+	to: string;
+	organizationName: string;
+	/** Absolute URL of the organization's billing page. */
+	billingUrl: string;
+}
+
 export interface Emailer {
 	sendReportReceived(input: ReportReceivedInput): Promise<SendResult>;
 	sendReportSubmitted(input: ReportSubmittedInput): Promise<SendResult>;
 	sendStatusChanged(input: StatusChangedInput): Promise<SendResult>;
 	sendOrgInvitation(input: OrgInvitationInput): Promise<SendResult>;
+	sendEmailVerification(input: EmailVerificationInput): Promise<SendResult>;
+	sendMagicLink(input: MagicLinkInput): Promise<SendResult>;
+	sendTrialEnding(input: TrialEndingInput): Promise<SendResult>;
 }
 
 /**
  * The only way to send mail. Templates and the transport stay internal so a
- * caller cannot assemble a send of its own and drift from these four.
+ * caller cannot assemble a send of its own and drift from these seven.
  */
 export function createEmailer({
 	apiKey,
@@ -132,6 +157,43 @@ export function createEmailer({
 					<OrgInvitationEmail
 						acceptUrl={acceptUrl}
 						inviterName={inviterName}
+						logoUrl={logoUrl}
+						organizationName={organizationName}
+					/>
+				),
+			});
+		},
+
+		sendEmailVerification({ to, verifyUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.emailVerification" })(
+					"subject",
+				),
+				react: <EmailVerificationEmail logoUrl={logoUrl} verifyUrl={verifyUrl} />,
+			});
+		},
+
+		sendMagicLink({ to, signInUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.magicLink" })("subject"),
+				react: <MagicLinkEmail logoUrl={logoUrl} signInUrl={signInUrl} />,
+			});
+		},
+
+		sendTrialEnding({ to, organizationName, billingUrl }) {
+			return client.send({
+				from,
+				to: [to],
+				subject: createAppTranslator({ namespace: "emails.trialEnding" })(
+					"subject",
+				),
+				react: (
+					<TrialEndingEmail
+						billingUrl={billingUrl}
 						logoUrl={logoUrl}
 						organizationName={organizationName}
 					/>

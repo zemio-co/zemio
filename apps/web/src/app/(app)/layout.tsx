@@ -1,45 +1,47 @@
 import { SidebarProvider } from "@zemio/ui";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { ROUTES } from "@/lib/consts";
+import {
+	isOrganizationAdminRole,
+	isOrganizationOwnerRole,
+} from "@/lib/organization";
+import { ROUTES } from "@/lib/routes";
 import { AppSidebar, BillingBanner } from "@/modules/shared";
-import { auth } from "@/server/better-auth";
-import { db } from "@/server/db";
+import { activeMemberRole } from "@/server/modules/membership";
+import { requireOnboarded } from "@/server/modules/onboarding";
 import { api, HydrateClient } from "@/trpc/server";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-	const requestHeaders = await headers();
-	const session = await auth.api.getSession({
-		headers: requestHeaders,
-	});
+	// Not signed in, or not through onboarding, and this is as far as anyone
+	// gets. The guard answers both, and the membership it read on the way is
+	// handed back rather than queried again.
+	const { hasMembership } = await requireOnboarded();
 
-	// When the user is not logged in, redirect to the login page
-	if (!session) {
-		redirect(ROUTES.AUTH);
+	if (!hasMembership) {
+		redirect(ROUTES.ONBOARDING_NO_ORG());
 	}
 
-	const memberCount = await db.member.count({
-		where: {
-			userId: session.user.id,
-		},
-	});
-
-	if (memberCount === 0) {
-		redirect(ROUTES.NO_ORG);
-	}
+	// Resolved here rather than in the browser because both consumers hide
+	// themselves from the roles they are not for, and a tree that decides that
+	// after hydration is a tree the server rendered differently.
+	const role = await activeMemberRole();
 
 	// Prefetched here rather than in the banner so every page under this layout
 	// shares one answer, and so the banner and the billing page cannot disagree
 	// about what state the organization is in.
 	void api.billing.status.prefetch();
 
+	const isOwner = isOrganizationOwnerRole(role);
+
 	return (
 		<SidebarProvider>
-			<AppSidebar />
+			{/* Hydrated too: its trial notice reads the prefetched status. */}
+			<HydrateClient>
+				<AppSidebar isOrgAdmin={isOrganizationAdminRole(role)} isOwner={isOwner} />
+			</HydrateClient>
 			<div className="min-w-0 flex-1">
 				<HydrateClient>
-					<BillingBanner className="mx-6 mt-6" />
+					<BillingBanner className="mx-6 mt-6" isOwner={isOwner} />
 				</HydrateClient>
 				{children}
 			</div>

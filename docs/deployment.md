@@ -307,6 +307,24 @@ executes with full log visibility and the same env/network context as the app.
 Prisma takes a database advisory lock, so concurrent replicas serialize rather
 than conflict.
 
+## Granting platform admin
+
+The platform-admin role is set by hand in the database. Stamp onboarding as
+finished at the same time: onboarding only finishes once somebody belongs to an
+organization, and until it has, every page — including the organization admin
+pages under `/settings/admin/orgs` — sends them back into the flow. An admin who
+is a member of no organization would otherwise have to create one, with a
+trial, before they could manage any.
+
+```sql
+UPDATE "user"
+SET role = 'admin',
+    "onboardingCompletedAt" = COALESCE("onboardingCompletedAt", now())
+WHERE email = '<address>';
+```
+
+They land on `/onboarding/no-org`, which links to the organization admin pages.
+
 ## Building images locally
 
 ```sh

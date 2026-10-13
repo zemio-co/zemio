@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";
+import { useSwitchOrganization } from "../hooks";
 
 type ActiveOrgQuery = ReturnType<typeof authClient.useActiveOrganization>;
 
@@ -194,11 +195,15 @@ function SidebarMenuOrgsButton({
 	const t = useTranslations("modules.shared.sidebarMenu");
 	const organizations = authClient.useListOrganizations();
 
+	const switchOrganization = useSwitchOrganization();
+
 	const handleOrgChange = async (organizationId: string) => {
-		await authClient.organization.setActive({
-			organizationId,
-		});
-		window.location.reload();
+		if (await switchOrganization(organizationId)) {
+			window.location.reload();
+			return;
+		}
+
+		toast.error(t("switchError"));
 	};
 
 	if (organizations.isPending) {

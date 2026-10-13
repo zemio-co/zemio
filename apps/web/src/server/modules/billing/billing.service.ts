@@ -44,7 +44,15 @@ export type BillingStatus =
 			seatLimit: number | null;
 			seatCount: number;
 			overSeatLimit: boolean;
-			/** When the paid period ends. Null with no subscription. */
+			/**
+			 * Whether the subscription is still in its trial.
+			 *
+			 * `state` cannot carry this: `trialing` resolves to entitled, exactly
+			 * like a healthy paid subscription, and the countdown has to tell
+			 * those apart.
+			 */
+			trialing: boolean;
+			/** When the paid period ends — during a trial, when the trial does. */
 			currentPeriodEnd: Date | null;
 			/** Whether the subscription ends rather than renews at that point. */
 			cancelAtPeriodEnd: boolean;
@@ -123,6 +131,7 @@ export async function getBillingStatus(
 		seatLimit: subscription?.seatLimit ?? null,
 		seatCount,
 		overSeatLimit: isOverSeatLimit(seatCount, subscription?.seatLimit ?? null),
+		trialing: subscription?.status === "trialing",
 		currentPeriodEnd: subscription?.currentPeriodEnd ?? null,
 		cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
 	};

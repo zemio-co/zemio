@@ -9,8 +9,10 @@ import { authClient } from "@/server/better-auth/client";
 
 export function AcceptInvitationPageContent({
 	invitationId,
+	organizationName,
 }: {
 	invitationId: string;
+	organizationName: string | null;
 }) {
 	const t = useTranslations("modules.acceptInvitation");
 	const router = useRouter();
@@ -35,7 +37,11 @@ export function AcceptInvitationPageContent({
 		<div className="container flex min-h-svh max-w-md items-center">
 			<div className="w-full rounded-2xl border bg-card p-8 shadow-sm">
 				<h1 className="font-semibold text-2xl">{t("title")}</h1>
-				<p className="mt-2 text-muted-foreground text-sm">{t("description")}</p>
+				<p className="mt-2 text-muted-foreground text-sm">
+					{organizationName
+						? t("invitedTo", { organization: organizationName })
+						: t("description")}
+				</p>
 				<Button className="mt-8 w-full" onClick={handleAccept}>
 					{t("acceptButton")}
 				</Button>
