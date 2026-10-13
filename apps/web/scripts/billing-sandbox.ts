@@ -176,6 +176,36 @@ async function create(tierName: string) {
 	console.log(`subscription ${subscription.id}: ${subscription.status}`);
 }
 
+/**
+ * Starts a card-less trial that ends in a day, shaped like the one `startTrial`
+ * creates.
+ *
+ * Stripe sends `customer.subscription.trial_will_end` a configured interval
+ * before a trial ends — three days by default — and immediately when the
+ * trial is shorter than that. A one-day trial is therefore how the warning is
+ * produced on demand rather than three days into a real one.
+ */
+async function trialEnding(tierName: string) {
+	const org = await organization();
+	if (!org.stripeCustomerId) throw new Error("Run `seed` first.");
+
+	const existing = await currentSubscription();
+	if (existing) {
+		throw new Error(
+			`Subscription ${existing.id} is already live (${existing.status}). \`cancel\` it first.`,
+		);
+	}
+
+	const subscription = await stripe.subscriptions.create({
+		customer: org.stripeCustomerId,
+		items: [{ price: await priceFor(tierName) }],
+		trial_end: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
+		trial_settings: { end_behavior: { missing_payment_method: "cancel" } },
+		metadata: { organizationId: org.id, zemio_trial: "true" },
+	});
+	console.log(`subscription ${subscription.id}: ${subscription.status}`);
+}
+
 async function change(tierName: string) {
 	const subscription = await currentSubscription();
 	if (!subscription) throw new Error("No live subscription to change.");
@@ -308,6 +338,7 @@ const [command, argument] = process.argv.slice(2);
 const commands: Record<string, () => Promise<void>> = {
 	seed,
 	create: () => create(argument ?? "M"),
+	"trial-ending": () => trialEnding(argument ?? "S"),
 	checkout: () => checkout(argument ?? "M"),
 	change: () => change(argument ?? "S"),
 	cancel,

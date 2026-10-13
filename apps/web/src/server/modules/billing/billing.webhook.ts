@@ -110,7 +110,7 @@ export async function handleStripeEvent(
 		const outcome = await deps.db.$transaction(async (tx) => {
 			const db = tx as unknown as PrismaClient;
 
-			// Every event is claimed, not just the four acted on, so the table grows
+			// Every event is claimed, not just the five acted on, so the table grows
 			// with the whole Stripe event volume — one paid checkout leaves around
 			// thirty rows. That is accepted: filtering first would save rows at the
 			// cost of the claim no longer covering every event.

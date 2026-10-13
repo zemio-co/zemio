@@ -34,7 +34,9 @@ subscribes.
 **Operators:** self-serve trials need one Stripe price tagged
 `zemio_trial: "true"` in its metadata — without it, an organization created by
 somebody who has not had their trial is still created and stays entitled, the
-missing price is logged, and the trial is not counted as used. The Stripe billing
+missing price is logged, and the trial is not counted as used. Subscribe the
+Stripe webhook endpoint to `customer.subscription.trial_will_end` as well;
+without it an owner is never warned that their trial is ending. The Stripe billing
 portal configuration must allow updating a payment method, since that is how a
 trial converts to a paid subscription. A deployment with `BILLING_ENABLED` off
 creates no Stripe objects and grants no trials; every organization stays
