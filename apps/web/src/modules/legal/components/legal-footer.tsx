@@ -21,7 +21,9 @@ async function LegalFooter({
 	return (
 		<div
 			className={cn(
-				"flex w-full items-center justify-center gap-8 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600",
+				// Wraps rather than overflowing: both shells clip their overflow, so
+				// on a narrow phone a single row would cut off the last link.
+				"flex w-full flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4 font-medium text-base-600 text-xs **:transition-colors [&>a]:hover:text-accent-600",
 				className,
 			)}
 			data-slot="legal-footer"
