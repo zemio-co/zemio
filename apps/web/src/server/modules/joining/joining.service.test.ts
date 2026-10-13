@@ -1,6 +1,10 @@
 import { createMockDb, type MockPrismaClient } from "@zemio/test-utils";
 import { beforeEach, describe, expect, it } from "vitest";
-import { applyAutoJoins } from "./joining.service";
+import {
+	applyAutoJoins,
+	joinAfterVerification,
+	openJoinedOrganization,
+} from "./joining.service";
 
 let db: MockPrismaClient;
 
@@ -68,5 +72,78 @@ describe("applyAutoJoins", () => {
 		expect(call?.data).toEqual([
 			expect.objectContaining({ userId: "user_1", organizationId: "org_b" }),
 		]);
+	});
+});
+
+describe("openJoinedOrganization", () => {
+	it("opens the person's organization in sessions that have none", async () => {
+		db.user.findUnique.mockResolvedValue({
+			lastActiveOrganizationId: null,
+		} as never);
+		db.member.findMany.mockResolvedValue([
+			{ organizationId: "org_a", createdAt: new Date("2026-01-01") },
+		] as never);
+
+		await openJoinedOrganization(db, "user_1");
+
+		// Only sessions and a remembered choice that are still empty: somebody
+		// already working in an organization is never moved.
+		expect(db.session.updateMany).toHaveBeenCalledWith({
+			where: { userId: "user_1", activeOrganizationId: null },
+			data: { activeOrganizationId: "org_a" },
+		});
+		expect(db.user.updateMany).toHaveBeenCalledWith({
+			where: { id: "user_1", lastActiveOrganizationId: null },
+			data: { lastActiveOrganizationId: "org_a" },
+		});
+		expect(db.$transaction).toHaveBeenCalledTimes(1);
+	});
+
+	it("writes nothing for somebody with no organization", async () => {
+		db.user.findUnique.mockResolvedValue({
+			lastActiveOrganizationId: null,
+		} as never);
+		db.member.findMany.mockResolvedValue([]);
+
+		await openJoinedOrganization(db, "user_1");
+
+		expect(db.$transaction).not.toHaveBeenCalled();
+	});
+});
+
+describe("joinAfterVerification", () => {
+	it("opens the organization even when a concurrent sign-in inserted the membership", async () => {
+		// The race: verification committed `emailVerified`, a sign-in elsewhere
+		// read it and joined first, so this call inserts nothing. The verifying
+		// session still has no organization and must be given one.
+		db.joiningRule.findMany.mockResolvedValue([domainRule("org_a")] as never);
+		db.member.findMany
+			.mockResolvedValueOnce([]) // memberships read before the insert
+			.mockResolvedValueOnce([
+				{ organizationId: "org_a", createdAt: new Date("2026-01-01") },
+			] as never); // memberships read when choosing what to open
+		db.member.createManyAndReturn.mockResolvedValue([]);
+		db.user.findUnique.mockResolvedValue({
+			lastActiveOrganizationId: null,
+		} as never);
+
+		await joinAfterVerification(db, "user_1", signals);
+
+		expect(db.session.updateMany).toHaveBeenCalledWith({
+			where: { userId: "user_1", activeOrganizationId: null },
+			data: { activeOrganizationId: "org_a" },
+		});
+	});
+
+	it("opens nothing when no rule admits the person and they belong nowhere", async () => {
+		db.joiningRule.findMany.mockResolvedValue([]);
+		db.member.findMany.mockResolvedValue([]);
+		db.user.findUnique.mockResolvedValue({
+			lastActiveOrganizationId: null,
+		} as never);
+
+		await joinAfterVerification(db, "user_1", signals);
+
+		expect(db.$transaction).not.toHaveBeenCalled();
 	});
 });

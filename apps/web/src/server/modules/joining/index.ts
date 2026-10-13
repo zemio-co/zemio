@@ -11,7 +11,9 @@ export {
 export { findInvitationById } from "./joining.repository";
 export {
 	applyAutoJoins,
+	joinAfterVerification,
 	type Openings,
+	openJoinedOrganization,
 	resolveOpenings,
 	resolveSessionOrganization,
 } from "./joining.service";

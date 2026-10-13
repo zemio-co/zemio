@@ -22,6 +22,8 @@ import { db } from "@/server/db";
 import { CURRENT_LEGAL_RELEASE } from "@/server/legal";
 import {
 	applyAutoJoins,
+	joinAfterVerification,
+	openJoinedOrganization,
 	resolveSessionOrganization,
 } from "@/server/modules/joining";
 import * as adminAc from "./ac/admin";
@@ -40,35 +42,6 @@ async function tenantIdOf(userId: string): Promise<string | null> {
 	});
 
 	return user?.microsoftTenantId ?? null;
-}
-
-/**
- * Opens a freshly joined organization in the sessions already running.
- *
- * The session hook that chooses an active organization runs when a session is
- * *created*, and verification happens inside one that already exists. Without
- * this, someone who verifies and is auto-joined is redirected out of onboarding
- * into an application whose every organization-scoped call refuses them for
- * having no active organization — until they log out and back in.
- *
- * Only sessions with no organization are touched, so this never moves someone
- * who is already working somewhere. The user record is updated on the same
- * terms, so the next login lands in the same place.
- */
-async function openJoinedOrganization(userId: string): Promise<void> {
-	const organizationId = await resolveSessionOrganization(db, userId);
-	if (!organizationId) return;
-
-	await db.$transaction([
-		db.session.updateMany({
-			where: { userId, activeOrganizationId: null },
-			data: { activeOrganizationId: organizationId },
-		}),
-		db.user.updateMany({
-			where: { id: userId, lastActiveOrganizationId: null },
-			data: { lastActiveOrganizationId: organizationId },
-		}),
-	]);
 }
 
 export const auth = betterAuth({
@@ -117,15 +90,11 @@ export const auth = betterAuth({
 		 */
 		afterEmailVerification: async (user) => {
 			try {
-				const joined = await applyAutoJoins(db, user.id, {
+				await joinAfterVerification(db, user.id, {
 					email: user.email,
 					emailVerified: true,
 					microsoftTenantId: await tenantIdOf(user.id),
 				});
-
-				if (joined.length === 0) return;
-
-				await openJoinedOrganization(user.id);
 			} catch (error) {
 				logger.error("Could not resolve joining rules after verification", {
 					userId: user.id,
@@ -331,11 +300,19 @@ export const auth = betterAuth({
 						// Joining rules decide who is admitted, not this hook. A `tid`
 						// needs no verified address and an email domain does, and that
 						// asymmetry belongs in one place (ADR-0008).
-						await applyAutoJoins(db, session.userId, {
+						const joined = await applyAutoJoins(db, session.userId, {
 							email: user.email,
 							emailVerified: user.emailVerified || verifiedByTenant,
 							microsoftTenantId: resolvedTenantId,
 						});
+
+						// The session being created opens in the new organization
+						// below. Sessions the person already has open elsewhere —
+						// the onboarding tab that sent the magic link, say — would
+						// otherwise stay without one until they log out.
+						if (joined.length > 0) {
+							await openJoinedOrganization(db, session.userId);
+						}
 					}
 
 					return {

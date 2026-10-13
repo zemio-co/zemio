@@ -51,6 +51,59 @@ export async function applyAutoJoins(
 	return joined;
 }
 
+/**
+ * Opens the person's organization in the sessions they already have open.
+ *
+ * The session hook that chooses an active organization runs when a session is
+ * *created*, so a membership gained inside an existing session — by verifying
+ * an address, or by a sign-in elsewhere — leaves the sessions already running
+ * with none. Every organization-scoped call in them then refuses the person
+ * until they log out and back in.
+ *
+ * Only sessions with no organization are touched, so this never moves someone
+ * who is already working somewhere. The remembered choice on the user is
+ * updated on the same terms, so the next login lands in the same place.
+ * Idempotent, and writes nothing for somebody who belongs nowhere.
+ */
+export async function openJoinedOrganization(
+	db: PrismaClient,
+	userId: string,
+): Promise<void> {
+	const organizationId = await resolveSessionOrganization(db, userId);
+	if (!organizationId) return;
+
+	await db.$transaction([
+		db.session.updateMany({
+			where: { userId, activeOrganizationId: null },
+			data: { activeOrganizationId: organizationId },
+		}),
+		db.user.updateMany({
+			where: { id: userId, lastActiveOrganizationId: null },
+			data: { lastActiveOrganizationId: organizationId },
+		}),
+	]);
+}
+
+/**
+ * Applies joining rules once an address has been verified, and opens what the
+ * person now belongs to in the sessions they have open.
+ *
+ * The opening does not depend on this call having joined anybody. Verification
+ * commits the flag before this runs, so a sign-in elsewhere in that moment can
+ * read it and insert the membership first; this call then inserts nothing,
+ * and the session that verified would be left without an organization.
+ * Whoever inserted the row, the person is in an organization now, and that is
+ * what decides.
+ */
+export async function joinAfterVerification(
+	db: PrismaClient,
+	userId: string,
+	signals: PersonSignals,
+): Promise<void> {
+	await applyAutoJoins(db, userId, signals);
+	await openJoinedOrganization(db, userId);
+}
+
 /** What a person with nowhere to go can act on. */
 export type Openings = {
 	invitations: Awaited<ReturnType<typeof repo.findPendingInvitations>>;
