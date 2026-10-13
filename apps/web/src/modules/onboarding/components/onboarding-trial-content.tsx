@@ -107,7 +107,8 @@ function OnboardingTrialContent({
 			<div>
 				<Button
 					className={"w-full"}
-					disabled={complete.isPending}
+					// Held after success too, while the page navigates away.
+					disabled={complete.isPending || complete.isSuccess}
 					onClick={() => complete.mutate()}
 					type="button"
 				>

@@ -110,7 +110,12 @@ function OnboardingCreateOrganizationForm({
 			>
 				{([isSubmitting, name]) => (
 					<Button
-						disabled={isSubmitting || String(name).trim() === ""}
+						// Held after success too: the page is navigating away, and a
+						// second click in that moment would create a second
+						// organization — read-only, since the trial went to the first.
+						disabled={
+							isSubmitting || createOrg.isSuccess || String(name).trim() === ""
+						}
 						form={CREATE_ORG_FORM_ID}
 						type="submit"
 					>
