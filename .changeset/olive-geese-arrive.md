@@ -1,6 +1,5 @@
 ---
 "@zemio/web": minor
-"@zemio/email": minor
 "@zemio/i18n": minor
 ---
 
