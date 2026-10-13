@@ -26,7 +26,10 @@ account takeover".
 Microsoft, for Zemio's purposes, is not a provider that verifies. Its tokens
 carry no `email_verified` claim at all, so there is no signal to trust or
 distrust — only an absence. Verification therefore has to come from Zemio: an
-email we send, and a link the person clicks.
+email we send, and a link the person clicks. (ADR-0010 later accepts one
+exception, which is a different claim rather than this one relaxed: a token
+carrying `xms_edov: true` from a work or school tenant, for the same address,
+says the tenant has proved it owns the address's domain.)
 
 Four operations are gated on a verified address, and no others:
 

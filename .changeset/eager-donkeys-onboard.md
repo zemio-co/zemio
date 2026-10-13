@@ -15,9 +15,11 @@ organization is invite-only: no rule is seeded from whoever created it.
 An email address now grants nothing until Zemio has verified it itself
 (ADR-0008). This gates accepting an invitation, joining by email domain, and
 creating an organization — but never joining by Microsoft tenant, which reads a
-signed `tid` claim rather than an address. Addresses arrive unverified whatever
-the identity provider asserts, because Better Auth's Entra provider will
-otherwise mark a personal Microsoft account verified on its own say-so.
+signed `tid` claim rather than an address. An identity provider's own
+verification flag is ignored, because Better Auth's Entra provider would
+otherwise mark a personal Microsoft account verified on its own say-so; the one
+claim accepted as proof is `xms_edov`, a work tenant's statement that it has
+proved the address's domain (ADR-0010).
 Existing addresses are reset to unverified by the migration, because nothing
 before this release verified one. Nobody loses a membership or sees onboarding
 again: work accounts on a domain their tenant has proved are verified again at

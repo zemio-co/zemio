@@ -27,10 +27,12 @@ A person with a Zemio login, independent of any organization.
 _Avoid_: account, profile
 
 **Verified Email**:
-An address Zemio has confirmed the person receives mail at — by a mail it sent,
-or by a Microsoft sign-in in which the address's own work tenant has proved the
-domain (ADR-0010). An address an identity provider merely asserts is not
-verified, however it arrived. Nothing an
+An address Zemio has proof of: a mail it sent that the person opened, or a
+Microsoft sign-in from the work tenant that owns the address's domain and has
+proved it to Microsoft (ADR-0010). The second proves who administers the
+address rather than that the person reads its mail, which is the same trust a
+tenant Joining Rule already places in that tenant. An address an identity
+provider merely asserts is not verified, however it arrived. Nothing an
 address alone would grant is granted until it is verified — an **Invitation**,
 a domain **Joining Rule**, creating an **Organization**, starting a **Trial**.
 A tenant Joining Rule is the exception, because it reads a signed claim rather

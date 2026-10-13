@@ -22,9 +22,9 @@ caught before release.
 
 A tenant administrator can set any address on a user, including one on a
 domain the tenant has never proved. Microsoft says so directly: the `email`
-claim "isn't guaranteed to be correct, and is mutable over time — never use it
-for authorization", and claims like `email` "can be controllable by tenant
-administrators or sometimes users"
+claim "isn't guaranteed to be correct, and is mutable over time - never use it
+for authorization or to save data for a user", and claims like `email` "can be
+controllable by tenant administrators or sometimes users"
 ([optional claims reference](https://learn.microsoft.com/en-us/entra/identity-platform/optional-claims-reference),
 [claims validation](https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation)).
 Trusting the tenant would have let anybody with a tenant of their own — free to
