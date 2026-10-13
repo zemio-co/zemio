@@ -27,6 +27,9 @@ import {
 	FieldLabel,
 	Input,
 	Label,
+	NativeSelect,
+	NativeSelectOptGroup,
+	NativeSelectOption,
 	Select,
 	SelectContent,
 	SelectGroup,
@@ -50,11 +53,6 @@ import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
-import {
-	NativeSelect,
-	NativeSelectOptGroup,
-	NativeSelectOption,
-} from "@/components/ui/native-select";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import { NO_COST_UNIT_GROUP } from "@/lib/consts";
 import { cn } from "@/lib/utils";

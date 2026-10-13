@@ -1,6 +1,12 @@
 "use client";
 
 import type { ExpenseType, ReportStatus } from "@zemio/db";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupTextarea,
+} from "@zemio/ui";
 import { format, formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
 import {
@@ -19,12 +25,6 @@ import {
 import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupButton,
-	InputGroupTextarea,
-} from "@/components/ui/input-group";
 import {
 	Tooltip,
 	TooltipContent,

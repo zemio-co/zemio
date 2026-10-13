@@ -1,6 +1,14 @@
 "use client";
 
 import { keepPreviousData } from "@tanstack/react-query";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@zemio/ui";
 import { differenceInDays, format } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
@@ -11,14 +19,6 @@ import {
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

@@ -1,12 +1,12 @@
 "use client";
 
 import { createAppTranslator } from "@zemio/i18n";
+import { Button } from "@zemio/ui";
 import { format, isSameDay } from "date-fns";
 import { DownloadIcon, EllipsisIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { expenseTypeLabel, useExpenseTypeLabel } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";

@@ -1,5 +1,6 @@
 import { createAppTranslator } from "@zemio/i18n";
 import {
+	Button,
 	Sidebar,
 	SidebarContent,
 	SidebarGroup,
@@ -17,7 +18,6 @@ import {
 	UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ADMIN_SETTINGS_MENU, ROUTES } from "@/lib/consts";
 
 const t = createAppTranslator({

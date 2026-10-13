@@ -1,6 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { CostUnit, ReportStatus, User } from "@zemio/db";
 import { createAppTranslator } from "@zemio/i18n";
+import { Checkbox } from "@zemio/ui";
 import { format } from "date-fns";
 import {
 	ALargeSmallIcon,
@@ -15,7 +16,6 @@ import type { FilterOption } from "@/components/data/filter-types";
 import { ListActionSlot } from "@/components/list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Tooltip,
 	TooltipContent,

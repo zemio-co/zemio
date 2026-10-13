@@ -11,6 +11,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import {
+	Button,
 	DataGridColumnHeader,
 	Grid,
 	GridBody,
@@ -36,7 +37,6 @@ import { useTranslations } from "next-intl";
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { SettingsSubtitle, SettingsTitle } from "../settings-typography";

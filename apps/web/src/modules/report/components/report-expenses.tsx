@@ -5,6 +5,7 @@ import {
 	Dialog as DialogPrimitive,
 } from "@base-ui/react";
 import { useQueries } from "@tanstack/react-query";
+import { Button } from "@zemio/ui";
 import { formatDate, isSameDay } from "date-fns";
 import {
 	MoreHorizontalIcon,
@@ -26,7 +27,6 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,

@@ -1,24 +1,24 @@
 "use client";
 
 import { Select as SelectPrimitive } from "@base-ui/react";
+import {
+	Button,
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectValue,
+} from "@zemio/ui";
 import { format, subDays } from "date-fns";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
-import { Button } from "@/components/ui/button";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";

@@ -8,13 +8,14 @@ import {
 	FieldDescription,
 	FieldLegend,
 	Label,
+	RadioGroup,
+	RadioGroupItem,
 	Skeleton,
 } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type z from "zod";
 import { useSaveBar } from "@/components/save-bar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
 import { updatePreferencesSchema } from "@/lib/validators";
 import { api } from "@/trpc/react";

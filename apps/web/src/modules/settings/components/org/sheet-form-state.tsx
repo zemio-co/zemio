@@ -1,7 +1,7 @@
 "use client";
 
+import { Button } from "@zemio/ui";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
 import { SheetBody, SheetFooter } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 
