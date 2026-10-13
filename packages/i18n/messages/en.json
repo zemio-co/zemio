@@ -1171,15 +1171,15 @@
 		},
 		"auth": {
 			"content": {
-				"title": "Willkommen zurück!",
+				"title": "Welcome back!",
 				"subtitle": "Sign up or log in to continue.",
-				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
+				"legal": "By creating an account, you accept the <terms>Terms of Use</terms> and confirm that you have read the <privacy>Privacy Policy</privacy> and the <platform>Platform Policies</platform>."
 			},
 			"form": {
-				"continueWithMicrosoft": "Mit Microsoft fortfahren",
-				"signInError": "Ein Fehler ist aufgetreten",
-				"signInSuccessTitle": "Anmeldung erfolgreich",
-				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet",
+				"continueWithMicrosoft": "Continue with Microsoft",
+				"signInError": "Something went wrong",
+				"signInSuccessTitle": "Signed in",
+				"signInSuccessDescription": "You will be redirected shortly",
 				"emailLabel": "Email address",
 				"emailPlaceholder": "you@university.edu",
 				"continueWithEmail": "Send sign-in link",
