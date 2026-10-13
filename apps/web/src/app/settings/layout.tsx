@@ -17,16 +17,22 @@ export default async function ServerLayout({
 	// organization today.
 	await requireOnboarded();
 
+	// Null for somebody working in no organization — none at all, or none
+	// active. They have no billing to explain, and `billing.status` is
+	// organization-scoped: asking anyway would be refused, and the browser
+	// would retry the refusal.
+	const role = await activeMemberRole();
+
+	if (role === null) {
+		return <SettingsLayout>{children}</SettingsLayout>;
+	}
+
 	// Settings is a sibling route group, so it inherits nothing from the
 	// application layout — including the banner. Without this the explanation of
 	// why an organization is read-only disappears at exactly the moment someone
 	// follows the banner's own link to the billing page. Same query, so the two
 	// layouts cannot disagree.
 	void api.billing.status.prefetch();
-
-	// Null for somebody in no organization, which reads as "not its owner" — the
-	// right answer, and the one the banner would reach anyway.
-	const role = await activeMemberRole();
 
 	return (
 		<SettingsLayout>
