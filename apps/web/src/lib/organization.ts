@@ -47,7 +47,13 @@ export const SELF_SERVE_REFUSAL = {
  */
 export type SelfServeRefusal = keyof typeof SELF_SERVE_REFUSAL;
 
-/** Which refusal a failed creation carries, or null if it was something else. */
+/**
+ * Which refusal a failed creation carries, or null if it was something else.
+ *
+ * Looked up in {@link SELF_SERVE_REFUSAL} rather than compared to one marker,
+ * so a reason added to the map is recognised here without anybody having to
+ * remember this function exists.
+ */
 export function selfServeRefusalOf(error: unknown): SelfServeRefusal | null {
 	if (typeof error !== "object" || error === null || !("message" in error)) {
 		return null;
@@ -55,7 +61,9 @@ export function selfServeRefusalOf(error: unknown): SelfServeRefusal | null {
 
 	const message = (error as { message?: unknown }).message;
 
-	return message === SELF_SERVE_REFUSAL.email_not_verified
-		? "email_not_verified"
-		: null;
+	const entry = Object.entries(SELF_SERVE_REFUSAL).find(
+		([, marker]) => marker === message,
+	);
+
+	return entry ? (entry[0] as SelfServeRefusal) : null;
 }
