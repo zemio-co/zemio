@@ -1,5 +1,6 @@
 import { createMockDb } from "@zemio/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { logger } from "@/lib/logger";
 import { clearTierCatalogue } from "./billing.catalogue";
 import { startTrial, TRIAL_PERIOD_DAYS } from "./billing.trial";
 
@@ -222,6 +223,96 @@ describe("startTrial", () => {
 		await expect(
 			startTrial(d as never, { organizationId: "org_1" }),
 		).resolves.toBeNull();
+	});
+});
+
+describe("startTrial when the trial price is misconfigured", () => {
+	/** Asserts no trial started, and the log names the mistake and its prices. */
+	async function expectNotStarted(
+		prices: unknown[],
+		reason: string,
+		priceIds: string[],
+	) {
+		const error = vi.spyOn(logger, "error").mockImplementation(() => {});
+		const d = deps({ prices });
+
+		await expect(
+			startTrial(d as never, { organizationId: "org_1" }),
+		).resolves.toBeNull();
+
+		expect(d.subscriptionsCreate).not.toHaveBeenCalled();
+		expect(error).toHaveBeenCalledWith("billing.trial_not_started", {
+			organizationId: "org_1",
+			reason,
+			priceIds,
+		});
+		error.mockRestore();
+	}
+
+	it("says nothing is tagged when nothing is", async () => {
+		await expectNotStarted(
+			[price({ metadata: { zemio_tier: "S", zemio_seats: "10" } })],
+			"none",
+			[],
+		);
+	});
+
+	it("refuses to choose between two tagged prices", async () => {
+		// A monthly and a yearly price are not comparable by amount, and the
+		// trial is billed on whichever is chosen once it ends (ADR-0009).
+		await expectNotStarted(
+			[
+				price(),
+				price({
+					id: "price_s_year",
+					unit_amount: 9000,
+					recurring: { interval: "year", interval_count: 1 },
+				}),
+			],
+			"ambiguous",
+			[TRIAL_PRICE, "price_s_year"],
+		);
+	});
+
+	it("counts a tagged price that is not a valid tier towards ambiguity", async () => {
+		await expectNotStarted(
+			[
+				price(),
+				price({
+					id: "price_broken",
+					metadata: { zemio_tier: "S", zemio_trial: "true" },
+				}),
+			],
+			"ambiguous",
+			[TRIAL_PRICE, "price_broken"],
+		);
+	});
+
+	it("names a tagged price that is not a tier Zemio can sell", async () => {
+		// Missing seats: dropped from the catalogue like any half-tagged price,
+		// but reported as what it is rather than as "nothing tagged".
+		await expectNotStarted(
+			[price({ metadata: { zemio_tier: "S", zemio_trial: "true" } })],
+			"invalid",
+			[TRIAL_PRICE],
+		);
+	});
+
+	it("names a tagged price negotiated for one organization", async () => {
+		await expectNotStarted(
+			[
+				price({
+					metadata: {
+						zemio_tier: "XL",
+						zemio_seats: "500",
+						zemio_trial: "true",
+						zemio_org: "org_other",
+					},
+				}),
+			],
+			"negotiated",
+			[TRIAL_PRICE],
+		);
 	});
 });
 

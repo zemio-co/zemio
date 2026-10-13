@@ -63,10 +63,11 @@ export function isTrialStartedFor(
  * Starts a card-less trial for an organization and puts it under enforcement,
  * or reports that it could not.
  *
- * Returns `null` rather than throwing when the dashboard names no trial tier.
- * The caller is in the middle of creating somebody's organization, and a
- * missing price is the operator's mistake to fix — refusing the organization
- * would make it the new customer's problem instead (ADR-0009).
+ * Returns `null` rather than throwing when the dashboard does not name exactly
+ * one usable trial tier. The caller is in the middle of creating somebody's
+ * organization, and a missing or misconfigured price is the operator's mistake
+ * to fix — refusing the organization would make it the new customer's problem
+ * instead (ADR-0009).
  *
  * Enforcement is switched on here rather than by the caller because it is the
  * other half of the same fact, and the two must not be able to disagree.
@@ -75,14 +76,20 @@ export async function startTrial(
 	deps: TrialDependencies,
 	args: { organizationId: string },
 ): Promise<TrialStarted | null> {
-	const tier = await findTrialTier(deps.stripe);
+	const trialTier = await findTrialTier(deps.stripe);
 
-	if (!tier) {
-		logger.error("No Stripe price is tagged as the trial tier", {
+	if (!trialTier.ok) {
+		// Which mistake, and on which prices: "nothing tagged" and "two tagged"
+		// send whoever reads this to different places in the dashboard.
+		logger.error("billing.trial_not_started", {
 			organizationId: args.organizationId,
+			reason: trialTier.reason,
+			priceIds: trialTier.priceIds,
 		});
 		return null;
 	}
+
+	const { tier } = trialTier;
 
 	const customerId = await resolveCustomerId(deps, args.organizationId);
 

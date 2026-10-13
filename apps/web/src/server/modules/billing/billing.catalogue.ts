@@ -1,6 +1,5 @@
 import "server-only";
 import type Stripe from "stripe";
-import { logger } from "@/lib/logger";
 import { withStripe } from "./billing.stripe";
 
 /**
@@ -136,10 +135,28 @@ export const TIER_CACHE_TTL_MS = 5 * 60 * 1000;
 type CatalogueEntry = {
 	tier: Tier;
 	offeredTo: string | null;
-	isTrial: boolean;
 };
 
-let cached: { entries: CatalogueEntry[]; expiresAt: number } | null = null;
+/**
+ * A price tagged as the trial tier, kept whether or not it is a valid tier.
+ *
+ * Read before {@link tierFromPrice} decides anything, because a tagged price
+ * that fails it is the operator saying "trial on this" about a price Zemio
+ * cannot use. Dropped silently like any other half-tagged price, it would read
+ * as "no price is tagged" — pointing whoever reads the log at the wrong fault.
+ */
+type TrialTagged = {
+	priceId: string;
+	tier: Tier | null;
+	offeredTo: string | null;
+};
+
+type Catalogue = {
+	entries: CatalogueEntry[];
+	trialTagged: TrialTagged[];
+};
+
+let cached: { catalogue: Catalogue; expiresAt: number } | null = null;
 
 /**
  * The read already running, if one is.
@@ -150,7 +167,7 @@ let cached: { entries: CatalogueEntry[]; expiresAt: number } | null = null;
  * A read that fails is forgotten rather than kept, so the caller after an
  * outage retries rather than being handed the rejection the outage produced.
  */
-let inFlight: Promise<CatalogueEntry[]> | null = null;
+let inFlight: Promise<Catalogue> | null = null;
 
 /** Drops the cached catalogue, so one test's read cannot serve the next. */
 export function clearTierCatalogue(): void {
@@ -158,10 +175,9 @@ export function clearTierCatalogue(): void {
 	inFlight = null;
 }
 
-async function fetchCatalogue(
-	stripe: TierPriceSource,
-): Promise<CatalogueEntry[]> {
+async function fetchCatalogue(stripe: TierPriceSource): Promise<Catalogue> {
 	const entries: CatalogueEntry[] = [];
+	const trialTagged: TrialTagged[] = [];
 	let startingAfter: string | undefined;
 
 	// Paged rather than capped: every negotiated XL deal adds a price, so the
@@ -178,12 +194,12 @@ async function fetchCatalogue(
 
 		for (const price of page.data) {
 			const tier = tierFromPrice(price);
-			if (tier) {
-				entries.push({
-					tier,
-					offeredTo: price.metadata?.[ORG_KEY]?.trim() || null,
-					isTrial: price.metadata?.[TRIAL_KEY]?.trim() === "true",
-				});
+			const offeredTo = price.metadata?.[ORG_KEY]?.trim() || null;
+
+			if (tier) entries.push({ tier, offeredTo });
+
+			if (price.metadata?.[TRIAL_KEY]?.trim() === "true") {
+				trialTagged.push({ priceId: price.id, tier, offeredTo });
 			}
 		}
 
@@ -194,18 +210,20 @@ async function fetchCatalogue(
 
 	// Cheapest first, so a tier added in the dashboard lands in its place
 	// without anything in Zemio knowing the order tiers are meant to come in.
-	return entries.sort((a, b) => a.tier.amount - b.tier.amount);
+	entries.sort((a, b) => a.tier.amount - b.tier.amount);
+
+	return { entries, trialTagged };
 }
 
-function readCatalogue(stripe: TierPriceSource): Promise<CatalogueEntry[]> {
+function readCatalogue(stripe: TierPriceSource): Promise<Catalogue> {
 	if (cached && cached.expiresAt > Date.now()) {
-		return Promise.resolve(cached.entries);
+		return Promise.resolve(cached.catalogue);
 	}
 
 	inFlight ??= fetchCatalogue(stripe)
-		.then((entries) => {
-			cached = { entries, expiresAt: Date.now() + TIER_CACHE_TTL_MS };
-			return entries;
+		.then((catalogue) => {
+			cached = { catalogue, expiresAt: Date.now() + TIER_CACHE_TTL_MS };
+			return catalogue;
 		})
 		.finally(() => {
 			inFlight = null;
@@ -229,7 +247,7 @@ export async function listTiers(
 	stripe: TierPriceSource,
 	organizationId: string,
 ): Promise<Tier[]> {
-	const entries = await readCatalogue(stripe);
+	const { entries } = await readCatalogue(stripe);
 
 	// Copied down to the tier, not just the array: a caller adjusting a tier it
 	// was handed must not rewrite the price every later caller reads.
@@ -241,34 +259,47 @@ export async function listTiers(
 }
 
 /**
- * The tier a trial runs on, or `null` if the dashboard names none.
+ * The tier a trial runs on, or why there is none.
  *
- * A negotiated price is never eligible however it is tagged: a trial is
- * offered to everyone who creates an organization, and a deal negotiated for
- * one customer is not something to hand the next one.
+ * Exactly one active price tagged `zemio_trial`, and it must be a published
+ * tier (ADR-0009). Anything else is the operator's to fix, and each case says
+ * which mistake it is:
  *
- * More than one tagged price is a misconfiguration rather than a choice. The
- * cheapest is used so that organizations keep being created, and the mistake
- * is logged rather than swallowed — silently picking one and saying nothing is
- * how a dashboard edit becomes an unexplained charge.
+ * - `none` — nothing is tagged.
+ * - `ambiguous` — more than one is, counting tagged prices that are not valid
+ *   tiers, since the operator's intent is unclear either way. Not resolved by
+ *   picking one: tagged prices can differ in interval and currency, so "the
+ *   cheapest" is not a comparison that means anything, and the trial is billed
+ *   on whichever is chosen once it ends.
+ * - `invalid` — the one tagged price is not a tier Zemio can sell (missing or
+ *   bad seats, no recurring amount).
+ * - `negotiated` — the one tagged price is a deal for a single organization,
+ *   which is not something to hand everyone who signs up.
+ *
+ * Every refusal fails open: the organization is created and stays entitled, as
+ * with no tag at all.
  */
+export type TrialTierResult =
+	| { ok: true; tier: Tier }
+	| {
+			ok: false;
+			reason: "none" | "ambiguous" | "invalid" | "negotiated";
+			priceIds: string[];
+	  };
+
 export async function findTrialTier(
 	stripe: TierPriceSource,
-): Promise<Tier | null> {
-	const entries = await readCatalogue(stripe);
-	const eligible = entries.filter(
-		(entry) => entry.isTrial && entry.offeredTo === null,
-	);
+): Promise<TrialTierResult> {
+	const { trialTagged } = await readCatalogue(stripe);
+	const priceIds = trialTagged.map((price) => price.priceId);
 
-	const chosen = eligible[0];
-	if (!chosen) return null;
-
-	if (eligible.length > 1) {
-		logger.error("More than one Stripe price is tagged as the trial tier", {
-			priceIds: eligible.map((entry) => entry.tier.priceId),
-			using: chosen.tier.priceId,
-		});
+	const [only, ...others] = trialTagged;
+	if (!only) return { ok: false, reason: "none", priceIds };
+	if (others.length > 0) return { ok: false, reason: "ambiguous", priceIds };
+	if (!only.tier) return { ok: false, reason: "invalid", priceIds };
+	if (only.offeredTo !== null) {
+		return { ok: false, reason: "negotiated", priceIds };
 	}
 
-	return { ...chosen.tier };
+	return { ok: true, tier: { ...only.tier } };
 }
