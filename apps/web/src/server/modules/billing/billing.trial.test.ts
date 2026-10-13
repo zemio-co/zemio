@@ -26,17 +26,18 @@ function deps(
 	} = {},
 ) {
 	const db = createMockDb();
-	// The row and the enforcement switch share one transaction, so the mock
-	// runs the callback against the same client the assertions read.
+	// The transaction hands its callback a client of its own, so a write that
+	// lands on `tx` provably ran inside it and one on `db` provably did not.
+	const tx = createMockDb();
 	db.$transaction.mockImplementation(((fn: (tx: unknown) => unknown) =>
-		fn(db)) as never);
+		fn(tx)) as never);
 	db.organization.findUnique.mockResolvedValue({
 		id: "org_1",
 		name: "Robotics Society",
 		stripeCustomerId: args.stripeCustomerId ?? "cus_1",
 	} as never);
-	db.organization.updateMany.mockResolvedValue({ count: 1 } as never);
-	db.subscription.upsert.mockResolvedValue({} as never);
+	tx.organization.updateMany.mockResolvedValue({ count: 1 } as never);
+	tx.subscription.upsert.mockResolvedValue({} as never);
 
 	const subscriptionsCreate = vi.fn().mockResolvedValue(
 		args.subscription ?? {
@@ -51,6 +52,7 @@ function deps(
 
 	return {
 		db,
+		tx,
 		stripe: {
 			prices: {
 				list: vi
@@ -146,7 +148,7 @@ describe("startTrial", () => {
 
 		await startTrial(d as never, { organizationId: "org_1" });
 
-		expect(d.db.subscription.upsert).toHaveBeenCalledWith(
+		expect(d.tx.subscription.upsert).toHaveBeenCalledWith(
 			expect.objectContaining({
 				where: { organizationId: "org_1" },
 				create: expect.objectContaining({
@@ -160,19 +162,22 @@ describe("startTrial", () => {
 		);
 	});
 
-	it("switches enforcement on with the row, not separately", async () => {
+	it("switches enforcement on with the row, in the same transaction", async () => {
 		// Two halves of one fact: Stripe is now billing this organization.
 		// Enforced without a row is read-only on arrival; a row without
-		// enforcement is free forever once Stripe cancels the trial.
+		// enforcement is free forever once Stripe cancels the trial. Both writes
+		// must land on the transaction's client, and neither outside it.
 		const d = deps();
 
 		await startTrial(d as never, { organizationId: "org_1" });
 
-		expect(d.db.organization.updateMany).toHaveBeenCalledWith({
+		expect(d.tx.subscription.upsert).toHaveBeenCalled();
+		expect(d.tx.organization.updateMany).toHaveBeenCalledWith({
 			where: { id: "org_1" },
 			data: { billingEnforced: true },
 		});
-		expect(d.db.$transaction).toHaveBeenCalled();
+		expect(d.db.subscription.upsert).not.toHaveBeenCalled();
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
 	});
 
 	it("switches nothing on when there was no trial to start", async () => {
@@ -182,6 +187,7 @@ describe("startTrial", () => {
 
 		await startTrial(d as never, { organizationId: "org_1" });
 
+		expect(d.tx.organization.updateMany).not.toHaveBeenCalled();
 		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
 	});
 
@@ -334,6 +340,7 @@ describe("startTrial when Stripe answers oddly", () => {
 		await expect(
 			startTrial(d as never, { organizationId: "org_1" }),
 		).resolves.toBeNull();
+		expect(d.tx.subscription.upsert).not.toHaveBeenCalled();
 		expect(d.db.subscription.upsert).not.toHaveBeenCalled();
 	});
 });
