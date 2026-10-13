@@ -56,10 +56,18 @@ linked deliberately. Passwordless answers itself, since a magic link *is* the
 proof.
 
 `User.emailVerified` becomes load-bearing, having previously been a column
-Better Auth required and nothing read. Users who already hold a `Member` row are
-backfilled as verified in a one-off migration: they are inside an organization by
-an administrator's or a tenant's decision, and demanding retroactive proof would
-lock working users out of new invitations while protecting nothing.
+Better Auth required and nothing read. Its existing values are reset to
+unverified in the migration, because every one was set from a provider's
+assertion — nothing before this release verified an address. An earlier draft
+grandfathered everybody holding a `Member` row instead, on the reasoning that
+they were inside by an administrator's or a tenant's decision. Membership is
+not proof of an address, though, and the flag would have outlived it: it
+grants invitations to other organizations, email-domain joining and account
+linking, and it would let a squatted address past the magic-link refusal
+(ADR-0010). Resetting costs little. Membership and onboarding are untouched, a
+work account on a proved domain is verified again at its next sign-in
+(ADR-0010), and anybody else confirms by mail only the first time an address
+would grant them something.
 
 This is stricter than common practice, and knowingly so. Many products trust the
 Microsoft email claim, and mostly get away with it because tenant administrators

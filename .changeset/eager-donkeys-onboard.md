@@ -17,9 +17,12 @@ An email address now grants nothing until Zemio has verified it itself
 creating an organization — but never joining by Microsoft tenant, which reads a
 signed `tid` claim rather than an address. Addresses arrive unverified whatever
 the identity provider asserts, because Better Auth's Entra provider will
-otherwise mark a personal Microsoft account verified on its own say-so. Users
-who already belong to an organization are grandfathered by the migration, so
-nobody who is already working is asked to verify.
+otherwise mark a personal Microsoft account verified on its own say-so.
+Existing addresses are reset to unverified by the migration, because nothing
+before this release verified one. Nobody loses a membership or sees onboarding
+again: work accounts on a domain their tenant has proved are verified again at
+their next sign-in (ADR-0010), and everybody else confirms by mail only when
+they next accept an invitation or create an organization.
 
 Sessions reopen in the organization the person was last working in, rather than
 whichever they joined first.
@@ -30,4 +33,6 @@ created and stay entitled, and the missing price is logged. The Stripe billing
 portal configuration must allow updating a payment method, since that is how a
 trial converts to a paid subscription. A deployment with `BILLING_ENABLED` off
 creates no Stripe objects and grants no trials; every organization stays
-entitled, as before (ADR-0001).
+entitled, as before (ADR-0001). Enable the `xms_edov` claim on the Microsoft
+app registration before deploying (see the `@zemio/web` onboarding changeset):
+without it every existing user stays unverified until they confirm by mail.

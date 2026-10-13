@@ -19,6 +19,10 @@ import type { PrismaClient } from "@zemio/db";
  * Any linked account counts: a magic-link sign-up creates no account row, so
  * an account on an unverified user can only have come from a sign-in that did
  * not prove the address.
+ *
+ * This only holds while an unproved address can never read as verified, which
+ * is why the onboarding migration resets every address that predates it
+ * rather than grandfathering members (ADR-0008).
  */
 export async function isHeldByUnprovenAccount(
 	db: PrismaClient,

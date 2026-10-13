@@ -1,5 +1,5 @@
--- Onboarding: joining rules, remembered active organization, and the
--- grandfathering that ADR-0008 depends on.
+-- Onboarding: joining rules, remembered active organization, and a reset of
+-- every address to unverified, since none was verified by Zemio (ADR-0008).
 --
 -- Behaviour-preserving for existing deployments. Every organization that had a
 -- Microsoft tenant configured gets an equivalent AUTO_JOIN rule before the
@@ -53,11 +53,16 @@ CREATE INDEX "user_lastActiveOrganizationId_idx" ON "user"("lastActiveOrganizati
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_lastActiveOrganizationId_fkey" FOREIGN KEY ("lastActiveOrganizationId") REFERENCES "organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- Grandfather everyone who is already a member of an organization (ADR-0008).
--- They are inside by an administrator's or a tenant's decision; demanding
--- retroactive proof of an address would lock working users out of their next
--- invitation while protecting nothing.
-UPDATE "user"
-SET "emailVerified" = true
-WHERE "emailVerified" = false
-  AND EXISTS (SELECT 1 FROM "member" WHERE "member"."userId" = "user"."id");
+-- Nothing before this release verified an address. Microsoft was the only way
+-- in, and Better Auth set `emailVerified` from the provider's own claims, so
+-- every `true` here is an assertion, which proves nothing (ADR-0008). Kept, it
+-- would grant invitations, email-domain joining and account linking on an
+-- address a tenant administrator could have set, and would let a squatted
+-- address past the magic-link refusal, which only looks at unverified users.
+--
+-- Reset rather than grandfathered. Membership is unaffected and onboarding is
+-- stamped complete for everybody, so nobody is stopped from working: a work
+-- account on a proved domain is verified again at its next sign-in
+-- (ADR-0010), and anybody else confirms by mail the first time an address
+-- would grant them something.
+UPDATE "user" SET "emailVerified" = false WHERE "emailVerified" = true;
