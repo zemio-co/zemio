@@ -6,4 +6,4 @@ export {
 	AppSidebar,
 	BillingBanner,
 } from "./components";
-export { useErrorDescription } from "./hooks";
+export { useErrorDescription, useSwitchOrganization } from "./hooks";

@@ -1102,6 +1102,11 @@
 			"billing": {
 				"title": "Billing",
 				"description": "Manage what your organization pays for.",
+				"open": {
+					"opening": "Opening billing …",
+					"failed": "This organization could not be opened. You may no longer be a member of it.",
+					"back": "Go to the overview"
+				},
 				"sections": {
 					"subscription": "Current subscription",
 					"tiers": "Available tiers",

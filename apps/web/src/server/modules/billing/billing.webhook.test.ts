@@ -627,6 +627,23 @@ describe("handleStripeEvent: a trial about to end", () => {
 		);
 	});
 
+	it("links to the billing of the organization the mail names", async () => {
+		// An owner of several organizations may be working in another one when
+		// they open the mail; a link to "billing" would show that one's.
+		const d = trialDeps();
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.trial_will_end"),
+		);
+
+		expect(sendTrialEnding).toHaveBeenCalledWith(
+			expect.objectContaining({
+				billingUrl: "https://zemio.test/settings/billing/org_1",
+			}),
+		);
+	});
+
 	it("does not warn twice when Stripe redelivers the event", async () => {
 		const d = trialDeps();
 

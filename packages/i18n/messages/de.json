@@ -1102,6 +1102,11 @@
 			"billing": {
 				"title": "Abrechnung",
 				"description": "Verwalte das Abonnement deiner Organisation.",
+				"open": {
+					"opening": "Abrechnung wird geöffnet …",
+					"failed": "Diese Organisation konnte nicht geöffnet werden. Du bist dort möglicherweise kein Mitglied mehr.",
+					"back": "Zur Übersicht"
+				},
 				"sections": {
 					"subscription": "Aktuelles Abonnement",
 					"tiers": "Verfügbare Tarife",

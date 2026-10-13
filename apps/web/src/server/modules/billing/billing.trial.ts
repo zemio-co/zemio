@@ -206,7 +206,11 @@ export async function notifyTrialEnding(
 		const result = await getEmailer().sendTrialEnding({
 			to: contact.ownerEmail,
 			organizationName: contact.organizationName,
-			billingUrl: absoluteUrl(ROUTES.SETTINGS_ORG_BILLING()),
+			// The organization named in the mail, not whichever one the owner
+			// happens to be working in when they open it.
+			billingUrl: absoluteUrl(
+				ROUTES.SETTINGS_ORGANIZATION_BILLING(organizationId),
+			),
 		});
 
 		logSend("email.trial_ending", result, { organizationId });

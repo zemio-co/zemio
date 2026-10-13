@@ -11,6 +11,10 @@ export const ROUTES = {
 	SETTINGS_ORG_ALLOWANCES: () => "/settings/org/allowances",
 	SETTINGS_ORG_COST_UNITS: () => "/settings/org/cost-units",
 	SETTINGS_ORG_BILLING: () => "/settings/org/billing",
+	/** One named organization's billing, switching to it first. For links sent
+	 * outside a session, such as mail, which cannot know the active one. */
+	SETTINGS_ORGANIZATION_BILLING: (organizationId: string) =>
+		`/settings/billing/${encodeURIComponent(organizationId)}`,
 	// ======= ADMIN SETTINGS =========================================
 	SETTINGS_ADMIN_ORGS: () => "/settings/admin/orgs",
 	SETTINGS_ADMIN_ORG_DETAILS: (id: string) => `/settings/admin/orgs/${id}`,
