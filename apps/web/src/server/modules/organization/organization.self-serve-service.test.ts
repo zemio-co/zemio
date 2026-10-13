@@ -282,6 +282,44 @@ describe("createSelfServeOrganization under concurrency", () => {
 		expect(second?.[0].slug).toMatch(/^robotics-[a-z0-9]+$/);
 	});
 
+	it("retries when the loser of the race failed on the unique constraint", async () => {
+		// Both passed Better Auth's own check; the loser's insert then failed on
+		// the slug's unique key with the adapter's error, not Better Auth's code.
+		// The slug is now held by an organization this person is not in.
+		const d = deps();
+		d.createOrganization
+			.mockRejectedValueOnce(new Error("Unique constraint failed on slug"))
+			.mockResolvedValueOnce({ id: "org_new" });
+		d.db.organization.findFirst
+			.mockResolvedValueOnce(null) // the availability check: free
+			.mockResolvedValueOnce({ members: [] } as never); // after: someone else's
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
+
+		expect(d.createOrganization).toHaveBeenCalledTimes(2);
+		expect(d.createOrganization.mock.calls[1]?.[0].slug).toMatch(
+			/^robotics-[a-z0-9]+$/,
+		);
+	});
+
+	it("does not retry when the organization holding the slug is the person's own", async () => {
+		// This attempt got as far as creating it. Asking again would leave them
+		// with two organizations after an error saying they have none.
+		const d = deps();
+		d.createOrganization.mockRejectedValue(new Error("member insert failed"));
+		d.db.organization.findFirst
+			.mockResolvedValueOnce(null)
+			.mockResolvedValueOnce({ members: [{ id: "member_1" }] } as never);
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).rejects.toThrow("member insert failed");
+
+		expect(d.createOrganization).toHaveBeenCalledTimes(1);
+	});
+
 	it("reports a creation that failed for any other reason, without retrying", async () => {
 		// Asking again under a different name fixes nothing here, reports the
 		// second failure in place of the real one, and risks a second

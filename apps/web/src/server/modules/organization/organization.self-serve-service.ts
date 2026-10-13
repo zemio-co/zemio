@@ -63,19 +63,43 @@ async function availableSlug(db: PrismaClient, name: string): Promise<string> {
 }
 
 /**
- * The one failure a different slug can fix.
+ * Whether a creation failed because somebody else took the slug — the one
+ * failure a different slug can fix.
  *
- * Better Auth raises this when the slug is already held; every other failure —
- * a validation error, a refused permission, a database that is down — is
- * unchanged by asking again under another name.
+ * Better Auth reports a slug its own check found taken as
+ * `ORGANIZATION_ALREADY_EXISTS`. Two creations in the same moment both pass
+ * that check, though, and the loser fails later, on the unique constraint, as
+ * whatever error the database adapter raises — a shape this code would have to
+ * guess. So the failure is also settled by looking: if the slug is now held by
+ * an organization this person is not in, someone else took it.
+ *
+ * Held by one they *are* in means this very attempt got as far as creating it,
+ * and asking again would leave them with two. Every other failure — a
+ * validation error, a refused permission, a database that is down — is
+ * unchanged by another name. Both are left to stand.
  */
-function isSlugTaken(error: unknown): boolean {
-	if (typeof error !== "object" || error === null || !("body" in error)) {
-		return false;
+async function isSlugTakenByOthers(
+	db: PrismaClient,
+	error: unknown,
+	slug: string,
+	userId: string,
+): Promise<boolean> {
+	if (typeof error === "object" && error !== null && "body" in error) {
+		const body = (error as { body?: { code?: unknown } }).body;
+		if (body?.code === "ORGANIZATION_ALREADY_EXISTS") return true;
 	}
 
-	const body = (error as { body?: { code?: unknown } }).body;
-	return body?.code === "ORGANIZATION_ALREADY_EXISTS";
+	try {
+		const holder = await db.organization.findFirst({
+			where: { slug },
+			select: { members: { where: { userId }, select: { id: true } } },
+		});
+
+		return holder !== null && holder.members.length === 0;
+	} catch {
+		// Cannot tell, so do not guess: the original failure stands.
+		return false;
+	}
 }
 
 /**
@@ -98,14 +122,12 @@ async function createWithFreeSlug(
 	name: string,
 	userId: string,
 ): Promise<{ id: string }> {
+	const slug = await availableSlug(deps.db, name);
+
 	try {
-		return await deps.createOrganization({
-			name,
-			slug: await availableSlug(deps.db, name),
-			userId,
-		});
+		return await deps.createOrganization({ name, slug, userId });
 	} catch (error) {
-		if (!isSlugTaken(error)) throw error;
+		if (!(await isSlugTakenByOthers(deps.db, error, slug, userId))) throw error;
 
 		return deps.createOrganization({
 			name,
