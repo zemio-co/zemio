@@ -1214,6 +1214,7 @@
 				"signOutError": "Fehler beim Abmelden",
 				"orgsLoadError": "Organisationen konnten nicht geladen werden.",
 				"yourOrganizations": "Deine Organisationen",
+				"switchError": "Die Organisation konnte nicht gewechselt werden.",
 				"headerLoadError": "Aktive Organisation konnte nicht geladen werden."
 			},
 			"command": {
