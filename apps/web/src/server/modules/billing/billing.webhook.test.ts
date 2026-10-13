@@ -121,6 +121,10 @@ const SUBSCRIPTION_EVENTS = [
 
 beforeEach(() => {
 	vi.restoreAllMocks();
+	// `restoreAllMocks` only restores spies; a module-level `vi.fn` keeps its
+	// calls. Without this, an assertion that a warning was sent passes on a
+	// call an earlier test made.
+	sendTrialEnding.mockClear();
 });
 
 describe("handleStripeEvent idempotency", () => {
