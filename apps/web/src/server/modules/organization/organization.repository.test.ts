@@ -224,6 +224,26 @@ describe("organizationRepository.update", () => {
 		expect(db.$queryRaw).toHaveBeenCalled();
 	});
 
+	it("leaves the rules alone for an organization that does not exist", async () => {
+		// Nothing to lock. The update raises not-found, as it does without a
+		// tenant — rather than the rule insert failing its foreign key and
+		// reading as a conflict with records that do not exist.
+		withTransaction([]);
+		db.$queryRaw.mockResolvedValue([] as never);
+		db.organization.update.mockRejectedValue({ code: "P2025" });
+
+		await expect(
+			organizationRepository.update(db, {
+				id: "missing",
+				data: {},
+				microsoftTenantId: "TENANT_1",
+			}),
+		).rejects.toMatchObject({ code: "P2025" });
+
+		expect(db.joiningRule.findMany).not.toHaveBeenCalled();
+		expect(db.joiningRule.createMany).not.toHaveBeenCalled();
+	});
+
 	it("leaves an unchanged tenant rule where it is", async () => {
 		// Saving the profile must not churn the rule row under a new id.
 		withTransaction(["tenant_1"], "tenant_1");

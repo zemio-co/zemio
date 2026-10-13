@@ -251,29 +251,36 @@ export const organizationRepository = {
 		const desired = args.microsoftTenantId?.toLowerCase() ?? null;
 
 		return db.$transaction(async (tx) => {
-			await tx.$queryRaw`SELECT id FROM "organization" WHERE id = ${args.id} FOR UPDATE`;
+			const locked = await tx.$queryRaw<{ id: string }[]>`
+				SELECT id FROM "organization" WHERE id = ${args.id} FOR UPDATE`;
 
-			const existing = await tx.joiningRule.findMany({
-				where: { organizationId: args.id, type: "MS_TENANT" },
-				select: { value: true },
-			});
-
-			const unchanged =
-				existing.length === (desired === null ? 0 : 1) &&
-				existing.every((rule) => rule.value === desired);
-
-			if (!unchanged) {
-				// Replaced rather than edited: there is at most one, and
-				// delete-then-insert expresses "set it" and "clear it" without a
-				// three-branch upsert.
-				await tx.joiningRule.deleteMany({
+			// No row to lock means no organization. Its rules are left alone and
+			// the update below raises the same not-found as an update without a
+			// tenant does — rather than the rule insert failing its foreign key,
+			// which would read as "still referenced by other records".
+			if (locked.length > 0) {
+				const existing = await tx.joiningRule.findMany({
 					where: { organizationId: args.id, type: "MS_TENANT" },
+					select: { value: true },
 				});
 
-				if (desired) {
-					await tx.joiningRule.createMany({
-						data: [{ organizationId: args.id, ...tenantRule(desired) }],
+				const unchanged =
+					existing.length === (desired === null ? 0 : 1) &&
+					existing.every((rule) => rule.value === desired);
+
+				if (!unchanged) {
+					// Replaced rather than edited: there is at most one, and
+					// delete-then-insert expresses "set it" and "clear it" without a
+					// three-branch upsert.
+					await tx.joiningRule.deleteMany({
+						where: { organizationId: args.id, type: "MS_TENANT" },
 					});
+
+					if (desired) {
+						await tx.joiningRule.createMany({
+							data: [{ organizationId: args.id, ...tenantRule(desired) }],
+						});
+					}
 				}
 			}
 
