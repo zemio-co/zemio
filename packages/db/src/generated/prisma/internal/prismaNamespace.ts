@@ -2194,6 +2194,7 @@ export const UserScalarFieldEnum = {
   microsoftTenantId: 'microsoftTenantId',
   onboardingCompletedAt: 'onboardingCompletedAt',
   lastActiveOrganizationId: 'lastActiveOrganizationId',
+  trialClaimedAt: 'trialClaimedAt',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires'

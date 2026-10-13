@@ -27,9 +27,14 @@ they next accept an invitation or create an organization.
 Sessions reopen in the organization the person was last working in, rather than
 whichever they joined first.
 
+A person gets one trial, ever. An organization created by somebody who has
+already had theirs is created all the same, but starts read-only until it
+subscribes.
+
 **Operators:** self-serve trials need one Stripe price tagged
-`zemio_trial: "true"` in its metadata — without it organizations are still
-created and stay entitled, and the missing price is logged. The Stripe billing
+`zemio_trial: "true"` in its metadata — without it, an organization created by
+somebody who has not had their trial is still created and stays entitled, the
+missing price is logged, and the trial is not counted as used. The Stripe billing
 portal configuration must allow updating a payment method, since that is how a
 trial converts to a paid subscription. A deployment with `BILLING_ENABLED` off
 creates no Stripe objects and grants no trials; every organization stays

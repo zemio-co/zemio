@@ -65,9 +65,10 @@ _Avoid_: line item, entry, cost
 
 **Trial**:
 A fixed period during which a newly self-created organization is entitled
-without having paid and without having given a card. It ends on a date fixed
-when it starts; an organization whose trial ends without a card becomes
-**Read-Only**. Only ever an organization's first trial.
+without having paid, and without a card being required. It ends on a date
+fixed when it starts; an organization whose trial ends without a card becomes
+**Read-Only**. A person gets one trial, ever: an organization created by
+somebody who has had theirs starts without one and must subscribe.
 _Avoid_: free tier, demo, evaluation, freemium
 
 **Subscription**:

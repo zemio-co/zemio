@@ -5,7 +5,8 @@ import { createSelfServeOrganization } from "./organization.self-serve-service";
 function deps(
 	args: {
 		emailVerified?: boolean;
-		trialing?: number;
+		/** Whether this person's one trial is already claimed. */
+		trialSpent?: boolean;
 		slugTaken?: boolean;
 		trial?: { subscriptionId: string; status: string } | null;
 		startTrialThrows?: boolean;
@@ -15,7 +16,11 @@ function deps(
 	db.user.findUnique.mockResolvedValue({
 		emailVerified: args.emailVerified ?? true,
 	} as never);
-	db.member.count.mockResolvedValue((args.trialing ?? 0) as never);
+	// The claim is a conditional update: it matches the person only while their
+	// trial is unclaimed. The release that may follow reuses the same mock.
+	db.user.updateMany.mockResolvedValue({
+		count: args.trialSpent ? 0 : 1,
+	} as never);
 	db.organization.findFirst.mockResolvedValue(
 		(args.slugTaken ? { id: "org_other" } : null) as never,
 	);
@@ -61,17 +66,18 @@ describe("createSelfServeOrganization", () => {
 		expect(d.createOrganization).not.toHaveBeenCalled();
 	});
 
-	it("creates a second organization while a trial is running", async () => {
+	it("creates another organization once the person's trial is spent", async () => {
 		// Somebody genuinely running two initiatives is not turned away.
-		const d = deps({ trialing: 1 });
+		const d = deps({ trialSpent: true });
 
 		await expect(
 			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
 		).resolves.toEqual({ id: "org_new" });
 	});
 
-	it("gives that second organization no trial", async () => {
-		const d = deps({ trialing: 1 });
+	it("gives that organization no trial", async () => {
+		// One trial per person, ever: a second organization must not renew it.
+		const d = deps({ trialSpent: true });
 
 		await createSelfServeOrganization(
 			d,
@@ -82,10 +88,10 @@ describe("createSelfServeOrganization", () => {
 		expect(d.startTrial).not.toHaveBeenCalled();
 	});
 
-	it("leaves that second organization unentitled, so it can subscribe", async () => {
+	it("leaves that organization unentitled, so it can subscribe", async () => {
 		// Read-only from the start and deliberately so: a state its owner can
 		// see and act on, unlike a trial that failed to start (ADR-0009).
-		const d = deps({ trialing: 1 });
+		const d = deps({ trialSpent: true });
 
 		await createSelfServeOrganization(
 			d,
@@ -170,6 +176,85 @@ describe("createSelfServeOrganization", () => {
 			where: { id: "user_1" },
 			data: { lastActiveOrganizationId: "org_new" },
 		});
+	});
+});
+
+describe("createSelfServeOrganization: the person's one trial", () => {
+	const CLAIM = {
+		where: { id: "user_1", trialClaimedAt: null },
+		data: { trialClaimedAt: expect.any(Date) },
+	};
+
+	it("claims the trial with a conditional update before starting it", async () => {
+		// Two organizations created at once both read "no trial yet" if this
+		// were a read; exactly one conditional update matches.
+		const d = deps();
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
+		);
+
+		expect(d.db.user.updateMany).toHaveBeenNthCalledWith(1, CLAIM);
+		expect(d.db.user.updateMany.mock.invocationCallOrder[0]).toBeLessThan(
+			d.startTrial.mock.invocationCallOrder[0] ?? 0,
+		);
+	});
+
+	it("keeps the claim once the trial started", async () => {
+		const d = deps();
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
+		);
+
+		expect(d.db.user.updateMany).toHaveBeenCalledTimes(1);
+	});
+
+	it("hands the trial back when none could be started", async () => {
+		// Billing off or no tagged price is not the person having had a trial.
+		const d = deps({ trial: null });
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
+		);
+
+		const claimedAt = d.db.user.updateMany.mock.calls[0]?.[0]?.data
+			?.trialClaimedAt as Date;
+		expect(d.db.user.updateMany).toHaveBeenLastCalledWith({
+			where: { id: "user_1", trialClaimedAt: claimedAt },
+			data: { trialClaimedAt: null },
+		});
+	});
+
+	it("hands the trial back when the billing provider fails", async () => {
+		const d = deps({ startTrialThrows: true });
+
+		await createSelfServeOrganization(
+			d,
+			{ userId: "user_1" },
+			{ name: "Robotics" },
+		);
+
+		expect(d.db.user.updateMany).toHaveBeenLastCalledWith(
+			expect.objectContaining({ data: { trialClaimedAt: null } }),
+		);
+	});
+
+	it("does not fail creation when handing the trial back fails", async () => {
+		const d = deps({ trial: null });
+		d.db.user.updateMany
+			.mockResolvedValueOnce({ count: 1 } as never)
+			.mockRejectedValueOnce(new Error("write conflict"));
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
 	});
 });
 

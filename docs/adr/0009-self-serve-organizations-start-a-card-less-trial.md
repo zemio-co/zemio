@@ -38,9 +38,16 @@ Two further points, both consequences of failing open. `billingEnforced` is set
 to `true` only *after* Stripe confirms the subscription — a trial that fails to
 start leaves a working organization and a log line, never a brand-new
 organization that is read-only on arrival for a reason its owner can neither see
-nor fix. And a person may hold only one trialing organization at a time; a second
+nor fix. And a person gets one trial, ever (`User.trialClaimedAt`); a second
 organization is allowed, because people genuinely run two initiatives, but it
-starts unentitled and must subscribe.
+starts unentitled and must subscribe. An earlier draft allowed one trialing
+organization *at a time*, which let a trial be renewed indefinitely by creating
+a new organization each time the last one ended, and which two organizations
+created in the same moment could both pass. The trial is claimed with a
+conditional update before Stripe is asked for it, so exactly one of two
+concurrent requests gets it, and handed back if no trial came of it — billing
+switched off, no tagged price, Stripe failing before it created anything — so
+a failure the person never saw does not spend it.
 
 ## Consequences
 

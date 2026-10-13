@@ -4,10 +4,7 @@ import type { PrismaClient } from "@zemio/db";
 import { logger } from "@/lib/logger";
 import { createOrganizationSlug, SELF_SERVE_REFUSAL } from "@/lib/organization";
 import type { TrialStarted } from "@/server/modules/billing/billing.trial";
-import {
-	mayStartTrial,
-	refuseSelfServeCreation,
-} from "./organization.self-serve";
+import { refuseSelfServeCreation } from "./organization.self-serve";
 
 /**
  * Creating an organization for yourself.
@@ -133,26 +130,65 @@ async function enforceBilling(
 	});
 }
 
+/**
+ * Claims this person's one trial, or reports that it is spent (ADR-0009).
+ *
+ * A conditional update rather than a read followed by a decision: two
+ * organizations created in the same moment would both read "no trial yet" and
+ * both start one. Here exactly one update matches. Returns the claim's
+ * timestamp, which is what {@link releaseTrialClaim} matches on.
+ */
+async function claimTrial(
+	db: PrismaClient,
+	userId: string,
+): Promise<Date | null> {
+	const claimedAt = new Date();
+	const { count } = await db.user.updateMany({
+		where: { id: userId, trialClaimedAt: null },
+		data: { trialClaimedAt: claimedAt },
+	});
+
+	return count === 1 ? claimedAt : null;
+}
+
+/**
+ * Hands a claimed trial back when no trial came of it.
+ *
+ * Billing switched off, no price tagged as the trial tier, Stripe failing
+ * before it created anything: none of these is the person having had their
+ * trial, and keeping the claim would spend it on a failure they never saw.
+ * Matched on this claim's own timestamp, so it can only undo itself.
+ *
+ * Best-effort. A failure here costs the person their trial, not their
+ * organization, and is logged for support to undo.
+ */
+async function releaseTrialClaim(
+	db: PrismaClient,
+	userId: string,
+	claimedAt: Date,
+): Promise<void> {
+	try {
+		await db.user.updateMany({
+			where: { id: userId, trialClaimedAt: claimedAt },
+			data: { trialClaimedAt: null },
+		});
+	} catch (error) {
+		logger.error("Could not hand back a trial that never started", {
+			userId,
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
+}
+
 export async function createSelfServeOrganization(
 	deps: SelfServeDependencies,
 	actor: { userId: string },
 	input: { name: string },
 ): Promise<{ id: string }> {
-	const [user, trialingOrganizations] = await Promise.all([
-		deps.db.user.findUnique({
-			where: { id: actor.userId },
-			select: { emailVerified: true },
-		}),
-		// Owned, not merely joined: a trial belongs to whoever committed the
-		// organization to it.
-		deps.db.member.count({
-			where: {
-				userId: actor.userId,
-				role: "owner",
-				organization: { subscription: { status: "trialing" } },
-			},
-		}),
-	]);
+	const user = await deps.db.user.findUnique({
+		where: { id: actor.userId },
+		select: { emailVerified: true },
+	});
 
 	const refusal = refuseSelfServeCreation({
 		emailVerified: user?.emailVerified ?? false,
@@ -167,27 +203,37 @@ export async function createSelfServeOrganization(
 
 	const organization = await createWithFreeSlug(deps, input.name, actor.userId);
 
-	if (mayStartTrial({ trialingOrganizations })) {
+	const trialClaimedAt = await claimTrial(deps.db, actor.userId);
+
+	if (trialClaimedAt) {
 		// Starting the trial is what switches enforcement on, atomically with
 		// the subscription row it depends on. A trial that could not start —
 		// billing switched off, a Stripe outage, no price tagged as the trial
 		// tier — leaves a working organization and a log line, never a
 		// brand-new organization that is read-only for a reason its owner can
-		// neither see nor fix (ADR-0009, ADR-0001).
+		// neither see nor fix (ADR-0009, ADR-0001). `startTrial` reports a trial
+		// Stripe created as started even when recording it failed, so a throw
+		// or `null` here means no trial exists and the claim is handed back.
+		let trial: TrialStarted | null = null;
+
 		try {
-			await deps.startTrial(organization.id);
+			trial = await deps.startTrial(organization.id);
 		} catch (error) {
 			logger.error("Could not start a trial for a new organization", {
 				organizationId: organization.id,
 				error: error instanceof Error ? error.message : String(error),
 			});
 		}
+
+		if (!trial) {
+			await releaseTrialClaim(deps.db, actor.userId, trialClaimedAt);
+		}
 	} else {
-		// Their one trial is already running elsewhere. This organization is
-		// unentitled from the start and deliberately so — read-only until it
-		// subscribes, which is a state its owner can see and act on, unlike the
-		// failures above. Checkout stays open to them precisely because there is
-		// no subscription yet.
+		// Their one trial is spent. This organization is unentitled from the
+		// start and deliberately so — read-only until it subscribes, which is a
+		// state its owner can see and act on, unlike the failures above.
+		// Checkout stays open to them precisely because there is no
+		// subscription yet.
 		await enforceBilling(deps, organization.id);
 
 		logger.info("organization.created_without_trial", {

@@ -36,6 +36,13 @@ model User {
   lastActiveOrganizationId String?
   lastActiveOrganization   Organization? @relation("LastActiveOrganization", fields: [lastActiveOrganizationId], references: [id], onDelete: SetNull)
 
+  // When this person's one trial was claimed (ADR-0009). Claimed with a
+  // conditional update before the trial is started, so two organizations
+  // created in the same moment cannot both get one, and released again if no
+  // trial came of it. A person, not an organization, holds it: otherwise a
+  // trial could be renewed by creating another organization.
+  trialClaimedAt DateTime?
+
   // Banning fields required by better-auth admin plugin
   banned     Boolean?  @default(false)
   banReason  String?
