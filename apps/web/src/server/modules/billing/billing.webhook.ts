@@ -134,7 +134,19 @@ export async function handleStripeEvent(
 			event.type === "customer.subscription.trial_will_end" &&
 			subscription
 		) {
-			await warnTrialEnding(deps, subscription);
+			// Decided on the re-fetched subscription, not the event: Stripe sends
+			// this three days out and may deliver it late, by which time the trial
+			// can have converted or been cancelled. "Your trial is ending" to an
+			// owner who just paid, or whose trial already ended, is wrong news.
+			if (subscription.status === "trialing") {
+				await warnTrialEnding(deps, subscription);
+			} else {
+				logger.info("Not warning about a trial that is no longer running", {
+					eventId: event.id,
+					subscriptionId: subscription.id,
+					status: subscription.status,
+				});
+			}
 		}
 
 		return outcome;

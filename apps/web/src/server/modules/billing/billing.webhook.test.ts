@@ -576,8 +576,8 @@ describe("handleStripeEvent: a trial Zemio started", () => {
 });
 
 describe("handleStripeEvent: a trial about to end", () => {
-	function trialDeps() {
-		const d = deps({ subscription: { status: "trialing" } });
+	function trialDeps(status = "trialing") {
+		const d = deps({ subscription: { status } });
 
 		// One mock serves the customer lookup and the owner lookup both.
 		d.db.organization.findUnique.mockResolvedValue({
@@ -629,6 +629,24 @@ describe("handleStripeEvent: a trial about to end", () => {
 				organizationName: "Robotics Society",
 			}),
 		);
+	});
+
+	it.each([
+		"active",
+		"canceled",
+	])("does not warn when the trial has already become %s", async (status) => {
+		// Delivered late: the owner converted, or the trial ended. The state is
+		// still recorded; only the warning would be wrong.
+		const d = trialDeps(status);
+
+		await expect(
+			handleStripeEvent(
+				d,
+				subscriptionEvent("customer.subscription.trial_will_end"),
+			),
+		).resolves.toBe("processed");
+
+		expect(sendTrialEnding).not.toHaveBeenCalled();
 	});
 
 	it("links to the billing of the organization the mail names", async () => {
