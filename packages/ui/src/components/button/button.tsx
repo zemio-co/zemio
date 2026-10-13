@@ -25,7 +25,7 @@ const buttonVariants = cva(
 					"hover:bg-accent-700",
 				],
 				outline: [
-					"border border-base-200 bg-background",
+					"ring-1 ring-base-700/10 shadow-sm bg-background",
 					"text-base-700 [&_svg:not([class*='text-'])]:text-slate-500",
 					"hover:bg-slate-50",
 				],
