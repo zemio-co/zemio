@@ -8,7 +8,6 @@ import { type BillingBannerKind, resolveBillingBanner } from "@/lib/billing";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { useTrialDaysRemaining } from "../hooks";
 
 /**
  * How each banner looks. Read-only is the only one that reports something
@@ -30,13 +29,6 @@ const TONE = {
 		title: "text-amber-800",
 		body: "text-amber-700",
 	},
-	trial: {
-		Icon: InfoIcon,
-		container: "bg-blue-50",
-		icon: "text-blue-600",
-		title: "text-blue-800",
-		body: "text-blue-700",
-	},
 	over_seat_limit: {
 		Icon: InfoIcon,
 		container: "bg-blue-50",
@@ -44,7 +36,7 @@ const TONE = {
 		title: "text-blue-800",
 		body: "text-blue-700",
 	},
-} as const satisfies Record<BillingBannerKind, unknown>;
+} as const satisfies Record<Exclude<BillingBannerKind, "trial">, unknown>;
 
 /**
  * Tells every member of an organization when something is wrong with its
@@ -70,20 +62,14 @@ function BillingBanner({
 
 	const data = status.data;
 
-	// Read before any return, as hooks must be. During a trial the period end
-	// is when the trial ends rather than when a payment is due.
-	const trialDays = useTrialDaysRemaining(
-		data?.enabled && data.trialing && data.currentPeriodEnd
-			? new Date(data.currentPeriodEnd)
-			: null,
-	);
-
 	// Nothing to say on a deployment that does not bill, and nothing to read
 	// off the disabled branch of the status either.
 	if (!data?.enabled) return null;
 
+	// A trial is not a problem to report above the page; the sidebar keeps its
+	// countdown in view instead (`TrialSidebarNotice`).
 	const kind = resolveBillingBanner(data);
-	if (!kind) return null;
+	if (!kind || kind === "trial") return null;
 
 	const tone = TONE[kind];
 
@@ -100,18 +86,6 @@ function BillingBanner({
 		case "payment_failing":
 			title = t("paymentFailing.title");
 			description = t("paymentFailing.description");
-			break;
-		case "trial":
-			title = t("trial.title");
-			// Zero means the end has passed and Stripe has not yet said so: the
-			// trial is over, not ending today. No end date at all is a trial
-			// whose length Zemio cannot state, so it states none.
-			description =
-				trialDays === null
-					? t("trial.descriptionNoDate")
-					: trialDays === 0
-						? t("trial.descriptionEnded")
-						: t("trial.description", { days: trialDays });
 			break;
 		case "over_seat_limit":
 			title = t("overSeatLimit.title");

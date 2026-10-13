@@ -4,6 +4,7 @@ import { createAppTranslator } from "@zemio/i18n";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarHeader,
@@ -23,6 +24,7 @@ import { usePathname } from "next/navigation";
 import type React from "react";
 import { ROUTES } from "@/lib/routes";
 import { AppSidebarMenu } from "./app-sidebar-menu";
+import { TrialSidebarNotice } from "./trial-sidebar-notice";
 
 const t = createAppTranslator({ namespace: "modules.shared.sidebar" });
 
@@ -54,14 +56,18 @@ const sidebarItems = [
 ];
 
 /**
- * `isOrgAdmin` is decided by the layout rather than read here, so that the
- * administration group is in the server's HTML or absent from it — asking the
- * browser would put it in neither, and then in both.
+ * `isOrgAdmin` and `isOwner` are decided by the layout rather than read here,
+ * so that what depends on them is in the server's HTML or absent from it —
+ * asking the browser would put it in neither, and then in both.
  */
 function AppSidebar({
 	isOrgAdmin,
+	isOwner,
 	...props
-}: React.ComponentProps<typeof Sidebar> & { isOrgAdmin: boolean }) {
+}: React.ComponentProps<typeof Sidebar> & {
+	isOrgAdmin: boolean;
+	isOwner: boolean;
+}) {
 	const pathname = usePathname();
 
 	return (
@@ -89,6 +95,9 @@ function AppSidebar({
 				</SidebarGroup>
 				<SidebarAdminMenu isOrgAdmin={isOrgAdmin} pathname={pathname} />
 			</SidebarContent>
+			<SidebarFooter>
+				<TrialSidebarNotice isOwner={isOwner} />
+			</SidebarFooter>
 		</Sidebar>
 	);
 }

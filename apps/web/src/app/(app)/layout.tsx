@@ -31,15 +31,17 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 	// about what state the organization is in.
 	void api.billing.status.prefetch();
 
+	const isOwner = isOrganizationOwnerRole(role);
+
 	return (
 		<SidebarProvider>
-			<AppSidebar isOrgAdmin={isOrganizationAdminRole(role)} />
+			{/* Hydrated too: its trial notice reads the prefetched status. */}
+			<HydrateClient>
+				<AppSidebar isOrgAdmin={isOrganizationAdminRole(role)} isOwner={isOwner} />
+			</HydrateClient>
 			<div className="min-w-0 flex-1">
 				<HydrateClient>
-					<BillingBanner
-						className="mx-6 mt-6"
-						isOwner={isOrganizationOwnerRole(role)}
-					/>
+					<BillingBanner className="mx-6 mt-6" isOwner={isOwner} />
 				</HydrateClient>
 				{children}
 			</div>
