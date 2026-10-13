@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
 import { logger } from "@/lib/logger";
 import { createOrganizationSlug, SELF_SERVE_REFUSAL } from "@/lib/organization";
+import { billingRepository } from "@/server/modules/billing/billing.repository";
 import type { TrialStarted } from "@/server/modules/billing/billing.trial";
 import { refuseSelfServeCreation } from "./organization.self-serve";
 
@@ -115,22 +116,6 @@ async function createWithFreeSlug(
 }
 
 /**
- * Puts the organization under billing enforcement.
- *
- * `updateMany` rather than `update` so an organization deleted in the moment
- * between creating it and this line is a no-op rather than a throw.
- */
-async function enforceBilling(
-	deps: SelfServeDependencies,
-	organizationId: string,
-): Promise<void> {
-	await deps.db.organization.updateMany({
-		where: { id: organizationId },
-		data: { billingEnforced: true },
-	});
-}
-
-/**
  * Claims this person's one trial, or reports that it is spent (ADR-0009).
  *
  * A conditional update rather than a read followed by a decision: two
@@ -234,7 +219,7 @@ export async function createSelfServeOrganization(
 		// state its owner can see and act on, unlike the failures above.
 		// Checkout stays open to them precisely because there is no
 		// subscription yet.
-		await enforceBilling(deps, organization.id);
+		await billingRepository.setBillingEnforced(deps.db, organization.id, true);
 
 		logger.info("organization.created_without_trial", {
 			organizationId: organization.id,
