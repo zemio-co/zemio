@@ -2,6 +2,7 @@
 
 import { Button as ButtonPrimitive } from "@base-ui/react";
 import { useQueries } from "@tanstack/react-query";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@zemio/ui";
 import { formatDate, formatDistanceToNow } from "date-fns";
 import {
 	CalendarPlusIcon,
@@ -19,11 +20,6 @@ import { type ReactNode, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useDateFnsLocale } from "@/hooks/use-date-fns-locale";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

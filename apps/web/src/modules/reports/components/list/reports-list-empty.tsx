@@ -1,9 +1,8 @@
 "use client";
 
-import { Button } from "@zemio/ui";
+import { Button, SheetTrigger } from "@zemio/ui";
 import { FilterIcon, PlusIcon, TrafficConeIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { CreateReport } from "@/modules/report/components";
 

@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@zemio/ui";
+import { Button, SheetBody, SheetFooter } from "@zemio/ui";
 import { useTranslations } from "next-intl";
-import { SheetBody, SheetFooter } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function SheetFormSkeleton({ fieldCount }: { fieldCount: number }) {

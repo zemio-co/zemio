@@ -1,9 +1,13 @@
 "use client";
 
-import { Button, buttonVariants, SidebarTrigger } from "@zemio/ui";
+import {
+	Button,
+	buttonVariants,
+	SheetTrigger,
+	SidebarTrigger,
+} from "@zemio/ui";
 import { CirclePlusIcon, LifeBuoyIcon, SettingsIcon } from "lucide-react";
 import Link from "next/link";
-import { SheetTrigger } from "@/components/ui/sheet";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { CreateReport } from "@/modules/report";

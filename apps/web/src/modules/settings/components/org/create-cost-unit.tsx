@@ -25,6 +25,9 @@ import {
 	SheetFooter,
 	SheetHeader,
 	SheetTitle,
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
 } from "@zemio/ui";
 import { InfoIcon, LoaderIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -32,11 +35,6 @@ import React from "react";
 import { toast } from "sonner";
 import type z from "zod";
 import { AsyncBoundary } from "@/components/async-boundary";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import { NO_COST_UNIT_GROUP } from "@/lib/consts";
 import type { WithHandle } from "@/lib/types";

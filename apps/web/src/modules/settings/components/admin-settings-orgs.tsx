@@ -3,6 +3,12 @@
 import { useForm } from "@tanstack/react-form";
 import {
 	Button,
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 	Field,
 	FieldDescription,
 	FieldGroup,
@@ -23,14 +29,6 @@ import {
 	BoxItemLink,
 	BoxItemTitle,
 } from "@/components/box";
-import {
-	Dialog,
-	DialogContent,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { api } from "@/trpc/react";

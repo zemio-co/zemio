@@ -6,6 +6,9 @@ import {
 	InputGroupAddon,
 	InputGroupButton,
 	InputGroupTextarea,
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
 } from "@zemio/ui";
 import { format, formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
@@ -25,11 +28,6 @@ import {
 import { useTranslations } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useExpenseTypeLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { cn, formatTimeElapsed } from "@/lib/utils";
