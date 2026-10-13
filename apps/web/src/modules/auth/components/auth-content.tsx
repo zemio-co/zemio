@@ -14,8 +14,9 @@ function AuthContent({ className, ...props }: React.ComponentProps<"div">) {
 		<div className={cn("relative z-20 w-full max-w-sm", className)} {...props}>
 			<Image alt="" className="size-8" src={ZemioIcon} />
 			{/* The product name, which is a name rather than copy — the sentence
-			    under it is the part that has a language. */}
-			<p className="mt-10 font-semibold text-base-800 text-lg">Zemio</p>
+			    under it is the part that has a language. The page's heading, so
+			    assistive technology can name the page it is on. */}
+			<h1 className="mt-10 font-semibold text-base-800 text-lg">Zemio</h1>
 			<p className="mt-0.5 text-base-500 text-sm">{t("subtitle")}</p>
 
 			<AuthError className="mt-8" />

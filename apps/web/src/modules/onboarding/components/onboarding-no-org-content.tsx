@@ -9,6 +9,7 @@ import {
 	OnboardingInvitationList,
 } from "./onboarding-invitation-list";
 import { OnboardingSendVerificationButton } from "./onboarding-send-verification-button";
+import { OnboardingTitle } from "./primtives/onboarding-text";
 
 /**
  * Belonging to nothing, after having belonged to something.
@@ -43,7 +44,7 @@ async function OnboardingNoOrgContent({
 			<div className="mb-8 w-fit rounded-md bg-zinc-50 p-2 shadow-sm ring-1 ring-zinc-700/10">
 				<BuildingIcon className="size-5 text-zinc-600" />
 			</div>
-			<p className="mt-10 font-semibold text-base-800 text-lg">{t("title")}</p>
+			<OnboardingTitle className="mt-10">{t("title")}</OnboardingTitle>
 			<p className="mt-0.5 text-base-500 text-sm">
 				{t("subtitle", { email: userEmail })}
 			</p>
