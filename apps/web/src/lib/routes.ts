@@ -35,6 +35,9 @@ export const ROUTES = {
 		email
 			? `/auth/magic-link-sent?email=${encodeURIComponent(email)}`
 			: "/auth/magic-link-sent",
+	// Where the emailed link lands, and the endpoint its button then opens.
+	AUTH_MAGIC_LINK: () => "/auth/magic-link",
+	AUTH_MAGIC_LINK_VERIFY: () => "/api/auth/magic-link/verify",
 
 	// ======= ONBOARDING =============================================
 	// The flow itself, plus the page for somebody who has already been

@@ -1,1 +1,6 @@
-export { AuthContent, AuthLayout, AuthMagicLinkSent } from "./components";
+export {
+	AuthContent,
+	AuthLayout,
+	AuthMagicLinkConfirm,
+	AuthMagicLinkSent,
+} from "./components";

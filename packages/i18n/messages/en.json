@@ -1187,6 +1187,11 @@
 				"magicLinkError": "The sign-in link could not be sent",
 				"emailRequired": "Please enter a valid email address"
 			},
+			"magicLink": {
+				"title": "Sign in to zemio",
+				"body": "Confirm with one click that you want to sign in.",
+				"submit": "Sign in now"
+			},
 			"magicLinkSent": {
 				"title": "Please check your inbox",
 				"body": "We have sent a sign-in link to <address>{email}</address>. Open it to confirm your email address.",

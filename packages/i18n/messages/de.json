@@ -1187,6 +1187,11 @@
 				"magicLinkError": "Der Anmeldelink konnte nicht gesendet werden",
 				"emailRequired": "Bitte gib eine gültige E-Mail-Adresse ein"
 			},
+			"magicLink": {
+				"title": "Bei zemio anmelden",
+				"body": "Bestätige mit einem Klick, dass du dich anmelden möchtest.",
+				"submit": "Jetzt anmelden"
+			},
 			"magicLinkSent": {
 				"title": "Bitte prüfe dein Postfach",
 				"body": "Wir haben einen Anmeldelink an <address>{email}</address> gesendet. Öffne ihn, um deine E-Mail-Adresse zu bestätigen.",

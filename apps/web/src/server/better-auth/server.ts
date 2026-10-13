@@ -12,6 +12,7 @@ import { logger } from "@/lib/logger";
 import { ROUTES } from "@/lib/routes";
 import { sendOrgInvitationEmail } from "@/server/better-auth/invitations";
 import { sendMagicLinkEmail } from "@/server/better-auth/magic-link";
+import { magicLinkLandingUrl } from "@/server/better-auth/magic-link-landing";
 import {
 	decodeMicrosoftIdToken,
 	isDomainVerifiedWorkAccount,
@@ -372,7 +373,12 @@ export const auth = betterAuth({
 		magicLink({
 			expiresIn: 60 * 15,
 			sendMagicLink: async ({ email, url }) => {
-				await sendMagicLinkEmail({ to: email, signInUrl: url });
+				// To a page with a button rather than to the endpoint itself, so a
+				// mail scanner fetching the link cannot spend the token.
+				await sendMagicLinkEmail({
+					to: email,
+					signInUrl: magicLinkLandingUrl(url),
+				});
 			},
 		}),
 
