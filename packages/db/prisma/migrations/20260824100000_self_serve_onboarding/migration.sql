@@ -30,6 +30,11 @@ CREATE UNIQUE INDEX "joining_rule_organizationId_type_value_key" ON "joining_rul
 -- CreateIndex
 CREATE INDEX "joining_rule_type_value_idx" ON "joining_rule"("type", "value");
 
+-- Values are compared as stored, and lookups lowercase what they look for. An
+-- uppercase value would be a rule nothing matches, so it is refused here
+-- rather than trusted to every writer.
+ALTER TABLE "joining_rule" ADD CONSTRAINT "joining_rule_value_lowercase" CHECK ("value" = lower("value"));
+
 -- AddForeignKey
 ALTER TABLE "joining_rule" ADD CONSTRAINT "joining_rule_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 

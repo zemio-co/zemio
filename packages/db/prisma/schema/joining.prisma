@@ -38,7 +38,11 @@ model JoiningRule {
   type JoiningRuleType
 
   // What the type matches on: a tenant GUID, a domain, or a connection id.
-  // Stored lowercased, and compared as stored.
+  // Stored lowercased, and compared as stored. The database refuses anything
+  // else (`joining_rule_value_lowercase`, a CHECK constraint in the migration,
+  // which Prisma's schema cannot express): a writer that forgot to lowercase
+  // would otherwise store a rule no lookup ever matches, and case variants of
+  // one value would both pass the unique index.
   value String
 
   mode JoiningRuleMode @default(AUTO_JOIN)
