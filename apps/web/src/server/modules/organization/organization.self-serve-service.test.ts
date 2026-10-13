@@ -246,6 +246,31 @@ describe("createSelfServeOrganization: the person's one trial", () => {
 		);
 	});
 
+	it("does not fail creation when claiming the trial fails", async () => {
+		// The organization already exists. Reporting this as a failed creation
+		// would have the person create a second one.
+		const d = deps();
+		d.db.user.updateMany.mockRejectedValue(new Error("connection reset"));
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
+
+		// Treated like a trial that could not start: no trial, and no
+		// enforcement either, so the new organization works (ADR-0009).
+		expect(d.startTrial).not.toHaveBeenCalled();
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("does not fail creation when switching enforcement on fails", async () => {
+		const d = deps({ trialSpent: true });
+		d.db.organization.updateMany.mockRejectedValue(new Error("connection reset"));
+
+		await expect(
+			createSelfServeOrganization(d, { userId: "user_1" }, { name: "Robotics" }),
+		).resolves.toEqual({ id: "org_new" });
+	});
+
 	it("does not fail creation when handing the trial back fails", async () => {
 		const d = deps({ trial: null });
 		d.db.user.updateMany

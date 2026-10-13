@@ -187,6 +187,75 @@ async function releaseTrialClaim(
 	}
 }
 
+/**
+ * Decides whether a just-created organization gets the person's trial, and
+ * never throws.
+ *
+ * Everything here runs after the organization exists. A failure surfacing as
+ * an error would tell the person that creating it failed, and they would
+ * create a second one. So every failure fails open, as a trial that cannot
+ * start always has: a working organization without a trial and a log line,
+ * never a brand-new organization that is read-only for a reason its owner can
+ * neither see nor fix (ADR-0009, ADR-0001).
+ */
+async function settleTrial(
+	deps: SelfServeDependencies,
+	organizationId: string,
+	userId: string,
+): Promise<void> {
+	let trialClaimedAt: Date | null;
+
+	try {
+		trialClaimedAt = await claimTrial(deps.db, userId);
+	} catch (error) {
+		// Whether the claim landed is unknown; the trial is not started either
+		// way. At worst the person's trial is spent on an organization without
+		// one, which support can undo — never two trials.
+		logger.error("Could not claim a trial for a new organization", {
+			organizationId,
+			userId,
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return;
+	}
+
+	if (trialClaimedAt) {
+		// Starting the trial is what switches enforcement on, atomically with
+		// the subscription row it depends on. `startTrial` reports a trial
+		// Stripe created as started even when recording it failed, so a throw
+		// or `null` here means no trial exists and the claim is handed back.
+		let trial: TrialStarted | null = null;
+
+		try {
+			trial = await deps.startTrial(organizationId);
+		} catch (error) {
+			logger.error("Could not start a trial for a new organization", {
+				organizationId,
+				error: error instanceof Error ? error.message : String(error),
+			});
+		}
+
+		if (!trial) await releaseTrialClaim(deps.db, userId, trialClaimedAt);
+		return;
+	}
+
+	// Their one trial is spent. This organization is unentitled from the start
+	// and deliberately so — read-only until it subscribes, which is a state its
+	// owner can see and act on, unlike the failures above. Checkout stays open
+	// to them precisely because there is no subscription yet.
+	try {
+		await billingRepository.setBillingEnforced(deps.db, organizationId, true);
+	} catch (error) {
+		logger.error("Could not put a trial-less organization under enforcement", {
+			organizationId,
+			error: error instanceof Error ? error.message : String(error),
+		});
+		return;
+	}
+
+	logger.info("organization.created_without_trial", { organizationId, userId });
+}
+
 export async function createSelfServeOrganization(
 	deps: SelfServeDependencies,
 	actor: { userId: string },
@@ -210,44 +279,7 @@ export async function createSelfServeOrganization(
 
 	const organization = await createWithFreeSlug(deps, input.name, actor.userId);
 
-	const trialClaimedAt = await claimTrial(deps.db, actor.userId);
-
-	if (trialClaimedAt) {
-		// Starting the trial is what switches enforcement on, atomically with
-		// the subscription row it depends on. A trial that could not start —
-		// billing switched off, a Stripe outage, no price tagged as the trial
-		// tier — leaves a working organization and a log line, never a
-		// brand-new organization that is read-only for a reason its owner can
-		// neither see nor fix (ADR-0009, ADR-0001). `startTrial` reports a trial
-		// Stripe created as started even when recording it failed, so a throw
-		// or `null` here means no trial exists and the claim is handed back.
-		let trial: TrialStarted | null = null;
-
-		try {
-			trial = await deps.startTrial(organization.id);
-		} catch (error) {
-			logger.error("Could not start a trial for a new organization", {
-				organizationId: organization.id,
-				error: error instanceof Error ? error.message : String(error),
-			});
-		}
-
-		if (!trial) {
-			await releaseTrialClaim(deps.db, actor.userId, trialClaimedAt);
-		}
-	} else {
-		// Their one trial is spent. This organization is unentitled from the
-		// start and deliberately so — read-only until it subscribes, which is a
-		// state its owner can see and act on, unlike the failures above.
-		// Checkout stays open to them precisely because there is no
-		// subscription yet.
-		await billingRepository.setBillingEnforced(deps.db, organization.id, true);
-
-		logger.info("organization.created_without_trial", {
-			organizationId: organization.id,
-			userId: actor.userId,
-		});
-	}
+	await settleTrial(deps, organization.id, actor.userId);
 
 	// So the next session opens here rather than in whichever organization they
 	// happened to join first. Best-effort: the organization exists and its
