@@ -1,5 +1,11 @@
 # @zemio/ui
 
+## 0.1.1
+
+### Patch Changes
+
+- [#198](https://github.com/zemio-co/zemio/pull/198) [`daee3f3`](https://github.com/zemio-co/zemio/commit/daee3f35cc24a2fcef864e2be34ae9cc9bc8c4dc) Thanks [@chris23lngr](https://github.com/chris23lngr)! - refactor(ui): take every UI primitive from @zemio/ui
+
 ## 0.1.0
 
 ### Minor Changes
