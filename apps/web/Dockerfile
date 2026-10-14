@@ -103,6 +103,11 @@ ENV HOSTNAME=0.0.0.0
 # and resolves one relative to HOME. Without it the agent refuses to start with
 # "No viable working directory path found" — the app itself serves fine, so the
 # only symptom is that no monitoring data ever arrives.
+# Coolify's container healthcheck shells out to curl (falling back to wget);
+# the slim base ships neither, so every check fails and the deploy rolls back.
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system --gid 1001 nodejs && \
     useradd --system --uid 1001 --gid nodejs --create-home nextjs
 
