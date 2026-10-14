@@ -2,6 +2,8 @@
 
 import { useForm } from "@tanstack/react-form";
 import {
+	Avatar,
+	AvatarImage,
 	Field,
 	FieldContent,
 	FieldDescription,
@@ -15,7 +17,6 @@ import type React from "react";
 import { toast } from "sonner";
 import z from "zod";
 import { useSaveBar } from "@/components/save-bar";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import {

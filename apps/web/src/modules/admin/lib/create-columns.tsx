@@ -2,7 +2,12 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import type { CostUnit, User } from "@zemio/db";
-import { DataGridColumnHeader } from "@zemio/ui";
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
+	DataGridColumnHeader,
+} from "@zemio/ui";
 import { format } from "date-fns";
 import {
 	ALargeSmallIcon,
@@ -16,7 +21,6 @@ import {
 import Link from "next/link";
 import type { useTranslations } from "next-intl";
 import type { FilterOption } from "@/components/data/filter-types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import { reportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";

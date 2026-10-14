@@ -1,12 +1,11 @@
 "use client";
 
 import type { Report as ReportPrimitive } from "@zemio/db";
+import { buttonVariants, Skeleton } from "@zemio/ui";
 import { format } from "date-fns";
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { reportStatusKeys } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";

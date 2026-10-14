@@ -1,9 +1,9 @@
 "use client";
 
+import { Button } from "@zemio/ui";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/lib/consts";
 import { OnboardingSendVerificationButton } from "@/modules/onboarding";
 import { authClient } from "@/server/better-auth/client";

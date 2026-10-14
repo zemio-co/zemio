@@ -2,6 +2,7 @@
 
 import { Separator } from "@base-ui/react";
 import { createAppTranslator } from "@zemio/i18n";
+import { Avatar, AvatarFallback, AvatarImage, Skeleton } from "@zemio/ui";
 import {
 	ArrowLeftIcon,
 	BellIcon,
@@ -18,8 +19,6 @@ import { useTranslations } from "next-intl";
 import type React from "react";
 import { useEffect, useState } from "react";
 import * as SidebarPrimitive from "@/components/settings-sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/server/better-auth/client";

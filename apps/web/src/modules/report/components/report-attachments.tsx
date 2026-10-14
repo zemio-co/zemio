@@ -1,10 +1,9 @@
 "use client";
 
+import { Button, Skeleton } from "@zemio/ui";
 import { DownloadIcon, FileIcon, TrashIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatBytes } from "@/lib/utils";
 import { api, type RouterOutputs } from "@/trpc/react";
 

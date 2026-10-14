@@ -2,6 +2,19 @@
 
 import { NumberField } from "@base-ui/react";
 import { useForm } from "@tanstack/react-form";
+import {
+	Button,
+	Field,
+	FieldDescription,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+	InputGroup,
+	InputGroupAddon,
+	InputGroupInput,
+	InputGroupText,
+	Switch,
+} from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -11,21 +24,6 @@ import {
 	BoxItemDescription,
 	BoxItemTitle,
 } from "@/components/box";
-import { Button } from "@/components/ui/button";
-import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-} from "@/components/ui/field";
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupInput,
-	InputGroupText,
-} from "@/components/ui/input-group";
-import { Switch } from "@/components/ui/switch";
 import {
 	updateMealAllowancesSchema,
 	updateTravelAllowancesSchema,

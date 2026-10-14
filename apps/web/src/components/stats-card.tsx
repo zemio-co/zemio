@@ -1,5 +1,5 @@
+import { Card, CardContent, CardDescription, CardTitle } from "@zemio/ui";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardDescription, CardTitle } from "./ui/card";
 
 export function StatsCard({
 	children,

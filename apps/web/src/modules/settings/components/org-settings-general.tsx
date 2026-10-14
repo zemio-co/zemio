@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +11,6 @@ import {
 	BoxItemDescription,
 	BoxItemTitle,
 } from "@/components/box";
-import { Input } from "@/components/ui/input";
 import { api } from "@/trpc/react";
 
 function useDebounce<T>(value: T, delay: number): T {

@@ -13,6 +13,15 @@ export {
 	AlertDialogTrigger,
 } from "./alert-dialog";
 export {
+	Avatar,
+	AvatarBadge,
+	AvatarFallback,
+	AvatarGroup,
+	AvatarGroupCount,
+	AvatarImage,
+} from "./avatar";
+export { Badge, badgeVariants } from "./badge";
+export {
 	Breadcrumb,
 	BreadcrumbEllipsis,
 	BreadcrumbItem,
@@ -28,7 +37,44 @@ export {
 	ButtonGroupText,
 	buttonGroupVariants,
 } from "./button-group";
+export { Calendar, CalendarDayButton } from "./calendar";
+export {
+	Card,
+	CardAction,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "./card";
+export type { ChartConfig } from "./chart";
+export {
+	ChartContainer,
+	ChartLegend,
+	ChartLegendContent,
+	ChartStyle,
+	ChartTooltip,
+	ChartTooltipContent,
+} from "./chart";
 export { Checkbox } from "./checkbox";
+export {
+	Combobox,
+	ComboboxChip,
+	ComboboxChips,
+	ComboboxChipsInput,
+	ComboboxCollection,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxGroup,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxLabel,
+	ComboboxList,
+	ComboboxSeparator,
+	ComboboxTrigger,
+	ComboboxValue,
+	useComboboxAnchor,
+} from "./combobox";
 export {
 	DataGridColumnHeader,
 	Grid,
@@ -77,10 +123,19 @@ export {
 	DropdownMenuTrigger,
 } from "./dropdown-menu";
 export {
+	Empty,
+	EmptyContent,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyMedia,
+	EmptyTitle,
+} from "./empty";
+export {
 	Field,
 	FieldContent,
 	FieldDescription,
 	FieldError,
+	FieldErrorFormatProvider,
 	FieldGroup,
 	FieldLabel,
 	FieldLegend,
@@ -97,7 +152,21 @@ export {
 	InputGroupText,
 	InputGroupTextarea,
 } from "./input-group";
+export { Kbd, KbdGroup } from "./kbd";
 export { Label } from "./label";
+export {
+	NativeSelect,
+	NativeSelectOptGroup,
+	NativeSelectOption,
+} from "./native-select";
+export {
+	Popover,
+	PopoverContent,
+	PopoverDescription,
+	PopoverHeader,
+	PopoverTitle,
+	PopoverTrigger,
+} from "./popover";
 export {
 	Properties,
 	PropertiesLabel,
@@ -106,6 +175,7 @@ export {
 	PropertyLabel,
 	PropertyValue,
 } from "./properties";
+export { RadioGroup, RadioGroupItem } from "./radio-group";
 export { ScrollArea, ScrollBar } from "./scroll-area";
 export {
 	Select,
@@ -169,6 +239,13 @@ export {
 	TableHeader,
 	TableRow,
 } from "./table";
+export {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+	tabsListVariants,
+} from "./tabs";
 export { Textarea } from "./textarea";
 export {
 	Tooltip,

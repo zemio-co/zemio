@@ -1,12 +1,17 @@
 "use client";
 
+import {
+	Button,
+	Kbd,
+	KbdGroup,
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@zemio/ui";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { Kbd, KbdGroup } from "./ui/kbd";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export function ThemeToggle({ ...props }: React.ComponentProps<typeof Button>) {
 	const t = useTranslations("modules.shared.themeToggle");
