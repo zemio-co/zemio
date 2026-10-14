@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldErrorFormatProvider } from "@zemio/ui";
+import { FieldErrorFormatProvider, TooltipProvider } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -21,7 +21,11 @@ export function Providers({
 				forcedTheme="light"
 				{...props}
 			>
-				<ValidationMessages>{children}</ValidationMessages>
+				{/* One provider for every tooltip: they open without delay, and once
+				    one is open its neighbours open instantly too. */}
+				<TooltipProvider>
+					<ValidationMessages>{children}</ValidationMessages>
+				</TooltipProvider>
 			</NextThemesProvider>
 		</NuqsAdapter>
 	);
