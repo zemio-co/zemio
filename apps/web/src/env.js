@@ -130,18 +130,6 @@ export const env = createEnv({
 		BETTER_AUTH_URL: z.url(),
 
 		/**
-		 * Superuser ID override
-		 * When set, takes precedence over config.ts app.superuserId
-		 */
-		SUPERUSER_ID: z.string().optional(),
-
-		/**
-		 * Microsoft tenant ID override
-		 * When set, takes precedence over config.ts auth.microsoft.tenantId
-		 */
-		MICROSOFT_TENANT_ID: z.string(),
-
-		/**
 		 * Microsoft client ID override
 		 * When set, takes precedence over config.ts auth.microsoft.clientId
 		 */
@@ -304,8 +292,6 @@ export const env = createEnv({
 		// Optional overrides
 		DATABASE_URL: process.env.DATABASE_URL,
 		BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-		SUPERUSER_ID: process.env.SUPERUSER_ID,
-		MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
 		MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
 		STORAGE_HOST: process.env.STORAGE_HOST,
 		STORAGE_REGION: process.env.STORAGE_REGION,
