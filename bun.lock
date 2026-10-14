@@ -270,7 +270,7 @@
         "react": "^19",
         "react-day-picker": "^9.13.0",
         "react-dom": "^19",
-        "recharts": "3.8.0",
+        "recharts": "^3.8.0",
       },
     },
   },
