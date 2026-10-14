@@ -32,7 +32,6 @@ import * as organizationAc from "./ac/organization";
 
 // Get configuration values
 const authUrl = env.BETTER_AUTH_URL;
-const _microsoftTenantId = env.MICROSOFT_TENANT_ID;
 const microsoftClientId = env.MICROSOFT_CLIENT_ID;
 
 /** The tenant recorded on a user by a previous login, if any. */
