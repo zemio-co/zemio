@@ -135,6 +135,7 @@ export {
 	FieldContent,
 	FieldDescription,
 	FieldError,
+	FieldErrorFormatProvider,
 	FieldGroup,
 	FieldLabel,
 	FieldLegend,
