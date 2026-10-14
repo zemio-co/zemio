@@ -34,6 +34,9 @@ export type UserMinAggregateOutputType = {
   updatedAt: Date | null
   role: string | null
   microsoftTenantId: string | null
+  onboardingCompletedAt: Date | null
+  lastActiveOrganizationId: string | null
+  trialClaimedAt: Date | null
   banned: boolean | null
   banReason: string | null
   banExpires: Date | null
@@ -49,6 +52,9 @@ export type UserMaxAggregateOutputType = {
   updatedAt: Date | null
   role: string | null
   microsoftTenantId: string | null
+  onboardingCompletedAt: Date | null
+  lastActiveOrganizationId: string | null
+  trialClaimedAt: Date | null
   banned: boolean | null
   banReason: string | null
   banExpires: Date | null
@@ -64,6 +70,9 @@ export type UserCountAggregateOutputType = {
   updatedAt: number
   role: number
   microsoftTenantId: number
+  onboardingCompletedAt: number
+  lastActiveOrganizationId: number
+  trialClaimedAt: number
   banned: number
   banReason: number
   banExpires: number
@@ -81,6 +90,9 @@ export type UserMinAggregateInputType = {
   updatedAt?: true
   role?: true
   microsoftTenantId?: true
+  onboardingCompletedAt?: true
+  lastActiveOrganizationId?: true
+  trialClaimedAt?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -96,6 +108,9 @@ export type UserMaxAggregateInputType = {
   updatedAt?: true
   role?: true
   microsoftTenantId?: true
+  onboardingCompletedAt?: true
+  lastActiveOrganizationId?: true
+  trialClaimedAt?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -111,6 +126,9 @@ export type UserCountAggregateInputType = {
   updatedAt?: true
   role?: true
   microsoftTenantId?: true
+  onboardingCompletedAt?: true
+  lastActiveOrganizationId?: true
+  trialClaimedAt?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -199,6 +217,9 @@ export type UserGroupByOutputType = {
   updatedAt: Date
   role: string
   microsoftTenantId: string | null
+  onboardingCompletedAt: Date | null
+  lastActiveOrganizationId: string | null
+  trialClaimedAt: Date | null
   banned: boolean | null
   banReason: string | null
   banExpires: Date | null
@@ -235,6 +256,9 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   role?: Prisma.StringFilter<"User"> | string
   microsoftTenantId?: Prisma.StringNullableFilter<"User"> | string | null
+  onboardingCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastActiveOrganizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  trialClaimedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -243,6 +267,7 @@ export type UserWhereInput = {
   invitationsSent?: Prisma.InvitationListRelationFilter
   members?: Prisma.MemberListRelationFilter
   ownReports?: Prisma.ReportListRelationFilter
+  lastActiveOrganization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   preferences?: Prisma.XOR<Prisma.PreferencesNullableScalarRelationFilter, Prisma.PreferencesWhereInput> | null
   bankingDetails?: Prisma.BankingDetailsListRelationFilter
   legalAcceptances?: Prisma.LegalAcceptanceListRelationFilter
@@ -259,6 +284,9 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   microsoftTenantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  onboardingCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActiveOrganizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialClaimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -267,6 +295,7 @@ export type UserOrderByWithRelationInput = {
   invitationsSent?: Prisma.InvitationOrderByRelationAggregateInput
   members?: Prisma.MemberOrderByRelationAggregateInput
   ownReports?: Prisma.ReportOrderByRelationAggregateInput
+  lastActiveOrganization?: Prisma.OrganizationOrderByWithRelationInput
   preferences?: Prisma.PreferencesOrderByWithRelationInput
   bankingDetails?: Prisma.BankingDetailsOrderByRelationAggregateInput
   legalAcceptances?: Prisma.LegalAcceptanceOrderByRelationAggregateInput
@@ -286,6 +315,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   role?: Prisma.StringFilter<"User"> | string
   microsoftTenantId?: Prisma.StringNullableFilter<"User"> | string | null
+  onboardingCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastActiveOrganizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  trialClaimedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -294,6 +326,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   invitationsSent?: Prisma.InvitationListRelationFilter
   members?: Prisma.MemberListRelationFilter
   ownReports?: Prisma.ReportListRelationFilter
+  lastActiveOrganization?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   preferences?: Prisma.XOR<Prisma.PreferencesNullableScalarRelationFilter, Prisma.PreferencesWhereInput> | null
   bankingDetails?: Prisma.BankingDetailsListRelationFilter
   legalAcceptances?: Prisma.LegalAcceptanceListRelationFilter
@@ -310,6 +343,9 @@ export type UserOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   microsoftTenantId?: Prisma.SortOrderInput | Prisma.SortOrder
+  onboardingCompletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastActiveOrganizationId?: Prisma.SortOrderInput | Prisma.SortOrder
+  trialClaimedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrderInput | Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -331,6 +367,9 @@ export type UserScalarWhereWithAggregatesInput = {
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
   microsoftTenantId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  onboardingCompletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  lastActiveOrganizationId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  trialClaimedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   banned?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
   banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -346,6 +385,8 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -354,6 +395,7 @@ export type UserCreateInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -370,6 +412,9 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -394,6 +439,8 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -402,6 +449,7 @@ export type UserUpdateInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -418,6 +466,9 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -442,6 +493,9 @@ export type UserCreateManyInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -457,6 +511,8 @@ export type UserUpdateManyMutationInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -472,6 +528,9 @@ export type UserUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -492,6 +551,9 @@ export type UserCountOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   microsoftTenantId?: Prisma.SortOrder
+  onboardingCompletedAt?: Prisma.SortOrder
+  lastActiveOrganizationId?: Prisma.SortOrder
+  trialClaimedAt?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
@@ -507,6 +569,9 @@ export type UserMaxOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   microsoftTenantId?: Prisma.SortOrder
+  onboardingCompletedAt?: Prisma.SortOrder
+  lastActiveOrganizationId?: Prisma.SortOrder
+  trialClaimedAt?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
@@ -522,9 +587,22 @@ export type UserMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   microsoftTenantId?: Prisma.SortOrder
+  onboardingCompletedAt?: Prisma.SortOrder
+  lastActiveOrganizationId?: Prisma.SortOrder
+  trialClaimedAt?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
+}
+
+export type UserListRelationFilter = {
+  every?: Prisma.UserWhereInput
+  some?: Prisma.UserWhereInput
+  none?: Prisma.UserWhereInput
+}
+
+export type UserOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type UserCreateNestedOneWithoutAuditEventsInput = {
@@ -549,12 +627,12 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
-}
-
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -611,6 +689,48 @@ export type UserUpdateOneRequiredWithoutLegalAcceptancesNestedInput = {
   upsert?: Prisma.UserUpsertWithoutLegalAcceptancesInput
   connect?: Prisma.UserWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLegalAcceptancesInput, Prisma.UserUpdateWithoutLegalAcceptancesInput>, Prisma.UserUncheckedUpdateWithoutLegalAcceptancesInput>
+}
+
+export type UserCreateNestedManyWithoutLastActiveOrganizationInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput> | Prisma.UserCreateWithoutLastActiveOrganizationInput[] | Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput | Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput[]
+  createMany?: Prisma.UserCreateManyLastActiveOrganizationInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUncheckedCreateNestedManyWithoutLastActiveOrganizationInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput> | Prisma.UserCreateWithoutLastActiveOrganizationInput[] | Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput | Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput[]
+  createMany?: Prisma.UserCreateManyLastActiveOrganizationInputEnvelope
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+}
+
+export type UserUpdateManyWithoutLastActiveOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput> | Prisma.UserCreateWithoutLastActiveOrganizationInput[] | Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput | Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutLastActiveOrganizationInput | Prisma.UserUpsertWithWhereUniqueWithoutLastActiveOrganizationInput[]
+  createMany?: Prisma.UserCreateManyLastActiveOrganizationInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutLastActiveOrganizationInput | Prisma.UserUpdateWithWhereUniqueWithoutLastActiveOrganizationInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutLastActiveOrganizationInput | Prisma.UserUpdateManyWithWhereWithoutLastActiveOrganizationInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+}
+
+export type UserUncheckedUpdateManyWithoutLastActiveOrganizationNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput> | Prisma.UserCreateWithoutLastActiveOrganizationInput[] | Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput[]
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput | Prisma.UserCreateOrConnectWithoutLastActiveOrganizationInput[]
+  upsert?: Prisma.UserUpsertWithWhereUniqueWithoutLastActiveOrganizationInput | Prisma.UserUpsertWithWhereUniqueWithoutLastActiveOrganizationInput[]
+  createMany?: Prisma.UserCreateManyLastActiveOrganizationInputEnvelope
+  set?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  disconnect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  delete?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  connect?: Prisma.UserWhereUniqueInput | Prisma.UserWhereUniqueInput[]
+  update?: Prisma.UserUpdateWithWhereUniqueWithoutLastActiveOrganizationInput | Prisma.UserUpdateWithWhereUniqueWithoutLastActiveOrganizationInput[]
+  updateMany?: Prisma.UserUpdateManyWithWhereWithoutLastActiveOrganizationInput | Prisma.UserUpdateManyWithWhereWithoutLastActiveOrganizationInput[]
+  deleteMany?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
 }
 
 export type UserCreateNestedOneWithoutMembersInput = {
@@ -679,6 +799,8 @@ export type UserCreateWithoutAuditEventsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -687,6 +809,7 @@ export type UserCreateWithoutAuditEventsInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -702,6 +825,9 @@ export type UserUncheckedCreateWithoutAuditEventsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -741,6 +867,8 @@ export type UserUpdateWithoutAuditEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -749,6 +877,7 @@ export type UserUpdateWithoutAuditEventsInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -764,6 +893,9 @@ export type UserUncheckedUpdateWithoutAuditEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -787,6 +919,8 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -794,6 +928,7 @@ export type UserCreateWithoutSessionsInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -810,6 +945,9 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -849,6 +987,8 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -856,6 +996,7 @@ export type UserUpdateWithoutSessionsInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -872,6 +1013,9 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -895,6 +1039,8 @@ export type UserCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -902,6 +1048,7 @@ export type UserCreateWithoutAccountsInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -918,6 +1065,9 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -957,6 +1107,8 @@ export type UserUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -964,6 +1116,7 @@ export type UserUpdateWithoutAccountsInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -980,6 +1133,9 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1003,6 +1159,8 @@ export type UserCreateWithoutBankingDetailsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1011,6 +1169,7 @@ export type UserCreateWithoutBankingDetailsInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
@@ -1026,6 +1185,9 @@ export type UserUncheckedCreateWithoutBankingDetailsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1065,6 +1227,8 @@ export type UserUpdateWithoutBankingDetailsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1073,6 +1237,7 @@ export type UserUpdateWithoutBankingDetailsInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
@@ -1088,6 +1253,9 @@ export type UserUncheckedUpdateWithoutBankingDetailsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1111,6 +1279,8 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1119,6 +1289,7 @@ export type UserCreateWithoutLegalAcceptancesInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
@@ -1134,6 +1305,9 @@ export type UserUncheckedCreateWithoutLegalAcceptancesInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1173,6 +1347,8 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1181,6 +1357,7 @@ export type UserUpdateWithoutLegalAcceptancesInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
@@ -1196,6 +1373,9 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1209,6 +1389,105 @@ export type UserUncheckedUpdateWithoutLegalAcceptancesInput = {
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
 }
 
+export type UserCreateWithoutLastActiveOrganizationInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: string
+  microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
+  members?: Prisma.MemberCreateNestedManyWithoutUserInput
+  ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
+  bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutLastActiveOrganizationInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: string
+  microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  invitationsSent?: Prisma.InvitationUncheckedCreateNestedManyWithoutInviterInput
+  members?: Prisma.MemberUncheckedCreateNestedManyWithoutUserInput
+  ownReports?: Prisma.ReportUncheckedCreateNestedManyWithoutOwnerInput
+  preferences?: Prisma.PreferencesUncheckedCreateNestedOneWithoutUserInput
+  bankingDetails?: Prisma.BankingDetailsUncheckedCreateNestedManyWithoutUserInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedCreateNestedManyWithoutUserInput
+  auditEvents?: Prisma.AuditEventUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutLastActiveOrganizationInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput>
+}
+
+export type UserCreateManyLastActiveOrganizationInputEnvelope = {
+  data: Prisma.UserCreateManyLastActiveOrganizationInput | Prisma.UserCreateManyLastActiveOrganizationInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserUpsertWithWhereUniqueWithoutLastActiveOrganizationInput = {
+  where: Prisma.UserWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedUpdateWithoutLastActiveOrganizationInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedCreateWithoutLastActiveOrganizationInput>
+}
+
+export type UserUpdateWithWhereUniqueWithoutLastActiveOrganizationInput = {
+  where: Prisma.UserWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLastActiveOrganizationInput, Prisma.UserUncheckedUpdateWithoutLastActiveOrganizationInput>
+}
+
+export type UserUpdateManyWithWhereWithoutLastActiveOrganizationInput = {
+  where: Prisma.UserScalarWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateManyMutationInput, Prisma.UserUncheckedUpdateManyWithoutLastActiveOrganizationInput>
+}
+
+export type UserScalarWhereInput = {
+  AND?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  OR?: Prisma.UserScalarWhereInput[]
+  NOT?: Prisma.UserScalarWhereInput | Prisma.UserScalarWhereInput[]
+  id?: Prisma.StringFilter<"User"> | string
+  name?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringFilter<"User"> | string
+  emailVerified?: Prisma.BoolFilter<"User"> | boolean
+  image?: Prisma.StringNullableFilter<"User"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  role?: Prisma.StringFilter<"User"> | string
+  microsoftTenantId?: Prisma.StringNullableFilter<"User"> | string | null
+  onboardingCompletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastActiveOrganizationId?: Prisma.StringNullableFilter<"User"> | string | null
+  trialClaimedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  banned?: Prisma.BoolNullableFilter<"User"> | boolean | null
+  banReason?: Prisma.StringNullableFilter<"User"> | string | null
+  banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+}
+
 export type UserCreateWithoutMembersInput = {
   id: string
   name: string
@@ -1219,6 +1498,8 @@ export type UserCreateWithoutMembersInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1226,6 +1507,7 @@ export type UserCreateWithoutMembersInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -1242,6 +1524,9 @@ export type UserUncheckedCreateWithoutMembersInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1281,6 +1566,8 @@ export type UserUpdateWithoutMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1288,6 +1575,7 @@ export type UserUpdateWithoutMembersInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -1304,6 +1592,9 @@ export type UserUncheckedUpdateWithoutMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1327,6 +1618,8 @@ export type UserCreateWithoutInvitationsSentInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1334,6 +1627,7 @@ export type UserCreateWithoutInvitationsSentInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -1350,6 +1644,9 @@ export type UserUncheckedCreateWithoutInvitationsSentInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1389,6 +1686,8 @@ export type UserUpdateWithoutInvitationsSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1396,6 +1695,7 @@ export type UserUpdateWithoutInvitationsSentInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -1412,6 +1712,9 @@ export type UserUncheckedUpdateWithoutInvitationsSentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1435,6 +1738,8 @@ export type UserCreateWithoutOwnReportsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1442,6 +1747,7 @@ export type UserCreateWithoutOwnReportsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   preferences?: Prisma.PreferencesCreateNestedOneWithoutUserInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
@@ -1458,6 +1764,9 @@ export type UserUncheckedCreateWithoutOwnReportsInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1497,6 +1806,8 @@ export type UserUpdateWithoutOwnReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1504,6 +1815,7 @@ export type UserUpdateWithoutOwnReportsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
@@ -1520,6 +1832,9 @@ export type UserUncheckedUpdateWithoutOwnReportsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1543,6 +1858,8 @@ export type UserCreateWithoutPreferencesInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1551,6 +1868,7 @@ export type UserCreateWithoutPreferencesInput = {
   invitationsSent?: Prisma.InvitationCreateNestedManyWithoutInviterInput
   members?: Prisma.MemberCreateNestedManyWithoutUserInput
   ownReports?: Prisma.ReportCreateNestedManyWithoutOwnerInput
+  lastActiveOrganization?: Prisma.OrganizationCreateNestedOneWithoutLastActiveForInput
   bankingDetails?: Prisma.BankingDetailsCreateNestedManyWithoutUserInput
   legalAcceptances?: Prisma.LegalAcceptanceCreateNestedManyWithoutUserInput
   auditEvents?: Prisma.AuditEventCreateNestedManyWithoutActorInput
@@ -1566,6 +1884,9 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   updatedAt?: Date | string
   role?: string
   microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  lastActiveOrganizationId?: string | null
+  trialClaimedAt?: Date | string | null
   banned?: boolean | null
   banReason?: string | null
   banExpires?: Date | string | null
@@ -1605,6 +1926,8 @@ export type UserUpdateWithoutPreferencesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1613,6 +1936,7 @@ export type UserUpdateWithoutPreferencesInput = {
   invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
   members?: Prisma.MemberUpdateManyWithoutUserNestedInput
   ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  lastActiveOrganization?: Prisma.OrganizationUpdateOneWithoutLastActiveForNestedInput
   bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
@@ -1628,6 +1952,9 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   role?: Prisma.StringFieldUpdateOperationsInput | string
   microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastActiveOrganizationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1639,6 +1966,92 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
   legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
   auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserCreateManyLastActiveOrganizationInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: string
+  microsoftTenantId?: string | null
+  onboardingCompletedAt?: Date | string | null
+  trialClaimedAt?: Date | string | null
+  banned?: boolean | null
+  banReason?: string | null
+  banExpires?: Date | string | null
+}
+
+export type UserUpdateWithoutLastActiveOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  invitationsSent?: Prisma.InvitationUpdateManyWithoutInviterNestedInput
+  members?: Prisma.MemberUpdateManyWithoutUserNestedInput
+  ownReports?: Prisma.ReportUpdateManyWithoutOwnerNestedInput
+  preferences?: Prisma.PreferencesUpdateOneWithoutUserNestedInput
+  bankingDetails?: Prisma.BankingDetailsUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLastActiveOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  invitationsSent?: Prisma.InvitationUncheckedUpdateManyWithoutInviterNestedInput
+  members?: Prisma.MemberUncheckedUpdateManyWithoutUserNestedInput
+  ownReports?: Prisma.ReportUncheckedUpdateManyWithoutOwnerNestedInput
+  preferences?: Prisma.PreferencesUncheckedUpdateOneWithoutUserNestedInput
+  bankingDetails?: Prisma.BankingDetailsUncheckedUpdateManyWithoutUserNestedInput
+  legalAcceptances?: Prisma.LegalAcceptanceUncheckedUpdateManyWithoutUserNestedInput
+  auditEvents?: Prisma.AuditEventUncheckedUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateManyWithoutLastActiveOrganizationInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  microsoftTenantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  onboardingCompletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  trialClaimedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  banned?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1745,6 +2158,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   role?: boolean
   microsoftTenantId?: boolean
+  onboardingCompletedAt?: boolean
+  lastActiveOrganizationId?: boolean
+  trialClaimedAt?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
@@ -1753,6 +2169,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   invitationsSent?: boolean | Prisma.User$invitationsSentArgs<ExtArgs>
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   ownReports?: boolean | Prisma.User$ownReportsArgs<ExtArgs>
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   bankingDetails?: boolean | Prisma.User$bankingDetailsArgs<ExtArgs>
   legalAcceptances?: boolean | Prisma.User$legalAcceptancesArgs<ExtArgs>
@@ -1770,9 +2187,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   role?: boolean
   microsoftTenantId?: boolean
+  onboardingCompletedAt?: boolean
+  lastActiveOrganizationId?: boolean
+  trialClaimedAt?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1785,9 +2206,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   updatedAt?: boolean
   role?: boolean
   microsoftTenantId?: boolean
+  onboardingCompletedAt?: boolean
+  lastActiveOrganizationId?: boolean
+  trialClaimedAt?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1800,26 +2225,34 @@ export type UserSelectScalar = {
   updatedAt?: boolean
   role?: boolean
   microsoftTenantId?: boolean
+  onboardingCompletedAt?: boolean
+  lastActiveOrganizationId?: boolean
+  trialClaimedAt?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "microsoftTenantId" | "banned" | "banReason" | "banExpires", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "microsoftTenantId" | "onboardingCompletedAt" | "lastActiveOrganizationId" | "trialClaimedAt" | "banned" | "banReason" | "banExpires", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   invitationsSent?: boolean | Prisma.User$invitationsSentArgs<ExtArgs>
   members?: boolean | Prisma.User$membersArgs<ExtArgs>
   ownReports?: boolean | Prisma.User$ownReportsArgs<ExtArgs>
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   bankingDetails?: boolean | Prisma.User$bankingDetailsArgs<ExtArgs>
   legalAcceptances?: boolean | Prisma.User$legalAcceptancesArgs<ExtArgs>
   auditEvents?: boolean | Prisma.User$auditEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
+}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  lastActiveOrganization?: boolean | Prisma.User$lastActiveOrganizationArgs<ExtArgs>
+}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -1829,6 +2262,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     invitationsSent: Prisma.$InvitationPayload<ExtArgs>[]
     members: Prisma.$MemberPayload<ExtArgs>[]
     ownReports: Prisma.$ReportPayload<ExtArgs>[]
+    lastActiveOrganization: Prisma.$OrganizationPayload<ExtArgs> | null
     preferences: Prisma.$PreferencesPayload<ExtArgs> | null
     bankingDetails: Prisma.$BankingDetailsPayload<ExtArgs>[]
     legalAcceptances: Prisma.$LegalAcceptancePayload<ExtArgs>[]
@@ -1844,6 +2278,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     updatedAt: Date
     role: string
     microsoftTenantId: string | null
+    onboardingCompletedAt: Date | null
+    lastActiveOrganizationId: string | null
+    trialClaimedAt: Date | null
     banned: boolean | null
     banReason: string | null
     banExpires: Date | null
@@ -2246,6 +2683,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   invitationsSent<T extends Prisma.User$invitationsSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$invitationsSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   members<T extends Prisma.User$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownReports<T extends Prisma.User$ownReportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownReportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  lastActiveOrganization<T extends Prisma.User$lastActiveOrganizationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lastActiveOrganizationArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   preferences<T extends Prisma.User$preferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$preferencesArgs<ExtArgs>>): Prisma.Prisma__PreferencesClient<runtime.Types.Result.GetResult<Prisma.$PreferencesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   bankingDetails<T extends Prisma.User$bankingDetailsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bankingDetailsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BankingDetailsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   legalAcceptances<T extends Prisma.User$legalAcceptancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$legalAcceptancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LegalAcceptancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2288,6 +2726,9 @@ export interface UserFieldRefs {
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly role: Prisma.FieldRef<"User", 'String'>
   readonly microsoftTenantId: Prisma.FieldRef<"User", 'String'>
+  readonly onboardingCompletedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly lastActiveOrganizationId: Prisma.FieldRef<"User", 'String'>
+  readonly trialClaimedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly banned: Prisma.FieldRef<"User", 'Boolean'>
   readonly banReason: Prisma.FieldRef<"User", 'String'>
   readonly banExpires: Prisma.FieldRef<"User", 'DateTime'>
@@ -2545,6 +2986,10 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2615,6 +3060,10 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2801,6 +3250,25 @@ export type User$ownReportsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ReportScalarFieldEnum | Prisma.ReportScalarFieldEnum[]
+}
+
+/**
+ * User.lastActiveOrganization
+ */
+export type User$lastActiveOrganizationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Organization
+   */
+  select?: Prisma.OrganizationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Organization
+   */
+  omit?: Prisma.OrganizationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrganizationInclude<ExtArgs> | null
+  where?: Prisma.OrganizationWhereInput
 }
 
 /**

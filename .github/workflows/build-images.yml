@@ -2,8 +2,8 @@ name: Build and Push Images
 
 # Builds the web and api Docker images in CI and publishes them to the GitHub
 # Container Registry. Railway deploys these prebuilt images instead of building
-# from the Dockerfile, which lets us use BuildKit secrets for the Sentry
-# source-map upload token (Railway's builder does not support secret mounts).
+# from the Dockerfile, giving a single reproducible artifact that is promoted
+# across environments.
 #
 # Pull requests into master/canary build both images without pushing, to catch
 # Docker/build breakage before merge. Pushes to master (production) / canary
@@ -79,9 +79,12 @@ jobs:
             type=sha,format=long
             type=ref,event=branch
             type=match,pattern=\w+-v(.*),group=1
-            type=raw,value=latest,enable={{is_default_branch}}
+            # Pinned to master, not {{is_default_branch}}: the production tag must
+            # not follow a change to the repo's default branch setting.
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -91,15 +94,53 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
-          # Non-sensitive Sentry coordinates.
+          # Baked into the image rather than configured per environment — see
+          # docs/deployment.md, "Build revision". Must be the real commit SHA:
+          # AppSignal opens a deploy marker when it changes, and links backtrace
+          # frames to the repo at that commit.
           build-args: |
-            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
-            SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
-            SENTRY_URL=${{ secrets.SENTRY_URL }}
-          # Sensitive token passed as a BuildKit secret (never written to an
-          # image layer).
-          secrets: |
-            sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}
+            APP_REVISION=${{ github.sha }}
+
+      # Sourcemaps ride inside the image, so they are pulled back out of the
+      # artifact that was actually published rather than rebuilt: Turbopack
+      # chunk names are not stable across builds, and maps from a second build
+      # would upload cleanly and resolve nothing.
+      #
+      # By digest, not by tag. `sha-<sha>` is written by every build of a
+      # commit, so a branch push and a tag push racing on the same commit each
+      # overwrite it — and the loser's maps describe chunk names that exist in
+      # no deployed image. The digest names the image this step's own build
+      # just pushed and nothing else can move it.
+      - name: Extract sourcemaps
+        if: github.event_name != 'pull_request' && (github.ref_name == 'canary' || github.ref_name == 'master')
+        run: |
+          image="ghcr.io/${{ github.repository_owner }}/zemio-web@${{ steps.build.outputs.digest }}"
+          docker pull -q "$image"
+          container=$(docker create "$image")
+          docker cp "$container:/app/sourcemaps" ./sourcemaps
+          docker rm -f "$container" > /dev/null
+          echo "extracted $(find ./sourcemaps -name '*.map' | wc -l) sourcemaps"
+
+      # On branch pushes, not on version tags, because the branch tags are what
+      # the services actually run: staging tracks `canary` and production
+      # tracks `master` (see docs/deployment.md, "Railway configuration"). A
+      # `web-v*` tag publishes only `sha-…` and the version, so its image is
+      # never deployed — maps taken from it would describe a build nobody runs.
+      # A `web-v*` tag still triggers the production *deploy*; it just pulls
+      # the `master` image whose maps went up when that commit was merged.
+      #
+      # Uploaded against the origin of the environment the image is headed for:
+      # AppSignal matches a map by the full URL of the minified file, so one
+      # image serving two domains needs one upload per environment.
+      - name: Upload sourcemaps to AppSignal
+        if: github.event_name != 'pull_request' && (github.ref_name == 'canary' || github.ref_name == 'master')
+        env:
+          APPSIGNAL_PUSH_API_KEY: ${{ secrets.APPSIGNAL_PUSH_API_KEY }}
+          APPSIGNAL_APP_NAME: zemio-web
+          APPSIGNAL_APP_ENV: ${{ github.ref_name == 'canary' && 'staging' || 'production' }}
+          ASSET_ORIGIN: ${{ github.ref_name == 'canary' && 'https://staging.zemio.co' || 'https://app.zemio.co' }}
+          APP_REVISION: ${{ github.sha }}
+        run: node apps/web/scripts/upload-sourcemaps.mjs ./sourcemaps
 
   build-api:
     if: github.ref_type != 'tag' || startsWith(github.ref_name, 'api-v')
@@ -127,7 +168,9 @@ jobs:
             type=sha,format=long
             type=ref,event=branch
             type=match,pattern=\w+-v(.*),group=1
-            type=raw,value=latest,enable={{is_default_branch}}
+            # Pinned to master, not {{is_default_branch}}: the production tag must
+            # not follow a change to the repo's default branch setting.
+            type=raw,value=latest,enable=${{ github.ref_name == 'master' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6

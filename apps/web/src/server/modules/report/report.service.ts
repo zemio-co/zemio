@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@zemio/db";
-import { ReportStatus } from "@zemio/db";
+import { NotificationPreference, ReportStatus } from "@zemio/db";
 import type { z } from "zod";
 import { env } from "@/env";
 import { isOrganizationAdminRole } from "@/lib/organization";
@@ -390,7 +390,8 @@ export function createReportService(deps: {
 				title: report.title,
 				ownerName: report.owner.name,
 				ownerEmail: report.owner.email,
-				ownerNotificationPref: report.owner.preferences?.notifications ?? null,
+				ownerNotificationPref:
+					report.owner.preferences?.notifications ?? NotificationPreference.ALL,
 				reviewerEmail: settings?.reviewerEmail ?? null,
 			});
 
@@ -457,7 +458,8 @@ export function createReportService(deps: {
 				status: input.status,
 				ownerName: report.owner.name,
 				ownerEmail: report.owner.email,
-				ownerNotificationPref: report.owner.preferences?.notifications ?? null,
+				ownerNotificationPref:
+					report.owner.preferences?.notifications ?? NotificationPreference.ALL,
 				notify: input.notify ?? false,
 			});
 

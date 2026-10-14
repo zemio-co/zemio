@@ -9,7 +9,5 @@ export interface Logger {
 }
 
 export interface LoggerOptions {
-	token: string | undefined;
 	service: string;
-	endpoint?: string;
 }

@@ -5,6 +5,23 @@ import {
 	Dialog as DialogPrimitive,
 } from "@base-ui/react";
 import { useQueries } from "@tanstack/react-query";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	Button,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	Skeleton,
+} from "@zemio/ui";
 import { formatDate, isSameDay } from "date-fns";
 import {
 	MoreHorizontalIcon,
@@ -16,25 +33,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useRef } from "react";
 import { toast } from "sonner";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 import { expenseTypeKeys } from "@/lib/i18n-labels";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

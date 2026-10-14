@@ -2,6 +2,26 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 /**
+ * `Name <address>` as written in `EMAIL_FROM`. Matched here so a malformed value
+ * fails at boot rather than at the first send, and exported so the one place
+ * that splits it into Scaleway's `{name, email}` uses the same rule.
+ *
+ * This only describes the shape — the captured address is checked separately
+ * below, because `a@b` and `a@-b` satisfy any pattern loose enough to accept
+ * every legal local part, and Scaleway would reject them one send at a time.
+ *
+ * The split deliberately does not happen in the schema below: `skipValidation`
+ * hands back `process.env` untouched, so a `.transform()` would be skipped along
+ * with the validation and leave a bare string behind a parsed-object type.
+ */
+export const EMAIL_FROM_PATTERN =
+	/^\s*(.+?)\s*<\s*([^\s<>@]+@[^\s<>@]+)\s*>\s*$/;
+
+/** Stated once so the schema and the split that follows it agree. */
+export const EMAIL_FROM_HINT =
+	'EMAIL_FROM must look like "zemio <noreply@send.zemio.co>"';
+
+/**
  * Environment Variables
  *
  * Validates the environment variables consumed by the web app. Secrets and
@@ -71,10 +91,15 @@ export const env = createEnv({
 		// =================================================================
 
 		/**
-		 * Resend API key for sending emails
-		 * Get this from https://resend.com/api-keys
+		 * Scaleway IAM secret key used as `X-Auth-Token` against the
+		 * Transactional Email API
 		 */
-		RESEND_API_KEY: z.string(),
+		SCALEWAY_TEM_SECRET_KEY: z.string(),
+
+		/**
+		 * Scaleway project the verified sending domain belongs to
+		 */
+		SCALEWAY_TEM_PROJECT_ID: z.string(),
 
 		// =================================================================
 		// Runtime Environment
@@ -105,18 +130,6 @@ export const env = createEnv({
 		BETTER_AUTH_URL: z.url(),
 
 		/**
-		 * Superuser ID override
-		 * When set, takes precedence over config.ts app.superuserId
-		 */
-		SUPERUSER_ID: z.string().optional(),
-
-		/**
-		 * Microsoft tenant ID override
-		 * When set, takes precedence over config.ts auth.microsoft.tenantId
-		 */
-		MICROSOFT_TENANT_ID: z.string(),
-
-		/**
 		 * Microsoft client ID override
 		 * When set, takes precedence over config.ts auth.microsoft.clientId
 		 */
@@ -141,10 +154,17 @@ export const env = createEnv({
 		STORAGE_BUCKET: z.string(),
 
 		/**
-		 * Email from address override
-		 * When set, takes precedence over config.ts email.from
+		 * Sender of every outgoing email, as `Name <address>`. The address has to
+		 * sit on a domain verified in Scaleway, so moving to another sending
+		 * domain is a change to this value rather than to the code.
 		 */
-		EMAIL_FROM: z.string().email().optional(),
+		EMAIL_FROM: z
+			.string()
+			.regex(EMAIL_FROM_PATTERN, EMAIL_FROM_HINT)
+			.refine(
+				(value) => z.email().safeParse(EMAIL_FROM_PATTERN.exec(value)?.[2]).success,
+				"EMAIL_FROM must carry a valid address on a domain verified in Scaleway",
+			),
 
 		/**
 		 * Secret key for signing banking details
@@ -164,56 +184,43 @@ export const env = createEnv({
 		INTERNAL_API_SECRET: z.string().min(32),
 
 		// =================================================================
-		// Better Stack Error Tracking
+		// AppSignal (optional — error tracking & monitoring)
 		// =================================================================
+		// Consumed by appsignal.cjs, which reads process.env directly because it
+		// runs before this module is loaded. Declared here so a typo fails the
+		// build rather than silently disabling monitoring.
 
 		/**
-		 * Telemetry API token used by the Sentry webpack plugin to upload source maps
-		 * to Better Stack Errors.
+		 * AppSignal push API key (server). Absent turns monitoring off.
 		 */
-		// Build-time only — used by the Sentry webpack plugin to upload source maps.
-		// Not required at runtime; the server must start even when these are absent.
-		SENTRY_AUTH_TOKEN: z.string().optional(),
+		APPSIGNAL_PUSH_API_KEY: z.string().min(1).optional(),
 
 		/**
-		 * Better Stack team identifier used for source map uploads.
+		 * AppSignal application name. Name + environment identify the app;
+		 * changing either creates a NEW app on appsignal.com rather than
+		 * renaming the existing one.
 		 */
-		SENTRY_ORG: z.string().optional(),
+		APPSIGNAL_APP_NAME: z.string().min(1).default("zemio-web"),
 
 		/**
-		 * Better Stack application identifier used for source map uploads.
+		 * AppSignal environment, e.g. "production" or "staging". Falls back to
+		 * NODE_ENV when unset.
 		 */
-		SENTRY_PROJECT: z.string().optional(),
+		APPSIGNAL_APP_ENV: z.string().min(1).optional(),
 
 		/**
-		 * Better Stack source map upload endpoint.
+		 * AppSignal front-end key, used by the browser SDK. Distinct from the
+		 * push API key and exposed to the browser by design; it is injected at
+		 * request time rather than inlined at build (see src/lib/runtime-env).
 		 */
-		SENTRY_URL: z.url().optional(),
-
-		// =================================================================
-		// Better Stack Runtime Error Tracking & Logging
-		// =================================================================
-		// Read at runtime (not inlined at build). The DSN is the only value
-		// exposed to the browser; it is injected into the document at request
-		// time rather than baked into the client bundle, keeping the image
-		// environment-agnostic. The source token and ingesting URL are used by
-		// the server-only logger.
+		APPSIGNAL_FRONTEND_KEY: z.string().min(1).optional(),
 
 		/**
-		 * Better Stack Errors DSN used by the Sentry SDK (server runtimes and,
-		 * via runtime injection, the browser).
+		 * Release identifier for deploy markers. Baked into the image by CI from
+		 * the commit SHA — not set per environment. Unset simply leaves errors
+		 * ungrouped by release.
 		 */
-		BETTER_STACK_DSN: z.url().optional(),
-
-		/**
-		 * Better Stack source token used by the server-side logger.
-		 */
-		BETTER_STACK_SOURCE_TOKEN: z.string().min(1).optional(),
-
-		/**
-		 * Better Stack log ingesting endpoint used by the server-side logger.
-		 */
-		BETTER_STACK_INGESTING_URL: z.url().optional(),
+		APP_REVISION: z.string().min(1).optional(),
 
 		// =================================================================
 		// Billing (optional — Zemio runs fully without it)
@@ -275,7 +282,8 @@ export const env = createEnv({
 		STORAGE_ACCESS_KEY: process.env.STORAGE_ACCESS_KEY,
 		STORAGE_SECURE: process.env.STORAGE_SECURE,
 		STORAGE_FORCE_PATH_STYLE: process.env.STORAGE_FORCE_PATH_STYLE,
-		RESEND_API_KEY: process.env.RESEND_API_KEY,
+		SCALEWAY_TEM_SECRET_KEY: process.env.SCALEWAY_TEM_SECRET_KEY,
+		SCALEWAY_TEM_PROJECT_ID: process.env.SCALEWAY_TEM_PROJECT_ID,
 		SECRET_ENCRYPTION_KEY: process.env.SECRET_ENCRYPTION_KEY,
 
 		// Runtime
@@ -284,8 +292,6 @@ export const env = createEnv({
 		// Optional overrides
 		DATABASE_URL: process.env.DATABASE_URL,
 		BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
-		SUPERUSER_ID: process.env.SUPERUSER_ID,
-		MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
 		MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
 		STORAGE_HOST: process.env.STORAGE_HOST,
 		STORAGE_REGION: process.env.STORAGE_REGION,
@@ -293,15 +299,12 @@ export const env = createEnv({
 		EMAIL_FROM: process.env.EMAIL_FROM,
 		API_URL: process.env.API_URL,
 		INTERNAL_API_SECRET: process.env.INTERNAL_API_SECRET,
-		SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-		SENTRY_ORG: process.env.SENTRY_ORG,
-		SENTRY_PROJECT: process.env.SENTRY_PROJECT,
-		SENTRY_URL: process.env.SENTRY_URL,
-
-		// Better Stack runtime error tracking & logging
-		BETTER_STACK_DSN: process.env.BETTER_STACK_DSN,
-		BETTER_STACK_SOURCE_TOKEN: process.env.BETTER_STACK_SOURCE_TOKEN,
-		BETTER_STACK_INGESTING_URL: process.env.BETTER_STACK_INGESTING_URL,
+		// AppSignal
+		APPSIGNAL_PUSH_API_KEY: process.env.APPSIGNAL_PUSH_API_KEY,
+		APPSIGNAL_APP_NAME: process.env.APPSIGNAL_APP_NAME,
+		APPSIGNAL_APP_ENV: process.env.APPSIGNAL_APP_ENV,
+		APPSIGNAL_FRONTEND_KEY: process.env.APPSIGNAL_FRONTEND_KEY,
+		APP_REVISION: process.env.APP_REVISION,
 
 		// Billing
 		BILLING_ENABLED: process.env.BILLING_ENABLED,

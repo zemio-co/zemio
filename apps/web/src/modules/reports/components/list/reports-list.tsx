@@ -14,6 +14,7 @@ import {
 	type VisibilityState,
 } from "@tanstack/react-table";
 import type { ReportStatus } from "@zemio/db";
+import { Button } from "@zemio/ui";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
@@ -23,7 +24,6 @@ import {
 	isMultiSelectFilter,
 } from "@/components/data/filter-types";
 import { List, ListItem } from "@/components/list";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { createColumns } from "./reports-list-columns";

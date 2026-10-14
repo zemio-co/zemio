@@ -1,8 +1,4 @@
 import type { Report } from "@zemio/db";
-import { format } from "date-fns";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { ReportStatusBadge } from "./report-status-badge";
 import {
 	Card,
 	CardContent,
@@ -10,7 +6,11 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "./ui/card";
+} from "@zemio/ui";
+import { format } from "date-fns";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { ReportStatusBadge } from "./report-status-badge";
 
 export function ReportCard<T extends Report>({
 	className,

@@ -2,6 +2,15 @@ import { createMockDb } from "@zemio/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { handleStripeEvent, type WebhookDependencies } from "./billing.webhook";
 
+// The trial-ending warning sends mail. Stubbed so these tests exercise the
+// webhook rather than the emailer, which has its own.
+const sendTrialEnding = vi.fn().mockResolvedValue({ ok: true, messageIds: [] });
+vi.mock("@/server/email", () => ({
+	getEmailer: () => ({ sendTrialEnding }),
+	absoluteUrl: (path: string) => `https://zemio.test${path}`,
+	logSend: () => {},
+}));
+
 /** A Stripe price carrying valid Zemio tier metadata. */
 function price(overrides: Record<string, unknown> = {}) {
 	return {
@@ -112,6 +121,10 @@ const SUBSCRIPTION_EVENTS = [
 
 beforeEach(() => {
 	vi.restoreAllMocks();
+	// `restoreAllMocks` only restores spies; a module-level `vi.fn` keeps its
+	// calls. Without this, an assertion that a warning was sent passes on a
+	// call an earlier test made.
+	sendTrialEnding.mockClear();
 });
 
 describe("handleStripeEvent idempotency", () => {
@@ -505,5 +518,191 @@ describe("handleStripeEvent unrecognised subjects", () => {
 		).resolves.toBe("ignored");
 
 		expect(d.db.subscription.upsert).not.toHaveBeenCalled();
+	});
+});
+
+describe("handleStripeEvent: a trial Zemio started", () => {
+	const ENFORCE = {
+		where: { id: "org_1" },
+		data: { billingEnforced: true },
+	};
+
+	it("switches enforcement on for the organization's own trial", async () => {
+		// The repair for a trial whose row `startTrial` could not record: left
+		// unenforced, the organization would stay entitled after Stripe cancels
+		// the card-less trial.
+		const d = deps({
+			subscription: {
+				status: "trialing",
+				metadata: { organizationId: "org_1", zemio_trial: "true" },
+			},
+		});
+
+		await expect(
+			handleStripeEvent(d, subscriptionEvent("customer.subscription.created")),
+		).resolves.toBe("processed");
+
+		expect(d.db.organization.updateMany).toHaveBeenCalledWith(ENFORCE);
+	});
+
+	it("leaves enforcement alone for a subscription that is not a Zemio trial", async () => {
+		// An organization can be exempt on purpose (ADR-0001); an ordinary
+		// subscription must not override that.
+		const d = deps({ subscription: { metadata: { organizationId: "org_1" } } });
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.created"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("leaves enforcement alone on later events for the trial", async () => {
+		// The trial metadata outlives the trial, so an exemption set by hand
+		// after it started must survive the next update.
+		const d = deps({
+			subscription: {
+				status: "active",
+				metadata: { organizationId: "org_1", zemio_trial: "true" },
+			},
+		});
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.updated"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+
+	it("leaves enforcement alone for a trial tagged for another organization", async () => {
+		const d = deps({
+			subscription: {
+				status: "trialing",
+				metadata: { organizationId: "org_other", zemio_trial: "true" },
+			},
+		});
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.created"),
+		);
+
+		expect(d.db.organization.updateMany).not.toHaveBeenCalled();
+	});
+});
+
+describe("handleStripeEvent: a trial about to end", () => {
+	function trialDeps(status = "trialing") {
+		const d = deps({ subscription: { status } });
+
+		// One mock serves the customer lookup and the owner lookup both.
+		d.db.organization.findUnique.mockResolvedValue({
+			id: "org_1",
+			name: "Robotics Society",
+			members: [{ user: { email: "owner@uni.de" } }],
+		} as never);
+
+		return d;
+	}
+
+	it("acts on the event rather than ignoring it", async () => {
+		// Unhandled, a card-less trial simply stops: the organization goes
+		// read-only mid-report having been told nothing.
+		const d = trialDeps();
+
+		await expect(
+			handleStripeEvent(
+				d,
+				subscriptionEvent("customer.subscription.trial_will_end"),
+			),
+		).resolves.toBe("processed");
+
+		expect(d.retrieve).toHaveBeenCalledWith("sub_1");
+	});
+
+	it("records the subscription's state like any other subscription event", async () => {
+		const d = trialDeps();
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.trial_will_end"),
+		);
+
+		expect(d.db.subscription.upsert).toHaveBeenCalled();
+	});
+
+	it("warns the organization's owner", async () => {
+		const d = trialDeps();
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.trial_will_end"),
+		);
+
+		expect(sendTrialEnding).toHaveBeenCalledWith(
+			expect.objectContaining({
+				to: "owner@uni.de",
+				organizationName: "Robotics Society",
+			}),
+		);
+	});
+
+	it.each([
+		"active",
+		"canceled",
+	])("does not warn when the trial has already become %s", async (status) => {
+		// Delivered late: the owner converted, or the trial ended. The state is
+		// still recorded; only the warning would be wrong.
+		const d = trialDeps(status);
+
+		await expect(
+			handleStripeEvent(
+				d,
+				subscriptionEvent("customer.subscription.trial_will_end"),
+			),
+		).resolves.toBe("processed");
+
+		expect(sendTrialEnding).not.toHaveBeenCalled();
+	});
+
+	it("links to the billing of the organization the mail names", async () => {
+		// An owner of several organizations may be working in another one when
+		// they open the mail; a link to "billing" would show that one's.
+		const d = trialDeps();
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.trial_will_end"),
+		);
+
+		expect(sendTrialEnding).toHaveBeenCalledWith(
+			expect.objectContaining({
+				billingUrl: "https://zemio.test/settings/billing/org_1",
+			}),
+		);
+	});
+
+	it("does not warn twice when Stripe redelivers the event", async () => {
+		const d = trialDeps();
+
+		await handleStripeEvent(
+			d,
+			subscriptionEvent("customer.subscription.trial_will_end"),
+		);
+		sendTrialEnding.mockClear();
+
+		d.db.processedStripeEvent.findUnique.mockResolvedValue({
+			id: "evt_1",
+		} as never);
+
+		await expect(
+			handleStripeEvent(
+				d,
+				subscriptionEvent("customer.subscription.trial_will_end"),
+			),
+		).resolves.toBe("duplicate");
+		expect(sendTrialEnding).not.toHaveBeenCalled();
 	});
 });

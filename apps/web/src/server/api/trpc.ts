@@ -122,7 +122,16 @@ const loggingMiddleware = t.middleware(async ({ next, path, type, ctx }) => {
 	} else {
 		const { code, message } = result.error;
 		if (code === "INTERNAL_SERVER_ERROR") {
-			logger.error("trpc.request", { ...base, ok: false, code, message });
+			// `errorMessage`, not `message`: on the stdout fallback path the
+			// fields are spread into the log entry, so a field called `message`
+			// would overwrite the entry's own — and `message` is the key the log
+			// drain reads as the log line (docs/deployment.md, "Log drain").
+			logger.error("trpc.request", {
+				...base,
+				ok: false,
+				code,
+				errorMessage: message,
+			});
 		} else {
 			logger.info("trpc.request", { ...base, ok: false, code });
 		}

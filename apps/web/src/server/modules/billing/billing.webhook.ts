@@ -6,6 +6,7 @@ import { isUniqueConstraintError } from "@/server/shared/errors";
 import { tierFromPrice } from "./billing.catalogue";
 import { entitlementFromStripeStatus, isEntitled } from "./billing.policy";
 import { billingRepository } from "./billing.repository";
+import { isTrialStartedFor, notifyTrialEnding } from "./billing.trial";
 
 /**
  * Keeping Zemio's copy of a subscription in step with Stripe.
@@ -58,6 +59,9 @@ function subscriptionIdFrom(event: Stripe.Event): string | null {
 		case "customer.subscription.created":
 		case "customer.subscription.updated":
 		case "customer.subscription.deleted":
+		// Three days before a trial ends. Acted on so the owner can be warned;
+		// its facts are recorded like any other subscription event.
+		case "customer.subscription.trial_will_end":
 			return event.data.object.id;
 		default:
 			return null;
@@ -103,10 +107,10 @@ export async function handleStripeEvent(
 		: null;
 
 	try {
-		return await deps.db.$transaction(async (tx) => {
+		const outcome = await deps.db.$transaction(async (tx) => {
 			const db = tx as unknown as PrismaClient;
 
-			// Every event is claimed, not just the four acted on, so the table grows
+			// Every event is claimed, not just the five acted on, so the table grows
 			// with the whole Stripe event volume — one paid checkout leaves around
 			// thirty rows. That is accepted: filtering first would save rows at the
 			// cost of the claim no longer covering every event.
@@ -121,9 +125,67 @@ export async function handleStripeEvent(
 
 			return await applyEvent(db, event, subscription);
 		});
+
+		// After the commit, never inside it: the send is slow, it can fail on
+		// its own, and rolling the claim back over a failed email would have
+		// Stripe redeliver an event whose state was already recorded.
+		if (
+			outcome === "processed" &&
+			event.type === "customer.subscription.trial_will_end" &&
+			subscription
+		) {
+			// Decided on the re-fetched subscription, not the event: Stripe sends
+			// this three days out and may deliver it late, by which time the trial
+			// can have converted or been cancelled. "Your trial is ending" to an
+			// owner who just paid, or whose trial already ended, is wrong news.
+			if (subscription.status === "trialing") {
+				await warnTrialEnding(deps, subscription);
+			} else {
+				logger.info("Not warning about a trial that is no longer running", {
+					eventId: event.id,
+					subscriptionId: subscription.id,
+					status: subscription.status,
+				});
+			}
+		}
+
+		return outcome;
 	} catch (error) {
 		if (error instanceof EventAlreadyProcessed) return "duplicate";
 		throw error;
+	}
+}
+
+/**
+ * Warns an owner that their trial is ending, without ever failing the event.
+ *
+ * Everything here runs after the commit, so the state the event describes is
+ * already recorded and claimed. A throw would answer Stripe non-2xx and ask for
+ * a redelivery that the claim then answers `duplicate` forever — reporting
+ * failure for work that succeeded, and still leaving the owner unwarned. The
+ * lookup is inside the guard for the same reason the send is.
+ */
+async function warnTrialEnding(
+	deps: WebhookDependencies,
+	subscription: Stripe.Subscription,
+): Promise<void> {
+	try {
+		const customerId = idOf(subscription.customer);
+		const organizationId = customerId
+			? await billingRepository.findOrganizationIdByStripeCustomer(
+					deps.db,
+					customerId,
+				)
+			: null;
+
+		if (organizationId) {
+			await notifyTrialEnding(deps.db, organizationId);
+		}
+	} catch (error) {
+		logger.error("Could not warn an owner that a trial is ending", {
+			subscriptionId: subscription.id,
+			error: error instanceof Error ? error.message : String(error),
+		});
 	}
 }
 
@@ -223,6 +285,22 @@ async function applyEvent(
 		tier: tier.name,
 		seatLimit: tier.seatLimit,
 	});
+
+	// A trial Zemio started is enforced from the moment it exists, and this is
+	// Stripe confirming that it does. `startTrial` normally got there first; when
+	// its own write failed after Stripe had created the subscription, this is
+	// what keeps a card-less trial from staying entitled after Stripe cancels it.
+	// Only a subscription tagged as *this* organization's trial: switching
+	// enforcement on for anything else would override an organization that is
+	// exempt on purpose (ADR-0001). Only on `created`, the event that confirms
+	// the trial exists: the metadata outlives the trial, and acting on every
+	// later update would undo an exemption set by hand after it started.
+	if (
+		event.type === "customer.subscription.created" &&
+		isTrialStartedFor(subscription, organizationId)
+	) {
+		await billingRepository.setBillingEnforced(db, organizationId, true);
+	}
 
 	return "processed";
 }

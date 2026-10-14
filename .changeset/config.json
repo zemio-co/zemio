@@ -8,6 +8,7 @@
 	"updateInternalDependencies": "patch",
 	"ignore": [
 		"@zemio/db",
+		"@zemio/email",
 		"@zemio/encryption",
 		"@zemio/logger",
 		"@zemio/typescript-config"

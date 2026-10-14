@@ -1,14 +1,10 @@
-// This file configures the initialization of Sentry on the client.
-// The added config here will be used whenever a users loads a page in their browser.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+import { plugin as windowEventsPlugin } from "@appsignal/plugin-window-events";
+import { getErrorTracker } from "@/lib/error-tracking/client";
 
-import * as Sentry from "@sentry/nextjs";
-import { getClientErrorTrackingConfig } from "@/lib/error-tracking/client";
-
-const errorTrackingConfig = getClientErrorTrackingConfig();
-
-if (errorTrackingConfig) {
-	Sentry.init(errorTrackingConfig);
+// AppSignal's browser SDK does not capture uncaught exceptions or unhandled
+// promise rejections on its own — that is what the window-events plugin adds.
+// Without it only the explicit captureError() calls would report anything.
+const tracker = getErrorTracker();
+if (tracker) {
+	tracker.use(windowEventsPlugin());
 }
-
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

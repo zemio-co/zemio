@@ -104,7 +104,7 @@ there.
 
 ## 3. Trigger each handled event
 
-Zemio acts on exactly four event types. Everything else is recorded and ignored.
+Zemio acts on exactly five event types. Everything else is recorded and ignored.
 
 | Event | How to produce it | Expect |
 | --- | --- | --- |
@@ -112,6 +112,14 @@ Zemio acts on exactly four event types. Everything else is recorded and ignored.
 | `customer.subscription.created` | `bun run scripts/billing-sandbox.ts create M` | subscription row appears |
 | `customer.subscription.updated` | `bun run scripts/billing-sandbox.ts change S` | `tier` and `seatLimit` move to S |
 | `customer.subscription.deleted` | `bun run scripts/billing-sandbox.ts cancel` | `status` becomes `canceled` |
+| `customer.subscription.trial_will_end` | `bun run scripts/billing-sandbox.ts trial-ending S` | the owner is sent the trial-ending mail |
+
+`trial-ending` starts a card-less trial that ends in a day. Stripe sends
+`trial_will_end` a configured interval before a trial ends — three days by
+default — and immediately when the trial is shorter than that, which is what
+makes the event reproducible. `cancel` it afterwards. A warning is only sent
+while the subscription is still trialing, so ending the trial early does not
+produce one.
 
 The `checkout` command needs `--conditions=react-server` because it calls the
 real `startCheckout` service, whose module graph is `server-only`. It prints a
@@ -148,7 +156,7 @@ stripe events resend evt_…
 
 The processed-event count from `show` should not move, and the subscription row
 should be untouched. Note the count grows with your whole event volume, not just
-the four handled types — one paid checkout leaves roughly thirty rows, which is
+the five handled types — one paid checkout leaves roughly thirty rows, which is
 expected.
 
 Because the claim and the write share a transaction, an event is never left
@@ -180,12 +188,14 @@ deployed Zemio needs a real endpoint, created once per Stripe account:
 
 1. Dashboard → **Developers → Webhooks → Add endpoint**.
 2. URL: `https://<your-host>/api/billing/webhook`.
-3. Subscribe it to exactly the four events Zemio handles — anything else is
+3. Subscribe it to exactly the five events Zemio handles — anything else is
    recorded and ignored:
    - `checkout.session.completed`
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
+   - `customer.subscription.trial_will_end` — without it, an owner whose
+     card-less trial is about to end is never warned
 4. Reveal the endpoint's **signing secret** and set it as
    `STRIPE_WEBHOOK_SECRET` on the deployment.
 

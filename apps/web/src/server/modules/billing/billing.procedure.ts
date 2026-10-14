@@ -6,6 +6,7 @@ import { billingConfig } from "./billing.config";
 import type { PortalDependencies } from "./billing.portal";
 import type { BillingServiceContext } from "./billing.service";
 import { getStripe } from "./billing.stripe";
+import { startTrial, type TrialStarted } from "./billing.trial";
 
 export type BillingRequestContext = {
 	db: PrismaClient;
@@ -56,4 +57,22 @@ export function toBillingDependencies(
 		// path, and Stripe would be handed `https://host//settings/...`.
 		appUrl: env.BETTER_AUTH_URL.replace(/\/+$/, ""),
 	};
+}
+
+/**
+ * Starts a trial for a newly created organization, or reports that this
+ * deployment has none to start.
+ *
+ * The whole of "a self-hosted instance has no trial" lives here (ADR-0009). No
+ * Stripe client is built, no subscription row is written, and the organization
+ * is entitled unconditionally because enforcement is never switched on for it
+ * (ADR-0001).
+ */
+export function startTrialIfBilling(
+	ctx: BillingRequestContext,
+	organizationId: string,
+): Promise<TrialStarted | null> {
+	if (!billingConfig.enabled) return Promise.resolve(null);
+
+	return startTrial({ db: ctx.db, stripe: getStripe() }, { organizationId });
 }

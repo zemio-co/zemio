@@ -1102,6 +1102,11 @@
 			"billing": {
 				"title": "Billing",
 				"description": "Manage what your organization pays for.",
+				"open": {
+					"opening": "Opening billing …",
+					"failed": "This organization could not be opened. You may no longer be a member of it.",
+					"back": "Go to the overview"
+				},
 				"sections": {
 					"subscription": "Current subscription",
 					"tiers": "Available tiers",
@@ -1166,15 +1171,37 @@
 		},
 		"auth": {
 			"content": {
-				"title": "Willkommen zurück!",
-				"subtitle": "Melde dich mit deinem Microsoft-Konto an um fortzufahren.",
-				"legal": "Mit der Erstellung eines Kontos akzeptierst du die <terms>Nutzungsbedingungen</terms> und bestätigst, die <privacy>Datenschutzerklärung</privacy> sowie die <platform>Plattformrichtlinien</platform> zur Kenntnis genommen zu haben."
+				"title": "Welcome back!",
+				"subtitle": "Sign up or log in to continue.",
+				"legal": "By creating an account, you accept the <terms>Terms of Use</terms> and confirm that you have read the <privacy>Privacy Policy</privacy> and the <platform>Platform Policies</platform>."
 			},
 			"form": {
-				"continueWithMicrosoft": "Mit Microsoft fortfahren",
-				"signInError": "Ein Fehler ist aufgetreten",
-				"signInSuccessTitle": "Anmeldung erfolgreich",
-				"signInSuccessDescription": "Du wirst in Kürze weitergeleitet"
+				"continueWithMicrosoft": "Continue with Microsoft",
+				"signInError": "Something went wrong",
+				"signInSuccessTitle": "Signed in",
+				"signInSuccessDescription": "You will be redirected shortly",
+				"emailLabel": "Email address",
+				"emailPlaceholder": "you@university.edu",
+				"continueWithEmail": "Send sign-in link",
+				"orSeparator": "or",
+				"magicLinkError": "The sign-in link could not be sent",
+				"emailRequired": "Please enter a valid email address"
+			},
+			"magicLink": {
+				"title": "Sign in to zemio",
+				"body": "Confirm with one click that you want to sign in.",
+				"submit": "Sign in now"
+			},
+			"magicLinkSent": {
+				"title": "Please check your inbox",
+				"body": "We have sent a sign-in link to <address>{email}</address>. Open it to confirm your email address.",
+				"bodyWithoutAddress": "We have sent you a sign-in link. Open it to confirm your email address.",
+				"back": "Go back"
+			},
+			"error": {
+				"accountNotLinked": "An account with this email address already exists and could not be connected to this Microsoft account. Sign in with a sign-in link to that address instead.",
+				"accountPendingVerification": "An account for this email address was created with a Microsoft account and has not been confirmed yet. Sign in with that Microsoft account and confirm your address there. If it isn't yours, please contact Zemio support.",
+				"generic": "Sign-in could not be completed. Please try again."
 			}
 		},
 		"legal": {
@@ -1182,8 +1209,9 @@
 				"version": "Version {version}"
 			},
 			"footer": {
-				"privacyPolicy": "Datenschutzerklärung",
-				"termsAndConditions": "Nutzungsbedingungen"
+				"privacyPolicy": "Privacy Policy",
+				"termsAndConditions": "Terms and Conditions",
+				"platformPolicies": "Platform Policies"
 			}
 		},
 		"shared": {
@@ -1196,6 +1224,7 @@
 				"signOutError": "Fehler beim Abmelden",
 				"orgsLoadError": "Organisationen konnten nicht geladen werden.",
 				"yourOrganizations": "Deine Organisationen",
+				"switchError": "The organization could not be switched.",
 				"headerLoadError": "Aktive Organisation konnte nicht geladen werden."
 			},
 			"command": {
@@ -1343,7 +1372,13 @@
 					"description": "New reports and expenses can be created and submitted again once the subscription has been renewed."
 				},
 				"action": "Manage billing",
-				"memberHint": "Contact your organization owner to resolve this."
+				"memberHint": "Contact your organization owner to resolve this.",
+				"trial": {
+					"title": "Trial in progress",
+					"description": "You have {days, plural, one {one day} other {# days}} left of your zemio trial. Add payment details so your organization can keep working afterwards.",
+					"descriptionEnded": "Your trial has ended. Without payment details your organization becomes read-only shortly.",
+					"descriptionNoDate": "You are trying zemio. Add payment details so your organization can keep working after the trial."
+				}
 			}
 		},
 		"preferences": {
@@ -1394,11 +1429,121 @@
 			}
 		},
 		"acceptInvitation": {
-			"title": "Einladung annehmen",
-			"description": "Du wurdest zu einer Organisation eingeladen. Bestätige den Beitritt, um fortzufahren.",
-			"acceptButton": "Einladung annehmen",
-			"acceptError": "Einladung konnte nicht angenommen werden",
-			"unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+			"title": "Accept invitation",
+			"signOutFailed": "You could not be signed out. Please try again.",
+			"description": "You have been invited to an organization. Confirm to join.",
+			"acceptButton": "Accept invitation",
+			"acceptError": "The invitation could not be accepted",
+			"unexpectedError": "An unexpected error occurred",
+			"invitedTo": "You have been invited to {organization}.",
+			"wrongAccountTitle": "This invitation belongs to a different address",
+			"wrongAccountBody": "This invitation was sent to {invited}. You are signed in as {current}.",
+			"wrongAccountHint": "Sign in as {invited} to accept it — or ask for a new invitation to {current}.",
+			"switchAccount": "Sign in with a different account",
+			"needsVerificationTitle": "Confirm your email address first",
+			"needsVerificationBody": "Before you can accept an invitation, you need to confirm that {email} belongs to you.",
+			"unavailableTitle": "This invitation is no longer valid",
+			"unavailableBody": "It has already been accepted or has expired. Ask your organization for a new invitation."
+		},
+		"noOrg": {
+			"title": "No organization yet",
+			"subtitle": "Your account ({email}) does not belong to an organization yet.",
+			"invitationsTitle": "Open invitations",
+			"invitationsHint": "Accept an invitation to join that organization.",
+			"openInvitation": "Open invitation",
+			"createTitle": "Create your own organization",
+			"createHint": "Create an organization for your initiative. You get 30 days of zemio free, with no payment details.",
+			"nameLabel": "Organization name",
+			"namePlaceholder": "e.g. Robotics Society",
+			"createButton": "Create organization",
+			"createFailed": "The organization could not be created",
+			"needsVerification": "Confirm your email address ({email}) first to create an organization.",
+			"manageOrgs": "Manage organizations",
+			"signOut": "Sign out",
+			"sendVerification": "Send confirmation email",
+			"verificationSent": "We have sent an email to {email}.",
+			"verificationFailed": "The confirmation email could not be sent"
+		},
+		"onboarding": {
+			"signOut": "Sign out",
+			"signOutFailed": "You could not be signed out. Please try again.",
+			"signedInAs": "Signed in as",
+			"confirmEmail": {
+				"title": "Confirm your email address",
+				"subtitle": "We need to confirm that {email} belongs to you before you can continue.",
+				"sendButton": "Send confirmation email",
+				"sent": "A confirmation email to {email} is on its way. If it has not arrived within a few minutes, check your spam folder or ask for another.",
+				"sendFailed": "The confirmation email could not be sent",
+				"afterHint": "Open the link in the email, then return to this page."
+			},
+			"name": {
+				"title": "What should we call you?",
+				"subtitle": "Your name appears on the reports you submit and in the emails Zemio sends about them.",
+				"label": "Full name",
+				"placeholder": "e.g. Alex Braun",
+				"submit": "Continue",
+				"required": "Please enter your name",
+				"saveFailed": "Your name could not be saved"
+			},
+			"organization": {
+				"title": "Join an organization",
+				"subtitle": "You have been invited to the following organizations.",
+				"emptyTitle": "Create your organization",
+				"emptySubtitle": "Nothing has invited you yet. Create an organization for your initiative to get started.",
+				"join": "Join",
+				"joinFailed": "You could not be added to that organization",
+				"createInstead": "Create organization instead",
+				"or": "Or"
+			},
+			"create": {
+				"title": "Create your organization",
+				"subtitle": "You become its owner. Zemio is free for 30 days, with no payment details.",
+				"nameLabel": "Organization name",
+				"namePlaceholder": "e.g. Robotics Society",
+				"nameRequired": "Please enter a name",
+				"submit": "Create organization",
+				"createFailed": "The organization could not be created",
+				"needsVerification": "Confirm your email address ({email}) first to create an organization.",
+				"back": "Back to invitations"
+			},
+			"progress": {
+				"stepOf": "Step {current} of {total}"
+			},
+			"invite": {
+				"title": "Invite your colleagues",
+				"subtitle": "They get an email with a link to {organizationName}. You can also do this later in settings.",
+				"emailPlaceholder": "colleague@university.edu",
+				"emailLabel": "Email address {number}",
+				"addAnother": "Add another address",
+				"submit": "Send invitations",
+				"skip": "Skip for now",
+				"invalidEmail": "Please enter a valid email address",
+				"inviteFailed": "The invitations could not be sent",
+				"inviteSent": "{count, plural, one {One invitation sent} other {# invitations sent}}"
+			},
+			"trial": {
+				"title": "Try Zemio free for 30 days",
+				"subtitle": "Your organization is fully usable for 30 days, with no payment details. After that you choose a tier; without one, everything already recorded stays readable and exportable.",
+				"features": {
+					"reports": "Collect expenses into reports and submit them together",
+					"receipts": "Attach receipts directly to every expense",
+					"review": "Review reports, send them back, and approve them",
+					"allowances": "Travel and meal allowances at your organization's own rates",
+					"costUnits": "Assign expenses to cost units and report on them",
+					"export": "Export reports as PDF, including the banking details for the payout"
+				},
+				"footnote": "Every tier includes the same functionality and differs only in the number of members it includes.",
+				"continue": "Continue",
+				"subscribe": {
+					"title": "Choose a tier",
+					"subtitle": "You have already used your free trial, so this organization starts read-only. Choose a tier to work in it — until then, everything recorded stays readable.",
+					"continue": "Choose a tier"
+				},
+				"ready": {
+					"title": "Your organization is ready",
+					"subtitle": "Here is what you can do with Zemio."
+				}
+			}
 		}
 	},
 	"validation": {
@@ -1427,10 +1572,10 @@
 	},
 	"emails": {
 		"shared": {
-			"supportPrompt": "Wende dich bei Fragen bitte an <email>support@zemio.co</email>.",
-			"regards": "Beste Grüße,",
-			"team": "Dein zemio Team",
-			"linkText": "hier"
+			"supportPrompt": "If you have any questions, please contact <email>support@zemio.co</email>.",
+			"regards": "Best regards,",
+			"team": "Your zemio team",
+			"linkText": "here"
 		},
 		"reportReceived": {
 			"subject": "Neuer Spesenbericht eingegangen",
@@ -1452,6 +1597,46 @@
 			"greeting": "Hallo {name},",
 			"body": "Der Status deines Spesenberichts <strong>\"{title}\"</strong> wurde zu <strong>{status}</strong> geändert. Du kannst den Bericht <link>hier</link> ansehen.",
 			"footer": "Du erhältst diese E-Mail, da du einen Spesenbericht eingereicht hast. Solltest du keinen Spesenbericht eingereicht haben, kannst du diese E-Mail ignorieren."
+		},
+		"orgInvitation": {
+			"subject": "Einladung zu {organization}",
+			"preview": "{inviter} hat dich zu {organization} eingeladen",
+			"heading": "Einladung zu {organization}",
+			"greeting": "Hallo,",
+			"body": "<strong>{inviter}</strong> hat dich zu <strong>{organization}</strong> bei zemio eingeladen.",
+			"cta": "Einladung annehmen",
+			"expiry": "Dieser Link verfällt in 48 Stunden.",
+			"footer": "Du erhältst diese E-Mail, da du zu einer Organisation in zemio eingeladen wurdest. Solltest du diese Einladung nicht erwarten, kannst du diese E-Mail ignorieren."
+		},
+		"emailVerification": {
+			"subject": "Confirm your email address",
+			"preview": "Confirm your email address for zemio",
+			"heading": "Confirm your email address",
+			"greeting": "Hello,",
+			"body": "Please confirm that this email address belongs to you. Until you do, you cannot accept an invitation or create an organization.",
+			"cta": "Confirm email address",
+			"expiry": "This link expires in 24 hours.",
+			"footer": "You are receiving this email because this address was used at zemio. If that was not you, you can ignore this email."
+		},
+		"magicLink": {
+			"subject": "Your sign-in link for zemio",
+			"preview": "Your sign-in link for zemio",
+			"heading": "Sign in to zemio",
+			"greeting": "Hello,",
+			"body": "Use the button below to sign in. Opening it also confirms that this email address belongs to you.",
+			"cta": "Sign in",
+			"expiry": "This link expires in 15 minutes and can only be used once.",
+			"footer": "You are receiving this email because a sign-in was requested for this address at zemio. If that was not you, you can ignore this email."
+		},
+		"trialEnding": {
+			"subject": "Your zemio trial ends in three days",
+			"preview": "The trial for {organization} ends in three days",
+			"heading": "The trial for {organization} is ending",
+			"greeting": "Hello,",
+			"body": "The free trial for {organization} ends in three days.",
+			"consequence": "Without payment details the organization becomes read-only afterwards: everything already recorded stays visible and exportable, but no new reports can be created or submitted.",
+			"cta": "Add payment details",
+			"footer": "You are receiving this email because you own this organization at zemio."
 		}
 	}
 }

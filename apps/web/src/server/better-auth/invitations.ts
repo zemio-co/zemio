@@ -1,5 +1,6 @@
-import { DEFAULT_EMAIL_FROM, ROUTES } from "@/lib/consts";
-import { getResend } from "@/server/resend";
+import { ROUTES } from "@/lib/consts";
+import { logger } from "@/lib/logger";
+import { absoluteUrl, getEmailer, logSend } from "@/server/email";
 
 type OrganizationInvitationEmailData = {
 	email: string;
@@ -18,19 +19,25 @@ export async function sendOrgInvitationEmail(
 	data: OrganizationInvitationEmailData,
 ) {
 	const inviterName = data.inviter.user.name ?? "Ein Teammitglied";
-	const acceptUrl = new URL(
-		ROUTES.ACCEPT_INVITATION(data.id),
-		process.env.BETTER_AUTH_URL,
-	).toString();
+	const acceptUrl = absoluteUrl(ROUTES.ACCEPT_INVITATION(data.id));
 
-	await getResend().emails.send({
-		from: DEFAULT_EMAIL_FROM,
-		to: data.email,
-		subject: `Einladung zu ${data.organization.name}`,
-		html: `
-      <p>${inviterName} hat dich zu <strong>${data.organization.name}</strong> eingeladen.</p>
-      <p><a href="${acceptUrl}">Einladung annehmen</a></p>
-      <p>Dieser Link verfällt in 48 Stunden.</p>
-    `,
-	});
+	// Best-effort: the invitation row exists either way and the link can be
+	// resent, so a failed send is logged rather than failing the mutation.
+	// Better Auth awaits this hook, so a throw — a misconfigured sender, a
+	// template fault — would take the whole invitation call down with it; the
+	// catch is what makes the promise above true.
+	try {
+		const result = await getEmailer().sendOrgInvitation({
+			to: data.email,
+			organizationName: data.organization.name,
+			inviterName,
+			acceptUrl,
+		});
+		logSend("email.org_invitation", result, { invitationId: data.id });
+	} catch (error) {
+		logger.error("email.org_invitation_failed", {
+			invitationId: data.id,
+			error,
+		});
+	}
 }

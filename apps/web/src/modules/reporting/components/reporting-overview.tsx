@@ -1,8 +1,8 @@
 "use client";
 
+import { Skeleton } from "@zemio/ui";
 import { useTranslations } from "next-intl";
 import type React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useReportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { cn } from "@/lib/utils";

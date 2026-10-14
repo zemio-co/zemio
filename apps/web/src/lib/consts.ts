@@ -3,7 +3,6 @@ import type { CostUnitStatus } from "@zemio/db";
 export const ROUTES = {
 	USER_DASHBOARD: "/",
 	AUTH: "/auth",
-	NO_ORG: "/no-org",
 	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
 	REPORT_DETAIL: (id: string) => `/reports/${id}`,
 	ADMIN_DASHBOARD: "/admin",
@@ -11,8 +10,6 @@ export const ROUTES = {
 	USER_SETTINGS: "/preferences",
 	PLATFORM_ADMIN_ORGANIZATIONS: "/platform-admin/organizations",
 };
-
-export const DEFAULT_EMAIL_FROM = "zemio <noreply@mail.zemio.co>";
 
 export const ADMIN_SETTINGS_MENU = {
 	GENERAL: "/admin/settings",

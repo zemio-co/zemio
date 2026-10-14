@@ -1,6 +1,9 @@
 "use client";
 
 import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
 	Properties,
 	PropertiesLabel,
 	PropertiesList,
@@ -20,7 +23,6 @@ import {
 	UserIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDateFnsLocale } from "@/hooks/use-date-fns-locale";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import { reportStatusKeys } from "@/lib/i18n-labels";

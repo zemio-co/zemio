@@ -98,8 +98,8 @@ export function createPlatformOrganizationService(deps: {
 						slug: input.slug,
 						logo: input.logo,
 						metadata: input.metadata,
-						microsoftTenantId: input.microsoftTenantId,
 					},
+					microsoftTenantId: input.microsoftTenantId,
 				});
 			} catch (error) {
 				throw mapPrismaError(error);

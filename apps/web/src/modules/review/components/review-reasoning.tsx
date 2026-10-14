@@ -1,8 +1,7 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage, Skeleton } from "@zemio/ui";
 import { useTranslations } from "next-intl";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { ReviewLoadState, ReviewReport } from "./review-types";
 

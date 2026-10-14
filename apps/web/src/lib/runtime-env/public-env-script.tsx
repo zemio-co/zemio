@@ -18,7 +18,7 @@ function serializeForScript(value: unknown): string {
  *
  * Rendered as a classic inline script in the document <head>. It executes
  * synchronously during HTML parsing, so the global is set before any client
- * code runs at hydration time — including the Sentry client instrumentation.
+ * code runs at hydration time — including the AppSignal client instrumentation.
  * This keeps the built image environment-agnostic ("build once, deploy
  * anywhere"): the browser-visible config comes from the server environment at
  * request time rather than being inlined at build time.

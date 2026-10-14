@@ -1,25 +1,23 @@
 "use client";
 
 import { keepPreviousData } from "@tanstack/react-query";
-import { differenceInDays, format } from "date-fns";
-import { useTranslations } from "next-intl";
-import React from "react";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
 	type ChartConfig,
 	ChartContainer,
 	ChartTooltip,
 	ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
 	Select,
 	SelectContent,
 	SelectGroup,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
+	Skeleton,
+} from "@zemio/ui";
+import { differenceInDays, format } from "date-fns";
+import { useTranslations } from "next-intl";
+import React from "react";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { useUpdateTimer } from "../hooks/use-update-timer";

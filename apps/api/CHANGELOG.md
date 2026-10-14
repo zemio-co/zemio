@@ -1,5 +1,12 @@
 # @zemio/api
 
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`0fa6617`](https://github.com/zemio-co/zemio/commit/0fa66171242d8cf5dfb0b0c1dea327a760a28dc9)]:
+  - @zemio/i18n@0.3.0
+
 ## 1.1.1
 
 ### Patch Changes

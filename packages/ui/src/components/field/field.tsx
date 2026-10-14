@@ -1,10 +1,38 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { cn } from "../../lib/cn";
 import { Label } from "../label";
 import { Separator } from "../separator";
+
+type FormatErrorMessage = (message: string) => React.ReactNode;
+
+const FieldErrorFormatContext = createContext<FormatErrorMessage>(
+	(message) => message,
+);
+
+/**
+ * Turns the messages `FieldError` receives into what it renders.
+ *
+ * Validation schemas may emit message keys rather than text; the package has
+ * no translations, so the app supplies the lookup once, at its root, and
+ * every form error passes through it. Without a provider messages render as
+ * they arrive.
+ */
+function FieldErrorFormatProvider({
+	format,
+	children,
+}: {
+	format: FormatErrorMessage;
+	children: React.ReactNode;
+}) {
+	return (
+		<FieldErrorFormatContext.Provider value={format}>
+			{children}
+		</FieldErrorFormatContext.Provider>
+	);
+}
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
 	return (
@@ -181,6 +209,8 @@ function FieldError({
 }: React.ComponentProps<"div"> & {
 	errors?: Array<{ message?: string } | undefined>;
 }) {
+	const format = useContext(FieldErrorFormatContext);
+
 	const content = useMemo(() => {
 		if (children) {
 			return children;
@@ -195,18 +225,22 @@ function FieldError({
 		];
 
 		if (uniqueErrors?.length === 1) {
-			return uniqueErrors[0]?.message;
+			const message = uniqueErrors[0]?.message;
+			return message && format(message);
 		}
 
 		return (
 			<ul className="ml-4 flex list-disc flex-col gap-1">
 				{uniqueErrors.map(
-					// biome-ignore lint/suspicious/noArrayIndexKey: stable index key
-					(error, index) => error?.message && <li key={index}>{error.message}</li>,
+					(error, index) =>
+						error?.message && (
+							// biome-ignore lint/suspicious/noArrayIndexKey: stable index key
+							<li key={index}>{format(error.message)}</li>
+						),
 				)}
 			</ul>
 		);
-	}, [children, errors]);
+	}, [children, errors, format]);
 
 	if (!content) {
 		return null;
@@ -229,6 +263,7 @@ export {
 	FieldContent,
 	FieldDescription,
 	FieldError,
+	FieldErrorFormatProvider,
 	FieldGroup,
 	FieldLabel,
 	FieldLegend,

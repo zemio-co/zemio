@@ -1,21 +1,23 @@
 // Multi-tenancy models, managed by the better-auth organization plugin
 
 model Organization {
-  id                String   @id
-  name              String
-  slug              String   @unique
-  logo              String?
-  metadata          String?
-  createdAt         DateTime
-  microsoftTenantId String?
+  id        String   @id
+  name      String
+  slug      String   @unique
+  logo      String?
+  metadata  String?
+  createdAt DateTime
 
   // Last Report.tag issued to this organization. Incremented atomically when
   // a report is created, which is what makes report numbers per-org.
   reportCounter Int @default(0)
 
-  // The Stripe customer this organization pays as. Null until an owner first
-  // reaches checkout — an organization that never subscribes never gets one.
-  // Unique so a Stripe customer can be traced back to exactly one organization.
+  // The Stripe customer this organization pays as. Null until it first needs
+  // one: an owner reaching checkout, or a self-created organization starting
+  // its trial, which happens at creation (ADR-0009). An organization that
+  // never does either — every organization on a deployment that does not bill
+  // — never gets one. Unique so a Stripe customer can be traced back to
+  // exactly one organization.
   stripeCustomerId String? @unique
 
   // Whether entitlement is enforced for this organization. Off by default, and
@@ -24,8 +26,13 @@ model Organization {
   // first real test of billing one customer rather than all of them (ADR-0001).
   billingEnforced Boolean @default(false)
 
-  members     Member[]
-  invitations Invitation[]
+  members      Member[]
+  invitations  Invitation[]
+  joiningRules JoiningRule[]
+
+  // The people whose last active organization this was. Only here because a
+  // relation needs both sides; nothing reads it.
+  lastActiveFor User[] @relation("LastActiveOrganization")
 
   reports        Report[]
   costUnits      CostUnit[]

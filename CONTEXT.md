@@ -26,6 +26,31 @@ _Avoid_: seat, user, participant
 A person with a Zemio login, independent of any organization.
 _Avoid_: account, profile
 
+**Verified Email**:
+An address Zemio has proof of: a mail it sent that the person opened, or a
+Microsoft sign-in from the work tenant that owns the address's domain and has
+proved it to Microsoft (ADR-0010). The second proves who administers the
+address rather than that the person reads its mail, which is the same trust a
+tenant Joining Rule already places in that tenant. An address an identity
+provider merely asserts is not verified, however it arrived. Nothing an
+address alone would grant is granted until it is verified — an **Invitation**,
+a domain **Joining Rule**, creating an **Organization**, starting a **Trial**.
+A tenant Joining Rule is the exception, because it reads a signed claim rather
+than an address (ADR-0008).
+_Avoid_: confirmed email, validated email, primary email
+
+**Joining Rule**:
+A standing statement by an organization about who may join it without being
+invited — a Microsoft tenant, an email domain, or an SSO connection — and on
+what terms: joined automatically, or admitted on request. Distinct from an
+**Invitation**, which names one person once and expires.
+_Avoid_: domain rule, auto-join, allowlist, provisioning rule
+
+**Invitation**:
+A named person's one-time, expiring grant to join a single organization,
+attributed to the member who sent it.
+_Avoid_: invite link, request, referral
+
 ### Expenses
 
 **Report**:
@@ -39,6 +64,14 @@ allowance.
 _Avoid_: line item, entry, cost
 
 ### Billing
+
+**Trial**:
+A fixed period during which a newly self-created organization is entitled
+without having paid, and without a card being required. It ends on a date
+fixed when it starts; an organization whose trial ends without a card becomes
+**Read-Only**. A person gets one trial, ever: an organization created by
+somebody who has had theirs starts without one and must subscribe.
+_Avoid_: free tier, demo, evaluation, freemium
 
 **Subscription**:
 An organization's ongoing agreement to pay for Zemio. An organization has at

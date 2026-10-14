@@ -1,6 +1,16 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { CostUnit, ReportStatus, User } from "@zemio/db";
 import { createAppTranslator } from "@zemio/i18n";
+import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
+	Badge,
+	Checkbox,
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@zemio/ui";
 import { format } from "date-fns";
 import {
 	ALargeSmallIcon,
@@ -13,14 +23,6 @@ import {
 import Link from "next/link";
 import type { FilterOption } from "@/components/data/filter-types";
 import { ListActionSlot } from "@/components/list";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { reportStatusLabel } from "@/lib/i18n-labels";
 import { StatusIcons } from "@/lib/icons";
 import { ROUTES } from "@/lib/routes";

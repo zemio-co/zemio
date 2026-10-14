@@ -14,6 +14,9 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import {
+	Avatar,
+	AvatarFallback,
+	AvatarImage,
 	Button,
 	Grid,
 	GridBody,
@@ -28,7 +31,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
 import { useMemo, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

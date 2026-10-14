@@ -6,10 +6,12 @@ import { z } from "zod";
  * These values are NOT inlined at build time. They are read from the server
  * environment at request time and injected into the document via
  * {@link PublicEnvScript}, then read back here in the browser. This keeps the
- * built image environment-agnostic ("build once, deploy anywhere").
+ * built image environment-agnostic ("build once, deploy anywhere"): the same
+ * image serves staging and production with different keys.
  */
 const publicRuntimeEnvSchema = z.object({
-	betterStackDsn: z.string().min(1).optional(),
+	appsignalFrontendKey: z.string().min(1).optional(),
+	appsignalRevision: z.string().min(1).optional(),
 });
 
 export type PublicRuntimeEnv = z.infer<typeof publicRuntimeEnvSchema>;

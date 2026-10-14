@@ -4,6 +4,7 @@ import { createAppTranslator } from "@zemio/i18n";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarHeader,
@@ -21,10 +22,9 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { isOrganizationAdminRole } from "@/lib/organization";
 import { ROUTES } from "@/lib/routes";
-import { authClient } from "@/server/better-auth/client";
 import { AppSidebarMenu } from "./app-sidebar-menu";
+import { TrialSidebarNotice } from "./trial-sidebar-notice";
 
 const t = createAppTranslator({ namespace: "modules.shared.sidebar" });
 
@@ -55,13 +55,25 @@ const sidebarItems = [
 	},
 ];
 
-function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+/**
+ * `isOrgAdmin` and `isOwner` are decided by the layout rather than read here,
+ * so that what depends on them is in the server's HTML or absent from it —
+ * asking the browser would put it in neither, and then in both.
+ */
+function AppSidebar({
+	isOrgAdmin,
+	isOwner,
+	...props
+}: React.ComponentProps<typeof Sidebar> & {
+	isOrgAdmin: boolean;
+	isOwner: boolean;
+}) {
 	const pathname = usePathname();
 
 	return (
 		<Sidebar {...props}>
-			<SidebarHeader className="h-16 px-2 py-4">
-				<AppSidebarMenu />
+			<SidebarHeader className="flex h-11 items-center justify-center border-base-200 border-b p-0">
+				<AppSidebarMenu triggerClassName="h-11 hover:bg-base-100 px-4  rounded-none w-full" />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
@@ -81,8 +93,11 @@ function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						))}
 					</SidebarMenu>
 				</SidebarGroup>
-				<SidebarAdminMenu pathname={pathname} />
+				<SidebarAdminMenu isOrgAdmin={isOrgAdmin} pathname={pathname} />
 			</SidebarContent>
+			<SidebarFooter>
+				<TrialSidebarNotice isOwner={isOwner} />
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
@@ -106,16 +121,13 @@ const sidebarAdminItems = [
 	},
 ];
 
-function SidebarAdminMenu({ pathname }: { pathname: string }) {
-	const { isPending: rolePending, data: roleData } =
-		authClient.useActiveMemberRole();
-
-	if (rolePending) return null;
-
-	const isOrgAdmin = roleData?.role
-		? isOrganizationAdminRole(roleData.role)
-		: false;
-
+function SidebarAdminMenu({
+	isOrgAdmin,
+	pathname,
+}: {
+	isOrgAdmin: boolean;
+	pathname: string;
+}) {
 	if (!isOrgAdmin) return null;
 
 	return (

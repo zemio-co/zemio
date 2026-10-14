@@ -3,8 +3,65 @@ import {
 	type BannerStatus,
 	BILLING_NOT_ENTITLED,
 	isBillingRefusal,
+	msUntilTrialDaysChange,
 	resolveBillingBanner,
+	trialDaysRemaining,
+	trialPageVariant,
 } from "./billing";
+
+describe("msUntilTrialDaysChange", () => {
+	const end = new Date("2027-01-15T12:00:00Z");
+	const DAY = 86_400_000;
+
+	it("lands exactly when the day count drops", () => {
+		const now = new Date(end.getTime() - 2.5 * DAY);
+		const ms = msUntilTrialDaysChange(end, now) ?? 0;
+
+		expect(trialDaysRemaining(end, now)).toBe(3);
+		expect(trialDaysRemaining(end, new Date(now.getTime() + ms - 1))).toBe(3);
+		expect(trialDaysRemaining(end, new Date(now.getTime() + ms))).toBe(2);
+	});
+
+	it("is never more than a day away", () => {
+		const now = new Date(end.getTime() - 10 * DAY);
+		expect(msUntilTrialDaysChange(end, now)).toBe(DAY);
+	});
+
+	it("reaches the last change, down to zero", () => {
+		const now = new Date(end.getTime() - 1000);
+		expect(msUntilTrialDaysChange(end, now)).toBe(1000);
+	});
+
+	it("schedules nothing once the trial has ended or has no end", () => {
+		expect(msUntilTrialDaysChange(end, end)).toBeNull();
+		expect(msUntilTrialDaysChange(null, end)).toBeNull();
+	});
+});
+
+describe("trialPageVariant", () => {
+	it("promises the trial only while there is one", () => {
+		expect(
+			trialPageVariant({ enabled: true, entitled: true, trialing: true }),
+		).toBe("trial");
+	});
+
+	it("asks for a subscription when the person's trial is spent", () => {
+		// Enforced and unentitled from the start (ADR-0009).
+		expect(
+			trialPageVariant({ enabled: true, entitled: false, trialing: false }),
+		).toBe("subscribe");
+	});
+
+	it("claims nothing when there is nothing to pay for yet", () => {
+		// A trial that could not start leaves the organization unenforced,
+		// entitled, and without a trial.
+		expect(
+			trialPageVariant({ enabled: true, entitled: true, trialing: false }),
+		).toBe("ready");
+		// A deployment that does not bill.
+		expect(trialPageVariant({ enabled: false, entitled: true })).toBe("ready");
+	});
+});
 
 /** A healthy, enforced organization well inside its tier. */
 const healthy: BannerStatus = {
@@ -12,6 +69,7 @@ const healthy: BannerStatus = {
 	enforced: true,
 	state: "entitled",
 	overSeatLimit: false,
+	trialing: false,
 };
 
 describe("resolveBillingBanner, when there is nothing to say", () => {
@@ -34,6 +92,7 @@ describe("resolveBillingBanner, when there is nothing to say", () => {
 				enforced: false,
 				state: "read_only",
 				overSeatLimit: true,
+				trialing: false,
 			}),
 		).toBeNull();
 	});
@@ -99,5 +158,55 @@ describe("isBillingRefusal", () => {
 		expect(isBillingRefusal(null)).toBe(false);
 		expect(isBillingRefusal(undefined)).toBe(false);
 		expect(isBillingRefusal("BILLING_NOT_ENTITLED")).toBe(false);
+	});
+});
+
+describe("resolveBillingBanner during a trial", () => {
+	it("counts a trial down from the first day", () => {
+		// A trial resolves to entitled, so without this nothing would ever
+		// mention it and it would simply stop.
+		expect(resolveBillingBanner({ ...healthy, trialing: true })).toBe("trial");
+	});
+
+	it("stays quiet about a trial nothing is enforced against", () => {
+		expect(
+			resolveBillingBanner({ ...healthy, enforced: false, trialing: true }),
+		).toBeNull();
+	});
+
+	it("reports a failing payment ahead of the countdown", () => {
+		expect(
+			resolveBillingBanner({
+				...healthy,
+				state: "payment_failing",
+				trialing: true,
+			}),
+		).toBe("payment_failing");
+	});
+
+	it("reports the countdown ahead of a seat count", () => {
+		expect(
+			resolveBillingBanner({ ...healthy, trialing: true, overSeatLimit: true }),
+		).toBe("trial");
+	});
+});
+
+describe("trialDaysRemaining", () => {
+	const now = new Date("2026-08-24T10:00:00Z");
+
+	it("counts whole days left", () => {
+		expect(trialDaysRemaining(new Date("2026-09-03T10:00:00Z"), now)).toBe(10);
+	});
+
+	it("rounds a part day up, so the last day is not reported as none", () => {
+		expect(trialDaysRemaining(new Date("2026-08-24T22:00:00Z"), now)).toBe(1);
+	});
+
+	it("never counts below zero", () => {
+		expect(trialDaysRemaining(new Date("2026-08-20T10:00:00Z"), now)).toBe(0);
+	});
+
+	it("has nothing to count without an end", () => {
+		expect(trialDaysRemaining(null, now)).toBeNull();
 	});
 });

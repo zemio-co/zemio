@@ -73,6 +73,11 @@ export type CostUnitGroup = Prisma.CostUnitGroupModel
  */
 export type CostUnit = Prisma.CostUnitModel
 /**
+ * Model JoiningRule
+ * 
+ */
+export type JoiningRule = Prisma.JoiningRuleModel
+/**
  * Model LegalAcceptance
  * 
  */

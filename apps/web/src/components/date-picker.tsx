@@ -1,19 +1,20 @@
 "use client";
 
+import {
+	Calendar,
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupInput,
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@zemio/ui";
 import { formatDate as formatDateFn } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 import { de } from "react-day-picker/locale";
-import { Calendar } from "./ui/calendar";
-import type { Input } from "./ui/input";
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupButton,
-	InputGroupInput,
-} from "./ui/input-group";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 function formatDate(date: Date | undefined): string {
 	if (!date) return "";
@@ -31,7 +32,7 @@ export function DatePicker({
 	onChange,
 	value: controlledValue,
 	...props
-}: React.ComponentProps<typeof Input>) {
+}: React.ComponentProps<"input">) {
 	const t = useTranslations("modules.shared.datePicker");
 	const [open, setOpen] = React.useState(false);
 	const [date, setDate] = React.useState<Date | undefined>(new Date());

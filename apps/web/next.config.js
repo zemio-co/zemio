@@ -4,7 +4,6 @@
  */
 
 import path from "node:path";
-import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
 import { env } from "./src/env.js";
 
@@ -17,9 +16,15 @@ const turbopackMemoryLimitMb = env.TURBOPACK_MEMORY_LIMIT_MB;
 /** @type {import("next").NextConfig} */
 const config = {
 	output: "standalone",
-	serverExternalPackages: ["pdfkit"],
+	// Emitted so AppSignal can resolve minified browser backtraces. The maps are
+	// uploaded privately and then stripped from the image — they embed the
+	// original source (sourcesContent), so serving them would publish it.
+	// See apps/web/Dockerfile and scripts/upload-sourcemaps.mjs.
+	productionBrowserSourceMaps: true,
+	// @appsignal/nodejs loads a native agent; it must stay unbundled.
+	serverExternalPackages: ["pdfkit", "@appsignal/nodejs"],
 	// @zemio/ui exports raw .ts/.tsx source rather than a prebuilt dist.
-	transpilePackages: ["@zemio/ui"],
+	transpilePackages: ["@zemio/email", "@zemio/ui"],
 	// Required for standalone output to correctly trace workspace package files
 	// (packages/db, packages/encryption) in the monorepo.
 	outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
@@ -38,34 +43,4 @@ const config = {
 	}),
 };
 
-const sourceMapUploadConfig =
-	env.SENTRY_AUTH_TOKEN && env.SENTRY_ORG && env.SENTRY_PROJECT && env.SENTRY_URL
-		? {
-				authToken: env.SENTRY_AUTH_TOKEN,
-				org: env.SENTRY_ORG,
-				project: env.SENTRY_PROJECT,
-				url: env.SENTRY_URL,
-			}
-		: {};
-
-export default withSentryConfig(withNextIntl(config), {
-	tunnelRoute: "/monitoring",
-	// Be verbose precisely when we are actually uploading source maps (i.e. when
-	// the Sentry credentials are present — the CI image build). Stay quiet locally
-	// where no auth token is configured. Using process.env.CI here does not work:
-	// CI is not propagated into the Docker build, so the upload would be silent in
-	// the one place we need its logs.
-	silent: !sourceMapUploadConfig.authToken,
-
-	// Upload a larger set of source maps for prettier stack traces (increases build time)
-	widenClientFileUpload: true,
-
-	webpack: {
-		// Tree-shaking options for reducing bundle size
-		treeshake: {
-			// Automatically tree-shake Sentry logger statements to reduce bundle size
-			removeDebugLogging: true,
-		},
-	},
-	...sourceMapUploadConfig,
-});
+export default withNextIntl(config);

@@ -26,3 +26,44 @@ export function createOrganizationSlug(name: string): string {
 		.replace(/-+/g, "-")
 		.replace(/^[-]+|[-]+$/g, "");
 }
+
+/**
+ * Why a person may not create an organization for themselves.
+ *
+ * Defined here rather than beside the rule because the rule is `server-only`
+ * and the browser needs the same strings: the procedure answers with a marker
+ * so the page can tell this `FORBIDDEN` from every other one the API raises,
+ * and offer the one action that resolves it.
+ */
+export const SELF_SERVE_REFUSAL = {
+	email_not_verified: "EMAIL_NOT_VERIFIED",
+} as const;
+
+/**
+ * Why a person may not create an organization.
+ *
+ * Derived from the markers rather than declared beside them, so a reason
+ * without a marker to travel as cannot be written in the first place.
+ */
+export type SelfServeRefusal = keyof typeof SELF_SERVE_REFUSAL;
+
+/**
+ * Which refusal a failed creation carries, or null if it was something else.
+ *
+ * Looked up in {@link SELF_SERVE_REFUSAL} rather than compared to one marker,
+ * so a reason added to the map is recognised here without anybody having to
+ * remember this function exists.
+ */
+export function selfServeRefusalOf(error: unknown): SelfServeRefusal | null {
+	if (typeof error !== "object" || error === null || !("message" in error)) {
+		return null;
+	}
+
+	const message = (error as { message?: unknown }).message;
+
+	const entry = Object.entries(SELF_SERVE_REFUSAL).find(
+		([, marker]) => marker === message,
+	);
+
+	return entry ? (entry[0] as SelfServeRefusal) : null;
+}

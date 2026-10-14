@@ -81,6 +81,7 @@ describe("billing.status with billing enabled", () => {
 			seatLimit: 25,
 			seatCount: 4,
 			overSeatLimit: false,
+			trialing: false,
 			currentPeriodEnd: PERIOD_END,
 			cancelAtPeriodEnd: false,
 		});

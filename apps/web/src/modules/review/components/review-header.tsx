@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReportStatus } from "@zemio/db";
+import { Skeleton } from "@zemio/ui";
 import {
 	BanknoteArrowDownIcon,
 	ChevronDownIcon,
@@ -8,7 +9,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type React from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { StatusIcons } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";

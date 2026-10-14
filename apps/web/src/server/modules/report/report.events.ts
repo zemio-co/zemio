@@ -6,7 +6,8 @@ export type ReportSubmittedEvent = {
 	title: string;
 	ownerName: string;
 	ownerEmail: string;
-	ownerNotificationPref: NotificationPreference | null;
+	/** Absent preferences mean `ALL`, applied by the emitter. */
+	ownerNotificationPref: NotificationPreference;
 	reviewerEmail: string | null;
 };
 
@@ -16,7 +17,8 @@ export type ReportStatusChangedEvent = {
 	status: ReportStatus;
 	ownerName: string;
 	ownerEmail: string;
-	ownerNotificationPref: NotificationPreference | null;
+	/** Absent preferences mean `ALL`, applied by the emitter. */
+	ownerNotificationPref: NotificationPreference;
 	notify: boolean;
 };
 

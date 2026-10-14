@@ -62,9 +62,6 @@ config.js
 # uploads
 apps/web/public/uploads
 
-# Sentry Config File
-.env.sentry-build-plugin
-
 # AI agent tooling (personal developer config)
 .agents/
 .claude/

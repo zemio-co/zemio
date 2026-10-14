@@ -15,6 +15,7 @@ import {
 } from "@tanstack/react-table";
 import type { CostUnitStatus } from "@zemio/db";
 import {
+	Badge,
 	Button,
 	DataGridColumnHeader,
 	Grid,
@@ -53,7 +54,6 @@ import {
 	type FilterOption,
 	isMultiSelectFilter,
 } from "@/components/data/filter-types";
-import { Badge } from "@/components/ui/badge";
 import { COST_UNIT_COLORS } from "@/lib/colors/cost-units";
 import {
 	COST_UNIT_SORT_FIELDS,

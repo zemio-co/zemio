@@ -11,6 +11,10 @@ export const ROUTES = {
 	SETTINGS_ORG_ALLOWANCES: () => "/settings/org/allowances",
 	SETTINGS_ORG_COST_UNITS: () => "/settings/org/cost-units",
 	SETTINGS_ORG_BILLING: () => "/settings/org/billing",
+	/** One named organization's billing, switching to it first. For links sent
+	 * outside a session, such as mail, which cannot know the active one. */
+	SETTINGS_ORGANIZATION_BILLING: (organizationId: string) =>
+		`/settings/billing/${encodeURIComponent(organizationId)}`,
 	// ======= ADMIN SETTINGS =========================================
 	SETTINGS_ADMIN_ORGS: () => "/settings/admin/orgs",
 	SETTINGS_ADMIN_ORG_DETAILS: (id: string) => `/settings/admin/orgs/${id}`,
@@ -25,6 +29,31 @@ export const ROUTES = {
 	USER_DASHBOARD: () => "/",
 
 	AUTH: () => "/auth",
+	// Encoded, because an address is not path-safe: a `+` in a query string
+	// reads back as a space, and the page names the address it sent to.
+	AUTH_MAGIC_LINK_SENT: (email?: string) =>
+		email
+			? `/auth/magic-link-sent?email=${encodeURIComponent(email)}`
+			: "/auth/magic-link-sent",
+	// Where the emailed link lands, and the endpoint its button then opens.
+	AUTH_MAGIC_LINK: () => "/auth/magic-link",
+	AUTH_MAGIC_LINK_VERIFY: () => "/api/auth/magic-link/verify",
+
+	// ======= ONBOARDING =============================================
+	// The flow itself, plus the page for somebody who has already been
+	// through it and belongs to nothing right now. They show the same two
+	// things to two different populations, which is why they share a shell
+	// and not a guard.
+	ONBOARDING: () => "/onboarding",
+	ONBOARDING_VERIFY_EMAIL: () => "/onboarding/verify-email",
+	ONBOARDING_NAME: () => "/onboarding/name",
+	ONBOARDING_ORGANIZATION: () => "/onboarding/organization",
+	ONBOARDING_ORGANIZATION_NEW: () => "/onboarding/organization/new",
+	ONBOARDING_INVITE: () => "/onboarding/invite",
+	ONBOARDING_TRIAL: () => "/onboarding/trial",
+	ONBOARDING_NO_ORG: () => "/onboarding/no-org",
+
+	ACCEPT_INVITATION: (id: string) => `/accept-invitation/${id}`,
 
 	LEGAL_TERMS_AND_CONDITIONS: () => "/legal/terms-and-conditions",
 	LEGAL_PRIVACY_POLICY: () => "/legal/privacy-policy",
