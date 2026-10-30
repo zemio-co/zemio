@@ -1,5 +1,16 @@
 # @zemio/web
 
+## 1.3.1
+
+### Patch Changes
+
+- [#202](https://github.com/zemio-co/zemio/pull/202) [`3ace580`](https://github.com/zemio-co/zemio/commit/3ace580582e7d6f2c05aecd1760d192207c6ef6a) Thanks [@chris23lngr](https://github.com/chris23lngr)! - Close sign-up. Microsoft sign-in and magic links now only sign in people who
+  already have a user; neither creates a new one. Existing users are unaffected.
+
+- [#204](https://github.com/zemio-co/zemio/pull/204) [`ec2f30e`](https://github.com/zemio-co/zemio/commit/ec2f30ecd9fa6e2a4466b4a13ee94b3ced7ca7ae) Thanks [@chris23lngr](https://github.com/chris23lngr)! - Publish the imprint at `/legal/imprint`, linked from the legal footer, and
+  replace the privacy policy with the new German version. The legal release moves
+  to `2026-10-30.1`, which is the version recorded for users created from now on.
+
 ## 1.3.0
 
 ### Minor Changes
