@@ -102,7 +102,7 @@ Expense-report application for student initiatives.
 
 - Microsoft OAuth only; tenant id (`microsoftTenantId`) auto-maps users to matching orgs on login
 - Active org is `session.activeOrganizationId`; tRPC context resolves `activeMember` from it
-- Legal acceptance (`CURRENT_LEGAL_RELEASE = 2026-04-14.1`) is a hard gate for `protectedProcedure`
+- Legal acceptance (`CURRENT_LEGAL_RELEASE = 2026-10-30.1`) is a hard gate for `protectedProcedure`
 
 ### Report lifecycle
 
