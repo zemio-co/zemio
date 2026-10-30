@@ -46,7 +46,7 @@ Betriebssystemangaben.
   sicheren und funktionsfähigen Angebot)
 - **Empfänger:** Hetzner Online GmbH — Verarbeitung im **Rechenzentrum Nürnberg,
   Deutschland**, siehe Abschnitt 6
-- **Speicherdauer:** `<TBD>` — nach Vorgabe des Hosting-Anbieters, kürzestmöglich
+- **Speicherdauer:** **14 Tage**, danach automatische Löschung
 
 ### 4.2 Reichweitenmessung auf der Website
 
@@ -70,19 +70,17 @@ Weil Plausible ohne Zugriff auf Informationen in Ihrem Endgerät auskommt, ist e
 Einwilligung nach § 25 Abs. 1 TDDDG nicht erforderlich. **Wir setzen deshalb kein
 Cookie-Banner ein.**
 
-### 4.3 Kontaktformular und E-Mail
+### 4.3 Kontaktaufnahme per E-Mail oder Telefon
 
-Über das Formular unter `zemio.co/contact` verarbeiten wir Ihren Namen, Ihre
-E-Mail-Adresse, das gewählte Thema und den Inhalt Ihrer Nachricht.
+Wenn Sie uns per E-Mail oder Telefon kontaktieren, verarbeiten wir Ihren Namen, Ihre
+Kontaktdaten und den Inhalt Ihrer Anfrage.
 
 - **Zweck:** Beantwortung Ihrer Anfrage
-- **Verarbeitung:** Die Absendung löst eine E-Mail an unser Geschäftspostfach aus. **Eine
-  Speicherung in einer Datenbank findet nicht statt**; Ihre Anfrage liegt ausschließlich
-  in unserem Postfach
+- **Verarbeitung:** E-Mails liegen ausschließlich in unserem Geschäftspostfach. **Eine
+  Speicherung in einer Datenbank findet nicht statt**
 - **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO bei Vertragsanbahnung, sonst
   Art. 6 Abs. 1 lit. f DSGVO
-- **Empfänger:** Hetzner Online GmbH (Übermittlung des Formulars, Verarbeitung in
-  Deutschland), Microsoft Ireland Operations Ltd. (Postfach)
+- **Empfänger:** Microsoft Ireland Operations Ltd. (Postfach)
 - **Speicherdauer:** 12 Monate nach abschließender Bearbeitung; darüber hinaus, soweit
   handels- oder steuerrechtliche Aufbewahrungsfristen bestehen
 
@@ -107,12 +105,14 @@ dieser Gespräche.
 
 ### 4.5 Nutzerkonto in der Anwendung
 
-Die Anmeldung erfolgt wahlweise über das Microsoft-Firmenkonto Ihrer Organisation oder
-mit E-Mail-Adresse und Passwort. Verarbeitet werden Name, E-Mail-Adresse, bei
-Microsoft-Anmeldung zusätzlich die Kennung des Microsoft-Mandanten, bei
-Passwort-Anmeldung ein Passwort-Hash. **Ihr Passwort selbst wird nicht gespeichert.**
+Die Anmeldung erfolgt wahlweise über Ihr Microsoft-Konto oder über einen Anmeldelink, den
+wir Ihnen per E-Mail zusenden. **Passwörter gibt es in Zemio nicht.** Verarbeitet werden
+Name und E-Mail-Adresse, bei Microsoft-Anmeldung zusätzlich die Kennung des
+Microsoft-Mandanten und, sofern in Ihrem Microsoft-Konto hinterlegt, Ihr Profilbild. Diese
+Angaben erhalten wir bei der Anmeldung von Microsoft.
 
 - **Zweck:** Bereitstellung des Zugangs, Zuordnung von Berechtigungen
+- **Empfänger:** Scaleway (Versand der Anmeldelinks, Verarbeitung in Frankreich)
 - **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO gegenüber unserem Vertragspartner;
   im Übrigen erfolgt die Verarbeitung im Auftrag Ihrer Organisation (Abschnitt 3)
 
@@ -171,7 +171,7 @@ Auftragsverarbeitung nach Art. 28 DSGVO.
 | Hetzner Online GmbH | Server, Datenbank, Speicherung der Belege **sowie Betrieb der Website `zemio.co`** | **Deutschland** (Rechenzentrum Nürnberg) |
 | Microsoft Ireland Operations Ltd. | Geschäftspostfach, Kommunikation, Dateiablage | **Deutschland** (Speicherort des Mandanten) |
 | AppSignal B.V. | Protokollverwaltung und Überwachung | **Europäischer Wirtschaftsraum** (vertraglich zugesichert); Sitz Niederlande |
-| Scaleway (Transactional Email) | Versand von Benachrichtigungs-E-Mails | **Frankreich** (Region Paris) |
+| Scaleway (Transactional Email) | Versand von E-Mails (Anmeldelinks und Benachrichtigungen) | **Frankreich** (Region Paris) |
 | Stripe Payments Europe, Limited | Rechnungsstellung und Zahlungsabwicklung | Irland, mit Verarbeitung auch in den **USA** |
 | Plausible Analytics | Reichweiten- und Ereignismessung der Website | **Deutschland** (Serverstandort), Verarbeitung innerhalb der EU |
 
@@ -230,4 +230,4 @@ Nordrhein-Westfalen, Postfach 20 04 44, 40102 Düsseldorf, Telefon +49 211 38424
 Wir passen diese Erklärung an, wenn sich die Verarbeitung ändert. Es gilt die jeweils auf
 dieser Seite veröffentlichte Fassung.
 
-**Stand:** `<TBD — Datum der Veröffentlichung eintragen>`
+**Stand:** 30. Oktober 2026
