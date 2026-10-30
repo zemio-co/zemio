@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
  * the same place to the same person a moment apart. Only the documents the
  * current legal release actually publishes are linked: `/legal/[slug]` reads
  * `CURRENT_LEGAL_RELEASE.documentKeys`, so a link to anything outside it is a
- * 404 with a reassuring name.
+ * 404 with a reassuring name. The imprint is the one exception, served beside
+ * the release because nobody accepts it.
  */
 async function LegalFooter({
 	className,
@@ -34,6 +35,7 @@ async function LegalFooter({
 				{t("termsAndConditions")}
 			</Link>
 			<Link href={ROUTES.LEGAL_PLATFORM_POLICIES()}>{t("platformPolicies")}</Link>
+			<Link href={ROUTES.LEGAL_IMPRINT()}>{t("imprint")}</Link>
 		</div>
 	);
 }

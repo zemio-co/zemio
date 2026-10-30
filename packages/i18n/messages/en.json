@@ -1211,7 +1211,8 @@
 			"footer": {
 				"privacyPolicy": "Privacy Policy",
 				"termsAndConditions": "Terms and Conditions",
-				"platformPolicies": "Platform Policies"
+				"platformPolicies": "Platform Policies",
+				"imprint": "Imprint"
 			}
 		},
 		"shared": {
