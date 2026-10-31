@@ -5,7 +5,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { cache } from "react";
 import { z } from "zod";
-import { CURRENT_LEGAL_RELEASE } from "./current-release";
+import { CURRENT_LEGAL_RELEASE, IMPRINT_DOCUMENT_KEY } from "./current-release";
 import type {
 	LegalDocumentDefinition,
 	LegalDocumentVersionSnapshot,
@@ -60,6 +60,11 @@ const loadLegalDocument = cache(
 			content,
 		};
 	},
+);
+
+export const getImprint = cache(
+	(): Promise<LegalDocumentDefinition> =>
+		loadLegalDocument(IMPRINT_DOCUMENT_KEY),
 );
 
 export const getCurrentLegalRelease = cache(

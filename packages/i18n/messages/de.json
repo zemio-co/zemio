@@ -1211,7 +1211,8 @@
 			"footer": {
 				"privacyPolicy": "Datenschutzerklärung",
 				"termsAndConditions": "Nutzungsbedingungen",
-				"platformPolicies": "Plattformrichtlinien"
+				"platformPolicies": "Plattformrichtlinien",
+				"imprint": "Impressum"
 			}
 		},
 		"shared": {

@@ -109,6 +109,8 @@ export const auth = betterAuth({
 			clientSecret: env.MICROSOFT_CLIENT_SECRET,
 			authority: "https://login.microsoftonline.com",
 			prompt: "select_account",
+			// Sign-up is closed: only people who already have a user may sign in.
+			disableSignUp: true,
 
 			/**
 			 * What Microsoft's word on an address is worth: proof when the tenant
@@ -366,10 +368,11 @@ export const auth = betterAuth({
 		 * The second way in, beside Microsoft. Opening the link proves the
 		 * mailbox, so the plugin marks the address verified — which is the same
 		 * proof `sendVerificationEmail` asks for, arriving one step earlier
-		 * (ADR-0008). Sign-up is left open: an initiative's treasurer with no
-		 * Microsoft account is exactly who self-serve onboarding is for.
+		 * (ADR-0008). Sign-up is closed, as for Microsoft: a link to an address
+		 * with no user is refused with `new_user_signup_disabled`.
 		 */
 		magicLink({
+			disableSignUp: true,
 			expiresIn: 60 * 15,
 			sendMagicLink: async ({ email, url }) => {
 				// To a page with a button rather than to the endpoint itself, so a
